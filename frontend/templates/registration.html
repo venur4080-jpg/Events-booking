@@ -11,9 +11,12 @@
         .reg-container {
             min-height: calc(100vh - 100px);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 2rem;
+            padding: 2.5rem 1.5rem 4rem;
+            max-width: 620px;
+            margin: 0 auto;
             animation: fadeIn 0.8s ease-out;
         }
 
@@ -95,13 +98,53 @@
 
         @media (max-width: 600px) {
             .input-row {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr !important;
             }
+            #passTypeGrid {
+                grid-template-columns: 1fr !important;
+                gap: 10px !important;
+            }
+            .form-container, .login-card {
+                padding: 1.4rem 1rem !important;
+            }
+        }
+
+        /* Seat Status & Pass Type Styles */
+        .reg-seat-text-soldout { color: #f87171 !important; font-weight: 700; }
+        .reg-seat-text-warning { color: #fbbf24 !important; font-weight: 700; }
+        .reg-seat-text-open { color: #34d399 !important; font-weight: 700; }
+
+        .pass-choice-card {
+            position: relative;
+            border-radius: 14px;
+            padding: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .pass-choice-inperson {
+            background: rgba(0, 242, 254, 0.08);
+            border: 2px solid var(--primary);
+        }
+        .pass-choice-livestream {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        .pass-card-soldout {
+            opacity: 0.6;
+            cursor: not-allowed !important;
+        }
+
+        .reg-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00f2fe, #4facfe);
+        }
+        .reg-progress-fill.soldout {
+            background: #ef4444;
         }
     </style>
 </head>
 
-<body>
+<body data-success="{{ '1' if success else '0' }}" data-event-id="{{ event.id if event else '' }}" data-detail-url="{{ url_for('event_detail', event_id=event.id if event else 1) }}">
     <nav class="navbar">
         <div class="nav-container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
             <div style="display: flex; align-items: center;">
@@ -136,7 +179,7 @@
 
 
     <div class="reg-container">
-        <div style="margin-bottom: 1.5rem;">
+        <div style="width: 100%; max-width: 550px; margin-bottom: 1.5rem;">
             <a href="{{ url_for('event_detail', event_id=event.id if event else 1) }}" class="back-btn-unified">
                 <span class="arrow">←</span> Back to Event Details
             </a>
@@ -161,9 +204,11 @@
                         We have dispatched your registration details along with your <strong>official admission ticket (PDF)</strong> directly to <strong>{{ email }}</strong>{% if team_name %} and your teammates' email addresses{% endif %}.
                     </p>
                 </div>
-                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                    <a href="{{ url_for('dashboard') }}" class="back-btn">Go to Dashboard</a>
-                    <a href="{{ url_for('download_ticket', event_id=event.id) }}" class="back-btn" style="background: var(--secondary); color: white;" target="_blank">Download Ticket (PDF)</a>
+                <div style="display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="{{ url_for('view_ticket_interactive', event_id=event.id) }}" class="back-btn" style="background: linear-gradient(135deg, #00f2fe, #4facfe); color: #020617; font-weight: 800; box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);">🎟️ View Holographic Pass</a>
+                    <a href="{{ url_for('download_ticket', event_id=event.id) }}" class="back-btn" style="background: rgba(255,255,255,0.12); color: white; border: 1px solid rgba(255,255,255,0.2);" target="_blank">📥 Download PDF</a>
+                    <a href="{{ url_for('event_calendar_ics', event_id=event.id) }}" class="back-btn" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">📅 Sync to Calendar</a>
+                    <a href="{{ url_for('dashboard') }}" class="back-btn">🏠 Dashboard</a>
                 </div>
             </div>
             {% else %}
@@ -179,11 +224,107 @@
                         📍 {{ event.venue or 'Tech Arena' }} ↗
                     </a>
                 </p>
+                <div style="margin-top: 10px; display: inline-flex; align-items: center; gap: 8px; background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.3); padding: 5px 14px; border-radius: 999px; font-size: 0.82rem;">
+                    <span>🪑</span>
+                    <span style="color: #cbd5e1;">Available Seats: <strong style="color: #00f2fe;">{{ event.seats_left }}</strong> / {{ event.seats_total or 100 }} Total</span>
+                    {% if event.is_in_person_sold_out %}
+                    <span class="reg-seat-text-soldout">• In-Person Sold Out</span>
+                    {% elif (event.seats_left or 100) < 15 %}
+                    <span class="reg-seat-text-warning">• {{ event.seats_left }} Left to Register</span>
+                    {% else %}
+                    <span class="reg-seat-text-open">• {{ event.seats_left }} Left to Register</span>
+                    {% endif %}
+                </div>
             </div>
 
+            {% if error %}
+            <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 1.5rem; color: #fca5a5; font-size: 0.9rem; display: flex; align-items: center; gap: 0.6rem;">
+                <span style="font-size: 1.2rem;">⚠️</span>
+                <span>{{ error }}</span>
+            </div>
+            {% endif %}
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        {% if category == 'error' and message != error %}
+                        <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 1.5rem; color: #fca5a5; font-size: 0.9rem; display: flex; align-items: center; gap: 0.6rem;">
+                            <span style="font-size: 1.2rem;">⚠️</span>
+                            <span>{{ message }}</span>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
             <form method="POST" id="regForm" onsubmit="return validateEventRegForm(this)">
-                <!-- Solo vs Team Registration Toggle -->
-                <div style="display: flex; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 12px; border: 1px solid var(--glass-border); margin-bottom: 1.5rem;">
+                <!-- Pass Type Selection (In-Person with Limit vs Unlimited Live Stream) -->
+                <div style="margin-bottom: 1.8rem;">
+                    <label style="display: block; color: var(--primary); font-weight: 700; font-size: 0.88rem; margin-bottom: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                        🎟️ Select Admission Pass Type
+                    </label>
+                    <div id="passTypeGrid" 
+                         data-sold-out="{{ '1' if event.is_in_person_sold_out else '0' }}" 
+                         data-in-person-price="{{ event.price }}" 
+                         data-stream-price="{{ event.stream_price or '₹199' }}" 
+                         style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <!-- In-Person Pass Option (Strict Capacity Limit) -->
+                        <div id="inPersonCard" onclick="selectPassType('in_person')" class="pass-choice-card pass-choice-inperson {% if event.is_in_person_sold_out %}pass-card-soldout{% endif %}">
+                            {% if event.is_in_person_sold_out %}
+                            <div style="position: absolute; top: -10px; right: 10px; background: #ef4444; color: white; font-size: 0.68rem; font-weight: 800; padding: 2px 8px; border-radius: 20px; box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);">
+                                SOLD OUT
+                            </div>
+                            {% endif %}
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                                <span style="font-size: 1.1rem;">🎟️</span>
+                                <span style="font-weight: 800; font-size: 1.05rem; color: #ffffff;">{{ event.price }}</span>
+                            </div>
+                            <div style="font-weight: 700; color: #ffffff; font-size: 0.95rem; margin-bottom: 4px;">In-Person Pass</div>
+                            <div style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.3; margin-bottom: 8px;">
+                                Physical venue admission & seated pass.
+                            </div>
+                            <!-- Limit / Capacity Info -->
+                            <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 6px 8px; font-size: 0.76rem;">
+                                <div style="display: flex; justify-content: space-between; color: #94a3b8; margin-bottom: 4px;">
+                                    <span>Limit: {{ event.seats_total or 100 }} seats</span>
+                                    {% if event.is_in_person_sold_out %}
+                                    <span class="reg-seat-text-soldout">{{ event.seats_left }} left</span>
+                                    {% elif (event.seats_left or 100) < 15 %}
+                                    <span class="reg-seat-text-warning">{{ event.seats_left }} left</span>
+                                    {% else %}
+                                    <span class="reg-seat-text-open">{{ event.seats_left }} left</span>
+                                    {% endif %}
+                                </div>
+                                <div style="width: 100%; height: 5px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                                    {% set fill_pct = ((((event.seats_filled or 0) / (event.seats_total or 100)) * 100) | round) if event.seats_total else 0 %}
+                                    <div class="reg-progress-fill {% if event.is_in_person_sold_out %}soldout{% endif %}" {{ ('style="width: ' ~ fill_pct ~ '%;"') | safe }}></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Live Stream Pass Option (Separate Amount, NO LIMIT) -->
+                        <div id="liveStreamCard" onclick="selectPassType('live_stream')" class="pass-choice-card pass-choice-livestream">
+                            <div style="position: absolute; top: -10px; right: 10px; background: linear-gradient(135deg, #10b981, #059669); color: white; font-size: 0.68rem; font-weight: 800; padding: 2px 8px; border-radius: 20px; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);">
+                                UNLIMITED
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                                <span style="font-size: 1.1rem;">📡</span>
+                                <span style="font-weight: 800; font-size: 1.05rem; color: #34d399;">{{ event.stream_price or '₹199' }}</span>
+                            </div>
+                            <div style="font-weight: 700; color: #ffffff; font-size: 0.95rem; margin-bottom: 4px;">Live Stream Pass</div>
+                            <div style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.3; margin-bottom: 8px;">
+                                Full HD live projection & interactive stream.
+                            </div>
+                            <!-- No Registration Limit -->
+                            <div style="background: rgba(16, 185, 129, 0.1); border-radius: 8px; padding: 6px 8px; font-size: 0.76rem; border: 1px solid rgba(16, 185, 129, 0.25); color: #34d399; font-weight: 600; text-align: center;">
+                                🌐 No Limit • Unlimited Virtual Access
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="pass_type" id="passTypeInput" value="{{ requested_type or ('live_stream' if event.is_in_person_sold_out else 'in_person') }}">
+                </div>
+
+                <!-- Solo vs Team Registration Toggle (Available for In-Person Pass) -->
+                <div id="regTypeToggleContainer" style="display: flex; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 12px; border: 1px solid var(--glass-border); margin-bottom: 1.5rem;">
                     <button type="button" id="soloTabBtn" onclick="setRegType('solo')" style="flex: 1; padding: 8px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.3s; background: var(--primary); color: #0f172a;">👤 Solo Pass</button>
                     <button type="button" id="teamTabBtn" onclick="setRegType('team')" style="flex: 1; padding: 8px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.3s; background: transparent; color: var(--text-muted);">👥 Team / Group</button>
                 </div>
@@ -234,33 +375,55 @@
                 <!-- Dynamic Teammate Fields -->
                 <div id="teammatesContainer" style="display: none; margin-top: 1.5rem;"></div>
 
-                {% if event.price != 'Free' %}
-                <div class="payment-section" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1);">
-                    <h3 style="color: white; margin-bottom: 1rem; font-size: 1.1rem;">Payment Information ({{ event.price }})</h3>
+                <!-- Pass Tier Selection -->
+                <div style="margin-top: 1.5rem; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.2rem;">
+                    <label style="display: block; color: var(--primary); font-weight: 700; font-size: 0.88rem; margin-bottom: 0.6rem;">🎟️ Select Pass Tier</label>
+                    <select name="pass_tier" class="input-field" style="width: 100%; cursor: pointer;">
+                        <option value="standard">Standard Delegate Pass (Full Access + Digital Certificate)</option>
+                        <option value="vip">⭐ VIP Pass (Front-row + Lunch + Networking Session)</option>
+                        <option value="student" selected>🎓 Student Scholar Pass (Verified ID Access)</option>
+                    </select>
+                </div>
+
+                <!-- Promo Code Engine -->
+                <div style="margin-top: 1.2rem; background: rgba(0,242,254,0.04); border: 1px solid rgba(0,242,254,0.25); border-radius: 12px; padding: 1.2rem;">
+                    <label style="display: block; color: #00f2fe; font-weight: 700; font-size: 0.88rem; margin-bottom: 0.4rem;">🏷️ Have a Promo Code?</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="promoCodeInput" placeholder="e.g. TECH2026, EARLYBIRD" class="input-field" style="text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">
+                        <button type="button" class="btn-primary" style="width: auto; padding: 0.6rem 1.2rem; margin: 0; font-size: 0.85rem; border-radius: 8px; font-weight: 700;" onclick="applyPromoCode()">Apply</button>
+                    </div>
+                    <div id="promoResultMsg" style="display: none; margin-top: 0.6rem; font-size: 0.82rem; font-weight: 600;"></div>
+                </div>
+
+                <!-- Payment Section (Dynamically updated based on selected Pass Type) -->
+                <div id="paymentSectionWrapper" class="payment-section" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <div>
+                            <h3 style="color: white; margin: 0; font-size: 1.1rem;">Payment Information</h3>
+                            <span id="passNamePriceLabel" style="font-size: 0.8rem; color: var(--text-muted);">In-Person Pass Fee</span>
+                        </div>
+                        <span id="displayEventPrice" style="font-size: 1.2rem; font-weight: 800; color: #00f2fe; font-family: var(--font-heading);">{{ event.price }}</span>
+                    </div>
                     <div class="payment-methods">
                         <label class="payment-option">
                             <input type="radio" name="payment_method" value="UPI" checked required>
                             <div class="payment-box">
-                                <span style="font-weight: 600;">UPI</span>
-                                <p style="font-size: 0.75rem; color: var(--text-muted);">Pay via PhonePe, GPay, Paytm, etc.</p>
+                                <span style="font-weight: 600;">UPI / Instant QR</span>
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">PhonePe, Google Pay, Paytm, BHIM</p>
                             </div>
                         </label>
                     </div>
                     
                     <div id="upi-details" style="margin-top: 1rem;">
                         <div class="input-group">
-                            <label>UPI ID (VPA)</label>
-                            <input type="text" name="upi_id" class="input-field" placeholder="username@upi" required>
+                            <label>UPI ID (VPA) *</label>
+                            <input type="text" name="upi_id" id="upiIdInput" class="input-field" placeholder="username@upi">
                         </div>
                     </div>
                 </div>
-                {% else %}
-                <input type="hidden" name="payment_method" value="N/A">
-                <input type="hidden" name="upi_id" value="N/A">
-                {% endif %}
 
                 <div style="margin-top: 2rem;">
-                    <button type="submit" class="btn-primary" style="width: 100%; font-weight: 700;">Complete Registration</button>
+                    <button type="submit" id="submitRegBtn" class="btn-primary" style="width: 100%; font-weight: 700;">Complete Registration</button>
                 </div>
                 
                 <p style="text-align: center; margin-top: 1.5rem; font-size: 0.8rem; color: var(--text-muted);">
@@ -423,8 +586,128 @@
             }
             container.innerHTML = html;
         }
-    </script>
-    <script>
+
+        const passGridEl = document.getElementById('passTypeGrid');
+        const isInPersonSoldOut = passGridEl ? (passGridEl.getAttribute('data-sold-out') === '1') : false;
+        const inPersonPrice = passGridEl ? (passGridEl.getAttribute('data-in-person-price') || 'Free') : 'Free';
+        const streamPrice = passGridEl ? (passGridEl.getAttribute('data-stream-price') || '₹199') : '₹199';
+
+        function selectPassType(type) {
+            if (type === 'in_person' && isInPersonSoldOut) {
+                if (window.showToast) {
+                    showToast('In-Person capacity limit reached! Please register for the unlimited Live Stream Pass.', 'error');
+                } else {
+                    alert('In-Person capacity limit reached! Please choose the unlimited Live Stream Pass.');
+                }
+                return;
+            }
+
+            const passInput = document.getElementById('passTypeInput');
+            const inPersonCard = document.getElementById('inPersonCard');
+            const liveStreamCard = document.getElementById('liveStreamCard');
+            const priceDisplay = document.getElementById('displayEventPrice');
+            const passLabel = document.getElementById('passNamePriceLabel');
+            const paymentSection = document.getElementById('paymentSectionWrapper');
+            const upiIdInput = document.getElementById('upiIdInput');
+            const regTypeToggle = document.getElementById('regTypeToggleContainer');
+            const submitBtn = document.getElementById('submitRegBtn');
+
+            passInput.value = type;
+
+            if (type === 'live_stream') {
+                liveStreamCard.style.background = 'rgba(16, 185, 129, 0.15)';
+                liveStreamCard.style.borderColor = '#10b981';
+                liveStreamCard.style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.25)';
+                
+                inPersonCard.style.background = 'rgba(255, 255, 255, 0.03)';
+                inPersonCard.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                inPersonCard.style.boxShadow = 'none';
+
+                if (priceDisplay) priceDisplay.textContent = streamPrice;
+                if (passLabel) passLabel.textContent = "Live Stream Pass Fee (Unlimited Virtual Access)";
+                if (submitBtn) submitBtn.textContent = `Complete Registration • Live Stream (${streamPrice})`;
+
+                // Live stream pass is individual digital pass
+                setRegType('solo');
+                if (regTypeToggle) regTypeToggle.style.display = 'none';
+
+                const isFree = streamPrice.trim().toLowerCase() === 'free';
+                if (paymentSection) paymentSection.style.display = isFree ? 'none' : 'block';
+                if (upiIdInput) {
+                    upiIdInput.required = !isFree;
+                    if (isFree) upiIdInput.value = 'N/A';
+                }
+            } else {
+                inPersonCard.style.background = 'rgba(0, 242, 254, 0.08)';
+                inPersonCard.style.borderColor = 'var(--primary)';
+                inPersonCard.style.boxShadow = '0 0 20px rgba(0, 242, 254, 0.2)';
+
+                liveStreamCard.style.background = 'rgba(255, 255, 255, 0.03)';
+                liveStreamCard.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                liveStreamCard.style.boxShadow = 'none';
+
+                if (priceDisplay) priceDisplay.textContent = inPersonPrice;
+                if (passLabel) passLabel.textContent = "In-Person Admission Pass Fee";
+                if (submitBtn) submitBtn.textContent = `Complete Registration • In-Person Pass (${inPersonPrice})`;
+
+                if (regTypeToggle) regTypeToggle.style.display = 'flex';
+
+                const isFree = inPersonPrice.trim().toLowerCase() === 'free';
+                if (paymentSection) paymentSection.style.display = isFree ? 'none' : 'block';
+                if (upiIdInput) {
+                    upiIdInput.required = !isFree;
+                    if (isFree) upiIdInput.value = 'N/A';
+                }
+            }
+        }
+
+        // Initialize pass type on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const initialType = (document.getElementById('passTypeInput') && document.getElementById('passTypeInput').value) || (isInPersonSoldOut ? 'live_stream' : 'in_person');
+            selectPassType(initialType);
+        });
+
+        async function applyPromoCode() {
+            const input = document.getElementById('promoCodeInput');
+            const msgEl = document.getElementById('promoResultMsg');
+            const code = input.value.trim().toUpperCase();
+            if (!code) {
+                msgEl.style.display = 'block';
+                msgEl.style.color = '#ef4444';
+                msgEl.textContent = 'Please enter a promo code.';
+                return;
+            }
+
+            const currentPrice = (document.getElementById('passTypeInput') && document.getElementById('passTypeInput').value === 'live_stream') ? streamPrice : inPersonPrice;
+
+            try {
+                const res = await fetch('/api/promo/validate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: code, price: currentPrice })
+                });
+                const data = await res.json();
+                msgEl.style.display = 'block';
+                if (data.ok) {
+                    msgEl.style.color = '#34d399';
+                    msgEl.textContent = data.message;
+                    const priceDisplay = document.getElementById('displayEventPrice');
+                    if (priceDisplay) {
+                        priceDisplay.innerHTML = `<span style="text-decoration: line-through; opacity: 0.6; font-size: 0.9rem; margin-right: 6px;">${currentPrice}</span> ₹${data.final_price}`;
+                    }
+                    if (window.showToast) showToast(`Promo Code ${code} Applied!`, 'success');
+                } else {
+                    msgEl.style.color = '#ef4444';
+                    msgEl.textContent = data.error || 'Invalid promo code.';
+                }
+            } catch (err) {
+                console.error("Promo error:", err);
+                msgEl.style.display = 'block';
+                msgEl.style.color = '#ef4444';
+                msgEl.textContent = 'Failed to validate promo code.';
+            }
+        }
+
         const hamburger = document.getElementById('hamburger');
         const sidebar = document.getElementById('sidebar');
         const closeSidebar = document.getElementById('closeSidebar');
@@ -440,26 +723,33 @@
         };
 
         // Mark registration success for confetti on event detail page
-        {% if success %}
-        sessionStorage.setItem('just_registered_{{ event.id }}', '1');
-        // Redirect to event detail after 2 seconds
-        setTimeout(() => {
-            window.location.href = '{{ url_for("event_detail", event_id=event.id) }}';
-        }, 2000);
-        {% endif %}
+        if (document.body && document.body.dataset && document.body.dataset.success === '1') {
+            const evId = document.body.dataset.eventId;
+            const detailUrl = document.body.dataset.detailUrl;
+            if (evId) {
+                sessionStorage.setItem('just_registered_' + evId, '1');
+            }
+            // Redirect to event detail after 2 seconds
+            setTimeout(() => {
+                if (detailUrl) {
+                    window.location.href = detailUrl;
+                }
+            }, 2000);
+        }
     </script>
 
     <script src="{{ url_for('static', filename='toast.js') }}"></script>
     <script src="{{ url_for('static', filename='confetti.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/motion@latest/dist/motion.js"></script>
     <script src="{{ url_for('static', filename='animations.js') }}"></script>
-    {% if success %}
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            window.launchConfetti && launchConfetti(3000);
-            window.showToast && showToast('Registration successful! 🎉 Redirecting...', 'success', 2500);
+            if (document.body && document.body.dataset && document.body.dataset.success === '1') {
+                window.launchConfetti && launchConfetti(3000);
+                window.showToast && showToast('Registration successful! 🎉 Redirecting...', 'success', 2500);
+            }
         });
     </script>
-    {% endif %}
 </body>
 </html>
 

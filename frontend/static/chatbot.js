@@ -102,6 +102,28 @@ Keep responses concise (2-3 sentences max). Be friendly and enthusiastic.`;
       #chatbot-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
       #chatbot-messages::-webkit-scrollbar { width: 3px; }
       #chatbot-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+
+      @media (max-width: 600px) {
+        #chatbot-trigger {
+          bottom: 1.2rem !important;
+          right: 1.2rem !important;
+          width: 50px !important;
+          height: 50px !important;
+          font-size: 1.3rem !important;
+        }
+        #chatbot-panel {
+          bottom: 4.8rem !important;
+          right: 12px !important;
+          left: 12px !important;
+          width: auto !important;
+          max-width: calc(100vw - 24px) !important;
+          max-height: min(480px, calc(100vh - 100px)) !important;
+          border-radius: 16px !important;
+        }
+        #chatbot-messages {
+          max-height: calc(100vh - 230px) !important;
+        }
+      }
     `;
     document.head.appendChild(style);
     document.body.appendChild(wrapper);

@@ -15,4 +15,6 @@ a2wsgi
 waitress
 gunicorn
 resend
+fastapi>=0.100.0
+pydantic>=2.0.0
 

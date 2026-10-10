@@ -87,7 +87,11 @@
                 <td><strong>{{ ev.title }}</strong></td>
                 <td style="color:var(--text-muted)">{{ ev.date }}</td>
                 <td><span class="badge badge-active">{{ ev.reg_count }}</span></td>
-                <td style="color:{% if ev.seats_left < 10 %}#ef4444{% else %}#10b981{% endif %}">
+                {% if ev.seats_left < 10 %}
+                <td style="color:#ef4444;font-weight:700">
+                {% else %}
+                <td style="color:#10b981;font-weight:700">
+                {% endif %}
                     {{ ev.seats_left }} / {{ ev.seats_total }}
                 </td>
             </tr>

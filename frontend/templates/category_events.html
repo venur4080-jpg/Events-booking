@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ category_info.title }} Events | EVENTS</title>
+    <meta name="description" content="Explore {{ category_info.title }} events, hackathons, concerts, competitions, and summits.">
+    <meta name="theme-color" content="{{ category_info.color or '#00f2fe' }}">
+    <link rel="manifest" href="/manifest.json">
+    <!-- Fonts and CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=5.1">
+    <style>
+        .calendar-container,
+        .calendar-container * {
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+        }
+        .calendar-container::-webkit-scrollbar,
+        .calendar-container *::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+            background: transparent !important;
+        }
+        .calendar-container {
+            max-width: 1100px;
+            width: 100%;
+            box-sizing: border-box;
+            margin: 2rem auto;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+            gap: 12px;
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }
+        .calendar-weekday, .calendar-day {
+            min-width: 0 !important;
+            box-sizing: border-box !important;
+        }
+        .calendar-events-list {
+            min-width: 0 !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
+            scrollbar-width: none !important;
+        }
+        .calendar-event-item {
+            min-width: 0 !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+        }
+        .calendar-event-title-wrapper {
+            flex: 1 !important;
+            min-width: 0 !important;
+            overflow: hidden !important;
+            white-space: nowrap !important;
+            text-overflow: ellipsis !important;
+        }
+        .event-status-dot {
+            width: 8px;
+            height: 8px;
+            min-width: 8px;
+            min-height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        .event-status-dot.dot-open {
+            background-color: #22c55e;
+            box-shadow: 0 0 6px rgba(34, 197, 94, 0.7);
+        }
+        .event-status-dot.dot-today {
+            background-color: #f59e0b;
+            box-shadow: 0 0 6px rgba(245, 158, 11, 0.7);
+        }
+        .event-status-dot.dot-closed {
+            background-color: #ef4444;
+            box-shadow: 0 0 6px rgba(239, 68, 68, 0.7);
+        }
+
+        /* Category Page Specific Enhancements */
+        .category-page-topbar {
+            max-width: 1280px;
+            margin: 1.5rem auto 0;
+            padding: 0 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            box-sizing: border-box;
+        }
+        .category-back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.6rem 1.25rem;
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(12px);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            text-decoration: none;
+        }
+        .category-back-btn:hover {
+            background: rgba(0, 242, 254, 0.15);
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateX(-4px);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
+        }
+        .category-page-banner {
+            max-width: 1280px;
+            margin: 1.5rem auto 2.5rem;
+            padding: 2.2rem 2.5rem;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 41, 59, 0.85) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            position: relative;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+        .category-page-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--cat-gradient, linear-gradient(90deg, #00f2fe, #4facfe));
+        }
+        .category-banner-left {
+            flex: 1 1 500px;
+        }
+        .category-banner-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: var(--cat-color, #00f2fe);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+        .category-banner-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin: 0 0 0.6rem 0;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .category-banner-desc {
+            color: var(--text-muted);
+            font-size: 1.02rem;
+            line-height: 1.6;
+            margin: 0 0 1.2rem 0;
+            max-width: 650px;
+        }
+        .category-banner-stats {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .category-stat-chip {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .category-banner-icon-hero {
+            width: 100px;
+            height: 100px;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            background: rgba(255, 255, 255, 0.06);
+            border: 2px solid var(--cat-color, rgba(0, 242, 254, 0.4));
+            box-shadow: 0 0 35px var(--cat-color, rgba(0, 242, 254, 0.3));
+            animation: floatGently 4s ease-in-out infinite;
+        }
+        .category-gradient-text {
+            background: var(--cat-gradient, linear-gradient(135deg, #00f2fe, #4facfe));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .seat-badge-soldout {
+            color: #f87171 !important;
+            font-weight: 700;
+            font-size: 0.72rem;
+        }
+        .seat-badge-warning {
+            color: #fbbf24 !important;
+            font-weight: 700;
+            font-size: 0.72rem;
+        }
+        .seat-badge-open {
+            color: #34d399 !important;
+            font-weight: 700;
+            font-size: 0.72rem;
+        }
+        @keyframes floatGently {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* Category Switcher Pill Tabs Ribbon */
+        .category-switcher-ribbon {
+            max-width: 1280px;
+            margin: 0 auto 1.5rem;
+            padding: 0 1.5rem;
+            box-sizing: border-box;
+            position: relative;
+        }
+        .category-pills-scroll {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 8px 4px 10px 4px;
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+            -webkit-overflow-scrolling: touch;
+        }
+        .category-pills-scroll::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+            background: transparent !important;
+        }
+        .category-pill-tab {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.6rem 1.15rem;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 999px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+            white-space: nowrap;
+            text-decoration: none;
+            flex-shrink: 0;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), background 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+        }
+        .category-pill-tab:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.28);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+        }
+        .category-pill-tab.active {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.22), rgba(79, 172, 254, 0.3));
+            border-color: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.35);
+            font-weight: 700;
+        }
+        .category-pill-tab-count {
+            background: rgba(255, 255, 255, 0.12);
+            padding: 2px 7px;
+            border-radius: 12px;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+        .category-pill-tab.active .category-pill-tab-count {
+            background: var(--primary);
+            color: var(--bg-dark);
+        }
+
+        /* View Mode Controls */
+        .category-view-modes {
+            display: inline-flex;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 4px;
+            gap: 4px;
+        }
+        .view-mode-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.5rem 0.9rem;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+        .view-mode-btn:hover {
+            color: #ffffff;
+        }
+        .view-mode-btn.active {
+            background: var(--primary);
+            color: var(--bg-dark);
+            font-weight: 700;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+        }
+
+        /* Grid View Layout */
+        .category-grid-stage {
+            max-width: 1280px;
+            margin: 2.5rem auto;
+            padding: 0 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.8rem;
+            box-sizing: border-box;
+        }
+        .grid-event-card {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            backdrop-filter: blur(16px);
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+        .grid-event-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), 0 0 25px rgba(0, 242, 254, 0.25);
+        }
+        .grid-event-card-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin: 0 0 0.45rem 0;
+            color: #ffffff;
+            line-height: 1.35;
+            min-height: 2.85rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .grid-event-card-title a {
+            color: inherit;
+            text-decoration: none;
+        }
+        .grid-venue-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.82rem;
+            margin-bottom: 0.45rem;
+            color: var(--primary);
+            height: 1.35rem;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        .grid-timing-row {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.6rem;
+            height: 1.35rem;
+            display: flex;
+            align-items: center;
+        }
+        .grid-desc-clamped {
+            font-size: 0.86rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+            min-height: 2.55rem;
+            margin: 0 0 1rem 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .grid-card-footer {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 0.85rem;
+        }
+
+        /* Empty State */
+        .category-empty-state {
+            max-width: 700px;
+            margin: 4rem auto;
+            padding: 3.5rem 2rem;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            text-align: center;
+        }
+
+        body.light-mode .category-page-banner {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(241, 245, 249, 0.9));
+            border-color: rgba(0, 0, 0, 0.1);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+        }
+        body.light-mode .category-banner-title {
+            color: #0f172a;
+        }
+        body.light-mode .category-back-btn {
+            background: #ffffff;
+            color: #0f172a;
+            border-color: rgba(0, 0, 0, 0.12);
+        }
+        body.light-mode .category-pill-tab {
+            background: #ffffff;
+            border-color: rgba(0, 0, 0, 0.1);
+            color: #475569;
+        }
+        body.light-mode .grid-event-card {
+            background: #ffffff;
+            border-color: rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+        }
+
+        @media (max-width: 768px) {
+            .category-page-topbar {
+                padding: 0 1rem !important;
+            }
+            .category-page-banner {
+                padding: 1.5rem 1.2rem !important;
+                margin: 1rem auto 1.5rem !important;
+                border-radius: 18px !important;
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 1.2rem !important;
+            }
+            .category-banner-left {
+                flex: 1 1 100% !important;
+            }
+            .category-banner-title {
+                font-size: 1.7rem !important;
+            }
+            .category-banner-icon-hero {
+                width: 72px !important;
+                height: 72px !important;
+                font-size: 2.5rem !important;
+                border-radius: 20px !important;
+            }
+            .category-switcher-ribbon {
+                padding: 0 1rem !important;
+                margin-bottom: 1rem !important;
+            }
+            .category-grid-stage {
+                grid-template-columns: 1fr !important;
+                gap: 1.2rem !important;
+                padding: 0 1rem !important;
+                margin: 1.5rem auto !important;
+            }
+        }
+    </style>
+    <!-- Theme loader -->
+    <script src="{{ url_for('static', filename='themes.js') }}?v=5.0"></script>
+</head>
+
+<body data-cat-color="{{ category_info.color or '#00f2fe' }}" data-cat-gradient="{{ category_info.gradient or 'linear-gradient(135deg, #00f2fe, #4facfe)' }}">
+    <script>
+        if (localStorage.getItem('theme') === 'light') {
+            document.body.classList.add('light-mode');
+        }
+        if (window.loadPersistedTheme) loadPersistedTheme();
+        const catCol = document.body.getAttribute('data-cat-color') || '#00f2fe';
+        const catGrad = document.body.getAttribute('data-cat-gradient') || 'linear-gradient(135deg, #00f2fe, #4facfe)';
+        document.documentElement.style.setProperty('--cat-color', catCol);
+        document.documentElement.style.setProperty('--cat-gradient', catGrad);
+    </script>
+
+    <!-- Skip Navigation -->
+    <a class="skip-nav" href="#categoryMainContent">Skip to main content</a>
+
+    <!-- Navigation -->
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
+        <div class="nav-container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <div style="display: flex; align-items: center;">
+                <button class="hamburger" id="hamburger" aria-label="Open sidebar menu" aria-expanded="false" aria-controls="sidebar" style="background:none;border:none;cursor:pointer;">☰</button>
+                <div class="logo" style="display: flex; align-items: center; gap: 10px;">
+                    <a href="{{ url_for('dashboard') }}" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit;">
+                        <img src="{{ url_for('static', filename='logo.png') }}" alt="EVENTS Logo" style="height: 35px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);">
+                        <div aria-label="EVENTS home">EV<span>ENTS</span></div>
+                    </a>
+                </div>
+            </div>
+            <div class="nav-links" style="display: flex; align-items: center; gap: 10px;">
+                <a href="{{ url_for('dashboard') }}" style="color: var(--primary); font-weight: 600; font-size: 0.9rem; text-decoration: none; margin-right: 6px;">🏠 Dashboard</a>
+                <span style="margin-right: 8px; color: var(--text-muted); font-weight: 500;">Welcome, <strong style="color: white;">{{ username }}</strong></span>
+                {% if current_user %}
+                <a href="{{ url_for('profile') }}" style="display: inline-flex; align-items: center;" title="My Profile" aria-label="Go to your profile">
+                    <img src="{{ current_user.profile_photo }}" alt="Profile picture of {{ username }}" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid var(--glass-border);">
+                </a>
+                {% endif %}
+
+                <!-- Notification Bell -->
+                <div style="position:relative;">
+                    <button id="notifBell" aria-label="Notifications" title="Notifications" style="background:transparent;border:1px solid var(--glass-border);color:var(--text-main);width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;">🔔
+                        <span id="notifBadge" style="position:absolute;top:-2px;right:-2px;background:#ef4444;color:white;width:18px;height:18px;border-radius:50%;font-size:0.7rem;font-weight:800;display:none;align-items:center;justify-content:center;">0</span>
+                    </button>
+                    <div id="notifPanel" class="notif-panel" onclick="event.stopPropagation()">
+                        <div class="notif-header">
+                            <span>🔔 Notifications</span>
+                        </div>
+                        <div id="notifList" class="notif-list-scrollable">
+                            <div style="padding:1.5rem;color:var(--text-muted);text-align:center;font-size:0.85rem">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if is_admin or session.get('username') in ['admin', 'Venu R'] %}
+                <a href="{{ url_for('admin_dashboard') }}" style="margin-right:10px;color:var(--admin-accent,#f59e0b);font-weight:700;font-size:0.85rem;text-decoration:none;" title="Admin Panel">⚡ Admin</a>
+                {% endif %}
+                <a href="{{ url_for('logout') }}" class="logout-btn-unique" aria-label="Log out of your account">⏻ Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar" role="complementary" aria-label="Sidebar navigation" aria-hidden="true">
+        <div class="sidebar-header">
+            <div class="sidebar-logo" style="display: flex; align-items: center; gap: 10px;">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="EVENTS Logo" style="height: 40px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);">
+                <div>EV<span>ENTS</span></div>
+            </div>
+            <button class="close-btn" id="closeSidebar" aria-label="Close sidebar" style="background:none;border:none;cursor:pointer;">&times;</button>
+        </div>
+        <ul class="sidebar-links" role="list">
+            <li><a href="{{ url_for('dashboard') }}">🏠 Dashboard</a></li>
+            <li><a href="{{ url_for('category_events', category_name='all') }}" class="active">🎪 Explore Categories</a></li>
+            <li><a href="{{ url_for('profile') }}">👤 My Profile</a></li>
+            <li><a href="{{ url_for('history') }}">📋 My Bookings</a></li>
+            <li><a href="{{ url_for('settings') }}">⚙️ Settings</a></li>
+            {% if is_admin or session.get('username') in ['admin', 'Venu R'] %}
+            <li><a href="{{ url_for('admin_dashboard') }}" style="color:var(--admin-accent,#f59e0b);font-weight:700">⚡ Admin Panel</a></li>
+            {% endif %}
+            {% if is_host %}
+            <li role="separator"><hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 1rem 0;"></li>
+            <li style="padding: 0 1rem; color: var(--primary); font-size: 0.8rem; font-weight: 800; text-transform: uppercase;">Host Management</li>
+            <li><a href="{{ url_for('scan_ticket') }}">🎟️ Check-In Scanner</a></li>
+            <li><a href="{{ url_for('checkin_history') }}">📅 Check-in History</a></li>
+            <li><a href="{{ url_for('add_event') }}">➕ Add New Event</a></li>
+            <li><a href="{{ url_for('host_analytics') }}">📈 Host Analytics</a></li>
+            {% endif %}
+            <li role="separator"><hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 1rem 0;"></li>
+            <li><a href="{{ url_for('logout') }}" style="color: var(--secondary);">🚪 Logout</a></li>
+        </ul>
+    </nav>
+
+    <!-- Top Navigation Bar & Breadcrumb -->
+    <div class="category-page-topbar">
+        <a href="{{ url_for('dashboard') }}" class="category-back-btn">
+            <span>←</span> Back to Dashboard
+        </a>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 0.85rem; color: var(--text-muted);">Active Domain:</span>
+            <span style="background: rgba(0, 242, 254, 0.15); color: var(--primary); border: 1px solid rgba(0, 242, 254, 0.35); padding: 4px 12px; border-radius: 999px; font-weight: 700; font-size: 0.85rem;">
+                {{ category_info.icon }} {{ category_info.title }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Category Hero Header Banner -->
+    <header class="category-page-banner" id="categoryMainContent">
+        <div class="category-banner-left">
+            <div class="category-banner-kicker">
+                <span>✨</span> {{ category_info.kicker or 'DOMAIN EXPEDITION' }}
+            </div>
+            <h1 class="category-banner-title">
+                {{ category_info.title }} <span class="category-gradient-text">Events</span>
+            </h1>
+            <p class="category-banner-desc">
+                {{ category_info.desc }}
+            </p>
+            <div class="category-banner-stats">
+                <span class="category-stat-chip">
+                    <span>⚡</span> {{ upcoming_events|length }} Upcoming Events
+                </span>
+                <span class="category-stat-chip">
+                    <span>📁</span> {{ past_events|length }} Past Archives
+                </span>
+                <span class="category-stat-chip">
+                    <span>🎟️</span> Instant Pass Booking
+                </span>
+                {% if is_host %}
+                <a href="{{ url_for('add_event') }}" class="category-stat-chip" style="background: var(--primary); color: var(--bg-dark); text-decoration: none; border-color: var(--primary);">
+                    <span>+</span> Add Event to this Category
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="category-banner-icon-hero">
+            {{ category_info.icon }}
+        </div>
+    </header>
+
+    <!-- Horizontal Category Switcher Pills Ribbon -->
+    <section class="category-switcher-ribbon" aria-label="Switch Domain Categories">
+        <div class="category-pills-scroll">
+            <a href="{{ url_for('category_events', category_name='all') }}" class="category-pill-tab {% if active_category == 'all' %}active{% endif %}">
+                <span>🌐</span> All Domains <span class="category-pill-tab-count">{{ total_events_count }}</span>
+            </a>
+            {% for cat_name, meta in categories_metadata.items() %}
+            <a href="{{ url_for('category_events', category_name=cat_name) }}" class="category-pill-tab {% if active_category == cat_name %}active{% endif %}">
+                <span>{{ meta.icon }}</span> {{ cat_name }} <span class="category-pill-tab-count">{{ category_counts.get(cat_name, 0) }}</span>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Search, Filter & View Mode Controls -->
+    <div class="search-filter-container">
+        <!-- Search Field -->
+        <div class="search-input-wrapper">
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" id="searchInput" class="search-input-field" placeholder="Search {{ category_info.title }} by title, venue, or keyword..." oninput="filterEvents()" autocomplete="off">
+        </div>
+
+        <!-- Filter & View Mode Group -->
+        <div class="filters-group">
+            <div class="select-wrapper">
+                <select id="statusFilter" class="filter-select" onchange="filterEvents()">
+                    <option value="all">All Events ({{ total_category_events }})</option>
+                    <option value="upcoming">Upcoming & Live ({{ upcoming_events|length }})</option>
+                    <option value="past">Concluded / Past ({{ past_events|length }})</option>
+                </select>
+            </div>
+
+            <div class="select-wrapper">
+                <select id="priceFilter" class="filter-select" onchange="filterEvents()">
+                    <option value="all">All Prices</option>
+                    <option value="free">Free Only</option>
+                    <option value="paid">Paid Only</option>
+                </select>
+            </div>
+
+            <!-- View Mode Switcher -->
+            <div class="category-view-modes">
+                <button type="button" class="view-mode-btn active" id="btnModeCarousel" onclick="switchViewMode('carousel')" title="Cylindrical Carousel View">
+                    🔄 Carousel
+                </button>
+                <button type="button" class="view-mode-btn" id="btnModeGrid" onclick="switchViewMode('grid')" title="Standard Grid View">
+                    🔲 Grid View
+                </button>
+                <button type="button" class="view-mode-btn" id="btnModeCalendar" onclick="switchViewMode('calendar')" title="Interactive Calendar View">
+                    📅 Calendar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1. Cylindrical Carousel View Container -->
+    <main id="carouselViewContainer" role="main" aria-label="Category Carousel">
+        {% if upcoming_events %}
+        <div class="carousel-container" id="carouselContainer" style="--carousel-radius: {{ carousel_radius }}px;">
+            <div class="circle-carousel" id="carousel" style="transform: translateZ(calc(-1 * var(--carousel-radius)));">
+                {% for event in upcoming_events %}
+                <div class="carousel-item" data-id="{{ event.id }}"
+                    style="--carousel-angle: {{ event.carousel_angle }}deg; --carousel-tz: {{ event.carousel_tz }}px;"
+                    data-title="{{ event.title|lower }}" data-category="{{ event.category }}"
+                    data-date="{{ event.date }}" data-time="{{ event.time }}" data-end-time="{{ event.end_time }}"
+                    data-cutoff-time="{{ event.cutoff_time }}"
+                    data-venue="{{ event.venue }}"
+                    data-venue-address="{{ event.venue_address }}"
+                    data-maps-url="{{ event.maps_url or ('https://www.google.com/maps/search/?api=1&query=' ~ ((event.venue ~ ' ' ~ event.venue_address) | urlencode)) }}"
+                    data-is-today="{{ '1' if event.is_today else '0' }}"
+                    data-is-open="{{ '1' if event.is_open else '0' }}"
+                    data-is-cutoff="{{ '1' if event.is_cutoff_reached else '0' }}"
+                    data-status-label="{{ event.status_label }}"
+                    data-price="{% if event.price.lower() == 'free' %}free{% else %}paid{% endif %}">
+                    
+                    <div class="glass-panel event-card {% if event.is_expired and not event.is_today %}event-expired{% endif %}">
+                        <!-- Event Image -->
+                        <a href="{{ url_for('event_detail', event_id=event.id) }}" class="image-wrapper"
+                            style="display: block; overflow: hidden; border-radius: 16px 16px 0 0; position: relative; text-decoration: none;">
+                            <img src="{{ event.image }}" alt="{{ event.title }}" class="card-image" loading="lazy"
+                                onerror="this.src='https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070&auto=format&fit=crop';">
+                            <div class="date-badge">{{ event.date }}</div>
+                            <div class="category-badge" style="position: absolute; top: 12px; left: 12px; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); padding: 4px 10px; border-radius: 20px; font-size: 0.76rem; color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.35); font-weight: 700;">
+                                {{ event.category }}
+                            </div>
+                        </a>
+
+                        <div class="card-content">
+                            <h3 class="event-title">
+                                <a href="{{ url_for('event_detail', event_id=event.id) }}" style="color: inherit; text-decoration: none;">{{ event.title }}</a>
+                            </h3>
+
+                            <!-- Event Real-Time Location & Google Maps Navigation Link -->
+                            <div class="event-venue-row" style="display: flex; align-items: center; gap: 6px; margin-bottom: 0.4rem; font-size: 0.8rem; overflow: hidden;">
+                                <a href="{{ event.maps_url or ('https://www.google.com/maps/search/?api=1&query=' ~ ((event.venue ~ ' ' ~ event.venue_address) | urlencode)) }}"
+                                   target="_blank" rel="noopener noreferrer" class="event-venue-link"
+                                   title="Open {{ event.venue }} on Google Maps"
+                                   onclick="event.stopPropagation();"
+                                   style="color: var(--primary); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%;">
+                                    <span style="flex-shrink: 0;">📍</span> <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ event.venue or 'Main Auditorium' }}</span> <span style="font-size: 0.72rem; opacity: 0.85; flex-shrink: 0;">↗</span>
+                                </a>
+                            </div>
+
+                            <!-- Timing & Status Badge -->
+                            <div class="event-time-row" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; margin-bottom: 0.5rem; font-size: 0.82rem;">
+                                <span style="color: var(--primary); font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                                    ⏰ {{ event.time }} - {{ event.end_time }}
+                                </span>
+                                {% if event.is_today %}
+                                    {% if event.is_open %}
+                                    <span style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); padding: 2px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 700;">⚡ Today (Closes {{ event.cutoff_time }})</span>
+                                    {% else %}
+                                    <span style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); padding: 2px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 700;">⛔ Closed (2h Cutoff)</span>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+
+                            <p class="event-desc">{{ event.desc }}</p>
+
+                            <!-- Available Seats with Total Seats to Register -->
+                            <div style="margin: 0.5rem 0; padding: 6px 10px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem;">
+                                <span style="color: #cbd5e1; display: inline-flex; align-items: center; gap: 4px;">
+                                    <span>🪑</span> Seats: <strong style="color: #00f2fe;">{{ event.seats_left }}</strong> / {{ event.seats_total or 100 }}
+                                </span>
+                                {% if event.is_in_person_sold_out %}
+                                <span class="seat-badge-soldout">⛔ Sold Out</span>
+                                {% elif (event.seats_left or 100) < 15 %}
+                                <span class="seat-badge-warning">{{ event.seats_left }} Left to Register</span>
+                                {% else %}
+                                <span class="seat-badge-open">{{ event.seats_left }} Left to Register</span>
+                                {% endif %}
+                            </div>
+
+                            <!-- Price Tag -->
+                            <div style="margin-top: auto; padding-bottom: 0.8rem; text-align: left;">
+                                <span class="price-tag" style="font-size: 1.45rem; font-weight: 800; letter-spacing: 0.5px;">
+                                    {{ event.price }}
+                                </span>
+                            </div>
+
+                            <div class="card-footer" style="justify-content: center;">
+                                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: nowrap;">
+                                    {% if event.is_open %}
+                                        {% if event.is_registered %}
+                                        <a href="{{ url_for('view_ticket_interactive', event_id=event.id) }}" class="register-btn-sm" style="background: rgba(0, 242, 254, 0.2); color: var(--primary); text-decoration: none; padding: 0.4rem 0.6rem; font-size: 0.8rem; white-space: nowrap;" title="Open Holographic Pass">🎟️ Pass</a>
+                                        {% if event.checked_in %}
+                                        <span class="register-btn-sm" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.35); padding: 0.4rem 0.6rem; font-size: 0.8rem; border-radius: 8px; font-weight: 700;">✓ Completed</span>
+                                        {% else %}
+                                        <button type="button" class="register-btn-sm unregister-btn" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; white-space: nowrap; cursor: pointer;" onclick="openUnregisterModal('{{ event.id }}', '{{ event.title | escape }}')">Unregister</button>
+                                        {% endif %}
+                                        {% else %}
+                                        <a href="{{ url_for('register_event', event_id=event.id) }}" class="register-btn-sm" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; padding: 0.4rem 0.8rem; font-size: 0.8rem; white-space: nowrap;">Register</a>
+                                        {% endif %}
+                                    {% else %}
+                                        {% if event.is_registered %}
+                                        <a href="{{ url_for('view_ticket_interactive', event_id=event.id) }}" class="register-btn-sm" style="background: rgba(0, 242, 254, 0.2); color: var(--primary); text-decoration: none; padding: 0.4rem 0.6rem; font-size: 0.8rem; white-space: nowrap;" title="Open Holographic Pass">🎟️ Pass</a>
+                                        {% if event.checked_in %}
+                                        <span class="register-btn-sm" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.35); padding: 0.4rem 0.6rem; font-size: 0.8rem; border-radius: 8px; font-weight: 700;">✓ Completed</span>
+                                        {% else %}
+                                        <button type="button" class="register-btn-sm unregister-btn" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; white-space: nowrap; cursor: pointer;" onclick="openUnregisterModal('{{ event.id }}', '{{ event.title | escape }}')">Unregister</button>
+                                        {% endif %}
+                                        {% else %}
+                                        <button class="register-btn-sm" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; white-space: nowrap; background: rgba(255,255,255,0.08); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1); cursor: not-allowed;" title="{{ event.status_reason }}" disabled>{% if event.is_cutoff_reached %}Cutoff Reached{% elif event.is_sold_out %}Sold Out{% else %}Closed{% endif %}</button>
+                                        {% endif %}
+                                    {% endif %}
+
+                                    {% if is_host %}
+                                    <form action="{{ url_for('delete_event', event_id=event.id) }}" method="POST" style="display: inline; margin: 0;" onsubmit="return confirmDelete(this, event);">
+                                        <button type="submit" class="register-btn-sm" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; white-space: nowrap; background: rgba(255,255,255,0.1); color: var(--text-muted); border: 1px solid var(--glass-border); cursor: pointer;">Delete</button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div style="margin-top: 10px; text-align: center;">
+                                <a href="{{ url_for('event_detail', event_id=event.id) }}" style="font-size: 0.8rem; color: var(--primary); text-decoration: none; font-weight: 600;">View Purpose & Details →</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="carousel-controls">
+                <button class="carousel-btn" onclick="rotateCarousel(-1)">◀ Prev</button>
+                <button class="carousel-btn" onclick="rotateCarousel(1)">Next ▶</button>
+            </div>
+        </div>
+        {% else %}
+        <div class="category-empty-state">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">✨</div>
+            <h2 style="color: #ffffff; margin-bottom: 0.8rem;">No Active Events in {{ category_info.title }}</h2>
+            <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 1.5rem;">There are currently no active registrations for this domain category. Check back soon or explore other categories!</p>
+            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                <a href="{{ url_for('category_events', category_name='all') }}" class="btn-primary" style="text-decoration: none; padding: 0.7rem 1.4rem; border-radius: 12px; font-weight: 700;">Explore All Categories</a>
+                <a href="{{ url_for('dashboard') }}" class="btn-secondary" style="text-decoration: none; padding: 0.7rem 1.4rem; border-radius: 12px;">Back to Dashboard</a>
+            </div>
+        </div>
+        {% endif %}
+    </main>
+
+    <!-- 2. Standard Grid View Container (Initially Hidden) -->
+    <div id="gridViewContainer" class="category-grid-stage" style="display: none;">
+        {% for event in upcoming_events %}
+        <div class="grid-event-card" data-id="{{ event.id }}" data-category="{{ event.category }}" data-price="{% if event.price.lower() == 'free' %}free{% else %}paid{% endif %}">
+            <a href="{{ url_for('event_detail', event_id=event.id) }}" style="display: block; position: relative; overflow: hidden; height: 180px; text-decoration: none;">
+                <img src="{{ event.image }}" alt="{{ event.title }}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease;" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070&auto=format&fit=crop';">
+                <div style="position: absolute; top: 10px; left: 10px; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(8px); padding: 4px 10px; border-radius: 20px; font-size: 0.74rem; color: var(--primary); font-weight: 700; border: 1px solid rgba(0, 242, 254, 0.35); z-index: 5;">
+                    {{ event.category }}
+                </div>
+                <div class="date-badge" style="position: absolute; top: 10px; right: 10px; bottom: auto; left: auto; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(8px); padding: 4px 10px; border-radius: 20px; font-size: 0.74rem; color: #ffffff; font-weight: 700; border: 1px solid rgba(255, 255, 255, 0.15); height: auto; max-height: 28px; z-index: 5; display: inline-flex; align-items: center; white-space: nowrap;">
+                    {{ event.date }}
+                </div>
+            </a>
+            <div style="padding: 1.25rem; display: flex; flex-direction: column; flex: 1; justify-content: space-between;">
+                <div>
+                    <h3 class="grid-event-card-title">
+                        <a href="{{ url_for('event_detail', event_id=event.id) }}">{{ event.title }}</a>
+                    </h3>
+                    <div class="grid-venue-row">
+                        <span>📍</span> <span>{{ event.venue or 'Auditorium' }}</span>
+                    </div>
+                    <div class="grid-timing-row">
+                        ⏰ {{ event.time }} - {{ event.end_time }}
+                    </div>
+
+                    <!-- Available Seats with Total Seats to Register -->
+                    <div style="margin: 0.5rem 0; padding: 5px 9px; background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 0.76rem;">
+                        <span style="color: #cbd5e1; display: inline-flex; align-items: center; gap: 4px;">
+                            <span>🪑</span> Seats: <strong style="color: #00f2fe;">{{ event.seats_left }}</strong> / {{ event.seats_total or 100 }}
+                        </span>
+                        {% if event.is_in_person_sold_out %}
+                        <span class="seat-badge-soldout">Sold Out</span>
+                        {% elif (event.seats_left or 100) < 15 %}
+                        <span class="seat-badge-warning">{{ event.seats_left }} Left</span>
+                        {% else %}
+                        <span class="seat-badge-open">{{ event.seats_left }} Left</span>
+                        {% endif %}
+                    </div>
+
+                    <p class="grid-desc-clamped">{{ event.desc }}</p>
+                </div>
+                <div class="grid-card-footer">
+                    <span style="font-size: 1.25rem; font-weight: 800; color: var(--primary);">{{ event.price }}</span>
+                    <a href="{{ url_for('event_detail', event_id=event.id) }}" class="btn-primary" style="text-decoration: none; padding: 0.45rem 1rem; font-size: 0.82rem; border-radius: 8px; font-weight: 700; height: 34px; display: inline-flex; align-items: center; justify-content: center; width: auto; margin: 0;">Details & Booking →</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- 3. Calendar View Container (Initially Hidden) -->
+    <div id="calendarViewContainer" class="calendar-container" style="display: none;">
+        <div class="calendar-header" style="flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; display: flex; margin-bottom: 1rem;">
+            <div style="display: flex; gap: 6px; align-items: center;">
+                <button class="calendar-nav-btn" onclick="prevMonth()" title="Previous Month">◀ Prev</button>
+                <button class="calendar-nav-btn" onclick="jumpToToday()" title="Jump to Current Month" style="background: rgba(0, 242, 254, 0.15); border-color: var(--primary); color: var(--primary);">⚡ Today</button>
+            </div>
+            <div style="text-align: center; flex: 1; min-width: 260px;">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 4px;">
+                    <h2 id="calendarTitle" style="margin: 0; font-size: 1.5rem; color: white;">Month Year</h2>
+                    <span id="calendarEventCountBadge" style="background: rgba(0, 242, 254, 0.18); color: var(--primary); border: 1px solid rgba(0, 242, 254, 0.4); font-size: 0.75rem; font-weight: 700; padding: 2px 10px; border-radius: 12px;">0 Events</span>
+                </div>
+                <div class="calendar-legend">
+                    <span style="display: inline-flex; align-items: center; gap: 5px;"><span class="event-status-dot dot-open"></span> Open / Upcoming</span>
+                    <span style="display: inline-flex; align-items: center; gap: 5px;"><span class="event-status-dot dot-today"></span> Held Today (Open - Closes 2h prior)</span>
+                    <span style="display: inline-flex; align-items: center; gap: 5px;"><span class="event-status-dot dot-closed"></span> Closed / Cutoff</span>
+                </div>
+            </div>
+            <div style="display: flex; gap: 6px; align-items: center;">
+                <button class="calendar-nav-btn" onclick="jumpToNextEventMonth()" title="Jump to Next Month with Events" style="background: rgba(255, 255, 255, 0.08);">🎯 Next Event</button>
+                <button class="calendar-nav-btn" onclick="nextMonth()" title="Next Month">Next ▶</button>
+            </div>
+        </div>
+        <div class="calendar-grid" id="calendarGrid">
+            <!-- Dynamically populated -->
+        </div>
+    </div>
+
+    <!-- 4. Past Concluded Events Section -->
+    {% if past_events %}
+    <section class="past-events-section helix-thread-section" style="max-width: 1300px; margin: 4rem auto; padding: 0 1.5rem; position: relative;">
+        <div style="text-align: center; margin-bottom: 2.5rem;">
+            <h2 class="past-events-heading" style="color: #ffffff; font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 0.6rem;">
+                Past <span class="category-gradient-text">{{ category_info.title }} Events</span>
+            </h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; max-width: 580px; margin: 0 auto 1.6rem; line-height: 1.5;">
+                Explore previously concluded events, archives, and past highlights in this domain.
+            </p>
+            <button type="button" id="togglePastEventsBtn" class="btn-past-events" style="display: inline-flex; align-items: center; gap: 8px;">
+                <span id="togglePastBtnIcon">📁</span> <span id="togglePastBtnText">Explore {{ past_events|length }} Past Events</span>
+            </button>
+        </div>
+
+        <div id="pastEventsContainer" class="past-events-screw-helix" style="display: none;">
+            <div class="helix-thread-stage">
+                {% for event in past_events %}
+                <div class="helix-thread-row" data-helix-index="{{ loop.index0 }}">
+                    <div class="glass-panel event-card helix-motion-card" data-id="{{ event.id }}"
+                        data-title="{{ event.title|lower }}" data-category="{{ event.category }}"
+                        data-date="{{ event.date }}" data-time="{{ event.time }}" data-end-time="{{ event.end_time }}"
+                        data-cutoff-time="{{ event.cutoff_time }}"
+                        data-venue="{{ event.venue }}"
+                        data-venue-address="{{ event.venue_address }}"
+                        data-maps-url="{{ event.maps_url or ('https://www.google.com/maps/search/?api=1&query=' ~ ((event.venue ~ ' ' ~ event.venue_address) | urlencode)) }}"
+                        data-is-today="{{ '1' if event.is_today else '0' }}"
+                        data-is-open="0"
+                        data-is-cutoff="{{ '1' if event.is_cutoff_reached else '0' }}"
+                        data-status-label="{{ event.status_label }}"
+                        data-price="{% if event.price.lower() == 'free' %}free{% else %}paid{% endif %}">
+                        
+                        <div class="helix-card-thread-header">
+                            <span class="helix-thread-badge">Past Event #{{ loop.index }}</span>
+                            <span class="helix-date-tag">🗓️ {{ event.date }}</span>
+                        </div>
+
+                        <a href="{{ url_for('event_detail', event_id=event.id) }}" class="image-wrapper" style="display: block; overflow: hidden; position: relative; text-decoration: none;">
+                            <img src="{{ event.image }}" alt="{{ event.title }}" style="width: 100%; height: 185px; object-fit: cover; filter: contrast(1.05) saturate(1.15);" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070&auto=format&fit=crop';">
+                            <div class="category-badge" style="position: absolute; top: 10px; right: 10px; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(8px); padding: 4px 10px; border-radius: 20px; font-size: 0.76rem; color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.35); font-weight: 600;">
+                                {{ event.category }}
+                            </div>
+                        </a>
+                        <div class="card-content" style="padding: 1.2rem 1.4rem;">
+                            <h3 class="event-title" style="color: #ffffff; font-size: 1.18rem; font-weight: 700; margin-bottom: 0.3rem;">
+                                <a href="{{ url_for('event_detail', event_id=event.id) }}" style="color: inherit; text-decoration: none;">{{ event.title }}</a>
+                            </h3>
+                            <div class="event-venue-row" style="display: flex; align-items: center; gap: 6px; margin-bottom: 0.35rem; font-size: 0.78rem; overflow: hidden;">
+                                <a href="{{ event.maps_url or ('https://www.google.com/maps/search/?api=1&query=' ~ ((event.venue ~ ' ' ~ event.venue_address) | urlencode)) }}" target="_blank" rel="noopener noreferrer" class="event-venue-link" title="Open {{ event.venue }} on Google Maps" style="color: rgba(226, 232, 240, 0.75); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; font-weight: 500;">
+                                    <span>📍</span> <span>{{ event.venue or 'Main Auditorium' }}</span> <span>↗</span>
+                                </a>
+                            </div>
+                            <div style="color: rgba(226, 232, 240, 0.7); font-size: 0.78rem; margin-bottom: 0.45rem;">
+                                ⏰ {{ event.time }} - {{ event.end_time }}
+                            </div>
+                            <p class="event-desc" style="color: rgba(203, 213, 225, 0.8); font-size: 0.88rem; line-height: 1.45; margin: 0; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ event.desc }}</p>
+                            <div style="margin-top: 1.3rem; display: flex; justify-content: space-between; gap: 10px; align-items: center; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.9rem;">
+                                <span class="helix-completed-badge">Completed</span>
+                                <div style="display: inline-flex; align-items: center; gap: 8px;">
+                                    {% if is_host %}
+                                    <form action="{{ url_for('delete_event', event_id=event.id) }}" method="POST" style="display: inline; margin: 0;" onsubmit="return confirmDelete(this, event);">
+                                        <button type="submit" class="register-btn-sm" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; white-space: nowrap; background: rgba(239,68,68,0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); cursor: pointer; border-radius: 6px;">Delete</button>
+                                    </form>
+                                    {% endif %}
+                                    <a href="{{ url_for('event_detail', event_id=event.id) }}" class="helix-detail-link">View Details →</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Footer -->
+    <footer class="site-footer glass-panel" style="margin-top: 6rem; padding: 4rem 2rem 2rem; border-radius: 0; border-left: none; border-right: none; border-bottom: none; position: relative;">
+        <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 3rem;">
+            <div style="flex: 1 1 300px;">
+                <h3 style="color: var(--primary); font-size: 1.8rem; margin-bottom: 1rem; font-weight: 800; display: flex; align-items: center; gap: 12px;">
+                    <img src="{{ url_for('static', filename='logo.png') }}" alt="EVENTS Logo" style="height: 45px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);">
+                    <div>EV<span style="color: white;">ENTS</span></div>
+                </h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem;">
+                    Empowering students & creators to connect through immersive events across tech, culture, sports, startups, and esports.
+                </p>
+            </div>
+            <div style="flex: 1 1 180px;">
+                <h4 style="color: white; margin-bottom: 1.2rem; font-size: 1.2rem;">Quick Links</h4>
+                <ul style="list-style: none; padding: 0; line-height: 2.2;">
+                    <li><a href="{{ url_for('dashboard') }}" class="footer-nav-link">🏠 Main Dashboard</a></li>
+                    <li><a href="{{ url_for('category_events', category_name='all') }}" class="footer-nav-link active">🎪 All Categories</a></li>
+                    <li><a href="{{ url_for('history') }}" class="footer-nav-link">📋 My Bookings</a></li>
+                    <li><a href="{{ url_for('profile') }}" class="footer-nav-link">👤 Profile</a></li>
+                </ul>
+            </div>
+            <div style="flex: 1 1 200px;">
+                <h4 style="color: white; margin-bottom: 1.2rem; font-size: 1.2rem;">Features</h4>
+                <ul style="list-style: none; padding: 0; line-height: 2.2;">
+                    <li><a href="{{ url_for('passport_page') }}" class="footer-nav-link">🛂 Event Passport & XP</a></li>
+                    <li><a href="{{ url_for('teams_page') }}" class="footer-nav-link">🤖 AI Team Matcher</a></li>
+                    <li><a href="{{ url_for('category_events', category_name='all') }}" class="footer-nav-link">🎟️ Holographic Pass</a></li>
+                    <li><a href="{{ url_for('history') }}" class="footer-nav-link">🎓 Verified Certificates</a></li>
+                </ul>
+            </div>
+            <div style="flex: 1 1 220px;">
+                <h4 style="color: white; margin-bottom: 1.2rem; font-size: 1.2rem;">Contact Us</h4>
+                <p style="color: var(--text-muted); font-size: 0.92rem; line-height: 1.6; margin-bottom: 0.5rem; user-select: text;">
+                    <span style="font-size: 1.1rem; vertical-align: middle; margin-right: 6px;">📞</span> +91 9686837274
+                </p>
+                <p style="color: var(--text-muted); font-size: 0.92rem; line-height: 1.6; margin-bottom: 1.5rem; word-break: break-all;">
+                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=venu.rachakondaa@gmail.com" target="_blank"
+                        rel="noopener noreferrer" style="color: var(--text-muted); text-decoration: none;">
+                        <span style="font-size: 1.1rem; vertical-align: middle; margin-right: 6px;">📧</span> venu.rachakondaa@gmail.com
+                    </a>
+                </p>
+            </div>
+        </div>
+        <div style="width: 100%; text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05); color: var(--text-muted); font-size: 0.85rem;">
+            &copy; 2026 EVENTS. All rights reserved.
+        </div>
+    </footer>
+
+    <!-- Unregister / Cancellation Reason Modal -->
+    <div id="unregisterModal" class="unreg-modal-overlay">
+        <div class="unreg-modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.2rem;">
+                <div>
+                    <h3 style="color: #ffffff; font-size: 1.35rem; font-weight: 700; margin: 0 0 4px 0;">Cancel Event Registration</h3>
+                    <p id="unregModalEventTitle" style="color: var(--primary); font-size: 0.95rem; font-weight: 600; margin: 0;"></p>
+                </div>
+                <button type="button" onclick="closeUnregisterModal()" style="background: none; border: none; color: var(--text-muted); font-size: 1.6rem; cursor: pointer; line-height: 1;" aria-label="Close modal">&times;</button>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; margin-bottom: 1.2rem;">
+                Please select the reason for unregistering. Your admission pass will be voided.
+            </p>
+            <form id="unregisterForm" method="POST" action="" onsubmit="return submitUnregisterForm(this)">
+                <input type="hidden" name="event_id" id="unregEventId" value="">
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.2rem; max-height: 300px; overflow-y: auto;">
+                    <label class="unreg-reason-option"><input type="radio" name="reason" value="Schedule conflict / Personal emergency" required> <span>Schedule conflict / Personal emergency</span></label>
+                    <label class="unreg-reason-option"><input type="radio" name="reason" value="Academic submissions or college exams"> <span>Academic submissions or college exams</span></label>
+                    <label class="unreg-reason-option"><input type="radio" name="reason" value="Venue location or transport constraints"> <span>Venue location or transport constraints</span></label>
+                    <label class="unreg-reason-option"><input type="radio" name="reason" value="Team members unavailable"> <span>Team members unavailable</span></label>
+                    <label class="unreg-reason-option"><input type="radio" name="reason" value="Other" id="reasonOtherRadio" onchange="handleReasonChange(this)"> <span>Other</span></label>
+                </div>
+                <div id="otherFeedbackContainer" style="display: none; margin-bottom: 1.2rem;">
+                    <textarea id="cancellationFeedback" name="feedback" rows="3" class="input-field" placeholder="Tell us why you are unregistering..."></textarea>
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end; align-items: center;">
+                    <button type="button" onclick="closeUnregisterModal()" class="btn-secondary" style="padding: 0.65rem 1.2rem; border-radius: 10px; font-weight: 600; cursor: pointer;">Keep Registration</button>
+                    <button type="submit" class="btn-primary" style="padding: 0.65rem 1.4rem; background: #ef4444; color: #ffffff; border-radius: 10px; font-weight: 700; border: none; cursor: pointer;">Confirm Unregister</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="custom-modal">
+        <div class="modal-content glass-panel">
+            <h3 style="color: white; margin-bottom: 1rem; font-size: 1.5rem;">Delete Event</h3>
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">Are you absolutely sure you want to delete this event? This action cannot be undone.</p>
+            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                <button class="register-btn-sm" style="background: transparent; border: 1px solid var(--glass-border); color: white;" onclick="closeDeleteModal()">Cancel</button>
+                <button class="register-btn-sm" style="background: #ef4444; color: white;" onclick="executeDelete()">Yes, Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/motion@latest/dist/motion.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='animations.js') }}"></script>
+    <script>
+        // Sidebar controls
+        const hamburger = document.getElementById('hamburger');
+        const sidebar = document.getElementById('sidebar');
+        const closeSidebar = document.getElementById('closeSidebar');
+
+        if (hamburger && sidebar) {
+            hamburger.onclick = () => {
+                sidebar.classList.add('active');
+                sidebar.setAttribute('aria-hidden', 'false');
+                hamburger.setAttribute('aria-expanded', 'true');
+            };
+        }
+        if (closeSidebar && sidebar) {
+            closeSidebar.onclick = () => {
+                sidebar.classList.remove('active');
+                sidebar.setAttribute('aria-hidden', 'true');
+                hamburger.setAttribute('aria-expanded', 'false');
+            };
+        }
+        document.addEventListener('click', (e) => {
+            if (sidebar && hamburger && !sidebar.contains(e.target) && !hamburger.contains(e.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Carousel & Data Suite
+        let currentAngle = 0;
+        let rotationStep = 0;
+        let upcomingEventsData = [];
+        let pastEventsData = [];
+        let allCategoryEventsData = [];
+
+        // View Mode Switcher
+        function switchViewMode(mode) {
+            const carouselSec = document.getElementById('carouselViewContainer');
+            const gridSec = document.getElementById('gridViewContainer');
+            const calSec = document.getElementById('calendarViewContainer');
+            const btnCarousel = document.getElementById('btnModeCarousel');
+            const btnGrid = document.getElementById('btnModeGrid');
+            const btnCal = document.getElementById('btnModeCalendar');
+
+            if (btnCarousel) btnCarousel.classList.remove('active');
+            if (btnGrid) btnGrid.classList.remove('active');
+            if (btnCal) btnCal.classList.remove('active');
+
+            if (carouselSec) carouselSec.style.display = 'none';
+            if (gridSec) gridSec.style.display = 'none';
+            if (calSec) calSec.style.display = 'none';
+
+            if (mode === 'carousel') {
+                if (carouselSec) carouselSec.style.display = 'block';
+                if (btnCarousel) btnCarousel.classList.add('active');
+            } else if (mode === 'grid') {
+                if (gridSec) gridSec.style.display = 'grid';
+                if (btnGrid) btnGrid.classList.add('active');
+            } else if (mode === 'calendar') {
+                if (calSec) calSec.style.display = 'block';
+                if (btnCal) btnCal.classList.add('active');
+                renderCalendar();
+            }
+        }
+
+        // Wheel and touchpad swipe logic for carousel
+        let wheelAccX = 0;
+        let wheelAccY = 0;
+        let isWheelCooldown = false;
+        let wheelResetTimer = null;
+        const WHEEL_THRESHOLD = 20;
+        const WHEEL_COOLDOWN = 400;
+
+        function handleCarouselWheel(e) {
+            let rawDx = e.deltaX;
+            let rawDy = e.deltaY;
+            if (e.shiftKey && !rawDx && rawDy) { rawDx = rawDy; rawDy = 0; }
+            if (e.deltaMode === 1) { rawDx *= 24; rawDy *= 24; }
+            else if (e.deltaMode === 2) { rawDx *= 300; rawDy *= 300; }
+
+            const absDx = Math.abs(rawDx);
+            const absDy = Math.abs(rawDy);
+            if (isWheelCooldown) {
+                if (absDx > absDy && e.cancelable) e.preventDefault();
+                return;
+            }
+            if (wheelResetTimer) clearTimeout(wheelResetTimer);
+            wheelResetTimer = setTimeout(() => { wheelAccX = 0; wheelAccY = 0; }, 180);
+
+            wheelAccX += rawDx;
+            wheelAccY += rawDy;
+            const totalAbsX = Math.abs(wheelAccX);
+            const totalAbsY = Math.abs(wheelAccY);
+
+            if (totalAbsX > totalAbsY && totalAbsX > 5) {
+                if (e.cancelable) e.preventDefault();
+                if (totalAbsX >= WHEEL_THRESHOLD) {
+                    if (wheelAccX > 0) rotateCarousel(1);
+                    else rotateCarousel(-1);
+                    wheelAccX = 0; wheelAccY = 0;
+                    if (wheelResetTimer) clearTimeout(wheelResetTimer);
+                    isWheelCooldown = true;
+                    setTimeout(() => { isWheelCooldown = false; }, WHEEL_COOLDOWN);
+                }
+            } else if (totalAbsY > 30 && totalAbsY > totalAbsX * 1.5) {
+                wheelAccX = 0;
+            }
+        }
+
+        function initCarouselTouchpad() {
+            const container = document.getElementById('carouselContainer');
+            if (!container) return;
+            container.removeEventListener('wheel', handleCarouselWheel);
+            container.addEventListener('wheel', handleCarouselWheel, { passive: false });
+
+            let isPointerDown = false;
+            let startPointerX = 0;
+            let currentPointerDx = 0;
+
+            container.addEventListener('pointerdown', (e) => {
+                if (e.target.closest('button, a, input, form')) return;
+                isPointerDown = true;
+                startPointerX = e.clientX;
+                currentPointerDx = 0;
+            });
+            container.addEventListener('pointermove', (e) => {
+                if (!isPointerDown) return;
+                currentPointerDx = e.clientX - startPointerX;
+            });
+            const endPointerSwipe = () => {
+                if (!isPointerDown) return;
+                isPointerDown = false;
+                if (Math.abs(currentPointerDx) > 40) {
+                    if (currentPointerDx < 0) rotateCarousel(1);
+                    else rotateCarousel(-1);
+                }
+                currentPointerDx = 0;
+            };
+            container.addEventListener('pointerup', endPointerSwipe);
+            container.addEventListener('pointercancel', endPointerSwipe);
+        }
+
+        function rotateCarousel(direction) {
+            currentAngle -= direction * rotationStep;
+            const carousel = document.getElementById('carousel');
+            if (carousel) {
+                carousel.style.transform = `translateZ(calc(-1 * var(--carousel-radius))) rotateY(${currentAngle}deg)`;
+            }
+        }
+
+        function initEventsData() {
+            upcomingEventsData = [];
+            pastEventsData = [];
+            allCategoryEventsData = [];
+
+            const items = document.querySelectorAll('.carousel-item');
+            items.forEach(item => {
+                const titleEl = item.querySelector('.event-title');
+                const imageEl = item.querySelector('.card-image');
+                const dateEl = item.querySelector('.date-badge');
+                const descEl = item.querySelector('.event-desc');
+                const id = item.getAttribute('data-id') || '';
+                const isExpired = item.querySelector('.event-expired') !== null || item.getAttribute('data-status') === 'past';
+                const time = item.getAttribute('data-time') || '10:00 AM';
+                const endTime = item.getAttribute('data-end-time') || '05:00 PM';
+                const cutoffTime = item.getAttribute('data-cutoff-time') || '';
+                const isToday = item.getAttribute('data-is-today') === '1';
+                const isOpen = item.getAttribute('data-is-open') === '1';
+                const isCutoff = item.getAttribute('data-is-cutoff') === '1';
+
+                const evObj = {
+                    id: parseInt(id) || 0,
+                    title: titleEl ? titleEl.textContent.trim() : '',
+                    category: item.getAttribute('data-category'),
+                    price: item.getAttribute('data-price'),
+                    status: 'upcoming',
+                    date: dateEl ? dateEl.textContent.trim() : (item.getAttribute('data-date') || ''),
+                    time: time,
+                    endTime: endTime,
+                    cutoffTime: cutoffTime,
+                    venue: item.getAttribute('data-venue') || 'Main Auditorium',
+                    venueAddress: item.getAttribute('data-venue-address') || '',
+                    mapsUrl: item.getAttribute('data-maps-url') || '',
+                    isToday: isToday,
+                    isOpen: isOpen,
+                    isCutoff: isCutoff,
+                    desc: descEl ? descEl.textContent.trim() : '',
+                    image: imageEl ? imageEl.src : '',
+                    element: item,
+                    isPast: isExpired
+                };
+                upcomingEventsData.push(evObj);
+                allCategoryEventsData.push(evObj);
+            });
+
+            const pastCards = document.querySelectorAll('#pastEventsContainer .event-card');
+            pastCards.forEach(card => {
+                const titleEl = card.querySelector('.event-title');
+                const id = card.getAttribute('data-id') || '';
+                const category = card.getAttribute('data-category');
+                const price = card.getAttribute('data-price');
+                const descEl = card.querySelector('.event-desc');
+
+                const evObj = {
+                    id: parseInt(id) || 0,
+                    title: titleEl ? titleEl.textContent.trim() : '',
+                    category: category,
+                    price: price,
+                    status: 'past',
+                    date: card.getAttribute('data-date') || '',
+                    time: card.getAttribute('data-time') || '10:00 AM',
+                    endTime: card.getAttribute('data-end-time') || '05:00 PM',
+                    cutoffTime: card.getAttribute('data-cutoff-time') || '',
+                    venue: card.getAttribute('data-venue') || 'Main Auditorium',
+                    desc: descEl ? descEl.textContent.trim() : '',
+                    element: card,
+                    isPast: true
+                };
+                pastEventsData.push(evObj);
+                allCategoryEventsData.push(evObj);
+            });
+
+            const totalEvents = upcomingEventsData.length;
+            rotationStep = totalEvents > 0 ? 360 / totalEvents : 0;
+            initCarouselTouchpad();
+        }
+
+        // Live Filtering
+        function filterEvents() {
+            const searchVal = (document.getElementById('searchInput') ? document.getElementById('searchInput').value : '').toLowerCase().trim();
+            const priceVal = document.getElementById('priceFilter') ? document.getElementById('priceFilter').value : 'all';
+            const statusVal = document.getElementById('statusFilter') ? document.getElementById('statusFilter').value : 'all';
+
+            let visibleCount = 0;
+            upcomingEventsData.forEach(ev => {
+                const matchSearch = !searchVal || ev.title.toLowerCase().includes(searchVal) || ev.desc.toLowerCase().includes(searchVal) || (ev.venue && ev.venue.toLowerCase().includes(searchVal));
+                const matchPrice = priceVal === 'all' || ev.price === priceVal;
+                const matchStatus = statusVal === 'all' || statusVal === 'upcoming';
+
+                if (matchSearch && matchPrice && matchStatus) {
+                    if (ev.element) ev.element.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    if (ev.element) ev.element.style.display = 'none';
+                }
+            });
+
+            // Filter Grid Items
+            const gridCards = document.querySelectorAll('.grid-event-card');
+            gridCards.forEach(card => {
+                const title = (card.querySelector('h3') ? card.querySelector('h3').textContent : '').toLowerCase();
+                const desc = (card.querySelector('p') ? card.querySelector('p').textContent : '').toLowerCase();
+                const venue = (card.querySelector('.grid-venue-row') ? card.querySelector('.grid-venue-row').textContent : '').toLowerCase();
+                const price = card.getAttribute('data-price');
+
+                const matchSearch = !searchVal || title.includes(searchVal) || desc.includes(searchVal) || venue.includes(searchVal);
+                const matchPrice = priceVal === 'all' || price === priceVal;
+                const matchStatus = statusVal === 'all' || statusVal === 'upcoming';
+
+                card.style.display = (matchSearch && matchPrice && matchStatus) ? 'flex' : 'none';
+            });
+
+            // If past selected, control past events section
+            const pastSection = document.querySelector('.past-events-section');
+            if (pastSection) {
+                if (statusVal === 'upcoming') {
+                    pastSection.style.display = 'none';
+                } else {
+                    pastSection.style.display = 'block';
+                }
+            }
+
+            recalculateCarousel(visibleCount);
+            renderCalendar();
+        }
+
+        function recalculateCarousel(visibleCount) {
+            const carousel = document.getElementById('carousel');
+            const carouselContainer = document.getElementById('carouselContainer');
+            if (!carousel || !carouselContainer) return;
+
+            if (visibleCount === 0) {
+                carouselContainer.style.display = 'none';
+                return;
+            }
+            carouselContainer.style.display = 'block';
+
+            let radius = 0;
+            if (visibleCount > 1) {
+                radius = Math.round((350 / 2) / Math.tan(Math.PI / visibleCount));
+            }
+            radius = Math.max(radius + 50, 450);
+            carouselContainer.style.setProperty('--carousel-radius', radius + 'px');
+
+            let index = 0;
+            upcomingEventsData.forEach(ev => {
+                if (ev.element && ev.element.style.display !== 'none') {
+                    const angle = Math.round((360 / visibleCount) * index * 100) / 100;
+                    ev.element.style.setProperty('--carousel-angle', angle + 'deg');
+                    ev.element.style.setProperty('--carousel-tz', radius + 'px');
+                    index++;
+                }
+            });
+
+            rotationStep = visibleCount > 0 ? 360 / visibleCount : 0;
+            currentAngle = 0;
+            carousel.style.transform = `translateZ(calc(-1 * var(--carousel-radius))) rotateY(${currentAngle}deg)`;
+            initCarouselTouchpad();
+        }
+
+        // Calendar View Engine
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        function renderCalendar() {
+            const gridEl = document.getElementById('calendarGrid');
+            const titleEl = document.getElementById('calendarTitle');
+            const countBadge = document.getElementById('calendarEventCountBadge');
+            if (!gridEl || !titleEl) return;
+
+            gridEl.innerHTML = '';
+            titleEl.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+            const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            weekdays.forEach(day => {
+                const dayEl = document.createElement('div');
+                dayEl.className = 'calendar-weekday';
+                dayEl.textContent = day;
+                gridEl.appendChild(dayEl);
+            });
+
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day empty';
+                gridEl.appendChild(emptyDay);
+            }
+
+            const searchVal = (document.getElementById('searchInput') ? document.getElementById('searchInput').value : '').toLowerCase().trim();
+            const priceVal = document.getElementById('priceFilter') ? document.getElementById('priceFilter').value : 'all';
+            const statusVal = document.getElementById('statusFilter') ? document.getElementById('statusFilter').value : 'all';
+
+            const eventsByDay = {};
+            const allEvents = allCategoryEventsData;
+            let matchingThisMonthCount = 0;
+
+            const now = new Date();
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            allEvents.forEach(ev => {
+                const matchSearch = !searchVal || ev.title.toLowerCase().includes(searchVal) || (ev.desc && ev.desc.toLowerCase().includes(searchVal)) || (ev.venue && ev.venue.toLowerCase().includes(searchVal));
+                const matchPrice = priceVal === 'all' || ev.price === priceVal;
+                const matchStatus = statusVal === 'all' || (statusVal === 'past' ? ev.isPast : !ev.isPast);
+                if (!matchSearch || !matchPrice || !matchStatus) return;
+
+                try {
+                    const dateObj = new Date(ev.date);
+                    if (!isNaN(dateObj.getTime()) && dateObj.getMonth() === currentMonth && dateObj.getFullYear() === currentYear) {
+                        const day = dateObj.getDate();
+                        if (!eventsByDay[day]) eventsByDay[day] = [];
+                        eventsByDay[day].push(ev);
+                        matchingThisMonthCount++;
+                    }
+                } catch (e) { }
+            });
+
+            if (countBadge) {
+                countBadge.textContent = `${matchingThisMonthCount} Event${matchingThisMonthCount === 1 ? '' : 's'}`;
+                countBadge.style.display = matchingThisMonthCount > 0 ? 'inline-block' : 'none';
+            }
+
+            for (let d = 1; d <= totalDays; d++) {
+                const dayEl = document.createElement('div');
+                dayEl.className = 'calendar-day';
+                dayEl.style.position = 'relative';
+
+                const isTodayCell = (d === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear());
+                if (isTodayCell) dayEl.classList.add('today');
+
+                const numEl = document.createElement('div');
+                numEl.className = 'calendar-day-number';
+                numEl.textContent = d;
+                dayEl.appendChild(numEl);
+
+                if (eventsByDay[d] && eventsByDay[d].length > 0) {
+                    const listEl = document.createElement('div');
+                    listEl.className = 'calendar-events-list';
+
+                    eventsByDay[d].forEach(ev => {
+                        const itemEl = document.createElement('div');
+                        itemEl.className = 'calendar-event-item';
+                        itemEl.onclick = () => { window.location.href = `/event/${ev.id}`; };
+
+                        const dotEl = document.createElement('span');
+                        dotEl.className = `event-status-dot ${ev.isToday ? 'dot-today' : (ev.isPast ? 'dot-closed' : 'dot-open')}`;
+
+                        const titleWrapper = document.createElement('div');
+                        titleWrapper.className = 'calendar-event-title-wrapper';
+                        titleWrapper.textContent = ev.title;
+
+                        itemEl.appendChild(dotEl);
+                        itemEl.appendChild(titleWrapper);
+                        listEl.appendChild(itemEl);
+                    });
+                    dayEl.appendChild(listEl);
+                }
+                gridEl.appendChild(dayEl);
+            }
+        }
+
+        function prevMonth() {
+            currentMonth--;
+            if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+            renderCalendar();
+        }
+        function nextMonth() {
+            currentMonth++;
+            if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+            renderCalendar();
+        }
+        function jumpToToday() {
+            currentMonth = new Date().getMonth();
+            currentYear = new Date().getFullYear();
+            renderCalendar();
+        }
+        function jumpToNextEventMonth() {
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const future = allCategoryEventsData
+                .map(ev => ({ ev, d: new Date(ev.date) }))
+                .filter(i => !isNaN(i.d.getTime()) && i.d >= today)
+                .sort((a,b) => a.d - b.d);
+            if (future.length > 0) {
+                currentMonth = future[0].d.getMonth();
+                currentYear = future[0].d.getFullYear();
+                renderCalendar();
+            }
+        }
+
+        // Toggle Past Events Visibility
+        const togglePastEventsBtn = document.getElementById('togglePastEventsBtn');
+        const pastEventsContainer = document.getElementById('pastEventsContainer');
+        const togglePastBtnText = document.getElementById('togglePastBtnText');
+        const togglePastBtnIcon = document.getElementById('togglePastBtnIcon');
+
+        if (togglePastEventsBtn && pastEventsContainer) {
+            togglePastEventsBtn.onclick = () => {
+                const isHidden = pastEventsContainer.style.display === 'none' || pastEventsContainer.style.display === '';
+                if (isHidden) {
+                    pastEventsContainer.style.display = 'block';
+                    if (togglePastBtnText) togglePastBtnText.textContent = 'Hide Past Events';
+                    if (togglePastBtnIcon) togglePastBtnIcon.textContent = '📂';
+                    togglePastEventsBtn.classList.add('active');
+                } else {
+                    pastEventsContainer.style.display = 'none';
+                    if (togglePastBtnText) togglePastBtnText.textContent = 'Explore Past Events';
+                    if (togglePastBtnIcon) togglePastBtnIcon.textContent = '📁';
+                    togglePastEventsBtn.classList.remove('active');
+                }
+            };
+        }
+
+        // Delete Modal Logic
+        let formToDelete = null;
+        function confirmDelete(form, event) {
+            event.preventDefault();
+            formToDelete = form;
+            const modal = document.getElementById('deleteModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                setTimeout(() => modal.classList.add('active'), 10);
+            }
+            return false;
+        }
+        function closeDeleteModal() {
+            formToDelete = null;
+            const modal = document.getElementById('deleteModal');
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.style.display = 'none', 300);
+            }
+        }
+        function executeDelete() {
+            if (formToDelete) formToDelete.submit();
+        }
+
+        // Unregister Modal Logic
+        function openUnregisterModal(eventId, eventTitle) {
+            const modal = document.getElementById('unregisterModal');
+            const form = document.getElementById('unregisterForm');
+            const titleEl = document.getElementById('unregModalEventTitle');
+            if (!modal || !form) return;
+            form.action = `/unregister/${eventId}`;
+            document.getElementById('unregEventId').value = eventId;
+            if (titleEl) titleEl.textContent = eventTitle || `Event #${eventId}`;
+            modal.style.display = 'flex';
+        }
+        function closeUnregisterModal() {
+            const modal = document.getElementById('unregisterModal');
+            if (modal) modal.style.display = 'none';
+        }
+        function handleReasonChange(radio) {
+            const feedbackBox = document.getElementById('otherFeedbackContainer');
+            if (feedbackBox) feedbackBox.style.display = (radio.value === 'Other') ? 'block' : 'none';
+        }
+        function submitUnregisterForm(form) {
+            const selected = form.querySelector('input[name="reason"]:checked');
+            if (!selected) {
+                alert('Please select a reason for cancellation.');
+                return false;
+            }
+            return true;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initEventsData();
+
+            // Category ribbon horizontal wheel scrolling & active tab auto-center
+            const pillsScroll = document.querySelector('.category-pills-scroll');
+            if (pillsScroll) {
+                pillsScroll.addEventListener('wheel', (e) => {
+                    if (e.deltaY !== 0 && !e.shiftKey) {
+                        e.preventDefault();
+                        pillsScroll.scrollLeft += e.deltaY;
+                    }
+                }, { passive: false });
+
+                const activeTab = pillsScroll.querySelector('.category-pill-tab.active');
+                if (activeTab) {
+                    activeTab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                }
+            }
+        });
+    </script>
+
+    <!-- Additional Modules -->
+    <script src="{{ url_for('static', filename='toast.js') }}"></script>
+    <script src="{{ url_for('static', filename='notifications.js') }}"></script>
+    <script src="{{ url_for('static', filename='chatbot.js') }}?v=5.0"></script>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, msg in messages %}
+    <div data-flash="{{ msg }}" data-flash-type="{{ category }}"></div>
+    {% endfor %}
+    {% endwith %}
+</body>
+
+</html>

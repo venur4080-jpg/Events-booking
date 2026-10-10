@@ -13,6 +13,7 @@ import requests
 from datetime import datetime, timedelta
 import io
 import os
+import hashlib
 import base64
 import csv
 import json
@@ -106,41 +107,5046 @@ def _connect_smtp_server(smtp_server: str = 'smtp.gmail.com', smtp_port: int = 4
 import math
 import base64
 EVENTS = [
-    {"id": 1, "title": "TechNova Codeathon", "date": "Mar 15, 2026", "time": "10:00 AM", "end_time": "05:00 PM", "desc": "24-hour intense coding marathon.", "price": "Free", "color": "#4facfe", "image": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80", "purpose": "Rapid prototyping and problem solving.", "full_details": "A 24-hour marathon where teams build solutions for real-world problems. Includes mentorship, workshops, and high-intensity coding.", "outcome": "Win prizes, gain deep technical experience, and network with tech leaders.", "venue": "Bangalore International Exhibition Centre (BIEC)", "venue_address": "10th Mile, Tumkur Road, Madavara Post, Dasanapura Hobli, Bengaluru, Karnataka 560073"},
-    {"id": 2, "title": "AI & ML Summit", "date": "Mar 20, 2026", "time": "09:30 AM", "end_time": "04:30 PM", "desc": "Explore the future of AI with experts.", "price": "₹800", "color": "#00f2fe", "image": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80", "purpose": "Knowledge sharing on cutting-edge AI trends.", "full_details": "Deep dive into Generative AI, Neural Networks, and the ethical implications of ML. Features keynote speakers from top AI labs.", "outcome": "Certification of participation and insight into AI career paths.", "venue": "T-Hub 2.0 Innovation Hub", "venue_address": "Plot No 1/C, Sy No 83/1, Raidurgam, Knowledge City, Serilingampally, Hyderabad, Telangana 500081"},
-    {"id": 3, "title": "Cyber Shield 2026", "date": "Mar 25, 2026", "time": "10:00 AM", "end_time": "05:00 PM", "desc": "Ethical Hacking workshop.", "price": "₹1200", "color": "#ff0055", "image": "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1200&q=80", "purpose": "Strengthening cybersecurity awareness and skills.", "full_details": "Hands-on penetration testing, network security basics, and threat modeling. Learn to protect modern web applications from common vulnerabilities.", "outcome": "Hands-on experience with security tools and a 'Security Badge' certification.", "venue": "IIT Bombay Convocation Hall", "venue_address": "Main Gate Rd, IIT Area, Powai, Mumbai, Maharashtra 400076"},
-    {"id": 4, "title": "WebMosaic UI/UX", "date": "Apr 02, 2026", "time": "11:00 AM", "end_time": "06:00 PM", "desc": "Design and build competition.", "price": "Free", "color": "#ff9a9e", "image": "https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?auto=format&fit=crop&w=1200&q=80", "purpose": "Focusing on user-centric design principles.", "full_details": "Compete to create the most intuitive and visually stunning interface. Workshops on Figma prototyping and accessibility included.", "outcome": "Portfolio feedback from design leads and a design trophy.", "venue": "Symbiosis Institute of Design Auditorium", "venue_address": "S No. 231/4A, Viman Nagar, Pune, Maharashtra 411014"},
-    {"id": 5, "title": "CloudCom Azure", "date": "Apr 10, 2026", "time": "10:00 AM", "end_time": "05:00 PM", "desc": "Hands-on workshop on Azure Cloud.", "price": "₹400", "color": "#a18cd1", "image": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80", "purpose": "Mastering cloud infrastructure and deployment.", "full_details": "Deploying scalable apps on Microsoft Azure. Learn about VMs, App Services, and Cloud Databases.", "outcome": "Hands-on deployment experience and trial Azure credits.", "venue": "TIDEL Park Tech Auditorium", "venue_address": "No.4, Rajiv Gandhi Salai, Taramani, Chennai, Tamil Nadu 600113"},
-    {"id": 6, "title": "Data Science Dive", "date": "Apr 15, 2026", "time": "09:00 AM", "end_time": "04:00 PM", "desc": "Big Data analytics and visualization.", "price": "₹1500", "color": "#fbc2eb", "image": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80", "purpose": "Unlocking patterns through data visualization.", "full_details": "Using Pandas, Matplotlib, and Seaborn to analyze complex datasets and present findings in an impactful way.", "outcome": "Mastery of data cleaning and professional charting techniques.", "venue": "Biswa Bangla Convention Centre", "venue_address": "Action Area I, Major Arterial Road, New Town, Kolkata, West Bengal 700156"},
-    {"id": 7, "title": "Gaming Arena (CS2)", "date": "Apr 20, 2026", "time": "01:00 PM", "end_time": "09:00 PM", "desc": "5v5 Tactical Shooter tournament.", "price": "₹400/Team", "color": "#8fd3f4", "image": "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80", "purpose": "Competitive gaming and team coordination.", "full_details": "A high-stakes Counter-Strike 2 tournament for college teams. Bracket-style elimination with live shoutcasting.", "outcome": "Winning team trophy and e-sports glory.", "venue": "Kanteerava Indoor Stadium Arena", "venue_address": "Kasturba Rd, Sampangi Rama Nagar, Bengaluru, Karnataka 560001"},
-    {"id": 8, "title": "AppVentures Mobile", "date": "Apr 25, 2026", "time": "10:30 AM", "end_time": "05:30 PM", "desc": "Flutter & React Native workshop.", "price": "₹800", "color": "#84fab0", "image": "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=1200&q=80", "purpose": "Cross-platform mobile app development.", "full_details": "Learn to build apps that run on both iOS and Android from a single codebase. Focus on state management and UI performance.", "outcome": "A fully functional demo app ready for your portfolio.", "venue": "DLF CyberHub Tech Lounge", "venue_address": "DLF Cyber City, Phase 2, Sector 24, Gurugram, Haryana 122002"},
-    {"id": 9, "title": "IoT Systems Expo", "date": "May 05, 2026", "time": "10:00 AM", "end_time": "05:00 PM", "desc": "Showcase your hardware projects.", "price": "Free", "color": "#fa709a", "image": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80", "purpose": "Connecting the physical world to the internet.", "full_details": "An exhibition of Arduino, Raspberry Pi, and ESP32 projects. Network with fellow hardware enthusiasts and innovators.", "outcome": "Project visibility and peer review from expert engineers.", "venue": "International Tech Park Bangalore (ITPB)", "venue_address": "ITPL Main Rd, Pattandur Agrahara, Whitefield, Bengaluru, Karnataka 560066"},
-    {"id": 10, "title": "RoboRumble", "date": "May 10, 2026", "time": "09:00 AM", "end_time": "05:00 PM", "desc": "Line follower and obstacle avoider competition.", "price": "₹1200", "color": "#fee140", "image": "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1200&q=80", "purpose": "Exploring robotics and autonomous logic.", "full_details": "Build and program robots to navigate complex paths and avoid obstacles. Testing speed, accuracy, and logic efficiency.", "outcome": "Robotics kit prizes and technical bragging rights.", "venue": "India Expo Centre & Mart", "venue_address": "Plot No. 23 -25 & 27- 29, Knowledge Park II, Greater Noida, Uttar Pradesh 201306"},
-    {"id": 11, "title": "Blockchain Basics", "date": "May 15, 2026", "time": "10:00 AM", "end_time": "04:30 PM", "desc": "Introduction to Web3 and Crypto.", "price": "₹800", "color": "#667eea", "image": "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=1200&q=80", "purpose": "Demystifying decentralized technologies.", "full_details": "Understand how ledgers work, the role of Smart Contracts, and the future of Ethereum and Bitcoin ecosystem.", "outcome": "Foundational knowledge to start building dApps.", "venue": "Jio World Convention Centre", "venue_address": "G Block BKC, Bandra Kurla Complex, Bandra East, Mumbai, Maharashtra 400098"},
-    {"id": 12, "title": "Tech QuizWhiz", "date": "May 20, 2026", "time": "02:00 PM", "end_time": "06:00 PM", "desc": "Test your tech knowledge.", "price": "Free", "color": "#30cfd0", "image": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80", "purpose": "Fun and engaging tech trivia.", "full_details": "Multiple rounds covering computer history, latest gadgets, and programming languages. Fast-paced and highly competitive.", "outcome": "Amazon vouchers and 'Tech Genius' title.", "venue": "Jnana Jyothi Auditorium - Central College", "venue_address": "Palace Rd, Gandhi Nagar, Bengaluru, Karnataka 560009"},
-    {"id": 13, "title": "Startup Pitch", "date": "May 28, 2026", "time": "10:00 AM", "end_time": "05:00 PM", "desc": "Pitch your ideas to investors.", "price": "Free", "color": "#f093fb", "image": "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=80", "purpose": "Accelerating entrepreneurship among students.", "full_details": "A platform to present your business ideas to a panel of venture capitalists and successful alumni. Get feedback and potential funding.", "outcome": "Incubation support and mentorship opportunities.", "venue": "Hyderabad International Convention Centre (HICC)", "venue_address": "Novotel & HICC Complex, Cyberabad Post, Hyderabad, Telangana 500081"},
-    {"id": 14, "title": "Networking Night", "date": "Jun 01, 2026", "time": "06:00 PM", "end_time": "10:00 PM", "desc": "Alumni meet and greet.", "price": "₹2000", "color": "#c471ed", "image": "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=80", "purpose": "Building professional connections.", "full_details": "A formal dinner event where current students can network with alumni working at top tech firms. Includes a panel discussion on career growth.", "outcome": "Valuable professional leads and mentorship connections.", "venue": "The Leela Palace Grand Ballroom", "venue_address": "23, HAL Old Airport Rd, HAL 2nd Stage, Kodihalli, Bengaluru, Karnataka 560008"},
-    {"id": 15, "title": "Full Stack Fest", "date": "Jun 10, 2026", "time": "09:30 AM", "end_time": "05:30 PM", "desc": "MERN Stack deep dive workshop.", "price": "₹2500", "color": "#f6d365", "image": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80", "purpose": "End-to-end web app development.", "full_details": "From database design with MongoDB to backend logic with Node Express and frontend interactivity with React.", "outcome": "Deployment-ready Full Stack project and MERN certification.", "venue": "MIT World Peace University Tech Dome", "venue_address": "Survey No. 124, Paud Rd, Kothrud, Pune, Maharashtra 411038"},
-    {"id": 16, "title": "Quantum Computing Quest", "date": "Jun 20, 2026", "time": "10:00 AM", "end_time": "04:30 PM", "desc": "Deep dive into qubits, quantum circuits, and algorithms.", "price": "₹600", "color": "#3f51b5", "image": "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=1200&q=80", "purpose": "Introduce students to quantum mechanics in computing.", "full_details": "Learn how qubits, superposition, and entanglement are used in modern quantum computing. Hands-on coding with Qiskit.", "outcome": "Understand quantum algorithms and earn a completion certificate.", "venue": "Indian Institute of Science (IISc) Faculty Hall", "venue_address": "CV Raman Rd, Mathikere, Bengaluru, Karnataka 560012"},
-    {"id": 17, "title": "Data Analytics Bootcamp", "date": "Jun 25, 2026", "time": "10:00 AM", "end_time": "05:00 PM", "desc": "Master SQL, PowerBI, and data pipelines.", "price": "₹750", "color": "#e91e63", "image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80", "purpose": "Gain real-world data analyst skills.", "full_details": "Build interactive dashboards, query large databases, and clean messy real-world datasets with industry mentors.", "outcome": "Portfolio-ready PowerBI project and data analytics certification.", "venue": "St. Joseph's University Tech Auditorium", "venue_address": "36, Lalbagh Rd, Shanti Nagar, Bengaluru, Karnataka 560027"},
-    {"id": 18, "title": "DevOps & CI/CD Masterclass", "date": "Jul 02, 2026", "time": "10:00 AM", "end_time": "05:00 PM", "desc": "Build automated pipelines with Docker & GitHub Actions.", "price": "₹900", "color": "#9c27b0", "image": "https://images.unsplash.com/photo-1607799279861-4dd421887fb3?auto=format&fit=crop&w=1200&q=80", "purpose": "Standardize modern deployment processes.", "full_details": "Learn containerization with Docker, orchestrate with Kubernetes, and configure continuous integration/deployment (CI/CD) pipelines.", "outcome": "Deploy a live application using fully automated CI/CD pipelines.", "venue": "Advant Navis Business Park", "venue_address": "Sector 142, Noida-Greater Noida Expy, Noida, Uttar Pradesh 201305"},
-    {"id": 19, "title": "SaaS Product Hackathon", "date": "Jul 10, 2026", "time": "09:00 AM", "end_time": "06:00 PM", "desc": "Build and launch a micro-SaaS in 48 hours.", "price": "Free", "color": "#00bcd4", "image": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80", "purpose": "Encourage student entrepreneurship and product building.", "full_details": "Teams will ideate, code, and launch a working software-as-a-service application. Mentoring on business model and Stripe integration.", "outcome": "A live working SaaS product and feedback from successful founders.", "venue": "WeWork Galaxy Tech Arena", "venue_address": "43, Residency Rd, Shanthala Nagar, Ashok Nagar, Bengaluru, Karnataka 560025"},
-    {"id": 20, "title": "Ethical Hacking CTF Challenge", "date": "Jul 18, 2026", "time": "11:00 AM", "end_time": "07:00 PM", "desc": "Jeopardy-style cybersecurity competition.", "price": "₹300", "color": "#4caf50", "image": "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80", "purpose": "Test penetration testing and cryptography skills.", "full_details": "Solve puzzles in web security, reverse engineering, forensics, and cryptography to find hidden flags.", "outcome": "Top teams win cash prizes and exclusive cybersecurity badges.", "venue": "IIIT Hyderabad Cyber Security Pavilion", "venue_address": "Gachibowli, Hyderabad, Telangana 500032"},
-    {"id": 21, "title": "Web3 Smart Contract Workshop", "date": "Jul 24, 2026", "time": "10:00 AM", "end_time": "05:00 PM", "desc": "Write and deploy Solidity contracts on Ethereum.", "price": "₹1100", "color": "#ff9800", "image": "https://images.unsplash.com/photo-1622979135225-d2ba269bc1df?auto=format&fit=crop&w=1200&q=80", "purpose": "Hands-on introduction to decentralized applications.", "full_details": "Master smart contract design principles, security patterns, and testing. Deploy contracts to testnets.", "outcome": "Verified smart contract on Etherscan and Web3 developer certificate.", "venue": "Koramangala Indoor Tech Pavilion", "venue_address": "80 Feet Rd, 6th Block, Koramangala, Bengaluru, Karnataka 560095"},
-    {"id": 22, "title": "Game Dev Odyssey", "date": "Aug 02, 2026", "time": "10:00 AM", "end_time": "05:30 PM", "desc": "Build 2D and 3D games using Unity & C#.", "price": "₹850", "color": "#795548", "image": "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80", "purpose": "Design and develop functional game prototypes.", "full_details": "Introduction to Unity interface, physics engine, game loop, and script writing. Build a fully functional game from scratch.", "outcome": "Playable desktop/web game build and design asset pack.", "venue": "NESCO Center Exhibition Hall", "venue_address": "Western Express Hwy, Goregaon, Mumbai, Maharashtra 400063"},
-    {"id": 23, "title": "Embedded Systems & Robotics", "date": "Aug 10, 2026", "time": "09:30 AM", "end_time": "04:30 PM", "desc": "Integrate sensors and microcontrollers with Python/C++.", "price": "₹1000", "color": "#607d8b", "image": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80", "purpose": "Understand IoT and hardware-software interaction.", "full_details": "Connect ESP32 and Arduino boards with sensors (temperature, ultrasonic, servo motors). Program logic to build smart appliances.", "outcome": "Hands-on kit experience and participation certificate.", "venue": "Anna University TAG Auditorium", "venue_address": "Sardar Patel Rd, Guindy, Chennai, Tamil Nadu 600025"},
-    {"id": 24, "title": "UX/UI Case Study Challenge", "date": "Aug 18, 2026", "time": "10:00 AM", "end_time": "05:00 PM", "desc": "Solve real-world user experience problems.", "price": "Free", "color": "#ff5722", "image": "https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=1200&q=80", "purpose": "Drive user research and visual design capabilities.", "full_details": "Participants are given a problem statement to research, create wireframes, and design high-fidelity interactive prototypes in Figma.", "outcome": "Comprehensive UX case study for student portfolios.", "venue": "National Institute of Design (NID) R&D Campus", "venue_address": "12th Mail, Tumkur Rd, Peenya Industrial Area, Bengaluru, Karnataka 560058"},
-    {"id": 25, "title": "System Design & Architecture", "date": "Aug 25, 2026", "time": "10:00 AM", "end_time": "05:00 PM", "desc": "Learn how to scale systems to millions of users.", "price": "₹500", "color": "#009688", "image": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=80", "purpose": "Master high-level software engineering concepts.", "full_details": "Covers horizontal scaling, load balancers, caching, databases replication, microservices, and message queues.", "outcome": "Solid understanding of system architecture for interviews.", "venue": "Electronic City Tech Hub - Auditorium 3", "venue_address": "Velankani Tech Park, Electronic City Phase 1, Bengaluru, Karnataka 560100"},
-    {"id": 26, "title": "Next-Gen AI Hackathon", "date": "Sep 02, 2026", "time": "09:00 AM", "end_time": "09:00 PM", "desc": "Build innovative applications using LLMs and Agentic AI.", "price": "Free", "color": "#FF5722", "image": "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=80", "purpose": "Fostering developer innovation in generative AI.", "full_details": "A 36-hour hackathon focusing on creating real-world AI applications using APIs from OpenAI, Google, and Anthropic. Mentors from top tech firms will assist teams.", "outcome": "Winning teams receive cash prizes, cloud credits, and incubation opportunities.", "venue": "Manpho Convention Centre", "venue_address": "No. 91/4, Veeranna Palya, Outer Ring Road, Nagavara, Bengaluru, Karnataka 560045"},
-    {"id": 27, "title": "Advanced Next.js Mastery", "date": "Sep 10, 2026", "time": "10:00 AM", "end_time": "05:00 PM", "desc": "Learn App Router, Server Actions, and advanced performance optimizations.", "price": "₹750", "color": "#00E676", "image": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80", "purpose": "Master modern full-stack React framework techniques.", "full_details": "Deep dive into App Router, Server Components, optimization strategies, SEO, edge runtime, and middleware implementation in Next.js.", "outcome": "Build a production-ready, highly optimized Next.js project and get certified.", "venue": "HITEC City Innovation Pavilion", "venue_address": "Cyber Towers, Hitec City, Madhapur, Hyderabad, Telangana 500081"},
-    {"id": 28, "title": "Rust for Systems Engineering", "date": "Sep 18, 2026", "time": "10:00 AM", "end_time": "04:30 PM", "desc": "Master memory safety, concurrency, and performance with Rust.", "price": "₹950", "color": "#FF9100", "image": "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=1200&q=80", "purpose": "Provide building blocks for high-performance backend systems.", "full_details": "Introduction to borrow checker, lifetimes, patterns, error handling, and writing safe concurrent systems without garbage collection.", "outcome": "Build a multi-threaded web server in Rust and earn a Rust developer badge.", "venue": "COEP Technological University Hall", "venue_address": "Wellesley Rd, Shivajinagar, Pune, Maharashtra 411005"},
-    {"id": 29, "title": "Kubernetes & Cloud Native GitOps", "date": "Sep 25, 2026", "time": "10:00 AM", "end_time": "05:30 PM", "desc": "Deploy and manage containerized apps using ArgoCD & Kubernetes.", "price": "₹1200", "color": "#2979FF", "image": "https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?auto=format&fit=crop&w=1200&q=80", "purpose": "Unlock scalable infrastructure automation.", "full_details": "Covers K8s architecture, pods, deployments, services, ingress, Helm charts, and automated GitOps deployment pipelines with ArgoCD.", "outcome": "A deployed multi-service app on a Kubernetes cluster and GitOps certificate.", "venue": "Unitech Cyber Park Auditorium", "venue_address": "Sector 39, Gurugram, Haryana 122003"},
-    {"id": 30, "title": "AR/VR Immersive Experience Design", "date": "Oct 02, 2026", "time": "10:00 AM", "end_time": "05:00 PM", "desc": "Build interactive virtual and augmented reality experiences.", "price": "Free", "color": "#D500F9", "image": "https://images.unsplash.com/photo-1592478411213-6153e4ebc07d?auto=format&fit=crop&w=1200&q=80", "purpose": "Explore the intersection of spatial design and technology.", "full_details": "Hands-on workshop using Unity and WebXR to design user interfaces and interactions for virtual and augmented environments.", "outcome": "A playable VR/AR scene compatible with mobile and headset browsers.", "venue": "Palace Grounds Tech Pavilion", "venue_address": "Bellary Rd, Jayamahal, Bengaluru, Karnataka 560006"},
-    {"id": 31, "title": "Big Data pipelines with Spark & Kafka", "date": "Oct 10, 2026", "time": "09:30 AM", "end_time": "05:00 PM", "desc": "Process real-time streaming data at scale.", "price": "₹1100", "color": "#00E5FF", "image": "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=1200&q=80", "purpose": "Architecting real-time streaming data ingestion.", "full_details": "Learn to build publisher-subscriber systems with Apache Kafka, process streaming events in Apache Spark, and save to data lakes.", "outcome": "Configure a live real-time analytics pipeline dashboard.", "venue": "Stellar IT Park Innovation Center", "venue_address": "C-25, Sector 62, Noida, Uttar Pradesh 201309"},
-    {"id": 32, "title": "Microservices Security & OAuth2", "date": "Oct 18, 2026", "time": "10:00 AM", "end_time": "04:30 PM", "desc": "Secure distributed APIs using OAuth2, OIDC, and API Gateways.", "price": "₹800", "color": "#00C853", "image": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1200&q=80", "purpose": "Implement robust security in distributed web networks.", "full_details": "Deep dive into authentication and authorization, JWT validation, Spring Security / NestJS Guards, and API Gateways.", "outcome": "Secure a multi-service web application with Keycloak and OAuth2.", "venue": "Mindspace IT Park Auditorium", "venue_address": "Mindspace Madhapur Rd, Vittal Rao Nagar, Hitec City, Hyderabad, Telangana 500081"},
-    {"id": 33, "title": "Mobile UI UX Animation Lab", "date": "Oct 25, 2026", "time": "11:00 AM", "end_time": "05:00 PM", "desc": "Design high-fidelity interactive animations in Figma and Lottie.", "price": "Free", "color": "#FF1744", "image": "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=1200&q=80", "purpose": "Craft delightful user experiences with micro-interactions.", "full_details": "Focus on UI motion principles, transition animations, exporting vector assets with Bodymovin, and integrating Lottie into mobile apps.", "outcome": "A portfolio-ready prototype showcase of delightful animations.", "venue": "Symbiosis Media & Design Studio", "venue_address": "S No. 231/4A, Viman Nagar, Pune, Maharashtra 411014"},
-    {"id": 34, "title": "Serverless Architectures on AWS", "date": "Nov 05, 2026", "time": "10:00 AM", "end_time": "05:00 PM", "desc": "Build scalable APIs using AWS Lambda, API Gateway, and DynamoDB.", "price": "₹900", "color": "#FFC400", "image": "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=1200&q=80", "purpose": "Familiarize developers with pay-as-you-go serverless models.", "full_details": "Write, deploy, and scale serverless backend functions. Learn infrastructure as code with Serverless Framework or AWS SAM.", "outcome": "Fully deployed backend on AWS with zero infrastructure management.", "venue": "Amazon Development Centre Campus", "venue_address": "Bagmane World Tech Centre, Mahadevapura, Bengaluru, Karnataka 560048"},
-    {"id": 35, "title": "Deep Learning with PyTorch", "date": "Nov 12, 2026", "time": "09:30 AM", "end_time": "05:30 PM", "desc": "Train Convolutional and Recurrent neural networks.", "price": "₹1500", "color": "#651FFF", "image": "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?auto=format&fit=crop&w=1200&q=80", "purpose": "Master the mathematical foundation and practical coding of deep learning.", "full_details": "Understand backpropagation, custom datasets, CNNs for computer vision, RNNs/Transformers for NLP, and model evaluation techniques.", "outcome": "Train and evaluate an image classification model from scratch.", "venue": "NIMHANS Convention Centre", "venue_address": "Hosur Main Rd, Lakkasandra, Hombegowda Nagar, Bengaluru, Karnataka 560029"}
+    {
+        "id": 1,
+        "title": "TechNova Codeathon 2026",
+        "date": "Nov 12, 2026",
+        "desc": "24-hour intense coding marathon with real-world problems and mentor guidance.",
+        "price": "Free",
+        "color": "#4facfe",
+        "image": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Rapid prototyping and algorithmic problem solving.",
+        "full_details": "A 24-hour marathon where student teams build scalable solutions for real-world civic and enterprise challenges. Includes 1-on-1 mentorship from top engineering leads.",
+        "outcome": "Win cash prizes up to \u20b91,00,000, gain deep technical experience, and network with tech recruiters.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Bangalore International Exhibition Centre (BIEC)",
+        "venue_address": "10th Mile, Tumkur Road, Madavara Post, Dasanapura Hobli, Bengaluru, Karnataka 560073",
+        "time": "10:00 AM",
+        "end_time": "05:00 PM",
+        "category": "Education"
+    },
+    {
+        "id": 2,
+        "title": "AI & ML Summit 2026",
+        "date": "Nov 18, 2026",
+        "desc": "Explore modern Generative AI, LLM architectures, and agentic workflows.",
+        "price": "\u20b9800",
+        "color": "#00f2fe",
+        "image": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Deep dive into state-of-the-art AI advancements.",
+        "full_details": "Hands-on sessions on Transformer architectures, Retrieval-Augmented Generation (RAG), and fine-tuning open-source models with industry researchers.",
+        "outcome": "Official Certificate of Participation, AI project portfolio artifact, and direct networking with AI labs.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "T-Hub 2.0 Innovation Hub",
+        "venue_address": "Plot No 1/C, Sy No 83/1, Raidurgam, Knowledge City, Serilingampally, Hyderabad, Telangana 500081",
+        "time": "09:30 AM",
+        "end_time": "04:30 PM",
+        "category": "Education"
+    },
+    {
+        "id": 3,
+        "title": "Cyber Shield Ethical Hacking Workshop",
+        "date": "Nov 25, 2026",
+        "desc": "Hands-on penetration testing, exploit analysis, and defense strategies.",
+        "price": "\u20b91200",
+        "color": "#ff0055",
+        "image": "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Strengthening cybersecurity defense and vulnerability assessment capabilities.",
+        "full_details": "Live bug bounty demonstrations, OWASP Top 10 vulnerabilities, web security bypass techniques, and network defense hardening.",
+        "outcome": "Certified Cyber Security Specialist Badge and hands-on experience in vulnerability assessment tools.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "IIT Bombay Convocation Hall",
+        "venue_address": "Main Gate Rd, IIT Area, Powai, Mumbai, Maharashtra 400076",
+        "time": "10:00 AM",
+        "end_time": "05:00 PM",
+        "category": "Education"
+    },
+    {
+        "id": 4,
+        "title": "WebMosaic UI/UX Design Lab",
+        "date": "Dec 02, 2026",
+        "desc": "Design systems, Figma micro-interactions, and user accessibility.",
+        "price": "Free",
+        "color": "#ff9a9e",
+        "image": "https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Master human-centered digital product design.",
+        "full_details": "Participants learn wireframing, high-fidelity Figma components, auto-layouts, micro-animations with Lottie, and design tokens.",
+        "outcome": "A complete, portfolio-ready UX case study evaluated by senior product designers.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Symbiosis Institute of Design Auditorium",
+        "venue_address": "S No. 231/4A, Viman Nagar, Pune, Maharashtra 411014",
+        "time": "11:00 AM",
+        "end_time": "06:00 PM",
+        "category": "Education"
+    },
+    {
+        "id": 5,
+        "title": "CloudCom Azure Infrastructure",
+        "date": "Dec 08, 2026",
+        "desc": "Architect scalable cloud microservices, virtual networks, and databases.",
+        "price": "\u20b9400",
+        "color": "#a18cd1",
+        "image": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Equip students with enterprise cloud architecture skills.",
+        "full_details": "Covers Microsoft Azure Resource Groups, Virtual Machines, Cosmos DB, and serverless Azure Functions with real deployments.",
+        "outcome": "Azure cloud credits, verified deployment architecture, and preparation for AZ-900 certification.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "TIDEL Park Tech Auditorium",
+        "venue_address": "No.4, Rajiv Gandhi Salai, Taramani, Chennai, Tamil Nadu 600113",
+        "time": "10:00 AM",
+        "end_time": "05:00 PM",
+        "category": "Education"
+    },
+    {
+        "id": 6,
+        "title": "Data Science Analytics Dive",
+        "date": "Dec 15, 2026",
+        "desc": "Big Data processing, statistical modeling, and interactive dashboards.",
+        "price": "\u20b91500",
+        "color": "#fbc2eb",
+        "image": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Extract actionable intelligence from complex enterprise datasets.",
+        "full_details": "Using Python, Pandas, Matplotlib, Seaborn, and SQL to clean raw transactional logs and visualize predictive trends.",
+        "outcome": "Mastery of end-to-end data pipelines and an interactive business analytics dashboard.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Biswa Bangla Convention Centre",
+        "venue_address": "Action Area I, Major Arterial Road, New Town, Kolkata, West Bengal 700156",
+        "time": "09:00 AM",
+        "end_time": "04:00 PM",
+        "category": "Education"
+    },
+    {
+        "id": 7,
+        "title": "AppVentures Mobile Flutter Fest",
+        "date": "Dec 20, 2026",
+        "desc": "Cross-platform iOS and Android mobile app development.",
+        "price": "\u20b9800",
+        "color": "#84fab0",
+        "image": "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Build sleek mobile experiences with single-codebase Flutter.",
+        "full_details": "Learn state management with Riverpod and Bloc, local offline storage with Hive, and Firebase push notifications.",
+        "outcome": "A fully functional demo application published on mobile emulator and GitHub.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "DLF CyberHub Tech Lounge",
+        "venue_address": "DLF Cyber City, Phase 2, Sector 24, Gurugram, Haryana 122002",
+        "time": "10:30 AM",
+        "end_time": "05:30 PM",
+        "category": "Education"
+    },
+    {
+        "id": 8,
+        "title": "IoT Smart Hardware Expo",
+        "date": "Jan 08, 2027",
+        "desc": "Connecting microcontrollers, sensors, and telemetry to cloud brokers.",
+        "price": "Free",
+        "color": "#fa709a",
+        "image": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Bridge the physical computing divide with smart embedded hardware.",
+        "full_details": "Live hardware demonstrations with ESP32, Raspberry Pi 5, MQTT communication, and smart home sensor arrays.",
+        "outcome": "Hands-on sensor calibration kit and project evaluation by IoT hardware architects.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "International Tech Park Bangalore (ITPB)",
+        "venue_address": "ITPL Main Rd, Pattandur Agrahara, Whitefield, Bengaluru, Karnataka 560066",
+        "time": "10:00 AM",
+        "end_time": "05:00 PM",
+        "category": "Education"
+    },
+    {
+        "id": 9,
+        "title": "RoboRumble Autonomous Robotics",
+        "date": "Jan 16, 2027",
+        "desc": "Robotic navigation, PID controllers, and autonomous maze solving.",
+        "price": "\u20b91200",
+        "color": "#fee140",
+        "image": "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Master algorithmic robotics and sensor feedback loops.",
+        "full_details": "Teams program micro-controllers to navigate obstacle courses with high speed and zero collision penalties.",
+        "outcome": "Trophies for fastest lap times and advanced robotics development kit.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "India Expo Centre & Mart",
+        "venue_address": "Plot No. 23 -25, Knowledge Park II, Greater Noida, Uttar Pradesh 201306",
+        "time": "09:00 AM",
+        "end_time": "05:00 PM",
+        "category": "Education"
+    },
+    {
+        "id": 10,
+        "title": "Blockchain & Web3 Developer Summit",
+        "date": "Jan 24, 2027",
+        "desc": "Smart contracts, decentralized finance protocols, and cryptography.",
+        "price": "\u20b9800",
+        "color": "#667eea",
+        "image": "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Demystify decentralized applications and consensus mechanisms.",
+        "full_details": "Solidity contract development, ERC-20 / ERC-721 token standards, Hardhat testing, and zero-knowledge proofs.",
+        "outcome": "Verified smart contract deployed on testnet and Web3 Developer Certification.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Jio World Convention Centre",
+        "venue_address": "G Block BKC, Bandra Kurla Complex, Bandra East, Mumbai, Maharashtra 400098",
+        "time": "10:00 AM",
+        "end_time": "04:30 PM",
+        "category": "Education"
+    },
+    {
+        "id": 11,
+        "title": "Tech QuizWhiz Inter-College Championship",
+        "date": "Feb 02, 2027",
+        "desc": "Fast-paced tech trivia, computer history, algorithms, and logic puzzles.",
+        "price": "Free",
+        "color": "#30cfd0",
+        "image": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Celebrate computer science history and competitive intellectual trivia.",
+        "full_details": "Buzzer rounds covering famous software bugs, cryptography history, silicon architecture, and programming paradigms.",
+        "outcome": "Amazon vouchers, championship trophy, and recognition as campus Tech Genius.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Jnana Jyothi Auditorium - Central College",
+        "venue_address": "Palace Rd, Gandhi Nagar, Bengaluru, Karnataka 560009",
+        "time": "02:00 PM",
+        "end_time": "06:00 PM",
+        "category": "Education"
+    },
+    {
+        "id": 12,
+        "title": "Full Stack MERN Masterclass",
+        "date": "Feb 10, 2027",
+        "desc": "End-to-end full stack web architecture with MongoDB, Express, React, and Node.",
+        "price": "\u20b92500",
+        "color": "#f6d365",
+        "image": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Build scalable, production-ready full stack web applications.",
+        "full_details": "Covers authentication with JWT and Cookies, schema validation with Zod, database indexing, state management, and cloud deployment.",
+        "outcome": "Live full stack web application hosted on cloud and MERN certification.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "MIT World Peace University Tech Dome",
+        "venue_address": "Survey No. 124, Paud Rd, Kothrud, Pune, Maharashtra 411038",
+        "time": "09:30 AM",
+        "end_time": "05:30 PM",
+        "category": "Education"
+    },
+    {
+        "id": 13,
+        "title": "Quantum Computing Fundamentals",
+        "date": "Feb 18, 2027",
+        "desc": "Qubits, quantum superposition, entanglement, and Qiskit circuits.",
+        "price": "\u20b9600",
+        "color": "#3f51b5",
+        "image": "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Equip students with the fundamentals of quantum hardware and algorithms.",
+        "full_details": "Introduction to Bloch spheres, quantum logic gates, Deutsch-Jozsa algorithm, and simulating quantum circuits on IBM Quantum computers.",
+        "outcome": "Deep intuition of quantum mechanics in computing and participation certificate.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Indian Institute of Science (IISc) Faculty Hall",
+        "venue_address": "CV Raman Rd, Mathikere, Bengaluru, Karnataka 560012",
+        "time": "10:00 AM",
+        "end_time": "04:30 PM",
+        "category": "Education"
+    },
+    {
+        "id": 14,
+        "title": "DevOps, Docker & CI/CD Masterclass",
+        "date": "Feb 26, 2027",
+        "desc": "Containerization, automated GitHub Actions pipelines, and Kubernetes.",
+        "price": "\u20b9900",
+        "color": "#9c27b0",
+        "image": "https://images.unsplash.com/photo-1607799279861-4dd421887fb3?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Automate modern software testing, containerization, and deployments.",
+        "full_details": "Multi-stage Docker builds, linting and unit test automation, blue-green deployment strategies, and health monitoring.",
+        "outcome": "A functional automated CI/CD pipeline repository and DevOps engineer badge.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Advant Navis Business Park",
+        "venue_address": "Sector 142, Noida-Greater Noida Expy, Noida, Uttar Pradesh 201305",
+        "time": "10:00 AM",
+        "end_time": "05:00 PM",
+        "category": "Education"
+    },
+    {
+        "id": 15,
+        "title": "Automated Penetration Testing with AI",
+        "date": "Feb 05, 2027",
+        "desc": "Leverage AI to discover security vulnerabilities and generate exploit payloads.",
+        "price": "\u20b91200",
+        "color": "#00f2fe",
+        "image": "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Applying machine learning to modern vulnerability discovery.",
+        "full_details": "Hands-on workshop demonstrating LLM-guided fuzzing, automated AST vulnerability scanning, and red-team automated evasion.",
+        "outcome": "AI Security Auditor credentials and custom fuzzing toolkit scripts.",
+        "seats_total": 100,
+        "seats_filled": 4,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "IIT Delhi Bharti School of Telecommunication",
+        "venue_address": "Hauz Khas, New Delhi, Delhi 110016",
+        "time": "10:00 AM",
+        "end_time": "05:30 PM",
+        "category": "Education"
+    },
+    {
+        "id": 16,
+        "title": "Future Tech Summit & Innovation Expo 2027",
+        "date": "Feb 15, 2027",
+        "desc": "Annual flagship university tech festival, exhibits, and student startup showcase.",
+        "price": "Free",
+        "color": "#ec4899",
+        "image": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Showcase revolutionary student technical projects and prototypes.",
+        "full_details": "Featuring 100+ university booths, keynote addresses from leading silicon and AI founders, and angel investor networking.",
+        "outcome": "Seed funding opportunities, startup incubation, and exhibition certificates.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Bangalore International Exhibition Centre (BIEC)",
+        "venue_address": "10th Mile, Tumkur Road, Bengaluru, Karnataka 560073",
+        "time": "10:00 AM",
+        "end_time": "05:00 PM",
+        "category": "Education"
+    },
+    {
+        "id": 17,
+        "title": "Generative AI Bootcamp 2025",
+        "date": "Nov 15, 2025",
+        "desc": "Concluded comprehensive workshop on prompt engineering and diffusion models.",
+        "price": "Free",
+        "color": "#8b5cf6",
+        "image": "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Historical foundation in generative models.",
+        "full_details": "Concluded academic session exploring transformer attention heads, latent diffusion, and text-to-image pipelines.",
+        "outcome": "Over 450 students completed projects and earned verifiable credentials.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Jnana Jyothi Auditorium",
+        "venue_address": "Central College Campus, Palace Rd, Bengaluru, Karnataka 560009",
+        "time": "10:00 AM",
+        "end_time": "05:00 PM",
+        "category": "Education"
+    },
+    {
+        "id": 18,
+        "title": "CyberDefense Conclave 2025",
+        "date": "Dec 10, 2025",
+        "desc": "Concluded national security symposium on cloud threat detection.",
+        "price": "\u20b91000",
+        "color": "#ef4444",
+        "image": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "National forum on critical infrastructure protection.",
+        "full_details": "Concluded event featuring live fire red-vs-blue exercises, zero-trust network models, and DFIR methodologies.",
+        "outcome": "Archived session notes, recorded presentations, and verified attendee badges.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "NESCO Center Exhibition Hall",
+        "venue_address": "Western Express Hwy, Goregaon, Mumbai, Maharashtra 400063",
+        "time": "09:30 AM",
+        "end_time": "04:30 PM",
+        "category": "Education"
+    },
+    {
+        "id": 19,
+        "title": "Inter-College Premier Cricket League 2026",
+        "date": "Nov 13, 2026",
+        "desc": "High-octane T20 cricket tournament between top university squads under floodlights.",
+        "price": "\u20b9500",
+        "color": "#10b981",
+        "image": "https://images.unsplash.com/photo-1531415074868-036b1c5f53ec?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Foster collegiate athletic excellence and sporting camaraderie.",
+        "full_details": "16 collegiate teams compete in knockout stages with professional DRS, live commentary, and scouting from state cricket selectors.",
+        "outcome": "Champion Trophy, \u20b91,50,000 team prize, Man of the Tournament medals, and scout selection.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "M. Chinnaswamy Stadium Arena",
+        "venue_address": "MG Road, Near Cubbon Park, Shivaji Nagar, Bengaluru, Karnataka 560001",
+        "time": "09:00 AM",
+        "end_time": "07:00 PM",
+        "category": "Sports"
+    },
+    {
+        "id": 20,
+        "title": "National Collegiate Football Cup 2026",
+        "date": "Nov 19, 2026",
+        "desc": "11v11 championship football knockout tournament on international-standard turf.",
+        "price": "\u20b9400",
+        "color": "#059669",
+        "image": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Promote university football talent and strategic team athletic competition.",
+        "full_details": "Group stage and knockout fixtures adhering strictly to FIFA regulations, with accredited referees and medical support staff.",
+        "outcome": "Golden Boot award, team silverware, and club academy trials.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Salt Lake Stadium (Vivekananda Yuba Bharati Krirangan)",
+        "venue_address": "JB Block, Sector III, Bidhannagar, Kolkata, West Bengal 700106",
+        "time": "08:30 AM",
+        "end_time": "06:00 PM",
+        "category": "Sports"
+    },
+    {
+        "id": 21,
+        "title": "Bangalore Midnight 10K & Half Marathon",
+        "date": "Nov 26, 2026",
+        "desc": "Scenic night run across illuminated city avenues with timing chips and medals.",
+        "price": "\u20b9800",
+        "color": "#f59e0b",
+        "image": "https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Promote cardiovascular fitness, community endurance, and civic charity.",
+        "full_details": "Certified 10km and 21.1km courses equipped with hydration stations, DJ cheer zones, and pacing teams.",
+        "outcome": "Finisher medal, dry-fit running jersey, RFID timed e-certificate, and energy goodie bag.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Kanteerava Outdoor Stadium",
+        "venue_address": "Kasturba Rd, Sampangi Rama Nagar, Bengaluru, Karnataka 560001",
+        "time": "08:00 PM",
+        "end_time": "11:30 PM",
+        "category": "Sports"
+    },
+    {
+        "id": 22,
+        "title": "All-India Badminton Open Championship",
+        "date": "Dec 03, 2026",
+        "desc": "Singles and doubles national badminton showdown on synthetic Olympic courts.",
+        "price": "\u20b9600",
+        "color": "#3b82f6",
+        "image": "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Showcase fast-paced badminton agility, stamina, and racket technique.",
+        "full_details": "BWF rules applied across Mens, Womens, and Mixed categories with feather shuttles and digital scoreboards.",
+        "outcome": "Ranked national points, customized Yonex racket kits, and cash rewards.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Padukone-Dravid Centre for Sports Excellence",
+        "venue_address": "Survey No 336, Bettahalasur, Jala Hobli, Yelahanka, Bengaluru, Karnataka 562157",
+        "time": "09:00 AM",
+        "end_time": "06:00 PM",
+        "category": "Sports"
+    },
+    {
+        "id": 23,
+        "title": "Valorant & CS2 Esports National Arena",
+        "date": "Dec 09, 2026",
+        "desc": "5v5 competitive tactical shooter battle on LAN with high-refresh monitors.",
+        "price": "\u20b9500",
+        "color": "#ef4444",
+        "image": "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Celebrate professional collegiate esports and tactical multiplayer coordination.",
+        "full_details": "Double-elimination bracket with live shoutcasting, custom player booths, and 240Hz mechanical battle-stations.",
+        "outcome": "\u20b92,00,000 esports prize pool, mechanical gaming peripherals, and pro roster contracts.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Cyber City Gaming Dome",
+        "venue_address": "Cyber Towers, Hitec City, Madhapur, Hyderabad, Telangana 500081",
+        "time": "11:00 AM",
+        "end_time": "09:00 PM",
+        "category": "Sports"
+    },
+    {
+        "id": 24,
+        "title": "Grandmaster Blitz Chess Open 2026",
+        "date": "Dec 16, 2026",
+        "desc": "FIDE rated 5+3 Blitz chess tournament featuring titled masters and college prodigies.",
+        "price": "\u20b9350",
+        "color": "#8b5cf6",
+        "image": "https://images.unsplash.com/photo-1529699211952-734e80c4d42b?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Sharpen deep tactical calculation, opening repertoire, and endgame mastery.",
+        "full_details": "9 rounds Swiss system with DGT electronic boards transmitting top 10 boards live worldwide.",
+        "outcome": "Official FIDE Blitz rating updates, Grandmaster signed chess sets, and trophies.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "YMCA International Sports Centre",
+        "venue_address": "223, Netaji Subhash Chandra Bose Rd, George Town, Chennai, Tamil Nadu 600001",
+        "time": "10:00 AM",
+        "end_time": "05:30 PM",
+        "category": "Sports"
+    },
+    {
+        "id": 25,
+        "title": "Pro Table Tennis Collegiate Smash",
+        "date": "Dec 21, 2026",
+        "desc": "High-spin table tennis singles and team duels on international Stag tables.",
+        "price": "\u20b9300",
+        "color": "#ec4899",
+        "image": "https://images.unsplash.com/photo-1609710228159-0fa9bd7c0827?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Develop lightning reflexes, topspin loops, and competitive match temperament.",
+        "full_details": "Matches played on ITTF approved flooring with multi-ball practice warm-up areas and umpires.",
+        "outcome": "Custom carbon-ply blades, rubber sheets, and all-state certificates.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Thyagaraj Indoor Stadium",
+        "venue_address": "INA Colony, Laxmi Bai Nagar, New Delhi, Delhi 110023",
+        "time": "09:30 AM",
+        "end_time": "05:00 PM",
+        "category": "Sports"
+    },
+    {
+        "id": 26,
+        "title": "3x3 Street Basketball Showdown",
+        "date": "Jan 09, 2027",
+        "desc": "FIBA 3x3 half-court basketball with DJ beats, slam dunk contests, and street food.",
+        "price": "\u20b9450",
+        "color": "#f97316",
+        "image": "https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Fast-paced streetball competition promoting quick transitions and shooting accuracy.",
+        "full_details": "12-second shot clock rules, 10-minute games, and a special halftime 3-point shootout competition.",
+        "outcome": "Custom basketball sneakers, official Molten balls, and championship rings.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Decathlon Sports Arena Anubhava",
+        "venue_address": "Survey No 78/10, Bellary Rd, Chikkajala, Bengaluru, Karnataka 562157",
+        "time": "02:00 PM",
+        "end_time": "08:30 PM",
+        "category": "Sports"
+    },
+    {
+        "id": 27,
+        "title": "National Aquatic Swimming Championship",
+        "date": "Jan 17, 2027",
+        "desc": "Freestyle, Butterfly, and Medley relay events in an Olympic 50m temperature-controlled pool.",
+        "price": "\u20b9600",
+        "color": "#06b6d4",
+        "image": "https://images.unsplash.com/photo-1519315901367-f34ff9154487?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Promote aquatic sports and evaluate national collegiate swimming times.",
+        "full_details": "Omega touch-pad electronic timing systems, individual heats, and mixed 4x100m relays.",
+        "outcome": "Gold, Silver, and Bronze medals plus qualification for University National Games.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Talkatora Swimming Complex",
+        "venue_address": "Talkatora Garden, President's Estate, New Delhi, Delhi 110004",
+        "time": "08:00 AM",
+        "end_time": "04:30 PM",
+        "category": "Sports"
+    },
+    {
+        "id": 28,
+        "title": "Ultimate Frisbee Open Invitational",
+        "date": "Jan 25, 2027",
+        "desc": "Mixed-gender Ultimate Frisbee tournament emphasizing fair play and athletic layouts.",
+        "price": "Free",
+        "color": "#14b8a6",
+        "image": "https://images.unsplash.com/photo-1592656094267-764a45160876?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Celebrate non-contact team athleticism and Spirit of the Game (SOTG) culture.",
+        "full_details": "7v7 grass field games with Discraft Ultrastar 175g discs and peer-voted spirit scoring.",
+        "outcome": "Spirit of the Game trophy, custom discs, and sportsmanship medals.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Gymkhana Club Athletic Grounds",
+        "venue_address": "Safdarjung Rd, New Delhi, Delhi 110011",
+        "time": "07:30 AM",
+        "end_time": "02:00 PM",
+        "category": "Sports"
+    },
+    {
+        "id": 29,
+        "title": "Inter-State Volleyball Super League",
+        "date": "Feb 03, 2027",
+        "desc": "Spike, block, and set in high-energy indoor court volleyball battles.",
+        "price": "\u20b9350",
+        "color": "#eab308",
+        "image": "https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Elevate volleyball coordination, vertical jumps, and defense coverage.",
+        "full_details": "Best-of-5 sets tournament format with Mikasa balls, professional antennae, and line judges.",
+        "outcome": "Best Attacker, Best Setter, and Best Libero awards with cash prizes.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Gachibowli Indoor Stadium",
+        "venue_address": "Old Mumbai Hwy, Gachibowli, Hyderabad, Telangana 500032",
+        "time": "10:00 AM",
+        "end_time": "06:00 PM",
+        "category": "Sports"
+    },
+    {
+        "id": 30,
+        "title": "Pro Kabaddi Collegiate Knockout",
+        "date": "Feb 11, 2027",
+        "desc": "Raids, tackles, and super-catches on professional synthetic kabaddi mats.",
+        "price": "\u20b9400",
+        "color": "#dc2626",
+        "image": "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Celebrate India's indigenous high-intensity contact sport.",
+        "full_details": "40-minute matches with 30-second raid timers, bonus lines, and PKL coaching scouts.",
+        "outcome": "Best Raider trophy, \u20b975,000 champion purse, and PKL development camp invitations.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Shree Shiv Chhatrapati Sports Complex (Balewadi)",
+        "venue_address": "National Games Park, Mahalunge, Pune, Maharashtra 411045",
+        "time": "03:00 PM",
+        "end_time": "08:30 PM",
+        "category": "Sports"
+    },
+    {
+        "id": 31,
+        "title": "Formula Student Electric Go-Kart GP",
+        "date": "Feb 19, 2027",
+        "desc": "High-torque electric kart racing and vehicle dynamics collegiate competition.",
+        "price": "\u20b91200",
+        "color": "#6366f1",
+        "image": "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Combine automotive engineering and high-speed circuit racing.",
+        "full_details": "Timed sprint qualifying laps, endurance races, and telemetry analysis by racing engineers.",
+        "outcome": "Fastest Lap Trophy, Pirelli karting accessories, and race engineering certificates.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Meco Kartopia International Track",
+        "venue_address": "Hennur-Bagalur Road, Mitganahalli, Chagalahatti, Bengaluru, Karnataka 562149",
+        "time": "09:00 AM",
+        "end_time": "05:00 PM",
+        "category": "Sports"
+    },
+    {
+        "id": 32,
+        "title": "Inter-University Track & Field Carnival",
+        "date": "Feb 27, 2027",
+        "desc": "100m dash, Long Jump, Javelin Throw, and 4x400m relay on synthetic tracks.",
+        "price": "Free",
+        "color": "#84cc16",
+        "image": "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Identify elite university sprinting and field athletics talent.",
+        "full_details": "Laser photofinish timing, international weight specifications for throwing events, and certified athletic jury.",
+        "outcome": "Individual event medals, Overall College Championship Shield, and state meet qualification.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Jawaharlal Nehru Stadium Athletic Arena",
+        "venue_address": "Pragati Vihar, New Delhi, Delhi 110003",
+        "time": "07:00 AM",
+        "end_time": "04:00 PM",
+        "category": "Sports"
+    },
+    {
+        "id": 33,
+        "title": "Taekwondo & Martial Arts Open Cup",
+        "date": "Mar 07, 2027",
+        "desc": "Sparring (Kyorugi) and Forms (Poomsae) martial arts clash with electronic scoring sensors.",
+        "price": "\u20b9500",
+        "color": "#a855f7",
+        "image": "https://images.unsplash.com/photo-1555597673-b21d5c935865?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Showcase discipline, agility, and precision kicks in Olympic Taekwondo.",
+        "full_details": "Divided into weight categories with Daedo electronic chest and headgear sensors.",
+        "outcome": "Custom black-belt medals, sparring equipment gear, and national ranking points.",
+        "seats_total": 100,
+        "seats_filled": 29,
+        "is_draft": 0,
+        "featured": 1,
+        "venue": "Koramangala Indoor Stadium",
+        "venue_address": "80 Feet Rd, 6th Block, Koramangala, Bengaluru, Karnataka 560095",
+        "time": "09:00 AM",
+        "end_time": "05:30 PM",
+        "category": "Sports"
+    },
+    {
+        "id": 34,
+        "title": "Apex Legends & BGMI Esports Arena",
+        "date": "Mar 16, 2027",
+        "desc": "Battle Royale team finals with live stage LED wall and shoutcaster desk.",
+        "price": "Free",
+        "color": "#f43f5e",
+        "image": "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Crown the top tactical battle royale squad across the nation.",
+        "full_details": "6 custom match rounds with point multipliers for eliminations and survival placement.",
+        "outcome": "\u20b91,50,000 cash pool, gaming jerseys, and streaming sponsorships.",
+        "seats_total": 100,
+        "seats_filled": 144,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "NESCO Esports Arena Center",
+        "venue_address": "Western Express Hwy, Goregaon, Mumbai, Maharashtra 400063",
+        "time": "12:00 PM",
+        "end_time": "08:00 PM",
+        "category": "Sports"
+    },
+    {
+        "id": 35,
+        "title": "Winter Cricket Trophy 2025",
+        "date": "Dec 18, 2025",
+        "desc": "Concluded winter inter-college cricket championship.",
+        "price": "\u20b9400",
+        "color": "#15803d",
+        "image": "https://images.unsplash.com/photo-1531415074868-036b1c5f53ec?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Historic winter sports championship.",
+        "full_details": "Concluded tournament with 12 college squads. Trophy was lifted by Bangalore Tech Titans.",
+        "outcome": "Archived scorecard, match highlights, and verifiable participant certificates.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Brabourne Stadium Cricket Ground",
+        "venue_address": "Veer Nariman Rd, Churchgate, Mumbai, Maharashtra 400020",
+        "time": "09:00 AM",
+        "end_time": "05:00 PM",
+        "category": "Sports"
+    },
+    {
+        "id": 36,
+        "title": "Autumn Football Derby 2025",
+        "date": "Nov 28, 2025",
+        "desc": "Concluded city derby football cup with 16 competing varsity clubs.",
+        "price": "\u20b9350",
+        "color": "#047857",
+        "image": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Collegiate football derby tradition.",
+        "full_details": "Concluded season final between Mumbai Strikers and Pune FC.",
+        "outcome": "Official match records, MVP badges, and certificate download archives.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Cooperage Football Stadium",
+        "venue_address": "Maharshi Karve Rd, Nariman Point, Mumbai, Maharashtra 400021",
+        "time": "02:00 PM",
+        "end_time": "07:00 PM",
+        "category": "Sports"
+    },
+    {
+        "id": 37,
+        "title": "Sunburn Arena Live EDM Explosion 2026",
+        "date": "Nov 14, 2026",
+        "desc": "Massive outdoor electronic dance music festival with international headliner DJs and laser show.",
+        "price": "\u20b91500",
+        "color": "#f43f5e",
+        "image": "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Deliver an unforgettable live audio-visual electronic music experience.",
+        "full_details": "Featuring international DJ headliners, pyrotechnics, immersive 360-degree LED stage walls, and multiple food & beverage zones.",
+        "outcome": "VIP wristband, festival memorabilia, and unforgettable live music memories.",
+        "seats_total": 100,
+        "seats_filled": 16,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Manpho Convention Grounds Arena",
+        "venue_address": "No. 91/4, Veeranna Palya, Outer Ring Road, Nagavara, Bengaluru, Karnataka 560045",
+        "time": "05:00 PM",
+        "end_time": "11:30 PM",
+        "category": "Music Concerts"
+    },
+    {
+        "id": 38,
+        "title": "Bollywood Symphony Grand Orchestra",
+        "date": "Nov 20, 2026",
+        "desc": "A 60-piece acoustic orchestra performing timeless Bollywood classics and modern anthems.",
+        "price": "\u20b91200",
+        "color": "#fbbf24",
+        "image": "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Celebrate cinema music heritage through grand acoustic orchestration.",
+        "full_details": "Renowned vocalists and a 60-piece orchestra playing strings, brass, flutes, and percussion in an acoustically tuned auditorium.",
+        "outcome": "Commemorative vinyl-style souvenir and exclusive VIP seating access.",
+        "seats_total": 100,
+        "seats_filled": 12,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Shanmukhananda Chandrasekarendra Auditorium",
+        "venue_address": "Comrade Harbanslal Marg, Sion East, Mumbai, Maharashtra 400022",
+        "time": "06:30 PM",
+        "end_time": "10:00 PM",
+        "category": "Music Concerts"
+    },
+    {
+        "id": 39,
+        "title": "Indie Rock & Fusion Music Fest",
+        "date": "Nov 27, 2026",
+        "desc": "Top Indian indie bands, electrifying guitar solos, and bilingual fusion jams.",
+        "price": "\u20b9800",
+        "color": "#8b5cf6",
+        "image": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Promote independent musicians and vibrant original live songwriting.",
+        "full_details": "Lineup includes 6 celebrated indie fusion acts with open-air amphitheater sound systems and merchandise stalls.",
+        "outcome": "Band merchandise discounts, meet & greet wristband, and festival poster.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Phoenix Marketcity Open Courtyard",
+        "venue_address": "Whitefield Main Rd, Devasandra Industrial Estate, Mahadevapura, Bengaluru, Karnataka 560048",
+        "time": "04:30 PM",
+        "end_time": "10:30 PM",
+        "category": "Music Concerts"
+    },
+    {
+        "id": 40,
+        "title": "Sufi & Qawwali Soulful Evening",
+        "date": "Dec 04, 2026",
+        "desc": "Mystical Sufi poetry and transcendent Qawwali chants by legendary maestros.",
+        "price": "\u20b9750",
+        "color": "#d97706",
+        "image": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Immerse listeners in rich spiritual Sufi acoustic traditions.",
+        "full_details": "Harmonium, tabla, and choral claps bringing alive centuries-old verses of Rumi, Bulleh Shah, and Amir Khusro.",
+        "outcome": "Soul-stirring cultural evening, reserved seating, and lyrical booklet.",
+        "seats_total": 100,
+        "seats_filled": 1,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Kamani Auditorium",
+        "venue_address": "1, Copernicus Marg, Mandi House, New Delhi, Delhi 110001",
+        "time": "07:00 PM",
+        "end_time": "10:30 PM",
+        "category": "Music Concerts"
+    },
+    {
+        "id": 41,
+        "title": "Electronic Pulse DJ Mega Night",
+        "date": "Dec 10, 2026",
+        "desc": "Deep house, techno, and progressive trance beats powered by VOID Acoustics.",
+        "price": "\u20b91100",
+        "color": "#06b6d4",
+        "image": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Celebrate cutting-edge underground techno and melodic house production.",
+        "full_details": "A 6-hour non-stop DJ set with synchronized laser mapping, kinetic light sculptures, and chillout lounges.",
+        "outcome": "Glow bands, DJ tracklist downloads, and festival drink vouchers.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Hitex Exhibition Center Hall 2",
+        "venue_address": "Trade Fair Office Building, Izzathnagar, Hyderabad, Telangana 500084",
+        "time": "06:00 PM",
+        "end_time": "11:59 PM",
+        "category": "Music Concerts"
+    },
+    {
+        "id": 42,
+        "title": "Acoustic Unplugged Under the Stars",
+        "date": "Dec 17, 2026",
+        "desc": "Intimate candlelit acoustic session with singer-songwriters, guitar, and cello.",
+        "price": "\u20b9600",
+        "color": "#ec4899",
+        "image": "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Experience raw vocal melodies and intimate acoustic storytelling.",
+        "full_details": "Cozy open-air setting with acoustic guitars, cajon, and warm ambient string lighting.",
+        "outcome": "Warm artisanal tea, acoustic guitar masterclass coupon, and signed artist cards.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Ranga Shankara Open Amphitheatre",
+        "venue_address": "36/2, 8th Cross Rd, R K Colony, 2nd Phase, J. P. Nagar, Bengaluru, Karnataka 560078",
+        "time": "06:30 PM",
+        "end_time": "09:30 PM",
+        "category": "Music Concerts"
+    },
+    {
+        "id": 43,
+        "title": "Global Jazz & Blues Festival 2026",
+        "date": "Dec 22, 2026",
+        "desc": "Saxophone improvisation, brass ensembles, and sultry blues rhythms from international artists.",
+        "price": "\u20b91400",
+        "color": "#3b82f6",
+        "image": "https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Celebrate jazz improvisation and vintage blues heritage.",
+        "full_details": "Performances by celebrated saxophonists, upright bassists, and blues guitarists in world-class acoustics.",
+        "outcome": "Commemorative Jazz Fest booklet and access to the post-concert artist lounge.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 1,
+        "venue": "NCPA Tata Theatre",
+        "venue_address": "NCPA Marg, Nariman Point, Mumbai, Maharashtra 400021",
+        "time": "07:00 PM",
+        "end_time": "10:30 PM",
+        "category": "Music Concerts"
+    },
+    {
+        "id": 44,
+        "title": "Hip-Hop Cypher & Rap Battleground",
+        "date": "Jan 10, 2027",
+        "desc": "Live beatboxing, lyrical rap battles, b-boy breaking, and street cyphers.",
+        "price": "\u20b9400",
+        "color": "#f97316",
+        "image": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Empower underground street hip-hop culture, rap lyricism, and urban dance.",
+        "full_details": "16 MCs battle for the microphone crown with live scratch DJs and graffiti artists painting live canvas murals.",
+        "outcome": "Exclusive streetwear merch discounts and official Cypher mixtape download.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "The Humming Tree Live Arena",
+        "venue_address": "949, 12th Main Rd, Doopanahalli, Indiranagar, Bengaluru, Karnataka 560008",
+        "time": "04:00 PM",
+        "end_time": "09:30 PM",
+        "category": "Music Concerts"
+    },
+    {
+        "id": 45,
+        "title": "Carnatic Classical Fusion Melodies",
+        "date": "Jan 18, 2027",
+        "desc": "Veena, violin, mridangam, and modern synthesizers blending traditional ragas with ambient beats.",
+        "price": "Free",
+        "color": "#10b981",
+        "image": "https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Bridge timeless Carnatic ragas with modern world music textures.",
+        "full_details": "World-renowned instrumentalists showcase intricate ragas (Charukesi, Kalyani) backed by ambient percussion.",
+        "outcome": "Raga breakdown listening guide and cultural heritage pass.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "The Music Academy Main Auditorium",
+        "venue_address": "New No. 168, TT Krishnamachari Rd, Royapettah, Chennai, Tamil Nadu 600014",
+        "time": "06:00 PM",
+        "end_time": "09:30 PM",
+        "category": "Music Concerts"
+    },
+    {
+        "id": 46,
+        "title": "Retro 90s Pop & Disco Night",
+        "date": "Jan 26, 2027",
+        "desc": "Dance to non-stop golden era pop hits, disco lights, and vinyl DJ sets.",
+        "price": "\u20b9900",
+        "color": "#ec4899",
+        "image": "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Relive the high-energy nostalgic 90s pop and synth-wave era.",
+        "full_details": "Live cover band and DJ duo spinning retro classics with retro costume contests and photo booths.",
+        "outcome": "Retro neon sunglasses, vinyl-themed coasters, and prize for best 90s outfit.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Hard Rock Cafe Live Pavilion",
+        "venue_address": "East Main Rd, Koregaon Park, Pune, Maharashtra 411001",
+        "time": "07:30 PM",
+        "end_time": "11:30 PM",
+        "category": "Music Concerts"
+    },
+    {
+        "id": 47,
+        "title": "Monsoon Beats Music Carnival 2026",
+        "date": "Feb 04, 2027",
+        "desc": "Multi-genre rain dance music festival with alternative rock, reggae, and electronic stages.",
+        "price": "\u20b91000",
+        "color": "#0ea5e9",
+        "image": "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Celebrate music through outdoor stages and carnival community spirit.",
+        "full_details": "3 live performance stages, eco-friendly rain showers, artisanal food trucks, and flea market stalls.",
+        "outcome": "Festival wristband, waterproof phone pouch, and artist meet & greet chances.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Nicco Park Amphitheatre Grounds",
+        "venue_address": "HM Block, Sector IV, Bidhannagar, Kolkata, West Bengal 700106",
+        "time": "03:00 PM",
+        "end_time": "10:00 PM",
+        "category": "Music Concerts"
+    },
+    {
+        "id": 48,
+        "title": "Psychedelic Trance & Visual Art Festival",
+        "date": "Feb 12, 2027",
+        "desc": "All-night psychedelic trance audio-visual journey with UV decor and projection mapping.",
+        "price": "\u20b91800",
+        "color": "#a855f7",
+        "image": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Deliver immersive high-BPM psychedelic music and visionary art installations.",
+        "full_details": "12-hour continuous music journey featuring international psytrance producers, fire dancers, and ambient chill-out domes.",
+        "outcome": "UV body paint experience, festival merchandise pack, and sunrise set access.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Hilltop Vagator Open Arena",
+        "venue_address": "Small Vagator, Anjuna, Bardez, Goa 403509",
+        "time": "06:00 PM",
+        "end_time": "06:00 AM",
+        "category": "Music Concerts"
+    },
+    {
+        "id": 49,
+        "title": "Candlelight Piano & Cello Concert",
+        "date": "Feb 20, 2027",
+        "desc": "Illuminated by 2,000 candles, classical musicians perform movie soundtracks and baroque sonatas.",
+        "price": "\u20b91300",
+        "color": "#f59e0b",
+        "image": "https://images.unsplash.com/photo-1520523839898-50712140d868?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Create a peaceful, candlelit acoustic sanctuary in an architectural landmark.",
+        "full_details": "Grand Steinway piano and string quartet performing Hans Zimmer, Ludovico Einaudi, and Chopin in a candle-lit hall.",
+        "outcome": "Intimate concert experience, scented candle gift, and printed program booklet.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "The Royal Opera House",
+        "venue_address": "Mathew Rd, Charni Road East, Opera House, Girgaon, Mumbai, Maharashtra 400004",
+        "time": "07:00 PM",
+        "end_time": "09:15 PM",
+        "category": "Music Concerts"
+    },
+    {
+        "id": 50,
+        "title": "National Battle of the College Bands 2026",
+        "date": "Feb 28, 2027",
+        "desc": "20 college rock and fusion bands battle live on stage for the national recording contract.",
+        "price": "Free",
+        "color": "#ef4444",
+        "image": "https://images.unsplash.com/photo-1464375117522-1311d6a5b81f?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Discover emerging student band talent and raw musical songwriting.",
+        "full_details": "Bands judged on original composition, stage presence, and technical skill by celebrity musicians.",
+        "outcome": "Winning band receives studio recording contract and \u20b91,00,000 in musical gear.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "St. Joseph's Open Quadrangle Grounds",
+        "venue_address": "36, Lalbagh Rd, Shanti Nagar, Bengaluru, Karnataka 560027",
+        "time": "02:00 PM",
+        "end_time": "08:30 PM",
+        "category": "Music Concerts"
+    },
+    {
+        "id": 51,
+        "title": "EDM Neon Bass Music Extravaganza",
+        "date": "Mar 08, 2027",
+        "desc": "Bass-heavy trap, dubstep, and future bass beats with LED wristband synchronization.",
+        "price": "\u20b91600",
+        "color": "#00f2fe",
+        "image": "https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Deliver high-energy bass music festival production with interactive lighting.",
+        "full_details": "Massive stadium stage with heavy subwoofers, CO2 cryo jets, and interactive RFID wristbands.",
+        "outcome": "Synced LED wristband, VIP festival entry, and live stream video recording link.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "MMRDA Grounds BKC",
+        "venue_address": "E Block BKC, Bandra Kurla Complex, Bandra East, Mumbai, Maharashtra 400051",
+        "time": "05:00 PM",
+        "end_time": "11:00 PM",
+        "category": "Music Concerts"
+    },
+    {
+        "id": 52,
+        "title": "Coke Studio Live Regional Concert",
+        "date": "Mar 17, 2027",
+        "desc": "Folk legends and contemporary pop icons collaborating in a grand live music spectacle.",
+        "price": "\u20b91200",
+        "color": "#dc2626",
+        "image": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Celebrate regional cultural music diversity on a massive live production stage.",
+        "full_details": "Live performances of Coke Studio hit tracks with authentic regional folk instruments and contemporary synthesizer arrangements.",
+        "outcome": "Official Coke Studio merchandise tee and high-definition studio audio track download.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Gachibowli Stadium Open Grounds",
+        "venue_address": "Old Mumbai Hwy, Gachibowli, Hyderabad, Telangana 500032",
+        "time": "06:00 PM",
+        "end_time": "10:30 PM",
+        "category": "Music Concerts"
+    },
+    {
+        "id": 53,
+        "title": "New Year Neon Music Festival 2025",
+        "date": "Dec 31, 2025",
+        "desc": "Concluded mega New Year countdown music celebration with fireworks and top artists.",
+        "price": "\u20b92000",
+        "color": "#ec4899",
+        "image": "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Historic New Year music celebration.",
+        "full_details": "Concluded festival attended by 10,000+ music enthusiasts welcoming 2026 with midnight fireworks.",
+        "outcome": "Archived event photos, commemorative festival badges, and certificate records.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Palace Grounds Main Arena",
+        "venue_address": "Bellary Rd, Jayamahal, Bengaluru, Karnataka 560006",
+        "time": "07:00 PM",
+        "end_time": "01:00 AM",
+        "category": "Music Concerts"
+    },
+    {
+        "id": 54,
+        "title": "Autumn Acoustic Sunset Jam 2025",
+        "date": "Oct 25, 2025",
+        "desc": "Concluded open-air sunset acoustic music evening.",
+        "price": "\u20b9500",
+        "color": "#f59e0b",
+        "image": "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Historical acoustic gathering in botanical gardens.",
+        "full_details": "Concluded concert featuring 5 acoustic indie acts among century-old trees.",
+        "outcome": "Archived performance recordings and attendee badge credentials.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Cubbon Park Bandstand Pavilion",
+        "venue_address": "Kasturba Rd, Sampangi Rama Nagar, Bengaluru, Karnataka 560001",
+        "time": "05:00 PM",
+        "end_time": "08:30 PM",
+        "category": "Music Concerts"
+    },
+    {
+        "id": 55,
+        "title": "Pan-India Mega Action Film Audio Launch",
+        "date": "Nov 15, 2026",
+        "desc": "Star-studded live audio launch with music directors, lead actors, and exclusive trailer showcase.",
+        "price": "\u20b9500",
+        "color": "#f43f5e",
+        "image": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Launch music album and theatrical trailer with lead cast interactions.",
+        "full_details": "Live performances of movie songs, speech by the director and superstar actors, and first public screening of the 4K trailer.",
+        "outcome": "Exclusive movie merchandise tee, signed motion poster, and early ticket booking codes.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Jawaharlal Nehru Indoor Stadium",
+        "venue_address": "Sydenhams Rd, Periamet, Chennai, Tamil Nadu 600003",
+        "time": "05:30 PM",
+        "end_time": "10:00 PM",
+        "category": "Movie Promotions"
+    },
+    {
+        "id": 56,
+        "title": "Sci-Fi Epic Trailer Reveal & Fan Meet",
+        "date": "Nov 21, 2026",
+        "desc": "World premiere of the official trailer on IMAX with director Q&A and cast interaction.",
+        "price": "Free",
+        "color": "#00f2fe",
+        "image": "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Engage fans with cutting-edge sci-fi cinema previews.",
+        "full_details": "IMAX laser trailer premiere, behind-the-scenes world-building breakdown, and interactive fan question mic session.",
+        "outcome": "Limited edition IMAX collectible ticket, sci-fi badge, and photo opportunities with the cast.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "PVR Superplex IMAX",
+        "venue_address": "Mall of India, Sector 18, Noida, Uttar Pradesh 201301",
+        "time": "03:00 PM",
+        "end_time": "06:30 PM",
+        "category": "Movie Promotions"
+    },
+    {
+        "id": 57,
+        "title": "National Cinema & Comic Con 2026",
+        "date": "Nov 28, 2026",
+        "desc": "Celebrate cinema, movie prop exhibitions, upcoming blockbuster panels, and cosplay contests.",
+        "price": "\u20b9850",
+        "color": "#fbbf24",
+        "image": "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Celebrate film culture, upcoming film lineups, and comic adaptations.",
+        "full_details": "Exclusive production house booths, teaser unveilings, movie prop museum, and celebrity panels.",
+        "outcome": "Comic Con tote bag, movie collectibles, and entry to the grand cosplay championship.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Bombay Exhibition Centre (BEC)",
+        "venue_address": "NESCO, Western Express Hwy, Goregaon East, Mumbai, Maharashtra 400063",
+        "time": "10:00 AM",
+        "end_time": "07:00 PM",
+        "category": "Movie Promotions"
+    },
+    {
+        "id": 58,
+        "title": "VFX & CGI Behind-the-Scenes Movie Preview",
+        "date": "Dec 05, 2026",
+        "desc": "Exclusive breakdown of Hollywood-grade VFX shots, motion capture, and green screen secrets.",
+        "price": "\u20b9400",
+        "color": "#8b5cf6",
+        "image": "https://images.unsplash.com/photo-1478720568477-152d9b164e26?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Inspire student filmmakers and animators with state-of-the-art visual effects pipelines.",
+        "full_details": "VFX supervisors present shot breakdowns from upcoming tentpole releases showing CGI rendering, simulations, and compositing.",
+        "outcome": "VFX masterclass handbook and behind-the-scenes digital artwork asset pack.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Prasads Multiplex Preview Theatre",
+        "venue_address": "NTR Gardens, Khairatabad, Hyderabad, Telangana 500063",
+        "time": "02:00 PM",
+        "end_time": "06:00 PM",
+        "category": "Movie Promotions"
+    },
+    {
+        "id": 59,
+        "title": "Director's Cut & Cast Live Q&A Conclave",
+        "date": "Dec 11, 2026",
+        "desc": "Intimate cinema panel discussing screenwriting, direction, and character nuances with lead actors.",
+        "price": "\u20b9600",
+        "color": "#10b981",
+        "image": "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Deep dive into cinematic craft, screenplay analysis, and directorial storytelling.",
+        "full_details": "National award-winning director and cast engage in an unscripted panel discussion with student filmmakers and film critics.",
+        "outcome": "Autographed screenplay booklet and admission pass for the special screening.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Siri Fort Auditorium",
+        "venue_address": "August Kranti Marg, Siri Fort Institutional Area, New Delhi, Delhi 110049",
+        "time": "05:00 PM",
+        "end_time": "08:30 PM",
+        "category": "Movie Promotions"
+    },
+    {
+        "id": 60,
+        "title": "Indie Film Premiere & Star Interaction",
+        "date": "Dec 18, 2026",
+        "desc": "Red carpet premiere of an acclaimed festival film followed by cast and crew interaction.",
+        "price": "\u20b9750",
+        "color": "#ec4899",
+        "image": "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Support independent Indian cinema and artistic storytelling.",
+        "full_details": "Red carpet entrance, full feature screening before commercial theatrical release, and post-show champagne discussion.",
+        "outcome": "Commemorative premiere ticket, film festival brochure, and director signed postcard.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "PVR PXL Cinema",
+        "venue_address": "Forum Mall, Hosur Rd, Koramangala, Bengaluru, Karnataka 560095",
+        "time": "06:00 PM",
+        "end_time": "09:30 PM",
+        "category": "Movie Promotions"
+    },
+    {
+        "id": 61,
+        "title": "Action Blockbuster Grand Teaser Launch",
+        "date": "Dec 23, 2026",
+        "desc": "Mass fan event launching the high-octane teaser with superstar entrance on stage.",
+        "price": "Free",
+        "color": "#f97316",
+        "image": "https://images.unsplash.com/photo-1574267432553-4b4628081c31?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Ignite nationwide buzz for the year's biggest action entertainer.",
+        "full_details": "Pyrotechnics, stage bike stunt entries, teaser release countdown, and superstar speech dedicated to fans.",
+        "outcome": "Teaser launch commemorative bandana, digital sticker pack, and VIP fandom passes.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Hitex Trade Center Hall 1",
+        "venue_address": "Trade Fair Office Building, Izzathnagar, Hyderabad, Telangana 500084",
+        "time": "04:00 PM",
+        "end_time": "07:30 PM",
+        "category": "Movie Promotions"
+    },
+    {
+        "id": 62,
+        "title": "Bollywood Star Cast Press Meet & Preview",
+        "date": "Jan 11, 2027",
+        "desc": "Exclusive media and fan press conference featuring A-list actors and producers.",
+        "price": "\u20b91000",
+        "color": "#e11d48",
+        "image": "https://images.unsplash.com/photo-1524712245354-2c4e5e7121c0?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Media and fan engagement ahead of worldwide theatrical release.",
+        "full_details": "Interactive media Q&A, poster unveiling, behind-the-scenes reel, and high-tea reception.",
+        "outcome": "Media kit with high-res stills, cast-signed press booklet, and luxury gift hamper.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "JW Marriott Grand Ballroom",
+        "venue_address": "Juhu Tara Rd, Juhu, Mumbai, Maharashtra 400049",
+        "time": "11:30 AM",
+        "end_time": "03:30 PM",
+        "category": "Movie Promotions"
+    },
+    {
+        "id": 63,
+        "title": "Horror-Thriller Midnight Screening & Cast Q&A",
+        "date": "Jan 19, 2027",
+        "desc": "Spine-chilling midnight advance screening with sound effects and haunted corridor decor.",
+        "price": "\u20b9450",
+        "color": "#475569",
+        "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Deliver an atmospheric horror movie experience for true genre buffs.",
+        "full_details": "Themed spooky photo booth, darkness screening with Dolby Atmos spatial audio, and surprise appearance by the film's cast.",
+        "outcome": "Glow-in-the-dark horror badge, popcorn tub, and exclusive promo mini-poster.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "INOX Megaplex Inorbit",
+        "venue_address": "Inorbit Mall, Link Rd, Malad West, Mumbai, Maharashtra 400064",
+        "time": "11:00 PM",
+        "end_time": "02:30 AM",
+        "category": "Movie Promotions"
+    },
+    {
+        "id": 64,
+        "title": "Regional Cinema Celebration & Motion Poster",
+        "date": "Jan 27, 2027",
+        "desc": "Celebrating storytelling in Kannada, Telugu, Tamil, and Malayalam with motion poster reveals.",
+        "price": "Free",
+        "color": "#ca8a04",
+        "image": "https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Champion regional Indian cinema and cultural storytelling brilliance.",
+        "full_details": "Showcase of upcoming regional masterpieces with traditional cultural performances and motion poster debuts.",
+        "outcome": "Regional cinema commemorative badge and early streaming platform trial codes.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Palace Grounds Sheesh Mahal",
+        "venue_address": "Bellary Rd, Jayamahal, Bengaluru, Karnataka 560006",
+        "time": "05:00 PM",
+        "end_time": "09:00 PM",
+        "category": "Movie Promotions"
+    },
+    {
+        "id": 65,
+        "title": "National Short Film Festival & Awards Gala",
+        "date": "Feb 05, 2027",
+        "desc": "Screening of 30 curated short films from university creators followed by jury award ceremony.",
+        "price": "\u20b9500",
+        "color": "#0284c7",
+        "image": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Discover emerging indie directors, cinematographers, and screenwriters.",
+        "full_details": "Category screenings across Fiction, Documentary, and Animation with feedback from veteran film jury.",
+        "outcome": "Best Short Film Trophy with \u20b950,000 cash grant and distribution contract.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Nandan Film Centre Main Auditorium",
+        "venue_address": "1/1, AJC Bose Rd, Elgin, Kolkata, West Bengal 700020",
+        "time": "10:00 AM",
+        "end_time": "07:00 PM",
+        "category": "Movie Promotions"
+    },
+    {
+        "id": 66,
+        "title": "Superhero Cinematic Universe Fan Con",
+        "date": "Feb 13, 2027",
+        "desc": "Immersive comic book movie activation with life-sized superhero statues and trailer exclusive drops.",
+        "price": "\u20b9700",
+        "color": "#2563eb",
+        "image": "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Bring the superhero cinematic multiverse to life for passionate fans.",
+        "full_details": "Interactive photo zones, superhero costume displays, trivia contests, and exclusive footage screenings.",
+        "outcome": "Superhero collector pin, comic book variant edition, and cinema voucher.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "DLF CyberHub Amphitheatre",
+        "venue_address": "DLF Cyber City, Phase 2, Sector 24, Gurugram, Haryana 122002",
+        "time": "11:00 AM",
+        "end_time": "06:30 PM",
+        "category": "Movie Promotions"
+    },
+    {
+        "id": 67,
+        "title": "Costume & Prop Design Cinema Expo",
+        "date": "Feb 21, 2027",
+        "desc": "Exhibition of legendary movie armor, royal period attire, and signature weapon props.",
+        "price": "\u20b9350",
+        "color": "#c026d3",
+        "image": "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Highlight the craftsmanship of costume designers, armorers, and production designers.",
+        "full_details": "Guided walkthroughs through actual movie sets and preserved costumes from blockbuster films.",
+        "outcome": "Behind-the-scenes design guide, prop replica souvenir, and certificate of attendance.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Film City Studio 4 Arena",
+        "venue_address": "Film City Complex, Goregaon East, Mumbai, Maharashtra 400065",
+        "time": "10:00 AM",
+        "end_time": "05:00 PM",
+        "category": "Movie Promotions"
+    },
+    {
+        "id": 68,
+        "title": "Celebrity Choreographers Dance Workshop & Film Promo",
+        "date": "Mar 01, 2027",
+        "desc": "Learn viral signature hook steps directly from Bollywood's top choreographers.",
+        "price": "\u20b9800",
+        "color": "#f43f5e",
+        "image": "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Promote dance-musical film with direct fan participation in signature choreography.",
+        "full_details": "Masterclass covering dynamic Bollywood hip-hop routines, followed by a group dance reel recording.",
+        "outcome": "Dance participation certificate, featured spot in the promotional fan reel, and movie tickets.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Shiamak Davar Dance Studio",
+        "venue_address": "Bandra West, Mumbai, Maharashtra 400050",
+        "time": "02:00 PM",
+        "end_time": "06:00 PM",
+        "category": "Movie Promotions"
+    },
+    {
+        "id": 69,
+        "title": "Mythological Mega-Budget Movie Showcase",
+        "date": "Mar 09, 2027",
+        "desc": "Grand reveal of concept art, creature design, and musical score for upcoming mythological epic.",
+        "price": "\u20b9900",
+        "color": "#d97706",
+        "image": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Unveil historical Indian mythology brought to life with world-class production values.",
+        "full_details": "Live musical performance of the anthem score, holographic presentation of mythical kingdoms, and cast speeches.",
+        "outcome": "Mythological art book, collector coin, and early premiere tickets.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Shilpakala Vedika Auditorium",
+        "venue_address": "Hitec City Main Rd, Madhapur, Hyderabad, Telangana 500081",
+        "time": "05:00 PM",
+        "end_time": "09:00 PM",
+        "category": "Movie Promotions"
+    },
+    {
+        "id": 70,
+        "title": "International Film Festival Star Screening",
+        "date": "Mar 18, 2027",
+        "desc": "Red-carpet opening gala of the International Film Festival of India with world cinema icons.",
+        "price": "\u20b91200",
+        "color": "#4f46e5",
+        "image": "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Celebrate global cinematic masterpieces and cultural diplomacy.",
+        "full_details": "Opening ceremony film screening attended by international directors, jury members, and national film luminaries.",
+        "outcome": "IFFI festival delegate kit, film schedule catalogue, and access to red carpet zones.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "IFFI Main Auditorium - ESG Complex",
+        "venue_address": "Dayanand Bandodkar Marg, Campal, Panaji, Goa 403001",
+        "time": "06:00 PM",
+        "end_time": "10:00 PM",
+        "category": "Movie Promotions"
+    },
+    {
+        "id": 71,
+        "title": "Mega Action Movie Trailer Launch 2025",
+        "date": "Nov 12, 2025",
+        "desc": "Concluded massive theatrical trailer launch for the record-breaking blockbuster.",
+        "price": "Free",
+        "color": "#b91c1c",
+        "image": "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Historic trailer launch event.",
+        "full_details": "Concluded trailer launch attended by over 5,000 fans celebrating the film's 100-crore opening.",
+        "outcome": "Archived trailer video, fan gallery photos, and verified attendance records.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Prasads Multiplex Large Screen",
+        "venue_address": "NTR Gardens, Khairatabad, Hyderabad, Telangana 500063",
+        "time": "05:00 PM",
+        "end_time": "08:30 PM",
+        "category": "Movie Promotions"
+    },
+    {
+        "id": 72,
+        "title": "Fantasy Film Cast Press Meet 2025",
+        "date": "Dec 20, 2025",
+        "desc": "Concluded fantasy cinema press conference with lead actor discussions.",
+        "price": "\u20b9500",
+        "color": "#9333ea",
+        "image": "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Concluded movie promotion panel.",
+        "full_details": "Archived session featuring media interactions, behind-the-scenes reels, and fan questions.",
+        "outcome": "Archived press transcripts and verified certificate downloads.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "PVR Director's Cut",
+        "venue_address": "Ambience Mall, Vasant Kunj, New Delhi, Delhi 110070",
+        "time": "02:00 PM",
+        "end_time": "05:00 PM",
+        "category": "Movie Promotions"
+    },
+    {
+        "id": 73,
+        "title": "Global Creator & Influencer Conclave 2026",
+        "date": "Nov 16, 2026",
+        "desc": "Meet top YouTube creators, podcast hosts, and digital storytellers in live keynotes and creator lounges.",
+        "price": "\u20b91200",
+        "color": "#8b5cf6",
+        "image": "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Connect passionate aspiring creators with the world's most successful digital influencers.",
+        "full_details": "Panels on audience monetization, viral storytelling, AI video production, and 1-on-1 creator networking booths.",
+        "outcome": "Creator networking contacts, verified attendee badge, and creator starter kit.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Jio World Convention Centre",
+        "venue_address": "G Block BKC, Bandra Kurla Complex, Bandra East, Mumbai, Maharashtra 400098",
+        "time": "10:00 AM",
+        "end_time": "06:00 PM",
+        "category": "Celebrity Meet-ups"
+    },
+    {
+        "id": 74,
+        "title": "Tech Titan Fireside Keynote with Silicon Leaders",
+        "date": "Nov 22, 2026",
+        "desc": "Intimate fireside chat with billionaire tech founders and silicon innovators followed by dinner.",
+        "price": "\u20b91500",
+        "color": "#0ea5e9",
+        "image": "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Gain rare insights into high-scale engineering, AI disruption, and venture leadership.",
+        "full_details": "Keynote address, interactive audience Q&A with tech CEOs, and a catered executive dinner.",
+        "outcome": "Exclusive access to executive network, signed autobiography, and business leadership certificate.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "The Leela Palace Grand Ballroom",
+        "venue_address": "23, HAL Old Airport Rd, HAL 2nd Stage, Kodihalli, Bengaluru, Karnataka 560008",
+        "time": "05:00 PM",
+        "end_time": "09:00 PM",
+        "category": "Celebrity Meet-ups"
+    },
+    {
+        "id": 75,
+        "title": "International Authors & Thought Leaders Conclave",
+        "date": "Nov 29, 2026",
+        "desc": "Book signing, live reading, and philosophical dialogues with international best-selling authors.",
+        "price": "\u20b9600",
+        "color": "#d97706",
+        "image": "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Celebrate literature, philosophy, and intellectual discourse.",
+        "full_details": "Moderated discussions on modern storytelling, historical fiction, and non-fiction science writing followed by book signings.",
+        "outcome": "Hardcover autographed copy of featured book and literary pass.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "India Habitat Centre Auditorium",
+        "venue_address": "Lodhi Rd, Near Airforce Bal Bharati School, New Delhi, Delhi 110003",
+        "time": "11:00 AM",
+        "end_time": "05:30 PM",
+        "category": "Celebrity Meet-ups"
+    },
+    {
+        "id": 76,
+        "title": "Youth Icons & Startup Unicorn Founders Gala",
+        "date": "Dec 06, 2026",
+        "desc": "Black-tie networking dinner with Forbes 30 Under 30 founders and angel investors.",
+        "price": "\u20b92500",
+        "color": "#ec4899",
+        "image": "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Accelerate high-level youth entrepreneurship and startup investments.",
+        "full_details": "Pitch elevator rounds, keynote toasts by unicorn founders, and gourmet multi-course dining.",
+        "outcome": "Investor introduction list, gala directory, and mentorship commitments.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Taj Santacruz Imperial Banquet Hall",
+        "venue_address": "Chhatrapati Shivaji Maharaj International Airport, Mumbai, Maharashtra 400099",
+        "time": "06:30 PM",
+        "end_time": "10:30 PM",
+        "category": "Celebrity Meet-ups"
+    },
+    {
+        "id": 77,
+        "title": "Bollywood Superstar Fan Fest & Autographs",
+        "date": "Dec 12, 2026",
+        "desc": "Exclusive fan interaction, stage games, photo-ops, and direct autograph signing.",
+        "price": "\u20b92000",
+        "color": "#f43f5e",
+        "image": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Connect devoted cinema fans with their beloved superstar idol in an intimate setting.",
+        "full_details": "Stage dance interactions, quiz with the star, 1-on-1 photo moment with framed physical print, and signed merchandise.",
+        "outcome": "Framed instant photo with the celebrity, signed poster, and VIP access badge.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Phoenix Mall of Asia Fan Arena",
+        "venue_address": "Bellary Rd, Byatarayanapura, Yelahanka, Bengaluru, Karnataka 560092",
+        "time": "03:00 PM",
+        "end_time": "07:00 PM",
+        "category": "Celebrity Meet-ups"
+    },
+    {
+        "id": 78,
+        "title": "Comedy Superstars Live Roast & Meetup",
+        "date": "Dec 19, 2026",
+        "desc": "Unfiltered stand-up comedy, crowd work, and back-stage green room hangout.",
+        "price": "\u20b91100",
+        "color": "#eab308",
+        "image": "https://images.unsplash.com/photo-1585699324551-f6c309eedeca?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Unwind with India's most celebrated stand-up comedians and humorists.",
+        "full_details": "90 minutes of fresh stand-up sets followed by an interactive crowd roast and VIP green room selfie session.",
+        "outcome": "Personalized comedy badge, autographed pass, and endless laughter.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Good Shepherd Auditorium",
+        "venue_address": "Museum Rd, Opp. St. Joseph's Boys' High School, Bengaluru, Karnataka 560025",
+        "time": "07:00 PM",
+        "end_time": "10:00 PM",
+        "category": "Celebrity Meet-ups"
+    },
+    {
+        "id": 79,
+        "title": "Fitness Icons & Olympian Athlete Masterclass",
+        "date": "Dec 24, 2026",
+        "desc": "Workout session, nutrition philosophy, and mental resilience keynote by Olympic medalists.",
+        "price": "\u20b9950",
+        "color": "#10b981",
+        "image": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Learn championship athletic mindset, functional fitness, and recovery science.",
+        "full_details": "Warmup and calisthenics workout led by Olympic athletes followed by a nutrition Q&A and photo session.",
+        "outcome": "Custom athletic resistance bands, signed training handbook, and fitness certification.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Balewadi High Performance Athletic Arena",
+        "venue_address": "National Games Park, Mahalunge, Pune, Maharashtra 411045",
+        "time": "08:00 AM",
+        "end_time": "01:30 PM",
+        "category": "Celebrity Meet-ups"
+    },
+    {
+        "id": 80,
+        "title": "Gaming & Live Streamer Superstars Conclave",
+        "date": "Jan 12, 2027",
+        "desc": "Play alongside India's top gaming YouTubers and Twitch streamers in live exhibition matches.",
+        "price": "\u20b9600",
+        "color": "#6366f1",
+        "image": "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Celebrate gaming creators and give community fans a chance to squad up live.",
+        "full_details": "Live squad battle royale games on stage, gaming trivia, streamer merchandise giveaways, and meet & greet line.",
+        "outcome": "Signed gaming mousepad, creator discord VIP roles, and photo booth memories.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "DLF Horizon Atrium",
+        "venue_address": "Golf Course Rd, Sector 43, Gurugram, Haryana 122002",
+        "time": "01:00 PM",
+        "end_time": "07:00 PM",
+        "category": "Celebrity Meet-ups"
+    },
+    {
+        "id": 81,
+        "title": "TEDx VIP Speakers Reception & Networking",
+        "date": "Jan 20, 2027",
+        "desc": "Ideas worth spreading: interact with scientists, explorers, philosophers, and humanitarians.",
+        "price": "\u20b91800",
+        "color": "#ef4444",
+        "image": "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Spark intellectual curiosity and transformative world-changing ideas.",
+        "full_details": "Curated 18-minute TEDx talks followed by dedicated networking tables with speakers over tea and cocktails.",
+        "outcome": "Official TEDx delegate badge, speaker contact directory, and commemorative pin.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Chowdiah Memorial Hall",
+        "venue_address": "16th Cross, Gayatri Devi Park Extension, Vyalikaval, Bengaluru, Karnataka 560003",
+        "time": "04:30 PM",
+        "end_time": "09:30 PM",
+        "category": "Celebrity Meet-ups"
+    },
+    {
+        "id": 82,
+        "title": "World Explorers & Mountaineers Conclave",
+        "date": "Jan 28, 2027",
+        "desc": "Everest summiters and deep-sea divers sharing gripping survival stories and photography.",
+        "price": "\u20b9700",
+        "color": "#0ea5e9",
+        "image": "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Inspire outdoor courage, geographical exploration, and mountaineering discipline.",
+        "full_details": "High-altitude 4K documentary reels, gear breakdown demonstrations, and stories of surviving sub-zero conditions.",
+        "outcome": "Mountaineering carabiner souvenir, autographed expedition map, and hiking handbook.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Birla Planetarium Auditorium",
+        "venue_address": "Cathedral Rd, Maidan, Kolkata, West Bengal 700071",
+        "time": "03:00 PM",
+        "end_time": "07:30 PM",
+        "category": "Celebrity Meet-ups"
+    },
+    {
+        "id": 83,
+        "title": "Couture Fashion Designers & Supermodels VIP Gala",
+        "date": "Feb 06, 2027",
+        "desc": "Red carpet luxury fashion showcase with top designers, stylists, and runway models.",
+        "price": "\u20b93000",
+        "color": "#d946ef",
+        "image": "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Celebrate haute couture innovation and meet industry leading stylists and fashion moguls.",
+        "full_details": "Runway fashion walkthrough, designer panel on sustainable luxury fabrics, and private cocktail lounge.",
+        "outcome": "Luxury designer gift bag, VIP fashion catalog, and red carpet photographs.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "The Oberoi Grand Ballroom",
+        "venue_address": "Dr Zakir Hussain Marg, Golf Links, New Delhi, Delhi 110003",
+        "time": "07:00 PM",
+        "end_time": "11:00 PM",
+        "category": "Celebrity Meet-ups"
+    },
+    {
+        "id": 84,
+        "title": "Space Scientists & Astronauts Public Townhall",
+        "date": "Feb 14, 2027",
+        "desc": "Meet ISRO space mission directors and astronauts discussing lunar exploration and human spaceflight.",
+        "price": "Free",
+        "color": "#38bdf8",
+        "image": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Ignite scientific passion and deep space exploration curiosity in student minds.",
+        "full_details": "Keynote presentation on Chandrayaan and Gaganyaan telemetry, space habitat engineering, and student Q&A.",
+        "outcome": "ISRO space mission badge, scale model poster, and science certificate.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "ISRO Telemetry & Tracking Auditorium",
+        "venue_address": "Outer Ring Rd, Peenya 1st Stage, Bengaluru, Karnataka 560058",
+        "time": "02:00 PM",
+        "end_time": "06:00 PM",
+        "category": "Celebrity Meet-ups"
+    },
+    {
+        "id": 85,
+        "title": "Masterchef & Culinary Icons Tasting Gala",
+        "date": "Feb 22, 2027",
+        "desc": "Live culinary demonstrations, signature dish tastings, and meet & greet with Michelin star chefs.",
+        "price": "\u20b92200",
+        "color": "#f97316",
+        "image": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Experience high gastronomy, molecular cooking, and meet celebrated culinary visionaries.",
+        "full_details": "7-course live cooking demonstration where attendees taste signature creations while hearing culinary stories.",
+        "outcome": "Autographed recipe book, gourmet spice kit, and culinary certificate.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "ITC Gardenia Grand Banquet",
+        "venue_address": "1, Residency Rd, Ashok Nagar, Bengaluru, Karnataka 560025",
+        "time": "06:00 PM",
+        "end_time": "10:00 PM",
+        "category": "Celebrity Meet-ups"
+    },
+    {
+        "id": 86,
+        "title": "Olympic Champions Inspiration Summit 2026",
+        "date": "Mar 02, 2027",
+        "desc": "Keynote addresses and interactive sessions with Olympic gold and silver medalists.",
+        "price": "Free",
+        "color": "#eab308",
+        "image": "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Inspire the nation's youth towards athletic dedication and podium glory.",
+        "full_details": "Athletes recount their 10,000-hour training journeys, dealing with pressure, and hoisting the national flag on international podiums.",
+        "outcome": "Olympic commemorative pin, inspiration handbook, and group photo opportunities.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Major Dhyan Chand National Stadium",
+        "venue_address": "India Gate, New Delhi, Delhi 110001",
+        "time": "10:00 AM",
+        "end_time": "03:30 PM",
+        "category": "Celebrity Meet-ups"
+    },
+    {
+        "id": 87,
+        "title": "Music Prodigies & Virtuosos Fan Meet",
+        "date": "Mar 10, 2027",
+        "desc": "Intimate musical masterclass and jam session with internationally acclaimed instrumentalists.",
+        "price": "\u20b91000",
+        "color": "#a855f7",
+        "image": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Foster deep musical mastery and student mentorship with virtuosic performers.",
+        "full_details": "Acoustic breakdowns, tuning techniques, and one-on-one feedback on attendee musical compositions.",
+        "outcome": "Music masterclass certificate, custom plectrum set, and sheet music notes.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "NCPA Experimental Theatre",
+        "venue_address": "NCPA Marg, Nariman Point, Mumbai, Maharashtra 400021",
+        "time": "05:00 PM",
+        "end_time": "08:30 PM",
+        "category": "Celebrity Meet-ups"
+    },
+    {
+        "id": 88,
+        "title": "FinTech Visionaries & Angel Investors Meetup",
+        "date": "Mar 19, 2027",
+        "desc": "Network with visionary angel investors, venture partners, and leading banking executives.",
+        "price": "\u20b92000",
+        "color": "#10b981",
+        "image": "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Bridge promising fintech startups with institutional capital and guidance.",
+        "full_details": "Keynote on digital public infrastructure, UPI cross-border rails, and private pitch rounds.",
+        "outcome": "Investor contact book, fintech trend whitepaper, and executive dinner access.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Four Seasons Hotel Tech Pavilion",
+        "venue_address": "1/136, Dr E Moses Rd, Gandhi Nagar, Upper Worli, Mumbai, Maharashtra 400018",
+        "time": "06:00 PM",
+        "end_time": "09:30 PM",
+        "category": "Celebrity Meet-ups"
+    },
+    {
+        "id": 89,
+        "title": "National Creators Summit 2025",
+        "date": "Oct 15, 2025",
+        "desc": "Concluded mega creator conclave celebrating digital storytelling.",
+        "price": "\u20b91000",
+        "color": "#6366f1",
+        "image": "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Historic national creators event.",
+        "full_details": "Concluded event featuring 50+ top content creators with 10,000+ enthusiastic attendees.",
+        "outcome": "Archived keynote videos, creator badge credentials, and photo gallery.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Pragati Maidan Bharat Mandapam",
+        "venue_address": "Pragati Maidan, New Delhi, Delhi 110001",
+        "time": "10:00 AM",
+        "end_time": "06:00 PM",
+        "category": "Celebrity Meet-ups"
+    },
+    {
+        "id": 90,
+        "title": "Global Leadership Roundtable 2025",
+        "date": "Dec 05, 2025",
+        "desc": "Concluded executive dinner and leadership discussion.",
+        "price": "\u20b91500",
+        "color": "#0ea5e9",
+        "image": "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Concluded leadership summit.",
+        "full_details": "Archived dinner gathering of industry pioneers discussing global market transitions.",
+        "outcome": "Archived whitepaper and verifiable attendee certificates.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "ITC Maratha Grand Ballroom",
+        "venue_address": "Sahar Airport Rd, Andheri East, Mumbai, Maharashtra 400099",
+        "time": "06:00 PM",
+        "end_time": "10:00 PM",
+        "category": "Celebrity Meet-ups"
+    },
+    {
+        "id": 91,
+        "title": "National Smart AgriTech & Drone Farming Expo",
+        "date": "Nov 17, 2026",
+        "desc": "Autonomous crop spraying drones, satellite NDVI imagery, and AI harvest automation.",
+        "price": "Free",
+        "color": "#16a34a",
+        "image": "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Modernize agricultural yields through precision drones, sensors, and robotics.",
+        "full_details": "Live field demonstrations of multi-spectral drone spraying, autonomous weeding robots, and soil moisture telemetry arrays.",
+        "outcome": "Drone pilot certification discounts, smart farming manual, and exhibitor contact book.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "GKVK Agricultural University Campus",
+        "venue_address": "Bellary Rd, Gandhi Krishi Vigyana Kendra, Bengaluru, Karnataka 560065",
+        "time": "09:00 AM",
+        "end_time": "05:00 PM",
+        "category": "Agriculture"
+    },
+    {
+        "id": 92,
+        "title": "Organic Farming & Sustainable Produce Fair",
+        "date": "Nov 23, 2026",
+        "desc": "Farm-fresh organic exhibition, zero-budget natural farming techniques, and seed exchange.",
+        "price": "\u20b9200",
+        "color": "#84cc16",
+        "image": "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Promote chemical-free organic farming, soil biology, and direct farmer-consumer sales.",
+        "full_details": "Over 80 organic farm stalls displaying heirloom crops, cold-pressed oils, natural honey, and composting workshops.",
+        "outcome": "Heirloom seed packet, natural farming handbook, and organic tasting samples.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Lalbagh Botanical Garden Exhibition Center",
+        "venue_address": "Mavalli, Bengaluru, Karnataka 560004",
+        "time": "08:30 AM",
+        "end_time": "06:00 PM",
+        "category": "Agriculture"
+    },
+    {
+        "id": 93,
+        "title": "Hydroponics & Vertical Farming Workshop",
+        "date": "Nov 30, 2026",
+        "desc": "Soil-less farming, NFT nutrient film channels, and climate-controlled LED greenhouses.",
+        "price": "\u20b9750",
+        "color": "#06b6d4",
+        "image": "https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Teach modern urban rooftop farming and high-yield commercial hydroponics.",
+        "full_details": "Hands-on assembly of NFT channels, pH and EC water balancing, nutrient formulation, and indoor crop lighting.",
+        "outcome": "DIY mini-hydroponic herb kit, nutrient dosing chart, and workshop certification.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Indian Institute of Horticultural Research (IIHR)",
+        "venue_address": "Hessarghatta Lake Post, Bengaluru, Karnataka 560089",
+        "time": "10:00 AM",
+        "end_time": "04:30 PM",
+        "category": "Agriculture"
+    },
+    {
+        "id": 94,
+        "title": "Soil Health & Precision Irrigation Congress",
+        "date": "Dec 07, 2026",
+        "desc": "Drip automation, soil micro-biome restoration, and water conservation technologies.",
+        "price": "\u20b9400",
+        "color": "#a16207",
+        "image": "https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Conserve groundwater and rebuild topsoil organic carbon levels.",
+        "full_details": "Agronomists explain sensor-based automated drip fertigation, bio-char application, and regenerative cover cropping.",
+        "outcome": "Soil testing kit vouchers, irrigation design blueprint, and conference certificate.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Punjab Agricultural University Convention Hall",
+        "venue_address": "Ferozepur Rd, PAU Campus, Ludhiana, Punjab 141004",
+        "time": "09:30 AM",
+        "end_time": "04:30 PM",
+        "category": "Agriculture"
+    },
+    {
+        "id": 95,
+        "title": "AI in Crop Disease Diagnostics Summit",
+        "date": "Dec 13, 2026",
+        "desc": "Computer vision models detecting plant pathology, fungal rust, and pest infestations from smartphone photos.",
+        "price": "Free",
+        "color": "#15803d",
+        "image": "https://images.unsplash.com/photo-1574943320219-553eb213f72d?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Deploy AI computer vision to prevent devastating crop yield losses for smallholders.",
+        "full_details": "Demonstration of edge AI cameras, leaf disease classification models, and real-time advisory SMS bots.",
+        "outcome": "Open-source crop dataset access, API keys for agri-AI models, and research badge.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "IARI Pusa Institute Auditorium",
+        "venue_address": "Pusa Rd, Pusa, New Delhi, Delhi 110012",
+        "time": "10:00 AM",
+        "end_time": "05:00 PM",
+        "category": "Agriculture"
+    },
+    {
+        "id": 96,
+        "title": "Agri-Startup Pitch & Venture Fair 2026",
+        "date": "Dec 20, 2026",
+        "desc": "30 innovative agritech startups pitching to venture capitalists and agricultural ministry funds.",
+        "price": "\u20b9500",
+        "color": "#ca8a04",
+        "image": "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Catalyze venture investment and commercialization of agricultural innovations.",
+        "full_details": "Pitch sessions across supply chain tech, farm robotics, grain quality testing spectrometers, and livestock telemetry.",
+        "outcome": "Investor introduction directory, grant application support, and startup showcase pass.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "MANAGE Agribusiness Incubator",
+        "venue_address": "Rajendranagar, Hyderabad, Telangana 500030",
+        "time": "09:30 AM",
+        "end_time": "06:00 PM",
+        "category": "Agriculture"
+    },
+    {
+        "id": 97,
+        "title": "Solar Power in Agriculture & Green Energy Expo",
+        "date": "Dec 25, 2026",
+        "desc": "Solar water pumping, agro-photovoltaics, and off-grid solar cold storage units.",
+        "price": "Free",
+        "color": "#eab308",
+        "image": "https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Promote solar energy independence and decarbonize farm power consumption.",
+        "full_details": "Live installations of solar micro-grids, solar-powered borewells, and dual-use agro-photovoltaic greenhouse structures.",
+        "outcome": "Government solar subsidy guide, equipment manufacturer directory, and green certificate.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Gujarat University Convention Centre",
+        "venue_address": "132 Feet Ring Rd, Near Helmet Cross Road, Ahmedabad, Gujarat 380052",
+        "time": "10:00 AM",
+        "end_time": "05:30 PM",
+        "category": "Agriculture"
+    },
+    {
+        "id": 98,
+        "title": "Dairy Farming Tech & Automated Milking Expo",
+        "date": "Jan 13, 2027",
+        "desc": "IoT cattle health monitoring collars, robotic milking parlors, and fodder silage management.",
+        "price": "\u20b9300",
+        "color": "#0284c7",
+        "image": "https://images.unsplash.com/photo-1527153857715-3908f2ae5e81?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Modernize dairy cattle management, milk hygiene, and disease prevention.",
+        "full_details": "Demonstration of automated milk yield analyzers, smart ear tags for estrus detection, and TMR silage mixers.",
+        "outcome": "Dairy farm automation manual, cattle nutrition guide, and attendee badge.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "National Dairy Research Institute (NDRI) Auditorium",
+        "venue_address": "GT Rd, Karnal, Haryana 132001",
+        "time": "09:00 AM",
+        "end_time": "05:00 PM",
+        "category": "Agriculture"
+    },
+    {
+        "id": 99,
+        "title": "Aquaponics & Urban Rooftop Farming Bootcamp",
+        "date": "Jan 21, 2027",
+        "desc": "Symbiotic fish and vegetable production systems for urban homes and commercial greenhouses.",
+        "price": "\u20b9850",
+        "color": "#0ea5e9",
+        "image": "https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Train urban growers in closed-loop aquaponics combining aquaculture with horticulture.",
+        "full_details": "Live setup of Tilapia fish tanks coupled with bell siphon gravel beds producing leafy greens and herbs.",
+        "outcome": "Aquaponics starter manual, water cycling test kit, and training certificate.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "University of Agricultural Sciences Campus",
+        "venue_address": "Krishinagar, Dharwad, Karnataka 580005",
+        "time": "10:00 AM",
+        "end_time": "04:30 PM",
+        "category": "Agriculture"
+    },
+    {
+        "id": 100,
+        "title": "Farm-to-Table Supply Chain Logistics Summit",
+        "date": "Jan 29, 2027",
+        "desc": "Cold-chain reefer transport, automated sorting, and direct farmer-to-retailer digital mandis.",
+        "price": "\u20b9600",
+        "color": "#10b981",
+        "image": "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Eliminate post-harvest food waste through real-time telemetry and cold chains.",
+        "full_details": "Logistics providers and farm FPOs discuss route optimization, solar cold rooms, and dynamic pricing APIs.",
+        "outcome": "Logistics partner directory, cold-chain subsidy whitepaper, and summit badge.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Hitex Trade Center Hall 3",
+        "venue_address": "Trade Fair Office Building, Izzathnagar, Hyderabad, Telangana 500084",
+        "time": "09:30 AM",
+        "end_time": "05:00 PM",
+        "category": "Agriculture"
+    },
+    {
+        "id": 101,
+        "title": "Horticulture & Greenhouse Automation Fair",
+        "date": "Feb 07, 2027",
+        "desc": "Polyhouse climate automation, misting systems, and exotic flower & berry cultivation.",
+        "price": "Free",
+        "color": "#f43f5e",
+        "image": "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Empower farmers to grow high-value horticultural crops year-round in controlled environments.",
+        "full_details": "Automated curtain motors, humidity mist foggers, CO2 enrichment systems, and strawberry/orchid agronomy.",
+        "outcome": "Polyhouse cost-benefit calculator, exotic seed samples, and participation pass.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "College of Agriculture Grounds",
+        "venue_address": "Shivajinagar, Pune, Maharashtra 411005",
+        "time": "10:00 AM",
+        "end_time": "05:30 PM",
+        "category": "Agriculture"
+    },
+    {
+        "id": 102,
+        "title": "Bio-Fertilizers & Natural Pest Control Workshop",
+        "date": "Feb 15, 2027",
+        "desc": "Trichoderma, mycorrhiza fungi cultures, and botanical neem-based insect repellent formulas.",
+        "price": "\u20b9250",
+        "color": "#84cc16",
+        "image": "https://images.unsplash.com/photo-1628352081506-83c43123ed6d?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Replace toxic synthetic chemical pesticides with regenerative biological pest controls.",
+        "full_details": "Hands-on preparation of Jeevamrit, microbial culture multiplication, and pheromone insect traps.",
+        "outcome": "Bio-inoculant starter cultures, natural pest recipe book, and certificate.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Tamil Nadu Agricultural University (TNAU)",
+        "venue_address": "Marudhamalai Rd, Navavoor, Coimbatore, Tamil Nadu 641003",
+        "time": "09:30 AM",
+        "end_time": "04:00 PM",
+        "category": "Agriculture"
+    },
+    {
+        "id": 103,
+        "title": "IoT Smart Sensors for Precision Agriculture",
+        "date": "Feb 23, 2027",
+        "desc": "LoRaWAN sensor nodes measuring NPK soil nutrients, leaf wetness, and ambient weather.",
+        "price": "\u20b9900",
+        "color": "#0ea5e9",
+        "image": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Teach developers and agronomists to build long-range wireless farm monitoring networks.",
+        "full_details": "Building battery-powered LoRaWAN nodes that transmit soil data over 15km to central dashboards.",
+        "outcome": "LoRaWAN development board, antenna, open-source firmware repo, and certificate.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "IIT Kharagpur Agri-Engineering Pavilion",
+        "venue_address": "Kharagpur Technology Park, Kharagpur, West Bengal 721302",
+        "time": "10:00 AM",
+        "end_time": "05:00 PM",
+        "category": "Agriculture"
+    },
+    {
+        "id": 104,
+        "title": "Cold Chain & Grain Silo Storage Conclave",
+        "date": "Mar 03, 2027",
+        "desc": "Scientific hermetic grain bags, steel silo aeration, and automated moisture sensors.",
+        "price": "\u20b9500",
+        "color": "#d97706",
+        "image": "https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Prevent fungal and weevil damage in stored food grains and pulses.",
+        "full_details": "Technical overview of temperature-monitored bulk silos, nitrogen purging, and warehouse receipt financing.",
+        "outcome": "Grain storage best practices guide, sample hermetic storage bag, and certificate.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "National Institute of Agricultural Extension Management (MANAGE)",
+        "venue_address": "Rajendranagar, Hyderabad, Telangana 500030",
+        "time": "09:30 AM",
+        "end_time": "04:30 PM",
+        "category": "Agriculture"
+    },
+    {
+        "id": 105,
+        "title": "Seed Innovation & Climate-Resilient Crops Conference",
+        "date": "Mar 11, 2027",
+        "desc": "Drought-tolerant millets, bio-fortified grains, and genomic marker-assisted breeding.",
+        "price": "Free",
+        "color": "#16a34a",
+        "image": "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Equip farming communities with drought and heat-tolerant crop genetics.",
+        "full_details": "Presentations by ICRISAT geneticists on pearl millet, sorghum, and chickpea varieties that thrive in arid climates.",
+        "outcome": "Sample climate-resilient seed kit, breeding monograph, and certificate.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "ICRISAT Global Headquarters",
+        "venue_address": "Patancheru, Hyderabad, Telangana 502324",
+        "time": "10:00 AM",
+        "end_time": "05:00 PM",
+        "category": "Agriculture"
+    },
+    {
+        "id": 106,
+        "title": "Agri-Drone Pilot Certification & Flying Camp",
+        "date": "Mar 20, 2027",
+        "desc": "DGCA accredited flight simulator training and live agricultural payload flight maneuvers.",
+        "price": "\u20b91500",
+        "color": "#6366f1",
+        "image": "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Train certified rural drone pilots for commercial aerial spraying enterprises.",
+        "full_details": "Flight planning software, obstacle avoidance, battery maintenance protocols, and live field flight test.",
+        "outcome": "DGCA Pilot Training Completion Badge, logbook endorsement, and career assistance.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Jakkur Aerodrome Drone Flying Grounds",
+        "venue_address": "Bellary Rd, Jakkuru, Bengaluru, Karnataka 560064",
+        "time": "08:30 AM",
+        "end_time": "04:30 PM",
+        "category": "Agriculture"
+    },
+    {
+        "id": 107,
+        "title": "Kisan Agri Expo 2025",
+        "date": "Dec 14, 2025",
+        "desc": "Concluded mega agricultural machinery and tractor exhibition.",
+        "price": "Free",
+        "color": "#15803d",
+        "image": "https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Historic national farming machinery expo.",
+        "full_details": "Concluded exhibition showcasing 200+ tractor models, harvesters, and solar pump technologies.",
+        "outcome": "Archived equipment brochures and verified attendance certificate.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Moshi Exhibition Ground",
+        "venue_address": "Pune-Nashik Highway, Moshi, Pune, Maharashtra 412105",
+        "time": "09:00 AM",
+        "end_time": "06:00 PM",
+        "category": "Agriculture"
+    },
+    {
+        "id": 108,
+        "title": "Organic Agro Fest 2025",
+        "date": "Nov 20, 2025",
+        "desc": "Concluded state-level organic farmers conference.",
+        "price": "\u20b9150",
+        "color": "#84cc16",
+        "image": "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Historic organic farming conference.",
+        "full_details": "Concluded convention featuring 100+ native seed preservers and organic soil scientists.",
+        "outcome": "Archived session notes and verified attendee credentials.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Gandhi Krishi Vigyana Kendra Hall",
+        "venue_address": "GKVK Campus, Bellary Rd, Bengaluru, Karnataka 560065",
+        "time": "09:00 AM",
+        "end_time": "05:00 PM",
+        "category": "Agriculture"
+    },
+    {
+        "id": 109,
+        "title": "Digital India Citizen Awareness & Public Services Summit",
+        "date": "Nov 18, 2026",
+        "desc": "Public awareness summit on DigiLocker, Aadhaar services, cyber safety, and citizen welfare portals.",
+        "price": "Free",
+        "color": "#2563eb",
+        "image": "https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Empower citizens with direct digital governance tools and public welfare benefits.",
+        "full_details": "Interactive kiosks demonstrating instant DigiLocker document issuance, PM-Kisan verification, and citizen grievance redressal.",
+        "outcome": "Citizen e-Governance Handbook, helpline contact card, and participation certificate.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Vigyan Bhawan Plenary Hall",
+        "venue_address": "Maulana Azad Rd, Rajpath Area, Central Secretariat, New Delhi, Delhi 110011",
+        "time": "10:00 AM",
+        "end_time": "05:00 PM",
+        "category": "Government"
+    },
+    {
+        "id": 110,
+        "title": "Smart City Governance & Urban Policy Townhall",
+        "date": "Nov 24, 2026",
+        "desc": "Open public townhall with municipal commissioners on traffic decongestion, waste management, and parks.",
+        "price": "Free",
+        "color": "#0ea5e9",
+        "image": "https://images.unsplash.com/photo-1477959858617-67f30bc75b82?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Direct democratic citizen dialogue with city administrators and urban planners.",
+        "full_details": "Citizens and resident welfare associations present neighborhood improvement proposals directly to city council heads.",
+        "outcome": "Recorded civic grievance docket, Smart City masterplan booklet, and civic contributor badge.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "BBMP Central Town Hall",
+        "venue_address": "JC Rd, Sampangi Rama Nagar, Bengaluru, Karnataka 560002",
+        "time": "10:30 AM",
+        "end_time": "04:30 PM",
+        "category": "Government"
+    },
+    {
+        "id": 111,
+        "title": "National Youth Leadership & Democracy Conclave",
+        "date": "Dec 01, 2026",
+        "desc": "Mock youth parliament, public policy debate, and constitutional rights forum.",
+        "price": "Free",
+        "color": "#f97316",
+        "image": "https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Inspire young collegiate minds toward ethical public administration and democratic debate.",
+        "full_details": "Structured parliamentary debate simulations on climate policy, education equity, and digital privacy legislation.",
+        "outcome": "Best Youth Parliamentarian Trophy, Constitution of India pocket edition, and certificate.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Constitution Club of India Main Auditorium",
+        "venue_address": "Rafi Marg, Sansad Marg Area, New Delhi, Delhi 110001",
+        "time": "09:30 AM",
+        "end_time": "05:30 PM",
+        "category": "Government"
+    },
+    {
+        "id": 112,
+        "title": "Public Healthcare & Ayushman Bharat Outreach Forum",
+        "date": "Dec 08, 2026",
+        "desc": "Free health screenings, digital health ID creation (ABHA), and subsidized medicine awareness.",
+        "price": "Free",
+        "color": "#10b981",
+        "image": "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Provide universal public health screening and enrollment into national health insurance.",
+        "full_details": "Free blood glucose, BP, ECG, and eye tests conducted by senior AIIMS medical officers with instant ABHA card generation.",
+        "outcome": "Free medical screening report, ABHA card laminated printout, and preventive healthcare guide.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "AIIMS Main Auditorium",
+        "venue_address": "Ansari Nagar East, Gautam Nagar, New Delhi, Delhi 110029",
+        "time": "09:00 AM",
+        "end_time": "04:00 PM",
+        "category": "Government"
+    },
+    {
+        "id": 113,
+        "title": "Renewable Clean Energy & Green City Civic Forum",
+        "date": "Dec 14, 2026",
+        "desc": "Subsidies for rooftop solar, EV charging infrastructure, and municipal rainwater harvesting.",
+        "price": "Free",
+        "color": "#84cc16",
+        "image": "https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Accelerate citizen adoption of solar panels, electric vehicles, and green architecture.",
+        "full_details": "Energy ministry experts guide homeowners and housing societies on net-metering solar subsidies and battery storage.",
+        "outcome": "Rooftop Solar Subsidy Calculator, EV charging map guide, and Green Citizen Certificate.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Mahatma Mandir Convention Centre",
+        "venue_address": "Sector 13C, Gandhinagar, Gujarat 382016",
+        "time": "10:00 AM",
+        "end_time": "05:00 PM",
+        "category": "Government"
+    },
+    {
+        "id": 114,
+        "title": "Civic Innovation & Smart Public Transport Hackathon",
+        "date": "Dec 21, 2026",
+        "desc": "Build open-data apps for bus tracking, metro transit integration, and pedestrian safety.",
+        "price": "Free",
+        "color": "#06b6d4",
+        "image": "https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Harness open civic transit data to solve real commuter pain points.",
+        "full_details": "Teams develop solutions using real-time GTFS feeds for live bus arrival predictions and seamless multi-modal ticketing.",
+        "outcome": "\u20b91,00,000 in transit innovation grants and pilot deployment on state transport portals.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "BMTC Central Traffic Auditorium",
+        "venue_address": "Shanthinagar Bus Station Complex, K.H. Road, Bengaluru, Karnataka 560027",
+        "time": "09:00 AM",
+        "end_time": "06:00 PM",
+        "category": "Government"
+    },
+    {
+        "id": 115,
+        "title": "Cyber Security for Public Infrastructure & Citizens",
+        "date": "Dec 26, 2026",
+        "desc": "Protecting citizens against online financial fraud, identity theft, and deepfake scams.",
+        "price": "Free",
+        "color": "#ef4444",
+        "image": "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Shield the public from cyber financial fraud and deceptive digital scams.",
+        "full_details": "CERT-In and Cyber Crime Police officers demonstrate how to report fraud on the 1930 national helpline and secure UPI PINs.",
+        "outcome": "Citizen Cyber Safety Guide, helpline emergency card, and verified attendee badge.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "National Cyber Security Centre Auditorium",
+        "venue_address": "Electronics Niketan, 6 CGO Complex, Lodhi Road, New Delhi, Delhi 110003",
+        "time": "10:00 AM",
+        "end_time": "04:30 PM",
+        "category": "Government"
+    },
+    {
+        "id": 116,
+        "title": "National Skill Development & PMKVY Job Conclave",
+        "date": "Jan 14, 2027",
+        "desc": "Free vocational skill certifications, apprenticeships, and on-spot recruitment by 50+ employers.",
+        "price": "Free",
+        "color": "#f59e0b",
+        "image": "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Bridge vocational students with verified job placements and national skill certifications.",
+        "full_details": "On-spot interviews across IT, manufacturing, healthcare, logistics, and retail under National Skill Development Corporation.",
+        "outcome": "PMKVY skill certification, job offer letters, and apprenticeship agreements.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "National Skill Development Corporation Pavilion",
+        "venue_address": "BKC Exhibition Grounds, Bandra East, Mumbai, Maharashtra 400051",
+        "time": "09:30 AM",
+        "end_time": "05:30 PM",
+        "category": "Government"
+    },
+    {
+        "id": 117,
+        "title": "Swachh Bharat & Municipal Waste Management Summit",
+        "date": "Jan 22, 2027",
+        "desc": "Zero-waste city models, decentralized composting, and circular economy plastics recycling.",
+        "price": "Free",
+        "color": "#16a34a",
+        "image": "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Promote sustainable urban sanitation and circular waste recycling.",
+        "full_details": "Municipal leaders from Indore and Mysore share best practices in 100% source segregation and biogas power generation.",
+        "outcome": "Home Composting Starter Guide, Swachh Bharat volunteer badge, and certificate.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Brilliant Convention Centre",
+        "venue_address": "Plot No. 5, Scheme No. 78, Part II, Vijay Nagar, Indore, Madhya Pradesh 452010",
+        "time": "10:00 AM",
+        "end_time": "04:30 PM",
+        "category": "Government"
+    },
+    {
+        "id": 118,
+        "title": "Disaster Management & Flood Response Readiness Camp",
+        "date": "Jan 30, 2027",
+        "desc": "NDRF rescue demonstrations, CPR training, and emergency citizen disaster protocols.",
+        "price": "Free",
+        "color": "#dc2626",
+        "image": "https://images.unsplash.com/photo-1544027993-37dbfe43562a?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Equip citizens and youth volunteers with life-saving disaster response skills.",
+        "full_details": "Live rescue drills by NDRF officers showing water rescue techniques, earthquake evacuation protocols, and emergency first aid.",
+        "outcome": "Certified First Responder Badge, emergency whistle kit, and disaster preparedness handbook.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "National Disaster Management Authority (NDMA) Hall",
+        "venue_address": "NDMA Bhawan, A-1, Safdarjung Enclave, New Delhi, Delhi 110029",
+        "time": "09:00 AM",
+        "end_time": "05:00 PM",
+        "category": "Government"
+    },
+    {
+        "id": 119,
+        "title": "Women Empowerment in Public Service & Governance",
+        "date": "Feb 08, 2027",
+        "desc": "Celebrating women IAS/IPS officers, panchayat leaders, and public innovators.",
+        "price": "Free",
+        "color": "#db2777",
+        "image": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Promote gender diversity in constitutional administration and civic leadership.",
+        "full_details": "Keynote panel of pioneering female civil servants sharing strategies for public policy implementation and grassroots reform.",
+        "outcome": "Leadership handbook, mentorship cohort invitation, and commemorative certificate.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Vidhana Soudha Banquet Hall",
+        "venue_address": "Dr. Ambedkar Veedhi, Sampangi Rama Nagar, Bengaluru, Karnataka 560001",
+        "time": "10:30 AM",
+        "end_time": "04:30 PM",
+        "category": "Government"
+    },
+    {
+        "id": 120,
+        "title": "Start-up India Seed Fund & Grant Distribution Expo",
+        "date": "Feb 16, 2027",
+        "desc": "Direct access to DPIIT startup recognition, tax exemptions, and government procurement tenders.",
+        "price": "Free",
+        "color": "#4f46e5",
+        "image": "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Empower early-stage founders to leverage government grants and GeM public procurement.",
+        "full_details": "Workshops on filing patents with 80% fee rebates, getting DPIIT certified, and securing GeM portal vendor status.",
+        "outcome": "DPIIT Fast-track application guide, Startup India kit, and conference badge.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Pragati Maidan Hall 5",
+        "venue_address": "Pragati Maidan, Mathura Rd, New Delhi, Delhi 110001",
+        "time": "09:30 AM",
+        "end_time": "05:30 PM",
+        "category": "Government"
+    },
+    {
+        "id": 121,
+        "title": "Rural Broadband & Digital Panchayat Conference",
+        "date": "Feb 24, 2027",
+        "desc": "BharatNet optical fiber expansion, rural telemedicine, and digital village governance.",
+        "price": "Free",
+        "color": "#0284c7",
+        "image": "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Expand internet connectivity and e-governance to India's 2,50,000 gram panchayats.",
+        "full_details": "Telecom ministry officers and sarpanches discuss optical fiber maintenance, village digital kiosks, and tele-education.",
+        "outcome": "Digital Gram Panchayat roadmap document and attendee certificate.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "National Institute of Rural Development (NIRDPR)",
+        "venue_address": "Rajendranagar, Hyderabad, Telangana 500030",
+        "time": "10:00 AM",
+        "end_time": "04:30 PM",
+        "category": "Government"
+    },
+    {
+        "id": 122,
+        "title": "Clean Air & Water Conservation Public Forum",
+        "date": "Mar 04, 2027",
+        "desc": "Air quality index monitoring, lake rejuvenation projects, and industrial effluent regulations.",
+        "price": "Free",
+        "color": "#0d9488",
+        "image": "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Safeguard urban water bodies and improve air quality through scientific citizen monitoring.",
+        "full_details": "Environmental scientists present real-time air sensor data, artificial wetland filtration, and citizen river cleanup drives.",
+        "outcome": "Air Quality Monitor Handbook, Lake Conservation Guide, and Green Citizen Badge.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Central Pollution Control Board (CPCB) Auditorium",
+        "venue_address": "Parivesh Bhawan, East Arjun Nagar, Delhi 110032",
+        "time": "10:00 AM",
+        "end_time": "04:30 PM",
+        "category": "Government"
+    },
+    {
+        "id": 123,
+        "title": "Road Safety & Automated Traffic Enforcement Summit",
+        "date": "Mar 12, 2027",
+        "desc": "AI camera speed enforcement, zero-fatality corridor designs, and defensive driving education.",
+        "price": "Free",
+        "color": "#eab308",
+        "image": "https://images.unsplash.com/photo-1508962914676-134849a727f0?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Reduce road fatalities to zero through strict enforcement, road engineering, and public awareness.",
+        "full_details": "Traffic police demonstration of ANPR cameras, speed radars, child safety seat laws, and emergency golden hour response.",
+        "outcome": "Road Safety Ambassador Certificate, reflective vehicle sticker, and safety guidebook.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Traffic Management Centre Auditorium",
+        "venue_address": "Infantry Rd, Tasker Town, Shivaji Nagar, Bengaluru, Karnataka 560001",
+        "time": "10:00 AM",
+        "end_time": "04:00 PM",
+        "category": "Government"
+    },
+    {
+        "id": 124,
+        "title": "National Consumer Rights & E-Daakhil Symposium",
+        "date": "Mar 21, 2027",
+        "desc": "Filing online consumer disputes, combating misleading advertisements, and warranty enforcement.",
+        "price": "Free",
+        "color": "#6366f1",
+        "image": "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Empower consumers to enforce legal remedies against defective goods and fraudulent services.",
+        "full_details": "Consumer commission judges guide attendees on using the national e-Daakhil portal for instant paperless court filings.",
+        "outcome": "Consumer Rights Legal Handbook, online filing guide, and symposium participation badge.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Indian Law Institute Auditorium",
+        "venue_address": "Bhagwan Das Rd, Opposite Supreme Court, New Delhi, Delhi 110001",
+        "time": "10:30 AM",
+        "end_time": "04:30 PM",
+        "category": "Government"
+    },
+    {
+        "id": 125,
+        "title": "Public E-Governance Summit 2025",
+        "date": "Nov 10, 2025",
+        "desc": "Concluded national summit on cloud-first e-governance and direct benefit transfers.",
+        "price": "Free",
+        "color": "#1e40af",
+        "image": "https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Historic national e-governance convention.",
+        "full_details": "Concluded convention reviewing digital delivery of 500+ citizen welfare schemes.",
+        "outcome": "Archived e-governance whitepaper and verifiable participant certificate.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Vigyan Bhawan Plenary Hall",
+        "venue_address": "Maulana Azad Rd, Rajpath Area, New Delhi, Delhi 110011",
+        "time": "10:00 AM",
+        "end_time": "05:00 PM",
+        "category": "Government"
+    },
+    {
+        "id": 126,
+        "title": "National Clean City Conclave 2025",
+        "date": "Dec 08, 2025",
+        "desc": "Concluded annual Swachh Survekshan rankings and municipal awards.",
+        "price": "Free",
+        "color": "#15803d",
+        "image": "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Concluded municipal sanitation awards.",
+        "full_details": "Concluded national awards event honoring top cleanest cities across India.",
+        "outcome": "Archived survey ranking booklet and verified attendee badge.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Brilliant Convention Centre",
+        "venue_address": "Plot No. 5, Scheme No. 78, Part II, Vijay Nagar, Indore, Madhya Pradesh 452010",
+        "time": "09:30 AM",
+        "end_time": "04:30 PM",
+        "category": "Government"
+    },
+    {
+        "id": 127,
+        "title": "Apex Legends LAN Showdown 2026",
+        "date": "Nov 12, 2026",
+        "desc": "Battle royale championship with 20 squad lobbies and 4K spectator screens.",
+        "price": "\u20b9500",
+        "color": "#8b5cf6",
+        "image": "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
+        "full_details": "Immersive gaming & e-sports event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with gaming & e-sports leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Apex Arena",
+        "venue_address": "Phoenix Marketcity, Whitefield, Bangalore",
+        "time": "10:00 AM",
+        "end_time": "06:00 PM",
+        "category": "Gaming & E-Sports"
+    },
+    {
+        "id": 128,
+        "title": "Valorant Campus Clash Champions",
+        "date": "Nov 18, 2026",
+        "desc": "Inter-college 5v5 tactical shooter tournament with pro casters.",
+        "price": "Free",
+        "color": "#8b5cf6",
+        "image": "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
+        "full_details": "Immersive gaming & e-sports event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with gaming & e-sports leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "PlayMax Gaming Hub",
+        "venue_address": "Koramangala 5th Block, Bangalore",
+        "time": "11:00 AM",
+        "end_time": "07:00 PM",
+        "category": "Gaming & E-Sports"
+    },
+    {
+        "id": 129,
+        "title": "BGMI India Masters Championship",
+        "date": "Nov 25, 2026",
+        "desc": "National mobile esports showdown with \u20b95,00,000 prize pool.",
+        "price": "\u20b9600",
+        "color": "#8b5cf6",
+        "image": "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
+        "full_details": "Immersive gaming & e-sports event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with gaming & e-sports leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Jawaharlal Nehru Indoor Stadium",
+        "venue_address": "Cuttack, Odisha",
+        "time": "01:00 PM",
+        "end_time": "09:00 PM",
+        "category": "Gaming & E-Sports"
+    },
+    {
+        "id": 130,
+        "title": "FIFA 26 NextGen Cup",
+        "date": "Dec 02, 2026",
+        "desc": "PlayStation 5 knockout tournament with live commentary and leaderboards.",
+        "price": "\u20b9300",
+        "color": "#8b5cf6",
+        "image": "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
+        "full_details": "Immersive gaming & e-sports event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with gaming & e-sports leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "PlayStation Lounge",
+        "venue_address": "Palladium Mall, Lower Parel, Mumbai",
+        "time": "12:00 PM",
+        "end_time": "08:00 PM",
+        "category": "Gaming & E-Sports"
+    },
+    {
+        "id": 131,
+        "title": "Unreal Engine 5 Game Jam & Hackathon",
+        "date": "Dec 08, 2026",
+        "desc": "48-hour indie game development sprint with mentors from Epic Games.",
+        "price": "Free",
+        "color": "#8b5cf6",
+        "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
+        "full_details": "Immersive gaming & e-sports event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with gaming & e-sports leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "IIT Madras Research Park",
+        "venue_address": "Kanagam Rd, Taramani, Chennai",
+        "time": "09:00 AM",
+        "end_time": "06:00 PM",
+        "category": "Gaming & E-Sports"
+    },
+    {
+        "id": 132,
+        "title": "Counter-Strike 2 Major Qualifier",
+        "date": "Dec 15, 2026",
+        "desc": "High-octane CS2 double-elimination tournament with 128-tick servers.",
+        "price": "\u20b9800",
+        "color": "#8b5cf6",
+        "image": "https://images.unsplash.com/photo-1560253023-3ec5d502959f?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
+        "full_details": "Immersive gaming & e-sports event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with gaming & e-sports leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "LXG (League of Extraordinary Gamers)",
+        "venue_address": "Indiranagar, Bangalore",
+        "time": "10:00 AM",
+        "end_time": "06:00 PM",
+        "category": "Gaming & E-Sports"
+    },
+    {
+        "id": 133,
+        "title": "Cosplay & Anime Gaming Con 2026",
+        "date": "Dec 20, 2026",
+        "desc": "Grand cosplay showcase, voice actor panels, retro arcade machines, and indie booths.",
+        "price": "\u20b9450",
+        "color": "#8b5cf6",
+        "image": "https://images.unsplash.com/photo-1566492031773-4f4e44671857?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
+        "full_details": "Immersive gaming & e-sports event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with gaming & e-sports leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Hitex Exhibition Centre",
+        "venue_address": "Izzat Nagar, Hyderabad",
+        "time": "10:30 AM",
+        "end_time": "08:00 PM",
+        "category": "Gaming & E-Sports"
+    },
+    {
+        "id": 134,
+        "title": "VR & Spatial Gaming Arena Expo",
+        "date": "Jan 08, 2027",
+        "desc": "Experience next-gen VR headsets, haptic vests, and mixed-reality gaming rig demos.",
+        "price": "\u20b9700",
+        "color": "#8b5cf6",
+        "image": "https://images.unsplash.com/photo-1593508512255-86ab42a8e620?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
+        "full_details": "Immersive gaming & e-sports event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with gaming & e-sports leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Pragati Maidan Hall 5",
+        "venue_address": "Mathura Rd, New Delhi",
+        "time": "11:00 AM",
+        "end_time": "07:00 PM",
+        "category": "Gaming & E-Sports"
+    },
+    {
+        "id": 135,
+        "title": "Street Fighter 6 & Tekken 8 FGC Showdown",
+        "date": "Jan 16, 2027",
+        "desc": "Fighting Game Community (FGC) arcade stick tournament and casual friendlies.",
+        "price": "\u20b9350",
+        "color": "#8b5cf6",
+        "image": "https://images.unsplash.com/photo-1551103782-8ab07afd45c1?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
+        "full_details": "Immersive gaming & e-sports event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with gaming & e-sports leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Smaaash CyberHub",
+        "venue_address": "DLF Phase 2, Gurugram",
+        "time": "01:00 PM",
+        "end_time": "08:00 PM",
+        "category": "Gaming & E-Sports"
+    },
+    {
+        "id": 136,
+        "title": "Indie Game Developers Showcase",
+        "date": "Jan 24, 2027",
+        "desc": "Playtest upcoming Indian indie video games and meet game designers.",
+        "price": "Free",
+        "color": "#8b5cf6",
+        "image": "https://images.unsplash.com/photo-1556438064-2d7646166914?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
+        "full_details": "Immersive gaming & e-sports event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with gaming & e-sports leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "National Institute of Design (NID)",
+        "venue_address": "Gandhinagar, Gujarat",
+        "time": "10:00 AM",
+        "end_time": "05:00 PM",
+        "category": "Gaming & E-Sports"
+    },
+    {
+        "id": 137,
+        "title": "Mobile Legends Bang Bang Tournament",
+        "date": "Feb 02, 2027",
+        "desc": "Fast-paced 5v5 MOBA championship with custom team merchandise.",
+        "price": "\u20b9400",
+        "color": "#8b5cf6",
+        "image": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
+        "full_details": "Immersive gaming & e-sports event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with gaming & e-sports leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "City Centre Salt Lake",
+        "venue_address": "DC Block, Sector 1, Kolkata",
+        "time": "02:00 PM",
+        "end_time": "09:00 PM",
+        "category": "Gaming & E-Sports"
+    },
+    {
+        "id": 138,
+        "title": "Sim Racing & Formula 1 Esports Cup",
+        "date": "Feb 10, 2027",
+        "desc": "Full-motion racing simulator tournament on Monza and Silverstone tracks.",
+        "price": "\u20b9900",
+        "color": "#8b5cf6",
+        "image": "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
+        "full_details": "Immersive gaming & e-sports event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with gaming & e-sports leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Buddh International Circuit Media Centre",
+        "venue_address": "Greater Noida, UP",
+        "time": "11:00 AM",
+        "end_time": "06:00 PM",
+        "category": "Gaming & E-Sports"
+    },
+    {
+        "id": 139,
+        "title": "Retro Arcade & Pixel Art Fest",
+        "date": "Feb 18, 2027",
+        "desc": "Original arcade cabinet tournaments: Pac-Man, Street Fighter II, and Tetris.",
+        "price": "Free",
+        "color": "#8b5cf6",
+        "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
+        "full_details": "Immersive gaming & e-sports event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with gaming & e-sports leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Rangoli Metro Art Center",
+        "venue_address": "MG Road, Bengaluru",
+        "time": "10:00 AM",
+        "end_time": "06:00 PM",
+        "category": "Gaming & E-Sports"
+    },
+    {
+        "id": 140,
+        "title": "Gaming Content Creators Summit 2027",
+        "date": "Feb 26, 2027",
+        "desc": "Keynotes on streaming gear, YouTube algorithms, and brand sponsorships.",
+        "price": "\u20b91200",
+        "color": "#8b5cf6",
+        "image": "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
+        "full_details": "Immersive gaming & e-sports event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with gaming & e-sports leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Manpho Convention Centre",
+        "venue_address": "Nagavara, Bangalore",
+        "time": "10:00 AM",
+        "end_time": "05:00 PM",
+        "category": "Gaming & E-Sports"
+    },
+    {
+        "id": 141,
+        "title": "Speedrunning & Glitch Fest India",
+        "date": "Mar 06, 2027",
+        "desc": "Live GDQ-style charity speedrunning marathon across modern and retro games.",
+        "price": "Free",
+        "color": "#8b5cf6",
+        "image": "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
+        "full_details": "Immersive gaming & e-sports event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with gaming & e-sports leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "IIIT Hyderabad Kohli Centre",
+        "venue_address": "Gachibowli, Hyderabad",
+        "time": "12:00 PM",
+        "end_time": "08:00 PM",
+        "category": "Gaming & E-Sports"
+    },
+    {
+        "id": 142,
+        "title": "National College Esports Championship",
+        "date": "Mar 15, 2027",
+        "desc": "The ultimate university esports showdown across BGMI, Valorant, and Rocket League.",
+        "price": "\u20b9500",
+        "color": "#8b5cf6",
+        "image": "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
+        "full_details": "Immersive gaming & e-sports event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with gaming & e-sports leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Netaji Indoor Stadium",
+        "venue_address": "BBD Bagh, Kolkata",
+        "time": "09:00 AM",
+        "end_time": "07:00 PM",
+        "category": "Gaming & E-Sports"
+    },
+    {
+        "id": 143,
+        "title": "Summer LAN Battle Royale 2026",
+        "date": "Jun 18, 2026",
+        "desc": "High-energy 100-player LAN battle royale with live stream audience.",
+        "price": "\u20b9500",
+        "color": "#8b5cf6",
+        "image": "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Concluded gaming & e-sports landmark event.",
+        "full_details": "Successfully hosted event bringing together delegates across the country for impactful gaming & e-sports showcases.",
+        "outcome": "Concluded session archived in official hall of records.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Nexus Mall Gaming Zone",
+        "venue_address": "Koramangala, Bangalore",
+        "time": "10:00 AM",
+        "end_time": "07:00 PM",
+        "category": "Gaming & E-Sports"
+    },
+    {
+        "id": 144,
+        "title": "Indie Game Sprint Winter 2025",
+        "date": "Dec 12, 2025",
+        "desc": "72-hour student game prototyping fest with 85 published game submissions.",
+        "price": "Free",
+        "color": "#8b5cf6",
+        "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Concluded gaming & e-sports landmark event.",
+        "full_details": "Successfully hosted event bringing together delegates across the country for impactful gaming & e-sports showcases.",
+        "outcome": "Concluded session archived in official hall of records.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "IIT Delhi Bharti Building",
+        "venue_address": "Hauz Khas, New Delhi",
+        "time": "09:00 AM",
+        "end_time": "06:00 PM",
+        "category": "Gaming & E-Sports"
+    },
+    {
+        "id": 145,
+        "title": "National Angel Investor & Pitch Fest 2026",
+        "date": "Nov 14, 2026",
+        "desc": "50 curated early-stage startups pitch live to 30+ prominent Angel & VC funds.",
+        "price": "\u20b91200",
+        "color": "#3b82f6",
+        "image": "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
+        "full_details": "Immersive business & startup event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with business & startup leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "T-Hub Phase 2 Conclave Hall",
+        "venue_address": "Knowledge City, Hyderabad",
+        "time": "09:30 AM",
+        "end_time": "05:30 PM",
+        "category": "Business & Startup"
+    },
+    {
+        "id": 146,
+        "title": "Fintech Disruption Summit 2026",
+        "date": "Nov 22, 2026",
+        "desc": "UPI 3.0, Neo-banking, AI credit scoring, and RBI regulatory sandbox updates.",
+        "price": "\u20b91500",
+        "color": "#3b82f6",
+        "image": "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
+        "full_details": "Immersive business & startup event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with business & startup leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Jio World Convention Centre",
+        "venue_address": "BKC, Bandra East, Mumbai",
+        "time": "10:00 AM",
+        "end_time": "05:00 PM",
+        "category": "Business & Startup"
+    },
+    {
+        "id": 147,
+        "title": "Student Entrepreneurs Bootcamp & Pitch",
+        "date": "Nov 29, 2026",
+        "desc": "Zero-to-One startup masterclass: customer discovery, unit economics, and deck building.",
+        "price": "Free",
+        "color": "#3b82f6",
+        "image": "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
+        "full_details": "Immersive business & startup event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with business & startup leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "IIM Bangalore Auditorium",
+        "venue_address": "Bannerghatta Road, Bengaluru",
+        "time": "09:00 AM",
+        "end_time": "04:30 PM",
+        "category": "Business & Startup"
+    },
+    {
+        "id": 148,
+        "title": "AI & SaaS Founder Conclave",
+        "date": "Dec 06, 2026",
+        "desc": "Growth playbooks, scaling to $10M ARR, PLG engines, and enterprise sales strategies.",
+        "price": "\u20b91800",
+        "color": "#3b82f6",
+        "image": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
+        "full_details": "Immersive business & startup event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with business & startup leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Leela Palace Grand Ballroom",
+        "venue_address": "Old Airport Road, Bangalore",
+        "time": "10:00 AM",
+        "end_time": "06:00 PM",
+        "category": "Business & Startup"
+    },
+    {
+        "id": 149,
+        "title": "Women in Business Leadership Summit",
+        "date": "Dec 14, 2026",
+        "desc": "Celebrating top women CXOs, founders, and investors driving social and tech disruption.",
+        "price": "Free",
+        "color": "#3b82f6",
+        "image": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
+        "full_details": "Immersive business & startup event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with business & startup leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "India Habitat Centre",
+        "venue_address": "Lodhi Road, New Delhi",
+        "time": "10:00 AM",
+        "end_time": "04:30 PM",
+        "category": "Business & Startup"
+    },
+    {
+        "id": 150,
+        "title": "D2C & E-Commerce Brands Masterclass",
+        "date": "Dec 22, 2026",
+        "desc": "Omnichannel scaling, supply chain optimization, and viral performance marketing.",
+        "price": "\u20b9900",
+        "color": "#3b82f6",
+        "image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
+        "full_details": "Immersive business & startup event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with business & startup leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "WeWork Galaxy",
+        "venue_address": "Residency Road, Shanthala Nagar, Bangalore",
+        "time": "10:30 AM",
+        "end_time": "05:30 PM",
+        "category": "Business & Startup"
+    },
+    {
+        "id": 151,
+        "title": "Venture Capital Networking Night",
+        "date": "Jan 09, 2027",
+        "desc": "Exclusive high-level networking mixer for Seed to Series B startup founders and partners.",
+        "price": "\u20b92500",
+        "color": "#3b82f6",
+        "image": "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
+        "full_details": "Immersive business & startup event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with business & startup leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Taj West End Prince of Wales Lawn",
+        "venue_address": "Race Course Rd, Bengaluru",
+        "time": "06:00 PM",
+        "end_time": "10:00 PM",
+        "category": "Business & Startup"
+    },
+    {
+        "id": 152,
+        "title": "Global Export & Supply Chain Expo",
+        "date": "Jan 18, 2027",
+        "desc": "Cross-border e-commerce, export compliance, customs digitization, and logistics.",
+        "price": "\u20b9600",
+        "color": "#3b82f6",
+        "image": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
+        "full_details": "Immersive business & startup event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with business & startup leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Chennai Trade Centre",
+        "venue_address": "Nandambakkam, Chennai",
+        "time": "09:30 AM",
+        "end_time": "05:00 PM",
+        "category": "Business & Startup"
+    },
+    {
+        "id": 153,
+        "title": "Healthcare & BioTech Innovators Forum",
+        "date": "Jan 27, 2027",
+        "desc": "Medical devices, digital health records, genomics, and telemedicine commercialization.",
+        "price": "\u20b91100",
+        "color": "#3b82f6",
+        "image": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
+        "full_details": "Immersive business & startup event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with business & startup leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "NSRCEL IIMB Innovation Hub",
+        "venue_address": "Bangalore",
+        "time": "10:00 AM",
+        "end_time": "05:00 PM",
+        "category": "Business & Startup"
+    },
+    {
+        "id": 154,
+        "title": "CleanTech & Green Energy Startup Pitch",
+        "date": "Feb 05, 2027",
+        "desc": "EV battery tech, solar microgrids, and carbon credit trading platforms.",
+        "price": "Free",
+        "color": "#3b82f6",
+        "image": "https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
+        "full_details": "Immersive business & startup event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with business & startup leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Mahatma Mandir Convention Centre",
+        "venue_address": "Gandhinagar, Gujarat",
+        "time": "10:00 AM",
+        "end_time": "04:30 PM",
+        "category": "Business & Startup"
+    },
+    {
+        "id": 155,
+        "title": "Legal & IP Strategy for Fast-Growing Startups",
+        "date": "Feb 14, 2027",
+        "desc": "Term sheets, founder vesting, patent filings, and ESOP pool management.",
+        "price": "\u20b9400",
+        "color": "#3b82f6",
+        "image": "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
+        "full_details": "Immersive business & startup event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with business & startup leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "National Law School of India University (NLSIU)",
+        "venue_address": "Nagarbhavi, Bangalore",
+        "time": "02:00 PM",
+        "end_time": "06:00 PM",
+        "category": "Business & Startup"
+    },
+    {
+        "id": 156,
+        "title": "Franchise & Retail Opportunity Expo 2027",
+        "date": "Feb 22, 2027",
+        "desc": "Meet 150+ leading franchise brands across F&B, education, and retail wellness.",
+        "price": "Free",
+        "color": "#3b82f6",
+        "image": "https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
+        "full_details": "Immersive business & startup event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with business & startup leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Pragati Maidan Hall 12",
+        "venue_address": "New Delhi",
+        "time": "10:00 AM",
+        "end_time": "06:00 PM",
+        "category": "Business & Startup"
+    },
+    {
+        "id": 157,
+        "title": "EdTech & Future of Work Conclave",
+        "date": "Mar 02, 2027",
+        "desc": "Adaptive AI learning, upskilling bootcamps, and hybrid workplace platforms.",
+        "price": "\u20b9800",
+        "color": "#3b82f6",
+        "image": "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
+        "full_details": "Immersive business & startup event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with business & startup leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "World Trade Center Kochi",
+        "venue_address": "Infopark, Kakkanad, Kerala",
+        "time": "10:00 AM",
+        "end_time": "05:00 PM",
+        "category": "Business & Startup"
+    },
+    {
+        "id": 158,
+        "title": "Real Estate PropTech & Smart Cities Summit",
+        "date": "Mar 11, 2027",
+        "desc": "Fractional real estate tokenization, BIM modelling, and smart IoT buildings.",
+        "price": "\u20b91400",
+        "color": "#3b82f6",
+        "image": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
+        "full_details": "Immersive business & startup event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with business & startup leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "ITC Grand Chola",
+        "venue_address": "Guindy, Chennai",
+        "time": "09:30 AM",
+        "end_time": "05:00 PM",
+        "category": "Business & Startup"
+    },
+    {
+        "id": 159,
+        "title": "Micro-SaaS Zero-to-$100k Workshop",
+        "date": "Mar 19, 2027",
+        "desc": "Solo founder guide to building, validating, and marketing profitable B2B SaaS.",
+        "price": "\u20b9750",
+        "color": "#3b82f6",
+        "image": "https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
+        "full_details": "Immersive business & startup event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with business & startup leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Cowrks Millenia",
+        "venue_address": "Ulsoor, Bengaluru",
+        "time": "11:00 AM",
+        "end_time": "04:00 PM",
+        "category": "Business & Startup"
+    },
+    {
+        "id": 160,
+        "title": "National Youth Entrepreneurship Conclave",
+        "date": "Mar 28, 2027",
+        "desc": "Government startup grants, incubation demo day, and startup success stories.",
+        "price": "Free",
+        "color": "#3b82f6",
+        "image": "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
+        "full_details": "Immersive business & startup event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with business & startup leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Vigyan Bhawan Plenary Hall",
+        "venue_address": "Maulana Azad Rd, New Delhi",
+        "time": "09:00 AM",
+        "end_time": "06:00 PM",
+        "category": "Business & Startup"
+    },
+    {
+        "id": 161,
+        "title": "Bangalore Seed Pitch Day 2026",
+        "date": "May 10, 2026",
+        "desc": "25 startups raised over \u20b912 Cr in angel commitments on demo day.",
+        "price": "\u20b91000",
+        "color": "#3b82f6",
+        "image": "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Concluded business & startup landmark event.",
+        "full_details": "Successfully hosted event bringing together delegates across the country for impactful business & startup showcases.",
+        "outcome": "Concluded session archived in official hall of records.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "T-Hub Bangalore Hub",
+        "venue_address": "Indiranagar, Bangalore",
+        "time": "10:00 AM",
+        "end_time": "05:00 PM",
+        "category": "Business & Startup"
+    },
+    {
+        "id": 162,
+        "title": "SaaS Growth Summit Autumn 2025",
+        "date": "Oct 15, 2025",
+        "desc": "Over 600 SaaS founders attended keynote sessions by industry unicorns.",
+        "price": "\u20b91500",
+        "color": "#3b82f6",
+        "image": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Concluded business & startup landmark event.",
+        "full_details": "Successfully hosted event bringing together delegates across the country for impactful business & startup showcases.",
+        "outcome": "Concluded session archived in official hall of records.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "JW Marriott Hotel",
+        "venue_address": "Vittal Mallya Rd, Bengaluru",
+        "time": "09:30 AM",
+        "end_time": "05:30 PM",
+        "category": "Business & Startup"
+    },
+    {
+        "id": 163,
+        "title": "Grand Standup Comedy Showcase 2026",
+        "date": "Nov 15, 2026",
+        "desc": "Starring India's top standup comedians performing non-stop hilarious sets.",
+        "price": "\u20b9699",
+        "color": "#ec4899",
+        "image": "https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
+        "full_details": "Immersive art, culture & theater event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with art, culture & theater leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Good Shepherd Auditorium",
+        "venue_address": "Museum Rd, Shanthala Nagar, Bangalore",
+        "time": "07:30 PM",
+        "end_time": "10:00 PM",
+        "category": "Art, Culture & Theater"
+    },
+    {
+        "id": 164,
+        "title": "National Classical Drama & Theater Fest",
+        "date": "Nov 21, 2026",
+        "desc": "Acclaimed multilingual theater productions, Shakespearean adaptations, and live musical drama.",
+        "price": "\u20b9400",
+        "color": "#ec4899",
+        "image": "https://images.unsplash.com/photo-1469488865564-c2de10f69f96?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
+        "full_details": "Immersive art, culture & theater event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with art, culture & theater leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Ranga Shankara",
+        "venue_address": "JP Nagar 2nd Phase, Bengaluru",
+        "time": "06:30 PM",
+        "end_time": "09:30 PM",
+        "category": "Art, Culture & Theater"
+    },
+    {
+        "id": 165,
+        "title": "Contemporary Art & Sculpture Biennial",
+        "date": "Nov 28, 2026",
+        "desc": "Exhibiting 200+ original paintings, kinetic sculptures, and interactive light installations.",
+        "price": "Free",
+        "color": "#ec4899",
+        "image": "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
+        "full_details": "Immersive art, culture & theater event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with art, culture & theater leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "National Gallery of Modern Art (NGMA)",
+        "venue_address": "Palace Road, Bengaluru",
+        "time": "10:00 AM",
+        "end_time": "07:00 PM",
+        "category": "Art, Culture & Theater"
+    },
+    {
+        "id": 166,
+        "title": "Sufi & Qawwali Mystical Night",
+        "date": "Dec 05, 2026",
+        "desc": "Soulful Sufi music ensemble and Qawwali recitals by heritage masters under the stars.",
+        "price": "\u20b9850",
+        "color": "#ec4899",
+        "image": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
+        "full_details": "Immersive art, culture & theater event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with art, culture & theater leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Purana Qila Amphitheater",
+        "venue_address": "Mathura Rd, New Delhi",
+        "time": "07:00 PM",
+        "end_time": "11:00 PM",
+        "category": "Art, Culture & Theater"
+    },
+    {
+        "id": 167,
+        "title": "Handmade Pottery & Clay Sculpting Workshop",
+        "date": "Dec 12, 2026",
+        "desc": "Hands-on wheel throwing, glazing techniques, and ceramic sculpture creation.",
+        "price": "\u20b91200",
+        "color": "#ec4899",
+        "image": "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
+        "full_details": "Immersive art, culture & theater event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with art, culture & theater leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Clay Station Art Studio",
+        "venue_address": "HSR Layout, Sector 1, Bangalore",
+        "time": "11:00 AM",
+        "end_time": "04:00 PM",
+        "category": "Art, Culture & Theater"
+    },
+    {
+        "id": 168,
+        "title": "Slam Poetry & Spoken Word Open Mic",
+        "date": "Dec 19, 2026",
+        "desc": "Expressive poetry performances, storytelling rounds, and acoustic interludes.",
+        "price": "\u20b9200",
+        "color": "#ec4899",
+        "image": "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
+        "full_details": "Immersive art, culture & theater event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with art, culture & theater leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Atta Galatta Cultural Space",
+        "venue_address": "Indiranagar, Bangalore",
+        "time": "05:00 PM",
+        "end_time": "08:30 PM",
+        "category": "Art, Culture & Theater"
+    },
+    {
+        "id": 169,
+        "title": "Broadway Musical Night: The Legends",
+        "date": "Dec 27, 2026",
+        "desc": "Magnificent musical orchestra, high-energy Broadway choreography, and vocalists.",
+        "price": "\u20b91500",
+        "color": "#ec4899",
+        "image": "https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
+        "full_details": "Immersive art, culture & theater event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with art, culture & theater leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "NCPA Jamshed Bhabha Theatre",
+        "venue_address": "Nariman Point, Mumbai",
+        "time": "06:30 PM",
+        "end_time": "09:30 PM",
+        "category": "Art, Culture & Theater"
+    },
+    {
+        "id": 170,
+        "title": "Indian Heritage Folk Dance Gala",
+        "date": "Jan 10, 2027",
+        "desc": "Kathak, Bharatanatyam, Yakshagana, and Garba performances by national troupes.",
+        "price": "Free",
+        "color": "#ec4899",
+        "image": "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
+        "full_details": "Immersive art, culture & theater event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with art, culture & theater leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Ravindra Kalakshetra",
+        "venue_address": "JC Road, Sampangi Rama Nagar, Bengaluru",
+        "time": "05:30 PM",
+        "end_time": "09:00 PM",
+        "category": "Art, Culture & Theater"
+    },
+    {
+        "id": 171,
+        "title": "Canvas Painting & Wine Soir\u00e9e",
+        "date": "Jan 19, 2027",
+        "desc": "Guided acrylic canvas painting session with free art kit, beverages, and music.",
+        "price": "\u20b9999",
+        "color": "#ec4899",
+        "image": "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
+        "full_details": "Immersive art, culture & theater event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with art, culture & theater leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Artiste Cafe",
+        "venue_address": "Indiranagar 100 Feet Rd, Bangalore",
+        "time": "03:00 PM",
+        "end_time": "07:00 PM",
+        "category": "Art, Culture & Theater"
+    },
+    {
+        "id": 172,
+        "title": "International Photography & Film Expo",
+        "date": "Jan 28, 2027",
+        "desc": "Street photography exhibitions, masterclasses with documentary filmmakers, and vintage lens swaps.",
+        "price": "Free",
+        "color": "#ec4899",
+        "image": "https://images.unsplash.com/photo-1452587925148-ce544e77e70d?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
+        "full_details": "Immersive art, culture & theater event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with art, culture & theater leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Kala Ghoda Art Enclave",
+        "venue_address": "Fort, Mumbai",
+        "time": "10:00 AM",
+        "end_time": "06:00 PM",
+        "category": "Art, Culture & Theater"
+    },
+    {
+        "id": 173,
+        "title": "Standup Comedy Open Mic Nights",
+        "date": "Feb 06, 2027",
+        "desc": "Catch budding comedians testing out fresh jokes alongside secret celebrity drop-ins.",
+        "price": "\u20b9150",
+        "color": "#ec4899",
+        "image": "https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
+        "full_details": "Immersive art, culture & theater event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with art, culture & theater leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "The Habitat",
+        "venue_address": "Khar West, Mumbai",
+        "time": "07:00 PM",
+        "end_time": "09:30 PM",
+        "category": "Art, Culture & Theater"
+    },
+    {
+        "id": 174,
+        "title": "Traditional Calligraphy & Typography Workshop",
+        "date": "Feb 15, 2027",
+        "desc": "Learn Devanagari and Gothic brush calligraphy lettering with ink pens and handmade parchment.",
+        "price": "\u20b9650",
+        "color": "#ec4899",
+        "image": "https://images.unsplash.com/photo-1516962215378-7fa2e137ae93?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
+        "full_details": "Immersive art, culture & theater event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with art, culture & theater leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Dhaatu Art Center",
+        "venue_address": "Banashankari 2nd Stage, Bangalore",
+        "time": "11:00 AM",
+        "end_time": "03:30 PM",
+        "category": "Art, Culture & Theater"
+    },
+    {
+        "id": 175,
+        "title": "Experimental Improv Comedy & Sketch Night",
+        "date": "Feb 23, 2027",
+        "desc": "100% unscripted on-the-spot improvised comedic games driven by audience prompts.",
+        "price": "\u20b9350",
+        "color": "#ec4899",
+        "image": "https://images.unsplash.com/photo-1526478806334-5fd488fcaabc?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
+        "full_details": "Immersive art, culture & theater event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with art, culture & theater leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Medai The Stage",
+        "venue_address": "Koramangala 4th Block, Bangalore",
+        "time": "06:30 PM",
+        "end_time": "09:00 PM",
+        "category": "Art, Culture & Theater"
+    },
+    {
+        "id": 176,
+        "title": "Sitar & Hindustani Classical Recital",
+        "date": "Mar 03, 2027",
+        "desc": "Maestro Sitar performances accompanied by Tabla virtuosos celebrating Indian ragas.",
+        "price": "\u20b9500",
+        "color": "#ec4899",
+        "image": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
+        "full_details": "Immersive art, culture & theater event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with art, culture & theater leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Chowdiah Memorial Hall",
+        "venue_address": "Vyalikaval, Malleshwaram, Bengaluru",
+        "time": "06:00 PM",
+        "end_time": "09:30 PM",
+        "category": "Art, Culture & Theater"
+    },
+    {
+        "id": 177,
+        "title": "Handloom & Textile Crafts Carnival",
+        "date": "Mar 12, 2027",
+        "desc": "Live weaving looms, block-printing workshops, and handloom artisan showcases.",
+        "price": "Free",
+        "color": "#ec4899",
+        "image": "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
+        "full_details": "Immersive art, culture & theater event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with art, culture & theater leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Chitra Kala Parishath",
+        "venue_address": "Kumara Krupa Rd, Bengaluru",
+        "time": "10:00 AM",
+        "end_time": "07:00 PM",
+        "category": "Art, Culture & Theater"
+    },
+    {
+        "id": 178,
+        "title": "Young Playwrights Festival 2027",
+        "date": "Mar 21, 2027",
+        "desc": "Original contemporary theatrical short plays written and performed by college theater societies.",
+        "price": "\u20b9300",
+        "color": "#ec4899",
+        "image": "https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
+        "full_details": "Immersive art, culture & theater event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with art, culture & theater leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Kamani Auditorium",
+        "venue_address": "Copernicus Marg, New Delhi",
+        "time": "05:00 PM",
+        "end_time": "09:30 PM",
+        "category": "Art, Culture & Theater"
+    },
+    {
+        "id": 179,
+        "title": "Kala Ghoda Theater Festival 2026",
+        "date": "Feb 08, 2026",
+        "desc": "Attracted over 40,000 visitors to live street plays, dance, and fine art displays.",
+        "price": "Free",
+        "color": "#ec4899",
+        "image": "https://images.unsplash.com/photo-1469488865564-c2de10f69f96?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Concluded art, culture & theater landmark event.",
+        "full_details": "Successfully hosted event bringing together delegates across the country for impactful art, culture & theater showcases.",
+        "outcome": "Concluded session archived in official hall of records.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Kala Ghoda Art Precinct",
+        "venue_address": "Mumbai",
+        "time": "05:00 PM",
+        "end_time": "10:00 PM",
+        "category": "Art, Culture & Theater"
+    },
+    {
+        "id": 180,
+        "title": "Monsoon Standup Comedy Gala 2025",
+        "date": "Jul 20, 2025",
+        "desc": "Housefull comedy special with 5 headline comedians and non-stop laughter.",
+        "price": "\u20b9799",
+        "color": "#ec4899",
+        "image": "https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Concluded art, culture & theater landmark event.",
+        "full_details": "Successfully hosted event bringing together delegates across the country for impactful art, culture & theater showcases.",
+        "outcome": "Concluded session archived in official hall of records.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "MLR Convention Centre",
+        "venue_address": "Whitefield, Bangalore",
+        "time": "07:00 PM",
+        "end_time": "09:30 PM",
+        "category": "Art, Culture & Theater"
+    },
+    {
+        "id": 181,
+        "title": "Bangalore Midnight Marathon 2026",
+        "date": "Nov 16, 2026",
+        "desc": "Iconic nighttime charity marathon with 5K, 10K, and Half Marathon timed chip runs.",
+        "price": "\u20b9950",
+        "color": "#10b981",
+        "image": "https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
+        "full_details": "Immersive health, fitness & yoga event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with health, fitness & yoga leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "KTPO Trade Centre",
+        "venue_address": "Whitefield, Bengaluru",
+        "time": "10:00 PM",
+        "end_time": "04:00 AM",
+        "category": "Health, Fitness & Yoga"
+    },
+    {
+        "id": 182,
+        "title": "Sunrise International Yoga & Mindfulness Retreat",
+        "date": "Nov 23, 2026",
+        "desc": "Guided 108 Surya Namaskars, sound bath therapy, and breathwork by yoga masters.",
+        "price": "Free",
+        "color": "#10b981",
+        "image": "https://images.unsplash.com/photo-1545205597-3d9d02c29597?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
+        "full_details": "Immersive health, fitness & yoga event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with health, fitness & yoga leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Cubbon Park Bandstand",
+        "venue_address": "Sampangi Rama Nagara, Bengaluru",
+        "time": "06:00 AM",
+        "end_time": "10:00 AM",
+        "category": "Health, Fitness & Yoga"
+    },
+    {
+        "id": 183,
+        "title": "CrossFit Arena Open Challenge 2026",
+        "date": "Nov 30, 2026",
+        "desc": "Deadlifts, box jumps, kettlebell sprints, and obstacle courses for all fitness tiers.",
+        "price": "\u20b9600",
+        "color": "#10b981",
+        "image": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
+        "full_details": "Immersive health, fitness & yoga event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with health, fitness & yoga leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Decathlon Sports Arena",
+        "venue_address": "Sarjapur Road, Bangalore",
+        "time": "08:00 AM",
+        "end_time": "04:00 PM",
+        "category": "Health, Fitness & Yoga"
+    },
+    {
+        "id": 184,
+        "title": "Holistic Nutrition & Gut Health Masterclass",
+        "date": "Dec 07, 2026",
+        "desc": "Evidence-based meal planning, metabolic health, gut microbiome, and athletic diets.",
+        "price": "\u20b9450",
+        "color": "#10b981",
+        "image": "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
+        "full_details": "Immersive health, fitness & yoga event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with health, fitness & yoga leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "The Leela Palace Conference Hall",
+        "venue_address": "Bangalore",
+        "time": "11:00 AM",
+        "end_time": "03:00 PM",
+        "category": "Health, Fitness & Yoga"
+    },
+    {
+        "id": 185,
+        "title": "Zumba & Dance Cardio Carnival",
+        "date": "Dec 16, 2026",
+        "desc": "High-energy Latin beats, licensed Zumba choreographers, and glowing neon wristbands.",
+        "price": "\u20b9300",
+        "color": "#10b981",
+        "image": "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
+        "full_details": "Immersive health, fitness & yoga event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with health, fitness & yoga leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Phoenix Marketcity Courtyard",
+        "venue_address": "Kurla, Mumbai",
+        "time": "06:00 PM",
+        "end_time": "09:00 PM",
+        "category": "Health, Fitness & Yoga"
+    },
+    {
+        "id": 186,
+        "title": "Mental Health & Stress Decompression Camp",
+        "date": "Dec 23, 2026",
+        "desc": "Guided cognitive wellness, mindful meditation, and peer support counseling forums.",
+        "price": "Free",
+        "color": "#10b981",
+        "image": "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
+        "full_details": "Immersive health, fitness & yoga event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with health, fitness & yoga leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "NIMHANS Convention Centre",
+        "venue_address": "Hosur Rd, Lakkasandra, Bengaluru",
+        "time": "10:00 AM",
+        "end_time": "02:00 PM",
+        "category": "Health, Fitness & Yoga"
+    },
+    {
+        "id": 187,
+        "title": "Pilates & Core Strength Intensive Workshop",
+        "date": "Jan 11, 2027",
+        "desc": "Mat and reformer pilates techniques to enhance core stability and posture alignment.",
+        "price": "\u20b9800",
+        "color": "#10b981",
+        "image": "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
+        "full_details": "Immersive health, fitness & yoga event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with health, fitness & yoga leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Bodycraft Studio",
+        "venue_address": "Indiranagar, Bangalore",
+        "time": "07:30 AM",
+        "end_time": "11:00 AM",
+        "category": "Health, Fitness & Yoga"
+    },
+    {
+        "id": 188,
+        "title": "Western Ghats Nature Trek & Wellness Walk",
+        "date": "Jan 20, 2027",
+        "desc": "Guided sunrise mountain trek, forest bathing, trail breakfast, and stretching routines.",
+        "price": "\u20b91400",
+        "color": "#10b981",
+        "image": "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
+        "full_details": "Immersive health, fitness & yoga event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with health, fitness & yoga leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Skandagiri Base Camp",
+        "venue_address": "Chikkaballapur, Karnataka",
+        "time": "05:30 AM",
+        "end_time": "03:00 PM",
+        "category": "Health, Fitness & Yoga"
+    },
+    {
+        "id": 189,
+        "title": "Strongman & Powerlifting Championship",
+        "date": "Jan 29, 2027",
+        "desc": "Squat, bench press, and deadlift official weight class powerlifting meets.",
+        "price": "\u20b9700",
+        "color": "#10b981",
+        "image": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
+        "full_details": "Immersive health, fitness & yoga event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with health, fitness & yoga leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Thyagaraj Indoor Stadium",
+        "venue_address": "INA Colony, New Delhi",
+        "time": "09:00 AM",
+        "end_time": "06:00 PM",
+        "category": "Health, Fitness & Yoga"
+    },
+    {
+        "id": 190,
+        "title": "AcroYoga & Partner Movement Jam",
+        "date": "Feb 07, 2027",
+        "desc": "Learn balance, therapeutic partner flying, and acro poses under lush green banyan trees.",
+        "price": "\u20b9500",
+        "color": "#10b981",
+        "image": "https://images.unsplash.com/photo-1545205597-3d9d02c29597?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
+        "full_details": "Immersive health, fitness & yoga event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with health, fitness & yoga leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Lalbagh Botanical Gardens",
+        "venue_address": "Mavalli, Bengaluru",
+        "time": "08:00 AM",
+        "end_time": "12:00 PM",
+        "category": "Health, Fitness & Yoga"
+    },
+    {
+        "id": 191,
+        "title": "Cycling Cyclothon: Pedal for Green India",
+        "date": "Feb 16, 2027",
+        "desc": "25K and 50K non-motorized cycling rally promoting urban sustainability and cardiac health.",
+        "price": "Free",
+        "color": "#10b981",
+        "image": "https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
+        "full_details": "Immersive health, fitness & yoga event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with health, fitness & yoga leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Vidhana Soudha Outer Ring",
+        "venue_address": "Bengaluru",
+        "time": "06:00 AM",
+        "end_time": "10:00 AM",
+        "category": "Health, Fitness & Yoga"
+    },
+    {
+        "id": 192,
+        "title": "Calisthenics & Bodyweight Acrobatics Workshop",
+        "date": "Feb 24, 2027",
+        "desc": "Master muscle-ups, handstands, human flags, and planche progressions safely.",
+        "price": "\u20b9550",
+        "color": "#10b981",
+        "image": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
+        "full_details": "Immersive health, fitness & yoga event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with health, fitness & yoga leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Muscle Beach Calisthenics Park",
+        "venue_address": "Juhu Beach, Mumbai",
+        "time": "09:00 AM",
+        "end_time": "01:00 PM",
+        "category": "Health, Fitness & Yoga"
+    },
+    {
+        "id": 193,
+        "title": "Women Self-Defense & Krav Maga Bootcamp",
+        "date": "Mar 04, 2027",
+        "desc": "Practical self-defense tactics, threat de-escalation, and situational awareness.",
+        "price": "Free",
+        "color": "#10b981",
+        "image": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
+        "full_details": "Immersive health, fitness & yoga event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with health, fitness & yoga leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "St. Joseph's Boys' High School Ground",
+        "venue_address": "Museum Rd, Bangalore",
+        "time": "10:00 AM",
+        "end_time": "02:00 PM",
+        "category": "Health, Fitness & Yoga"
+    },
+    {
+        "id": 194,
+        "title": "Sound Bowl Healing & Deep Meditation",
+        "date": "Mar 13, 2027",
+        "desc": "Tibetan singing bowl frequencies to soothe the nervous system and induce restful sleep.",
+        "price": "\u20b9750",
+        "color": "#10b981",
+        "image": "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
+        "full_details": "Immersive health, fitness & yoga event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with health, fitness & yoga leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Aura Healing Space",
+        "venue_address": "Defence Colony, Indiranagar, Bangalore",
+        "time": "06:00 PM",
+        "end_time": "08:30 PM",
+        "category": "Health, Fitness & Yoga"
+    },
+    {
+        "id": 195,
+        "title": "Trail Running & Forest 10K Sprint",
+        "date": "Mar 22, 2027",
+        "desc": "Off-road dirt trail run through scenic eucalyptus groves with hydration stations.",
+        "price": "\u20b9650",
+        "color": "#10b981",
+        "image": "https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
+        "full_details": "Immersive health, fitness & yoga event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with health, fitness & yoga leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Turahalli Forest Trail",
+        "venue_address": "Banashankari 6th Stage, Bengaluru",
+        "time": "06:00 AM",
+        "end_time": "10:00 AM",
+        "category": "Health, Fitness & Yoga"
+    },
+    {
+        "id": 196,
+        "title": "National Fitness Expo & Bodybuilding Grand Prix",
+        "date": "Mar 29, 2027",
+        "desc": "Supplement expos, athlete meet-and-greets, and competitive physique categories.",
+        "price": "\u20b9800",
+        "color": "#10b981",
+        "image": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
+        "full_details": "Immersive health, fitness & yoga event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with health, fitness & yoga leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Bombay Exhibition Centre (NESCO)",
+        "venue_address": "Goregaon East, Mumbai",
+        "time": "09:00 AM",
+        "end_time": "07:00 PM",
+        "category": "Health, Fitness & Yoga"
+    },
+    {
+        "id": 197,
+        "title": "Bangalore 10K Summer Run 2026",
+        "date": "Apr 14, 2026",
+        "desc": "Over 8,000 runners completed the certified 10K loop across Cubbon Park.",
+        "price": "\u20b9750",
+        "color": "#10b981",
+        "image": "https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Concluded health, fitness & yoga landmark event.",
+        "full_details": "Successfully hosted event bringing together delegates across the country for impactful health, fitness & yoga showcases.",
+        "outcome": "Concluded session archived in official hall of records.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Kanteerava Stadium",
+        "venue_address": "Nunegundlapalli, Bangalore",
+        "time": "05:30 AM",
+        "end_time": "09:30 AM",
+        "category": "Health, Fitness & Yoga"
+    },
+    {
+        "id": 198,
+        "title": "World Yoga Day Mega Gathering 2025",
+        "date": "Jun 21, 2025",
+        "desc": "Synchronized yoga session with 12,000 yoga practitioners and yoga gurus.",
+        "price": "Free",
+        "color": "#10b981",
+        "image": "https://images.unsplash.com/photo-1545205597-3d9d02c29597?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Concluded health, fitness & yoga landmark event.",
+        "full_details": "Successfully hosted event bringing together delegates across the country for impactful health, fitness & yoga showcases.",
+        "outcome": "Concluded session archived in official hall of records.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Palace Grounds",
+        "venue_address": "Jayamahal, Bengaluru",
+        "time": "06:00 AM",
+        "end_time": "09:00 AM",
+        "category": "Health, Fitness & Yoga"
+    },
+    {
+        "id": 199,
+        "title": "Great Indian Food Truck Festival 2026",
+        "date": "Nov 17, 2026",
+        "desc": "50+ gourmet food trucks, live indie bands, artisanal desserts, and food tasting courts.",
+        "price": "\u20b9199",
+        "color": "#f97316",
+        "image": "https://images.unsplash.com/photo-1565123409695-7b5ef63a2efb?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for food, tech & festivals enthusiasts and professionals.",
+        "full_details": "Immersive food, tech & festivals event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with food, tech & festivals leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Jayanthi Garden",
+        "venue_address": "Sindhi High School Grounds, Bengaluru",
+        "time": "12:00 PM",
+        "end_time": "10:30 PM",
+        "category": "Food, Tech & Festivals"
+    },
+    {
+        "id": 200,
+        "title": "Artisanal Specialty Coffee & Brewing Fest",
+        "date": "Nov 24, 2026",
+        "desc": "Pour-over masterclasses, espresso latte art showdowns, and single-origin bean tastings.",
+        "price": "\u20b9450",
+        "color": "#f97316",
+        "image": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for food, tech & festivals enthusiasts and professionals.",
+        "full_details": "Immersive food, tech & festivals event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with food, tech & festivals leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Third Wave Roastery",
+        "venue_address": "Koramangala 4th Block, Bangalore",
+        "time": "10:00 AM",
+        "end_time": "06:00 PM",
+        "category": "Food, Tech & Festivals"
+    },
+    {
+        "id": 201,
+        "title": "Asian Street Food & Dim Sum Carnival",
+        "date": "Dec 01, 2026",
+        "desc": "Live wok stations: Ramen, bao buns, Korean corn dogs, Thai satay, and dumplings.",
+        "price": "\u20b9250",
+        "color": "#f97316",
+        "image": "https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for food, tech & festivals enthusiasts and professionals.",
+        "full_details": "Immersive food, tech & festivals event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with food, tech & festivals leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "High Street Phoenix Courtyard",
+        "venue_address": "Lower Parel, Mumbai",
+        "time": "01:00 PM",
+        "end_time": "10:00 PM",
+        "category": "Food, Tech & Festivals"
+    },
+    {
+        "id": 202,
+        "title": "Masterclass: Italian Sourdough & Woodfired Pizza",
+        "date": "Dec 09, 2026",
+        "desc": "Hands-on sourdough fermentation, hand-tossed dough shaping, and woodfired pizza ovens.",
+        "price": "\u20b91500",
+        "color": "#f97316",
+        "image": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for food, tech & festivals enthusiasts and professionals.",
+        "full_details": "Immersive food, tech & festivals event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with food, tech & festivals leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Culinary Academy of India",
+        "venue_address": "Begumpet, Hyderabad",
+        "time": "11:00 AM",
+        "end_time": "04:00 PM",
+        "category": "Food, Tech & Festivals"
+    },
+    {
+        "id": 203,
+        "title": "Craft Beer & BBQ Grill Fest 2026",
+        "date": "Dec 18, 2026",
+        "desc": "Slow-smoked briskets, artisanal sausages, vegan BBQ skewers, and 12 craft beer taps on pour.",
+        "price": "\u20b9899",
+        "color": "#f97316",
+        "image": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for food, tech & festivals enthusiasts and professionals.",
+        "full_details": "Immersive food, tech & festivals event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with food, tech & festivals leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Toit Brewpub Courtyard",
+        "venue_address": "Indiranagar, Bangalore",
+        "time": "02:00 PM",
+        "end_time": "11:00 PM",
+        "category": "Food, Tech & Festivals"
+    },
+    {
+        "id": 204,
+        "title": "Indian Heritage Sweets & Mithai Gala",
+        "date": "Dec 26, 2026",
+        "desc": "Showcasing royal confectioneries: Kaju Katli, Jalebi, Ghewar, Sandesh, and Mysore Pak.",
+        "price": "Free",
+        "color": "#f97316",
+        "image": "https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for food, tech & festivals enthusiasts and professionals.",
+        "full_details": "Immersive food, tech & festivals event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with food, tech & festivals leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Chandni Chowk Heritage Plaza",
+        "venue_address": "Old Delhi",
+        "time": "10:30 AM",
+        "end_time": "08:00 PM",
+        "category": "Food, Tech & Festivals"
+    },
+    {
+        "id": 205,
+        "title": "Vegan & Plant-Based Culinary Expo",
+        "date": "Jan 12, 2027",
+        "desc": "Plant-based meats, dairy-free cheeses, cruelty-free living, and superfood cooking demos.",
+        "price": "\u20b9200",
+        "color": "#f97316",
+        "image": "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for food, tech & festivals enthusiasts and professionals.",
+        "full_details": "Immersive food, tech & festivals event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with food, tech & festivals leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "World Trade Centre",
+        "venue_address": "Brigade Gateway, Malleshwaram, Bengaluru",
+        "time": "10:00 AM",
+        "end_time": "06:00 PM",
+        "category": "Food, Tech & Festivals"
+    },
+    {
+        "id": 206,
+        "title": "Chocoholic: Chocolate & Dessert Expo",
+        "date": "Jan 21, 2027",
+        "desc": "Bean-to-bar bean roasting, truffle rolling workshops, and chocolate fountains.",
+        "price": "\u20b9350",
+        "color": "#f97316",
+        "image": "https://images.unsplash.com/photo-1511381939415-e44015466834?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for food, tech & festivals enthusiasts and professionals.",
+        "full_details": "Immersive food, tech & festivals event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with food, tech & festivals leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Orion Mall Lakeside",
+        "venue_address": "Rajajinagar, Bangalore",
+        "time": "11:00 AM",
+        "end_time": "08:30 PM",
+        "category": "Food, Tech & Festivals"
+    },
+    {
+        "id": 207,
+        "title": "Mixology & Mocktail Craft Masterclass",
+        "date": "Jan 30, 2027",
+        "desc": "Infused syrups, botanical garnishes, smoked glasses, and flair bartending techniques.",
+        "price": "\u20b91200",
+        "color": "#f97316",
+        "image": "https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for food, tech & festivals enthusiasts and professionals.",
+        "full_details": "Immersive food, tech & festivals event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with food, tech & festivals leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Skyye Lounge",
+        "venue_address": "UB City 16th Floor, Vittal Mallya Rd, Bengaluru",
+        "time": "04:00 PM",
+        "end_time": "08:00 PM",
+        "category": "Food, Tech & Festivals"
+    },
+    {
+        "id": 208,
+        "title": "South Indian Breakfast & Dosa Fest",
+        "date": "Feb 08, 2027",
+        "desc": "Crispy Benne Masala dosas, filter coffee, Podi idlis, and 20 varieties of chutneys.",
+        "price": "Free",
+        "color": "#f97316",
+        "image": "https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for food, tech & festivals enthusiasts and professionals.",
+        "full_details": "Immersive food, tech & festivals event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with food, tech & festivals leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Vidyarthi Bhavan Grounds",
+        "venue_address": "Gandhi Bazaar, Basavanagudi, Bengaluru",
+        "time": "07:00 AM",
+        "end_time": "01:00 PM",
+        "category": "Food, Tech & Festivals"
+    },
+    {
+        "id": 209,
+        "title": "Global Cheese & Charcuterie Tasting Tour",
+        "date": "Feb 17, 2027",
+        "desc": "Artisanal Gouda, aged Cheddar, Brie, and imported olives tasting with sommeliers.",
+        "price": "\u20b91400",
+        "color": "#f97316",
+        "image": "https://images.unsplash.com/photo-1452195100486-9cc805987862?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for food, tech & festivals enthusiasts and professionals.",
+        "full_details": "Immersive food, tech & festivals event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with food, tech & festivals leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "The Oberoi Hotel",
+        "venue_address": "MG Road, Yellappa Chetty Layout, Bengaluru",
+        "time": "03:00 PM",
+        "end_time": "07:30 PM",
+        "category": "Food, Tech & Festivals"
+    },
+    {
+        "id": 210,
+        "title": "Organic Farmers Kitchen & Millets Conclave",
+        "date": "Feb 25, 2027",
+        "desc": "Farm-to-table cooking, traditional Ragi and Jowar dishes, and agro-nutrition stalls.",
+        "price": "Free",
+        "color": "#f97316",
+        "image": "https://images.unsplash.com/photo-1506484381205-f7945653044d?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for food, tech & festivals enthusiasts and professionals.",
+        "full_details": "Immersive food, tech & festivals event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with food, tech & festivals leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Gandhi Krishi Vigyana Kendra (GKVK)",
+        "venue_address": "Bellary Rd, Bengaluru",
+        "time": "09:30 AM",
+        "end_time": "05:00 PM",
+        "category": "Food, Tech & Festivals"
+    },
+    {
+        "id": 211,
+        "title": "Taco & Mexican Fiesta Carnival",
+        "date": "Mar 05, 2027",
+        "desc": "Birria tacos, freshly mashed guacamole, churros with dulce de leche, and salsa dancing.",
+        "price": "\u20b9250",
+        "color": "#f97316",
+        "image": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for food, tech & festivals enthusiasts and professionals.",
+        "full_details": "Immersive food, tech & festivals event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with food, tech & festivals leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "UB City Amphitheatre",
+        "venue_address": "Vittal Mallya Rd, Bangalore",
+        "time": "01:00 PM",
+        "end_time": "09:30 PM",
+        "category": "Food, Tech & Festivals"
+    },
+    {
+        "id": 212,
+        "title": "Baking Masterclass: French Macarons & Choux",
+        "date": "Mar 14, 2027",
+        "desc": "Piping techniques, chocolate ganache fillings, and delicate French pastry creation.",
+        "price": "\u20b91800",
+        "color": "#f97316",
+        "image": "https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for food, tech & festivals enthusiasts and professionals.",
+        "full_details": "Immersive food, tech & festivals event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with food, tech & festivals leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Lavonne Academy of Baking Science and Pastry Arts",
+        "venue_address": "Indiranagar, Bangalore",
+        "time": "10:30 AM",
+        "end_time": "03:30 PM",
+        "category": "Food, Tech & Festivals"
+    },
+    {
+        "id": 213,
+        "title": "Hyderabad Biryani & Kebab Festival",
+        "date": "Mar 23, 2027",
+        "desc": "Dum biryanis from legendary chefs, Galouti kebabs, Mirchi ka Salan, and Double ka Meetha.",
+        "price": "Free",
+        "color": "#f97316",
+        "image": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for food, tech & festivals enthusiasts and professionals.",
+        "full_details": "Immersive food, tech & festivals event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with food, tech & festivals leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "People's Plaza",
+        "venue_address": "Necklace Road, Hyderabad",
+        "time": "12:30 PM",
+        "end_time": "11:00 PM",
+        "category": "Food, Tech & Festivals"
+    },
+    {
+        "id": 214,
+        "title": "Street Food of India Mega Carnival",
+        "date": "Mar 30, 2027",
+        "desc": "Over 100 stalls: Delhi chaat, Mumbai pav bhaji, Kolkata kathi rolls, and Indore poha.",
+        "price": "\u20b9150",
+        "color": "#f97316",
+        "image": "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Premier gathering for food, tech & festivals enthusiasts and professionals.",
+        "full_details": "Immersive food, tech & festivals event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
+        "outcome": "Gain industry exposure, network with food, tech & festivals leaders, and receive an authentic participation credential.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Jawaharlal Nehru Stadium Gate 2",
+        "venue_address": "Pragati Vihar, New Delhi",
+        "time": "11:00 AM",
+        "end_time": "10:00 PM",
+        "category": "Food, Tech & Festivals"
+    },
+    {
+        "id": 215,
+        "title": "Bangalore Food Truck Carnival 2026",
+        "date": "Jan 18, 2026",
+        "desc": "Served over 15,000 foodies across 40 specialty food trucks.",
+        "price": "\u20b9199",
+        "color": "#f97316",
+        "image": "https://images.unsplash.com/photo-1565123409695-7b5ef63a2efb?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Concluded food, tech & festivals landmark event.",
+        "full_details": "Successfully hosted event bringing together delegates across the country for impactful food, tech & festivals showcases.",
+        "outcome": "Concluded session archived in official hall of records.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Pebble Jungle Lounge",
+        "venue_address": "Palace Grounds, Bengaluru",
+        "time": "12:00 PM",
+        "end_time": "10:00 PM",
+        "category": "Food, Tech & Festivals"
+    },
+    {
+        "id": 216,
+        "title": "Autumn Specialty Coffee Fest 2025",
+        "date": "Nov 08, 2025",
+        "desc": "National AeroPress and Barista championship qualifiers.",
+        "price": "\u20b9350",
+        "color": "#f97316",
+        "image": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1200&q=80",
+        "purpose": "Concluded food, tech & festivals landmark event.",
+        "full_details": "Successfully hosted event bringing together delegates across the country for impactful food, tech & festivals showcases.",
+        "outcome": "Concluded session archived in official hall of records.",
+        "seats_total": 100,
+        "seats_filled": 0,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Araku Coffee Flagship Roastery",
+        "venue_address": "Indiranagar, Bangalore",
+        "time": "10:00 AM",
+        "end_time": "06:00 PM",
+        "category": "Food, Tech & Festivals"
+    },
+    {
+        "id": 217,
+        "title": "AI Agentic Systems & LLM Architecture Summit 2027",
+        "date": "2026-11-28",
+        "desc": "Hands-on engineering summit exploring multi-agent workflows, LangGraph, autonomous agents and enterprise LLM production deployments.",
+        "price": "\u20b9299",
+        "color": "#6366f1",
+        "image": "/static/images/events/ai_summit.jpg",
+        "purpose": "Equip engineers and researchers with the skills to architect and deploy production-grade multi-agent autonomous AI systems.",
+        "full_details": "Comprehensive day-long deep dive featuring keynote sessions from leading AI researchers, interactive live coding of agentic loops, prompt distillation workshops, and open Q&A on AI alignment.",
+        "outcome": "Participants build functional agentic systems, receive code templates, and earn an advanced AI Agent Systems Certificate.",
+        "seats_total": 250,
+        "seats_filled": 64,
+        "is_draft": 0,
+        "featured": 1,
+        "venue": "Tech Hall A, Bangalore",
+        "venue_address": "Tech Hall A, Innovation Boulevard, Whitefield, Bangalore, Karnataka 560066",
+        "time": "09:30 AM",
+        "end_time": "05:30 PM",
+        "category": "Education"
+    },
+    {
+        "id": 218,
+        "title": "AR/VR Spatial Computing & Metaverse Hackathon",
+        "date": "2026-12-05",
+        "desc": "36-hour immersive hackathon building cutting-edge spatial computing applications for Apple Vision Pro, Meta Quest 3, and WebXR.",
+        "price": "₹0",
+        "color": "#8b5cf6",
+        "image": "/static/images/events/web_mosaic.jpg",
+        "purpose": "Foster student and indie developer innovation in next-generation spatial computing, spatial interactions, and mixed-reality toolsets.",
+        "full_details": "Hackathon tracks include Education XR, Healthcare Spatial Visualizations, and Mixed-Reality Gaming. High-end VR headsets and dev kits provided on-site with mentor support from top spatial computing studios.",
+        "outcome": "Top 3 winning teams receive ₹2,00,000 in hardware grants, incubation support, and direct investor showcase.",
+        "seats_total": 300,
+        "seats_filled": 120,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Innovation Lab 3, Whitefield",
+        "venue_address": "Innovation Lab 3, EPIP Zone, Whitefield, Bangalore, Karnataka 560066",
+        "time": "08:00 AM",
+        "end_time": "08:00 PM",
+        "category": "Education"
+    },
+    {
+        "id": 219,
+        "title": "National Archery & Precision Shooting Championship",
+        "date": "2026-11-29",
+        "desc": "State-of-the-art competitive archery and 10m air rifle precision championship featuring Olympic qualifiers and collegiate talent.",
+        "price": "₹249",
+        "color": "#10b981",
+        "image": "/static/images/events/sports_athletics.jpg",
+        "purpose": "Promote Olympic precision sports and provide collegiate athletes a platform to compete under international federation standards.",
+        "full_details": "Features Recurve, Compound, and 10m Air Rifle categories with computerized laser scoring targets, live arena video feeds, and Olympic coach scouting.",
+        "outcome": "Medalists qualify for national circuit selection trials and receive specialized sporting equipment grants.",
+        "seats_total": 200,
+        "seats_filled": 45,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Sports Authority Complex, Bangalore",
+        "venue_address": "Sports Authority of India Complex, Netaji Subhas Southern Centre, Bangalore, Karnataka 560056",
+        "time": "08:30 AM",
+        "end_time": "06:00 PM",
+        "category": "Sports"
+    },
+    {
+        "id": 220,
+        "title": "Inter-City Squash & Lawn Tennis Masters Cup",
+        "date": "2026-12-08",
+        "desc": "Premier collegiate and open singles and doubles racquet championship on world-class synthetic and glass-backed courts.",
+        "price": "₹399",
+        "color": "#059669",
+        "image": "/static/images/events/sports_badminton.jpg",
+        "purpose": "Deliver high-intensity competitive racquet sport tournaments for students, club players, and rising athletes.",
+        "full_details": "Men's & Women's Singles, Doubles, and Mixed Doubles divisions across 4 glass-back squash courts and 6 floodlit tennis courts with certified umpires.",
+        "outcome": "Winners receive ₹1,50,000 prize pool, championship trophies, and ranking points.",
+        "seats_total": 180,
+        "seats_filled": 52,
+        "is_draft": 0,
+        "featured": 1,
+        "venue": "Kanteerava Tennis Courts, Bangalore",
+        "venue_address": "Sree Kanteerava Outdoor Stadium, Kasturba Road, Sampangi Rama Nagara, Bangalore, Karnataka 560001",
+        "time": "09:00 AM",
+        "end_time": "07:00 PM",
+        "category": "Sports"
+    },
+    {
+        "id": 221,
+        "title": "Sufi Rock & Mystical Qawwali Conclave",
+        "date": "2026-11-30",
+        "desc": "Soul-stirring evening of traditional Sufi harmonies blended with contemporary electric guitar riffs and percussion ensembles.",
+        "price": "₹699",
+        "color": "#ec4899",
+        "image": "/static/images/events/music_sufi.jpg",
+        "purpose": "Celebrate traditional mystical musical heritage through modern acoustic and rock fusion interpretations.",
+        "full_details": "Featuring renowned Sufi ensembles and rock fusion bands performing classic poetry of Rumi, Bulleh Shah, and Amir Khusro under immersive stage lighting.",
+        "outcome": "Attendees experience a transformative cultural evening with live musical performances and artisanal beverage stalls.",
+        "seats_total": 600,
+        "seats_filled": 310,
+        "is_draft": 0,
+        "featured": 1,
+        "venue": "Palace Grounds Stage 2, Bangalore",
+        "venue_address": "Palace Grounds, Jayamahal Main Road, Vasanth Nagar, Bangalore, Karnataka 560006",
+        "time": "06:30 PM",
+        "end_time": "11:00 PM",
+        "category": "Music Concerts"
+    },
+    {
+        "id": 222,
+        "title": "Electronic Sunset & Deep House Beach Club Fest",
+        "date": "2026-12-12",
+        "desc": "Day-to-night electronic music festival featuring international progressive house, melodic techno, and sunset ambient beats.",
+        "price": "₹899",
+        "color": "#a855f7",
+        "image": "/static/images/events/music_edm.jpg",
+        "purpose": "Deliver a world-class electronic music experience with state-of-the-art spatial sound and visual laser mapping.",
+        "full_details": "Triple stage setup with top DJ line-ups, curated food trucks, interactive light installations, and silent disco chill zones.",
+        "outcome": "Memorable electronic dance music festival experience celebrating youth culture and audio-visual production.",
+        "seats_total": 800,
+        "seats_filled": 420,
+        "is_draft": 0,
+        "featured": 1,
+        "venue": "Lakeside Amphitheatre, Bangalore",
+        "venue_address": "Lakeside Amphitheatre, Hebbal Outer Ring Road, Bangalore, Karnataka 560024",
+        "time": "04:00 PM",
+        "end_time": "11:30 PM",
+        "category": "Music Concerts"
+    },
+    {
+        "id": 223,
+        "title": "Bollywood Action Franchise Teaser Reveal & Cast Meet",
+        "date": "2026-11-26",
+        "desc": "High-octane press and fan event unveiling the official teaser, motion posters, and action sequence breakdown with the lead star cast.",
+        "price": "₹199",
+        "color": "#f59e0b",
+        "image": "/static/images/events/movie_action.jpg",
+        "purpose": "Provide cinephiles and media an exclusive first-look at the year's biggest action blockbuster.",
+        "full_details": "4K laser projection screening of teaser, live stunt choreography demo by stunt directors, media Q&A, and exclusive merchandise giveaway.",
+        "outcome": "Fans get signed movie posters, exclusive photos with the stars, and early bird premiere tickets.",
+        "seats_total": 350,
+        "seats_filled": 180,
+        "is_draft": 0,
+        "featured": 1,
+        "venue": "PVR Directors Cut, Forum Mall",
+        "venue_address": "PVR Director's Cut, Forum Mall, Hosur Road, Koramangala, Bangalore, Karnataka 560095",
+        "time": "05:00 PM",
+        "end_time": "08:30 PM",
+        "category": "Movie Promotions"
+    },
+    {
+        "id": 224,
+        "title": "Anime Film Theatrical Premiere & Voice Actor Panel",
+        "date": "2026-12-06",
+        "desc": "Exclusive IMAX premiere of the highly anticipated Japanese anime feature film featuring dubbing artists and Japanese animation directors.",
+        "price": "₹349",
+        "color": "#ef4444",
+        "image": "/static/images/events/movie_scifi.jpg",
+        "purpose": "Celebrate Japanese animation cinema with Indian anime fans and creators in IMAX.",
+        "full_details": "Red carpet cosplay welcome, full theatrical screening, interactive panel on anime localization, voice acting masterclass, and official studio art exhibition.",
+        "outcome": "Exclusive collectible movie badges, limited edition manga prints, and community fan networking.",
+        "seats_total": 400,
+        "seats_filled": 290,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "INOX IMAX Screen 1, Bangalore",
+        "venue_address": "INOX IMAX, Garuda Mall, Magrath Road, Ashok Nagar, Bangalore, Karnataka 560025",
+        "time": "06:00 PM",
+        "end_time": "09:30 PM",
+        "category": "Movie Promotions"
+    },
+    {
+        "id": 225,
+        "title": "Cricket Legend Masterclass & Exclusive Fan Interaction",
+        "date": "2026-11-27",
+        "desc": "Intimate masterclass and fireside chat with India's legendary World Cup champion cricketer on leadership, mental resilience, and peak performance.",
+        "price": "\u20b91499",
+        "color": "#eab308",
+        "image": "/static/images/events/celeb_sports.jpg",
+        "purpose": "Inspire students, corporate leaders, and athletes through firsthand leadership wisdom from a legendary sporting icon.",
+        "full_details": "Includes 60-minute motivational keynote, interactive audience Q&A, professional photo op with personalized cricket bat signing, and high-tea banquet.",
+        "outcome": "Attendees receive signed memorabilia, professional commemorative photograph, and invaluable leadership insights.",
+        "seats_total": 150,
+        "seats_filled": 95,
+        "is_draft": 0,
+        "featured": 1,
+        "venue": "Chinnaswamy VIP Lounge, Bangalore",
+        "venue_address": "M. Chinnaswamy Stadium VIP Lounge, Cubbon Road, Shivaji Nagar, Bangalore, Karnataka 560001",
+        "time": "03:00 PM",
+        "end_time": "06:30 PM",
+        "category": "Celebrity Meet-ups"
+    },
+    {
+        "id": 226,
+        "title": "Top Standup Comics Live Podcast & VIP Meet & Greet",
+        "date": "2026-12-09",
+        "desc": "Unfiltered live recording of India's #1 comedy podcast followed by a personal VIP backstage hangout with the country's top comedy creators.",
+        "price": "\u20b9999",
+        "color": "#f97316",
+        "image": "/static/images/events/celeb_comedy.jpg",
+        "purpose": "Provide fans a hilarious behind-the-scenes look into comedy writing, podcast production, and unscripted humor.",
+        "full_details": "Live audience participation improv segments, roast sessions, backstage pass access, photo ops, and complimentary signed tour merchandise.",
+        "outcome": "Guaranteed laughs, broadcast credit on the YouTube podcast release, and direct interaction with the comedians.",
+        "seats_total": 300,
+        "seats_filled": 210,
+        "is_draft": 0,
+        "featured": 1,
+        "venue": "Good Shepherd Auditorium, Bangalore",
+        "venue_address": "Good Shepherd Auditorium, Museum Road, Shanthala Nagar, Richmond Town, Bangalore, Karnataka 560025",
+        "time": "07:00 PM",
+        "end_time": "10:30 PM",
+        "category": "Celebrity Meet-ups"
+    },
+    {
+        "id": 227,
+        "title": "Smart Greenhouse & Hydroponic Urban Farming Expo",
+        "date": "2026-11-24",
+        "desc": "Practical demonstration of automated climate-controlled greenhouses, vertical NFT hydroponics, and rooftop soil-less farming technologies.",
+        "price": "\u20b90",
+        "color": "#84cc16",
+        "image": "/static/images/events/agri_smart.jpg",
+        "purpose": "Educate urban citizens, hobbyist growers, and progressive farmers on zero-pesticide, high-yield soil-less cultivation.",
+        "full_details": "Live operating hydroponic towers, nutrient film techniques, IoT sensor kits for automated pH & EC regulation, and hands-on seedling propagation workshops.",
+        "outcome": "Participants take home a DIY microgreens growing kit, digital farming guides, and hydroponic supplier contact directories.",
+        "seats_total": 450,
+        "seats_filled": 160,
+        "is_draft": 0,
+        "featured": 1,
+        "venue": "GKVK Agriculture Campus, Bangalore",
+        "venue_address": "Gandhi Krishi Vigyana Kendra (GKVK), Bellary Road, Bangalore, Karnataka 560065",
+        "time": "09:30 AM",
+        "end_time": "04:30 PM",
+        "category": "Agriculture"
+    },
+    {
+        "id": 228,
+        "title": "Kisan Drone Spraying & Solar Irrigation Conclave",
+        "date": "2026-12-04",
+        "desc": "State-wide exhibition of DGCA-approved agricultural spray drones, solar-powered drip irrigation pumps, and IoT soil moisture telematics.",
+        "price": "\u20b90",
+        "color": "#16a34a",
+        "image": "/static/images/events/agri_expo.jpg",
+        "purpose": "Equip farmers and agri-entrepreneurs with modern drone technology and renewable irrigation systems to slash input costs by 40%.",
+        "full_details": "Outdoor flight demonstrations of 10L & 20L crop protection drones, solar pump subsidy enrollment counters, and bank micro-loan approval desks.",
+        "outcome": "Farmers learn drone operation protocols, enroll in subsidized solar irrigation schemes, and receive free soil health test cards.",
+        "seats_total": 500,
+        "seats_filled": 280,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "University of Agricultural Sciences, Hebbal",
+        "venue_address": "University of Agricultural Sciences, Hebbal Campus, Bangalore, Karnataka 560024",
+        "time": "09:00 AM",
+        "end_time": "05:00 PM",
+        "category": "Agriculture"
+    },
+    {
+        "id": 229,
+        "title": "Cyber Security for Citizens & Digital Fraud Prevention Summit",
+        "date": "2026-11-25",
+        "desc": "Public awareness summit in collaboration with Cyber Police and CERT-In explaining UPI frauds, phishing defense, SIM swap protection, and legal remedy.",
+        "price": "\u20b90",
+        "color": "#2563eb",
+        "image": "/static/images/events/gov_civic.jpg",
+        "purpose": "Educate everyday citizens, senior citizens, and students on safeguarding their digital identity and financial transactions.",
+        "full_details": "Live case study demonstrations of OTP frauds, step-by-step reporting walkthrough on the National Cyber Crime Portal (1930 helpline), and interactive Q&A with cyber forensic inspectors.",
+        "outcome": "Citizens gain practical digital safety hygiene, fraud reporting checklists, and emergency cyber assistance contacts.",
+        "seats_total": 400,
+        "seats_filled": 210,
+        "is_draft": 0,
+        "featured": 1,
+        "venue": "Vikas Soudha Conference Hall, Bangalore",
+        "venue_address": "Vikas Soudha, Dr. Ambedkar Veedhi, Sampangi Rama Nagara, Bangalore, Karnataka 560001",
+        "time": "10:00 AM",
+        "end_time": "04:00 PM",
+        "category": "Government"
+    },
+    {
+        "id": 230,
+        "title": "National Youth Parliament & Public Policy Hackathon",
+        "date": "2026-12-07",
+        "desc": "Flagship democratic debate and policy hackathon where student delegates draft parliamentary bills on climate action, education reform, and urban transport.",
+        "price": "\u20b90",
+        "color": "#1d4ed8",
+        "image": "/static/images/events/gov_youth.jpg",
+        "purpose": "Nurture young civic leaders and channel youth policy recommendations directly to parliamentary committees.",
+        "full_details": "Modeled after the Lok Sabha proceedings with Question Hour, Zero Hour, and Special Mentions, adjudicated by retired IAS officers and constitutional law scholars.",
+        "outcome": "Top 5 policy whitepapers published in the National Youth Policy Compendium and delegates receive Parliamentary Commendation Certificates.",
+        "seats_total": 350,
+        "seats_filled": 145,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Town Hall Civic Center, Bangalore",
+        "venue_address": "Sir Puttanna Chetty Town Hall, JC Road, Bangalore, Karnataka 560002",
+        "time": "09:30 AM",
+        "end_time": "06:00 PM",
+        "category": "Government"
+    },
+    {
+        "id": 231,
+        "title": "Rocket League & Brawlhalla Collegiate Championship",
+        "date": "2026-11-28",
+        "desc": "High-octane collegiate esports arena showdown featuring aerial Rocket League triples and fast-paced Brawlhalla platform brawls.",
+        "price": "\u20b9199",
+        "color": "#06b6d4",
+        "image": "/static/images/events/esports_fifa.jpg",
+        "purpose": "Provide collegiate esports teams a platform to showcase mechanical skill, team communication, and tournament prowess.",
+        "full_details": "Played on ultra-low latency 240Hz monitors with live caster shoutcasting, spectator stadium seating, and Twitch / YouTube live streams.",
+        "outcome": "Champions take home \u20b91,00,000 cash prize, gaming gear bundles, and college championship trophy.",
+        "seats_total": 220,
+        "seats_filled": 85,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "PlayMax Gaming Arena, Indiranagar",
+        "venue_address": "PlayMax Esports Hub, 100 Feet Road, Indiranagar, Bangalore, Karnataka 560038",
+        "time": "11:00 AM",
+        "end_time": "07:30 PM",
+        "category": "Gaming & E-Sports"
+    },
+    {
+        "id": 232,
+        "title": "Overwatch 2 & Marvel Rivals National Tournament",
+        "date": "2026-12-10",
+        "desc": "5v5 and 6v6 hero shooter championship uniting the top competitive teams across India for strategic supremacy.",
+        "price": "\u20b9249",
+        "color": "#0891b2",
+        "image": "/static/images/events/esports_valorant.jpg",
+        "purpose": "Crown the finest hero shooter squad in the country with professional tier-1 broadcast production.",
+        "full_details": "Double-elimination bracket, dedicated coaching booths, pro gamer meetups, and open free-play LAN stations for attendees.",
+        "outcome": "\u20b91,50,000 prize pool, MVP gaming peripherals, and scouting opportunities for international esports organizations.",
+        "seats_total": 300,
+        "seats_filled": 130,
+        "is_draft": 0,
+        "featured": 1,
+        "venue": "Zeal Esports Stadium, Koramangala",
+        "venue_address": "Zeal Gaming Arena, 80 Feet Road, 4th Block, Koramangala, Bangalore, Karnataka 560034",
+        "time": "10:30 AM",
+        "end_time": "08:00 PM",
+        "category": "Gaming & E-Sports"
+    },
+    {
+        "id": 233,
+        "title": "DeepTech & Semiconductor Founders Conclave",
+        "date": "2026-11-29",
+        "desc": "Elite gathering of hardware startups, fabless semiconductor innovators, robotics founders, and sovereign deeptech venture capitalists.",
+        "price": "\u20b9599",
+        "color": "#0284c7",
+        "image": "/static/images/events/startup_pitch.jpg",
+        "purpose": "Accelerate India's semiconductor and hardware startup ecosystem through direct corporate partnerships and funding.",
+        "full_details": "Keynotes on RISC-V architectures, silicon prototyping subsidies, VC investor pitch rooms, and enterprise procurement roundtables.",
+        "outcome": "Startups connect with angel syndicates, grant bodies, and potential anchor enterprise customers.",
+        "seats_total": 350,
+        "seats_filled": 175,
+        "is_draft": 0,
+        "featured": 1,
+        "venue": "Leela Palace Grand Ballroom, Bangalore",
+        "venue_address": "The Leela Palace, Old Airport Road, HAL 2nd Stage, Bangalore, Karnataka 560008",
+        "time": "09:00 AM",
+        "end_time": "06:00 PM",
+        "category": "Business & Startup"
+    },
+    {
+        "id": 234,
+        "title": "B2B SaaS Growth & Global Expansion Masterclass",
+        "date": "2026-12-11",
+        "desc": "Intensive masterclass for SaaS founders and GTM leaders on scaling from $1M ARR to $10M ARR across US, Europe, and APAC markets.",
+        "price": "\u20b9499",
+        "color": "#0369a1",
+        "image": "/static/images/events/startup_saas.jpg",
+        "purpose": "Provide SaaS founders actionable outbound sales playbooks, PLG conversion frameworks, and enterprise pricing models.",
+        "full_details": "Led by 4x SaaS founders and growth VPs, featuring live audit of attendee funnels, churn reduction tactics, and networking lunch.",
+        "outcome": "Attendees receive proven GTM templates, outbound email sequences, and peer founder mastermind membership.",
+        "seats_total": 250,
+        "seats_filled": 110,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "WeWork Galaxy, Residency Road",
+        "venue_address": "WeWork Galaxy, 43 Residency Road, Shanthala Nagar, Bangalore, Karnataka 560025",
+        "time": "10:00 AM",
+        "end_time": "05:00 PM",
+        "category": "Business & Startup"
+    },
+    {
+        "id": 235,
+        "title": "Kathak & Bharatanatyam Classical Dance Fest",
+        "date": "2026-11-27",
+        "desc": "Enchanting celebration of Indian classical dance traditions featuring Padma awardee maestros, rhythmic footwork, and live Carnatic orchestra.",
+        "price": "\u20b9299",
+        "color": "#d946ef",
+        "image": "/static/images/events/art_theater.jpg",
+        "purpose": "Preserve and celebrate India's ancient classical dance heritage through world-class auditorium performances.",
+        "full_details": "Performances include solo Varnams, Tarana jugalbandis, and fusion choreographies accompanied by live mridangam, flute, and vocals.",
+        "outcome": "An uplifting evening of sublime classical aesthetic and cultural storytelling.",
+        "seats_total": 280,
+        "seats_filled": 140,
+        "is_draft": 0,
+        "featured": 1,
+        "venue": "Ranga Shankara, JP Nagar",
+        "venue_address": "Ranga Shankara, 36/2 8th Cross Road, JP Nagar 2nd Phase, Bangalore, Karnataka 560078",
+        "time": "06:30 PM",
+        "end_time": "09:30 PM",
+        "category": "Art, Culture & Theater"
+    },
+    {
+        "id": 236,
+        "title": "Contemporary Sculpture & Modern Art Exhibition",
+        "date": "2026-12-08",
+        "desc": "Curated modern art exhibition showcasing avant-garde metal sculptures, interactive light art, and digital generative installations.",
+        "price": "\u20b9150",
+        "color": "#c026d3",
+        "image": "/static/images/events/art_culture.jpg",
+        "purpose": "Provide a premier platform for young contemporary artists and art collectors to engage with cutting-edge visual expressions.",
+        "full_details": "Over 80 original artworks across 3 gallery halls with daily guided curator walks, artist talks, and live bronze casting demos.",
+        "outcome": "Art lovers can purchase original artwork directly from creators and learn modern sculpture techniques.",
+        "seats_total": 350,
+        "seats_filled": 95,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "National Gallery of Modern Art, Palace Road",
+        "venue_address": "National Gallery of Modern Art, 49 Manikyavelu Mansion, Palace Road, Bangalore, Karnataka 560052",
+        "time": "10:00 AM",
+        "end_time": "06:00 PM",
+        "category": "Art, Culture & Theater"
+    },
+    {
+        "id": 237,
+        "title": "Functional Fitness & Hyrox Style Obstacle Challenge",
+        "date": "2026-11-26",
+        "desc": "High-adrenaline fitness race combining functional movements, sled pushes, rowing sprints, and kettlebell carries for all fitness levels.",
+        "price": "\u20b9399",
+        "color": "#14b8a6",
+        "image": "/static/images/events/health_crossfit.jpg",
+        "purpose": "Inspire everyday athletes to test their functional stamina, strength, and mental endurance in a supportive community race.",
+        "full_details": "Open, Doubles, and Relay divisions with certified fitness judges, hydration recovery stations, and post-race high-protein brunch.",
+        "outcome": "Finisher medals, personalized split time tracking, and fitness apparel goodies for all participants.",
+        "seats_total": 250,
+        "seats_filled": 130,
+        "is_draft": 0,
+        "featured": 1,
+        "venue": "Decathlon Sports Arena, Sarjapur",
+        "venue_address": "Decathlon Sarjapur, 96/1 Carmeloaram Post, Sarjapur Main Road, Bangalore, Karnataka 560035",
+        "time": "06:30 AM",
+        "end_time": "01:00 PM",
+        "category": "Health, Fitness & Yoga"
+    },
+    {
+        "id": 238,
+        "title": "Pranayama, Sound Bath & Chakra Alignment Immersion",
+        "date": "2026-12-06",
+        "desc": "Peaceful day retreat featuring Tibetan singing bowls, ancient Vedic breathwork, guided mindfulness meditation, and organic sattvic meals.",
+        "price": "\u20b9499",
+        "color": "#0d9488",
+        "image": "/static/images/events/health_yoga.jpg",
+        "purpose": "Facilitate deep somatic relaxation, mental detoxification, and nervous system regulation amidst peaceful natural surroundings.",
+        "full_details": "Led by certified sound therapy practitioners and master yogis with acoustic resonance instruments, herbal detox drinks, and journaling sessions.",
+        "outcome": "Participants leave deeply rejuvenated with daily pranayama routines and audio meditation tracks for home practice.",
+        "seats_total": 300,
+        "seats_filled": 160,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "Art of Living Meditation Dome, Kanakapura",
+        "venue_address": "Art of Living International Center, 21st Km Kanakapura Road, Udayapura, Bangalore, Karnataka 560082",
+        "time": "08:00 AM",
+        "end_time": "03:30 PM",
+        "category": "Health, Fitness & Yoga"
+    },
+    {
+        "id": 239,
+        "title": "Woodfired Neapolitan Pizza & Pasta Masterclass",
+        "date": "2026-11-25",
+        "desc": "Hands-on culinary masterclass teaching 72-hour sourdough pizza fermentation, hand-stretched mozzarella, and authentic handmade fresh pasta.",
+        "price": "\u20b9449",
+        "color": "#f97316",
+        "image": "/static/images/events/food_pizza.jpg",
+        "purpose": "Impart authentic Italian culinary mastery from sourdough starter care to wood-fired 90-second blistering techniques.",
+        "full_details": "Each participant operates their own workstation with personal wood-fired tabletop ovens, fresh Italian semolina, San Marzano tomatoes, and wine pairing.",
+        "outcome": "Eat your own freshly baked gourmet pizza, take home fresh pasta bundles and sourdough starter jars.",
+        "seats_total": 180,
+        "seats_filled": 95,
+        "is_draft": 0,
+        "featured": 1,
+        "venue": "The Culinary Studio, Indiranagar",
+        "venue_address": "The Culinary Studio, 12th Main Road, HAL 2nd Stage, Indiranagar, Bangalore, Karnataka 560038",
+        "time": "11:00 AM",
+        "end_time": "03:30 PM",
+        "category": "Food, Tech & Festivals"
+    },
+    {
+        "id": 240,
+        "title": "Craft Chocolate Tasting & Cocoa Bean-to-Bar Expo",
+        "date": "2026-12-05",
+        "desc": "Artisanal festival celebrating Indian single-origin cocoa from Kerala, Karnataka, and Tamil Nadu with live stone-grinding and bonbon crafting.",
+        "price": "\u20b9349",
+        "color": "#ea580c",
+        "image": "/static/images/events/food_fest.jpg",
+        "purpose": "Promote sustainable bean-to-bar Indian craft chocolate makers and educate food enthusiasts on single-origin tasting profiles.",
+        "full_details": "Tasting flight of 12 distinct dark, milk, and inclusion chocolates, tempering workshops, cocoa farming documentary screening, and dessert stalls.",
+        "outcome": "Attendees receive a curated single-origin tasting box, chocolatier pairing guide, and bonbon crafting booklet.",
+        "seats_total": 300,
+        "seats_filled": 140,
+        "is_draft": 0,
+        "featured": 0,
+        "venue": "UB City Central Courtyard, Bangalore",
+        "venue_address": "UB City, 24 Vittal Mallya Road, KG Halli, D' Souza Layout, Bangalore, Karnataka 560001",
+        "time": "12:00 PM",
+        "end_time": "08:00 PM",
+        "category": "Food, Tech & Festivals"
+    }
 ]
 
 try:
@@ -176,12 +5182,83 @@ else:
     STATIC_DIR = 'static'
 
 app = Flask(__name__, template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
-app.secret_key = os.environ.get('SECRET_KEY', 'your_secret_key_here')
+app.secret_key = os.environ.get('SECRET_KEY', 'events_secure_session_key_2026')
 is_dev = '--dev' in sys.argv or os.environ.get('FLASK_ENV') == 'development' or os.environ.get('DEBUG') == '1'
 app.config['TEMPLATES_AUTO_RELOAD'] = is_dev
 app.jinja_env.auto_reload = is_dev
 
+# Enterprise Session & Payload Hardening
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['SESSION_COOKIE_SECURE'] = (not is_dev) and (os.environ.get('ENABLE_HTTPS', '0') == '1' or os.environ.get('RENDER') == 'true')
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max payload limit
+
 bcrypt = Bcrypt(app)
+
+# Enterprise Security Headers & Cache Optimization Middleware
+@app.after_request
+def add_security_and_cache_headers(response):
+    # 1. Security Headers
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    response.headers['Permissions-Policy'] = 'camera=(self), microphone=(), geolocation=()'
+
+    # 2. Intelligent Caching
+    path = request.path
+    if path.startswith('/static/'):
+        if not is_dev:
+            response.headers['Cache-Control'] = 'public, max-age=86400, stale-while-revalidate=604800'
+    elif path.startswith('/api/') or path in ('/profile', '/settings', '/history', '/host/analytics', '/admin'):
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+
+    return response
+
+# Clean Error Handlers (Security: Prevents Internal Stack Trace Exposure)
+@app.errorhandler(400)
+def handle_400(e):
+    if request.path.startswith('/api/'):
+        return jsonify({'error': 'Bad Request', 'status': 400}), 400
+    flash('Invalid request parameters.', 'danger')
+    return redirect(request.referrer or url_for('dashboard'))
+
+@app.errorhandler(403)
+def handle_403(e):
+    if request.path.startswith('/api/'):
+        return jsonify({'error': 'Access Forbidden', 'status': 403}), 403
+    flash('You do not have permission to access this resource.', 'danger')
+    return redirect(url_for('dashboard'))
+
+@app.errorhandler(404)
+def handle_404(e):
+    if request.path.startswith('/api/'):
+        return jsonify({'error': 'Resource not found', 'status': 404}), 404
+    return render_template('dashboard.html', error_banner="The requested page could not be found."), 404
+
+@app.errorhandler(413)
+def handle_413(e):
+    if request.path.startswith('/api/'):
+        return jsonify({'error': 'Payload Too Large (Max 16MB)', 'status': 413}), 413
+    flash('Uploaded file is too large. Maximum allowed size is 16MB.', 'danger')
+    return redirect(request.referrer or url_for('profile'))
+
+@app.errorhandler(500)
+def handle_500(e):
+    if request.path.startswith('/api/'):
+        return jsonify({'error': 'Internal Server Error', 'status': 500}), 500
+    return render_template('dashboard.html', error_banner="A temporary system error occurred. Please try again."), 500
+
+import html
+
+def sanitize_text(text: str, max_length: int = 1000) -> str:
+    """Safely sanitizes user text inputs, neutralizing HTML/script tags while preserving readable text."""
+    if not text:
+        return ''
+    cleaned = str(text).strip()[:max_length]
+    return html.escape(cleaned, quote=True)
 
 DB_PATH = os.path.join(BASE_DIR, 'users.db')
 UPLOAD_FOLDER = os.path.join(STATIC_DIR, 'uploads', 'profiles')
@@ -607,6 +5684,12 @@ def get_event_status_info(event: dict, ref_now=None):
     maps_url = f"https://www.google.com/maps/search/?api=1&query={encoded_loc}"
     maps_directions_url = f"https://www.google.com/maps/dir/?api=1&destination={encoded_loc}"
 
+    seats_left = max(0, seats_total - seats_filled)
+    raw_sp = str(event.get('stream_price') or '').strip()
+    if not raw_sp:
+        raw_sp = 'Free' if str(event.get('price', '')).strip().lower() in ('free', '0', '₹0') else '₹199'
+    stream_price = raw_sp
+
     return {
         'is_valid_date': True,
         'is_today': is_today,
@@ -616,6 +5699,11 @@ def get_event_status_info(event: dict, ref_now=None):
         'is_cutoff_reached': is_cutoff_reached,
         'is_open': is_open,
         'is_sold_out': is_sold_out,
+        'is_in_person_sold_out': is_sold_out,
+        'seats_total': seats_total,
+        'seats_filled': seats_filled,
+        'seats_left': seats_left,
+        'stream_price': stream_price,
         'start_dt': start_dt,
         'end_dt': end_dt,
         'cutoff_dt': cutoff_dt,
@@ -631,6 +5719,49 @@ def get_event_status_info(event: dict, ref_now=None):
 
 
 # Database Setup
+
+def get_category(title, explicit_category=None):
+    if isinstance(title, dict):
+        explicit_category = title.get('category') or explicit_category
+        title = title.get('title', '')
+    if explicit_category and str(explicit_category).strip():
+        c_str = str(explicit_category).strip()
+        valid_cats = [
+            'Education', 'Sports', 'Music Concerts', 'Movie Promotions',
+            'Celebrity Meet-ups', 'Agriculture', 'Government',
+            'Gaming & E-Sports', 'Business & Startup', 'Art, Culture & Theater',
+            'Health, Fitness & Yoga', 'Food, Tech & Festivals'
+        ]
+        for vc in valid_cats:
+            if c_str.lower() == vc.lower() or c_str.lower() in vc.lower():
+                return vc
+        return c_str
+
+    t = (title or "").lower()
+    if any(k in t for k in ['gaming', 'esports', 'valorant', 'bgmi', 'fifa', 'apex', 'unreal', 'game jam', 'cosplay', 'arcade', 'speedrunning', 'racing', 'fgc', 'overwatch', 'brawlhalla', 'rocket league']):
+        return 'Gaming & E-Sports'
+    if any(k in t for k in ['startup', 'founder', 'pitch', 'angel', 'investor', 'venture', 'saas', 'fintech', 'business', 'entrepreneur', 'd2c', 'franchise', 'proptech', 'export', 'deeptech', 'semiconductor']):
+        return 'Business & Startup'
+    if any(k in t for k in ['comedy', 'standup', 'theater', 'theatre', 'drama', 'art', 'sculpture', 'poetry', 'spoken word', 'musical', 'folk dance', 'calligraphy', 'handloom', 'painting', 'sitar', 'classical music', 'qawwali', 'kathak', 'bharatanatyam', 'dance']):
+        return 'Art, Culture & Theater'
+    if any(k in t for k in ['marathon', 'yoga', 'crossfit', 'fitness', 'wellness', 'nutrition', 'zumba', 'mental health', 'pilates', 'trek', 'powerlifting', 'cycling', 'calisthenics', 'bodybuilding', 'krav maga', 'hyrox', 'pranayama', 'sound bath']):
+        return 'Health, Fitness & Yoga'
+    if any(k in t for k in ['food', 'coffee', 'brewing', 'culinary', 'sourdough', 'pizza', 'bbq', 'beer', 'mithai', 'vegan', 'chocolate', 'mixology', 'dosa', 'biryani', 'cheese', 'taco', 'baking', 'street food', 'pasta', 'cocoa']):
+        return 'Food, Tech & Festivals'
+    if any(k in t for k in ['cricket', 'football', 'badminton', 'athletics', 'chess', 'table tennis', 'volleyball', 'swimming', 'basketball', 'kabaddi', 'tennis', 'hockey', 'squash', 'championship', 'archery', 'shooting']):
+        return 'Sports'
+    if any(k in t for k in ['concert', 'sunburn', 'edm', 'rock', 'sufi', 'acoustic', 'symphony', 'indie music', 'fusion', 'jazz', 'playback', 'unplugged', 'music fest', 'deep house', 'bass']):
+        return 'Music Concerts'
+    if any(k in t for k in ['movie', 'trailer', 'premiere', 'star cast', 'box office', 'cinematography', 'film fest', 'teaser', 'screening', 'red carpet cinema', 'motion poster', 'film awards', 'anime film', 'cinema']):
+        return 'Movie Promotions'
+    if any(k in t for k in ['celebrity', 'fan meet', 'creator summit', 'fireside', 'autograph', 'vip fan', 'influencer', 'youtuber', 'meet & greet', 'bollywood', 'superstar', 'legend masterclass']):
+        return 'Celebrity Meet-ups'
+    if any(k in t for k in ['agri', 'farm', 'kisan', 'organic', 'crop', 'soil', 'irrigation', 'dairy', 'poultry', 'horticulture', 'hydroponic', 'fertilizer', 'harvest', 'greenhouse']):
+        return 'Agriculture'
+    if any(k in t for k in ['government', 'gov', 'civic', 'swachh', 'digital india', 'public scheme', 'voter', 'panchayat', 'niti', 'policy', 'smart city', 'tribal', 'governance', 'citizen', 'parliament']):
+        return 'Government'
+    return 'Education'
+
 def init_db():
     conn = get_db()
     c = conn.cursor()
@@ -667,6 +5798,7 @@ def init_db():
         ("ALTER TABLE events ADD COLUMN featured INTEGER DEFAULT 0",),
         ("ALTER TABLE events ADD COLUMN venue TEXT DEFAULT 'Main Campus Auditorium'",),
         ("ALTER TABLE events ADD COLUMN venue_address TEXT DEFAULT 'Tech Park Campus, Innovation Block A, Bangalore - 560103'",),
+        ("ALTER TABLE events ADD COLUMN stream_price TEXT DEFAULT '₹199'",),
         ("ALTER TABLE users ADD COLUMN first_name TEXT DEFAULT ''",),
         ("ALTER TABLE users ADD COLUMN middle_name TEXT DEFAULT ''",),
         ("ALTER TABLE users ADD COLUMN last_name TEXT DEFAULT ''",),
@@ -696,11 +5828,22 @@ def init_db():
         ("ALTER TABLE registrations ADD COLUMN ticket_code TEXT DEFAULT ''",),
         ("ALTER TABLE registrations ADD COLUMN cancellation_reason TEXT DEFAULT ''",),
         ("ALTER TABLE registrations ADD COLUMN cancellation_feedback TEXT DEFAULT ''",),
+        ("ALTER TABLE registrations ADD COLUMN pass_type TEXT DEFAULT 'in_person'",),
+        ("ALTER TABLE registrations ADD COLUMN amount_paid REAL DEFAULT 0.0",),
     ]:
         try:
             c.execute(col[0])
         except Exception:
             pass
+
+    try:
+        c.execute("UPDATE events SET stream_price = 'Free' WHERE (stream_price IS NULL OR stream_price = '') AND LOWER(COALESCE(price, '')) = 'free'")
+        c.execute("UPDATE events SET stream_price = '₹199' WHERE stream_price IS NULL OR stream_price = ''")
+        c.execute("UPDATE events SET seats_total = 100 WHERE seats_total IS NULL OR seats_total <= 0")
+        c.execute("UPDATE events SET seats_filled = 0 WHERE seats_filled IS NULL")
+        c.execute("UPDATE registrations SET pass_type = 'in_person' WHERE pass_type IS NULL OR pass_type = ''")
+    except Exception:
+        pass
 
     # New auxiliary tables
     c.execute('''CREATE TABLE IF NOT EXISTS notifications (
@@ -740,6 +5883,37 @@ def init_db():
         currency TEXT DEFAULT 'INR',
         status TEXT DEFAULT 'created',
         payment_id TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS team_match_posts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER NOT NULL,
+        username TEXT NOT NULL,
+        title TEXT NOT NULL,
+        skills TEXT NOT NULL,
+        description TEXT,
+        status TEXT DEFAULT 'open',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS live_polls (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER NOT NULL,
+        question TEXT NOT NULL,
+        options TEXT NOT NULL,
+        votes TEXT DEFAULT '{}',
+        is_active INTEGER DEFAULT 1,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS live_qa (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER NOT NULL,
+        username TEXT NOT NULL,
+        question TEXT NOT NULL,
+        upvotes INTEGER DEFAULT 0,
+        is_answered INTEGER DEFAULT 0,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )''')
     
@@ -813,16 +5987,24 @@ def init_db():
     except Exception:
         pass
 
-    # Composite Indices for High Concurrency Performance
+    # Composite Indices for High Concurrency Performance & Instant Query Execution
     for idx in [
         "CREATE INDEX IF NOT EXISTS idx_reg_user ON registrations(username);",
         "CREATE INDEX IF NOT EXISTS idx_reg_event ON registrations(event_id);",
+        "CREATE INDEX IF NOT EXISTS idx_reg_event_user ON registrations(event_id, username);",
+        "CREATE INDEX IF NOT EXISTS idx_reg_ticket ON registrations(ticket_code);",
         "CREATE INDEX IF NOT EXISTS idx_reg_checkedin ON registrations(checked_in);",
         "CREATE INDEX IF NOT EXISTS idx_notif_user ON notifications(username, is_read);",
         "CREATE INDEX IF NOT EXISTS idx_reviews_event ON reviews(event_id);",
+        "CREATE INDEX IF NOT EXISTS idx_reviews_event_user ON reviews(event_id, username);",
         "CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);",
+        "CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);",
+        "CREATE INDEX IF NOT EXISTS idx_users_userid ON users(user_id);",
         "CREATE INDEX IF NOT EXISTS idx_events_id ON events(id);",
+        "CREATE INDEX IF NOT EXISTS idx_events_category ON events(category);",
+        "CREATE INDEX IF NOT EXISTS idx_events_draft ON events(is_draft);",
         "CREATE INDEX IF NOT EXISTS idx_audit_created ON audit_log(created_at);",
+        "CREATE INDEX IF NOT EXISTS idx_audit_user ON audit_log(username);",
     ]:
         try:
             c.execute(idx)
@@ -1425,6 +6607,117 @@ def login():
 
     return render_template('login.html', error=error, msg=msg, challenge_display=challenge_display, username=request.form.get('username', ''))
 
+CATEGORY_METADATA = {
+    'Education': {
+        'icon': '🎓',
+        'color': '#00f2fe',
+        'gradient': 'linear-gradient(135deg, #00f2fe, #4facfe)',
+        'kicker': 'KNOWLEDGE & CODE',
+        'title': 'Education',
+        'desc': 'Tech hackathons, AI summits, coding bootcamps, workshops & seminars.',
+        'tag': 'Tech & Academics'
+    },
+    'Sports': {
+        'icon': '⚽',
+        'color': '#10b981',
+        'gradient': 'linear-gradient(135deg, #10b981, #059669)',
+        'kicker': 'ATHLETICS & COMPETITION',
+        'title': 'Sports',
+        'desc': 'Cricket cups, football tournaments, athletics, chess & sports championships.',
+        'tag': 'Championships'
+    },
+    'Music Concerts': {
+        'icon': '🎵',
+        'color': '#ec4899',
+        'gradient': 'linear-gradient(135deg, #ec4899, #f43f5e)',
+        'kicker': 'LIVE RHYTHM & SOUND',
+        'title': 'Music Concerts',
+        'desc': 'EDM festivals, rock fests, acoustic nights, classical recitals & indie concerts.',
+        'tag': 'Live Music'
+    },
+    'Movie Promotions': {
+        'icon': '🎬',
+        'color': '#f59e0b',
+        'gradient': 'linear-gradient(135deg, #f59e0b, #d97706)',
+        'kicker': 'CINEMA & SCREEN',
+        'title': 'Movie Promotions',
+        'desc': 'Film premieres, star cast meets, trailer launches & film festivals.',
+        'tag': 'Premieres & Cinema'
+    },
+    'Celebrity Meet-ups': {
+        'icon': '⭐',
+        'color': '#8b5cf6',
+        'gradient': 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+        'kicker': 'STARS & ICONS',
+        'title': 'Celebrity Meet-ups',
+        'desc': 'VIP fan meetings, creator summits, fireside Q&As & autograph sessions.',
+        'tag': 'VIP & Creators'
+    },
+    'Agriculture': {
+        'icon': '🌾',
+        'color': '#84cc16',
+        'gradient': 'linear-gradient(135deg, #84cc16, #65a30d)',
+        'kicker': 'SUSTAINABLE AGRITECH',
+        'title': 'Agriculture',
+        'desc': 'AgriTech expos, organic farming, drone irrigation & Kisan summits.',
+        'tag': 'AgriTech & Farming'
+    },
+    'Government': {
+        'icon': '🏛️',
+        'color': '#06b6d4',
+        'gradient': 'linear-gradient(135deg, #06b6d4, #0891b2)',
+        'kicker': 'CIVIC & POLICY',
+        'title': 'Government',
+        'desc': 'Civic forums, public scheme expos, youth festivals & governance summits.',
+        'tag': 'Public & Governance'
+    },
+    'Gaming & E-Sports': {
+        'icon': '🎮',
+        'color': '#a855f7',
+        'gradient': 'linear-gradient(135deg, #a855f7, #6366f1)',
+        'kicker': 'PRO ESPORTS & GAMING',
+        'title': 'Gaming & E-Sports',
+        'desc': 'Competitive LAN tourneys, BGMI championships, Valorant & FIFA showdowns.',
+        'tag': 'Competitive Esports'
+    },
+    'Business & Startup': {
+        'icon': '💼',
+        'color': '#3b82f6',
+        'gradient': 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+        'kicker': 'VENTURE & CAPITAL',
+        'title': 'Business & Startup',
+        'desc': 'Pitch fests, angel investor summits, founder networking & venture keynotes.',
+        'tag': 'Startups & Ventures'
+    },
+    'Art, Culture & Theater': {
+        'icon': '🎨',
+        'color': '#f43f5e',
+        'gradient': 'linear-gradient(135deg, #f43f5e, #be123c)',
+        'kicker': 'EXPRESSION & HERITAGE',
+        'title': 'Art, Culture & Theater',
+        'desc': 'Stage plays, modern art exhibitions, cultural dances & photography expos.',
+        'tag': 'Arts & Culture'
+    },
+    'Health, Fitness & Yoga': {
+        'icon': '🧘',
+        'color': '#14b8a6',
+        'gradient': 'linear-gradient(135deg, #14b8a6, #0f766e)',
+        'kicker': 'WELLNESS & MINDFULNESS',
+        'title': 'Health, Fitness & Yoga',
+        'desc': 'Sound baths, breathwork retreats, marathons, crossfit & wellness expos.',
+        'tag': 'Health & Wellness'
+    },
+    'Food, Tech & Festivals': {
+        'icon': '🍔',
+        'color': '#f97316',
+        'gradient': 'linear-gradient(135deg, #f97316, #c2410c)',
+        'kicker': 'CULINARY & TASTE',
+        'title': 'Food, Tech & Festivals',
+        'desc': 'Food truck carnivals, artisanal coffee brewing, baking masterclasses & BBQ fests.',
+        'tag': 'Food & Festivals'
+    }
+}
+
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
 
@@ -1459,6 +6752,11 @@ def dashboard():
         ev['status_reason'] = status_info['status_reason']
         ev['maps_url'] = status_info['maps_url']
         ev['maps_directions_url'] = status_info['maps_directions_url']
+        ev['seats_total'] = status_info.get('seats_total') or 100
+        ev['seats_filled'] = status_info.get('seats_filled') or 0
+        ev['seats_left'] = status_info.get('seats_left') or max(0, ev['seats_total'] - ev['seats_filled'])
+        ev['is_in_person_sold_out'] = status_info.get('is_in_person_sold_out') or (ev['seats_filled'] >= ev['seats_total'])
+        ev['stream_price'] = status_info.get('stream_price') or '₹199'
         ev['is_registered'] = ev['id'] in registered_ids
         
         if ev['is_expired'] and not ev['is_today']:
@@ -1480,7 +6778,150 @@ def dashboard():
             ev['carousel_angle'] = 0
             ev['carousel_tz'] = 0
     
-    return render_template('dashboard.html', upcoming_events=upcoming_events, past_events=past_events, username=username, is_host=is_host(), carousel_radius=radius)
+    category_counts = {k: 0 for k in CATEGORY_METADATA.keys()}
+    for ev in events:
+        c_name = ev.get('category') or get_category(ev.get('title', ''))
+        if c_name in category_counts:
+            category_counts[c_name] += 1
+        else:
+            category_counts['Education'] += 1
+
+    return render_template('dashboard.html', upcoming_events=upcoming_events, past_events=past_events, username=username, is_host=is_host(), carousel_radius=radius, category_counts=category_counts, categories_metadata=CATEGORY_METADATA, total_events_count=len(events))
+
+@app.route('/explore/<path:category_name>', methods=['GET'])
+@app.route('/explore', methods=['GET'])
+@app.route('/category', methods=['GET'])
+@app.route('/category/<path:category_name>', methods=['GET'])
+def category_events(category_name=None):
+    if not session.get('loggedin'):
+        return redirect(url_for('login'))
+    username = session.get('username')
+    
+    # Query parameter fallback if not in path (e.g. /category?name=Education)
+    if not category_name:
+        category_name = request.args.get('name') or request.args.get('category') or 'all'
+    
+    category_name = urllib.parse.unquote(str(category_name)).strip()
+    
+    active_category = 'all'
+    if category_name.lower() not in ['all', 'all-categories', 'all categories', '']:
+        # Match case-insensitively or normalized
+        normalized_target = category_name.replace('-', ' ').replace('_', ' ').strip().lower()
+        for cat_key in CATEGORY_METADATA.keys():
+            normalized_key = cat_key.replace('-', ' ').replace('_', ' ').strip().lower()
+            if normalized_key == normalized_target or cat_key.lower() == category_name.lower():
+                active_category = cat_key
+                break
+        if active_category == 'all':
+            # Check partial match
+            for cat_key in CATEGORY_METADATA.keys():
+                if normalized_target in cat_key.lower() or cat_key.lower() in normalized_target:
+                    active_category = cat_key
+                    break
+        if active_category == 'all':
+            active_category = category_name
+
+    registered_ids = get_user_registered_ids(username)
+    current_date = datetime.now()
+    
+    events = get_events()
+    
+    category_counts = {k: 0 for k in CATEGORY_METADATA.keys()}
+    for ev in events:
+        c_name = ev.get('category') or get_category(ev.get('title', ''))
+        if c_name in category_counts:
+            category_counts[c_name] += 1
+        else:
+            category_counts['Education'] += 1
+
+    upcoming_events = []
+    past_events = []
+
+    for ev in events:
+        ev_cat = ev.get('category') or get_category(ev.get('title', ''))
+        ev['category'] = ev_cat
+        
+        # Check if this event belongs to active_category
+        if active_category != 'all' and ev_cat.lower() != active_category.lower():
+            continue
+            
+        status_info = get_event_status_info(ev, ref_now=current_date)
+        ev['time'] = status_info['time_str']
+        ev['end_time'] = status_info['end_time_str']
+        ev['cutoff_time'] = status_info['cutoff_time_str']
+        ev['is_today'] = status_info['is_today']
+        ev['is_expired'] = status_info['is_expired']
+        ev['is_cutoff_reached'] = status_info['is_cutoff_reached']
+        ev['is_open'] = status_info['is_open']
+        ev['is_sold_out'] = status_info['is_sold_out']
+        ev['status_label'] = status_info['status_label']
+        ev['status_badge'] = status_info['status_badge']
+        ev['status_reason'] = status_info['status_reason']
+        ev['maps_url'] = status_info['maps_url']
+        ev['maps_directions_url'] = status_info['maps_directions_url']
+        ev['seats_total'] = status_info.get('seats_total') or 100
+        ev['seats_filled'] = status_info.get('seats_filled') or 0
+        ev['seats_left'] = status_info.get('seats_left') or max(0, ev['seats_total'] - ev['seats_filled'])
+        ev['is_in_person_sold_out'] = status_info.get('is_in_person_sold_out') or (ev['seats_filled'] >= ev['seats_total'])
+        ev['stream_price'] = status_info.get('stream_price') or '₹199'
+        ev['is_registered'] = ev['id'] in registered_ids
+        
+        if ev['is_expired'] and not ev['is_today']:
+            past_events.append(ev)
+        else:
+            upcoming_events.append(ev)
+
+    # Calculate carousel angles and radius for this category's upcoming active events
+    all_category_events = upcoming_events + past_events
+    total_upcoming = len(upcoming_events)
+    radius = 450
+    if total_upcoming > 1:
+        radius = max(int(round((350 / 2) / math.tan(math.pi / total_upcoming))) + 50, 450)
+        for i, ev in enumerate(upcoming_events):
+            ev['carousel_angle'] = round((360 / total_upcoming) * i, 2)
+            ev['carousel_tz'] = radius
+    elif total_upcoming == 1:
+        upcoming_events[0]['carousel_angle'] = 0
+        upcoming_events[0]['carousel_tz'] = 450
+        
+    # Category Info metadata
+    if active_category == 'all':
+        category_info = {
+            'icon': '🌐',
+            'color': '#00f2fe',
+            'gradient': 'linear-gradient(135deg, #00f2fe, #4facfe)',
+            'kicker': 'ALL DOMAINS & TRACKS',
+            'title': 'All Categories',
+            'desc': 'Discover all events, hackathons, workshops, conferences and cultural summits across all 12 domains.',
+            'tag': 'All Events'
+        }
+    else:
+        category_info = CATEGORY_METADATA.get(active_category, {
+            'icon': '✨',
+            'color': '#00f2fe',
+            'gradient': 'linear-gradient(135deg, #00f2fe, #4facfe)',
+            'kicker': 'DOMAIN HUB',
+            'title': active_category,
+            'desc': f'Explore curated events, workshops, and competitions in {active_category}.',
+            'tag': active_category
+        })
+
+    return render_template(
+        'category_events.html',
+        active_category=active_category,
+        category_info=category_info,
+        category_counts=category_counts,
+        categories_metadata=CATEGORY_METADATA,
+        all_category_events=all_category_events,
+        upcoming_events=upcoming_events,
+        past_events=past_events,
+        total_category_events=len(all_category_events),
+        total_events_count=len(events),
+        carousel_radius=radius,
+        username=username,
+        is_host=is_host(),
+        is_admin=is_admin()
+    )
 
 @app.route('/event/<int:event_id>')
 def event_detail(event_id):
@@ -1512,6 +6953,11 @@ def event_detail(event_id):
     event['status_reason'] = status_info['status_reason']
     event['maps_url'] = status_info['maps_url']
     event['maps_directions_url'] = status_info['maps_directions_url']
+    event['seats_total'] = status_info.get('seats_total') or 100
+    event['seats_filled'] = status_info.get('seats_filled') or 0
+    event['seats_left'] = status_info.get('seats_left') or max(0, event['seats_total'] - event['seats_filled'])
+    event['is_in_person_sold_out'] = status_info.get('is_in_person_sold_out') or (event['seats_filled'] >= event['seats_total'])
+    event['stream_price'] = status_info.get('stream_price') or '₹199'
     
     # Check if user is registered (micro-cached)
     username = session.get('username')
@@ -1594,8 +7040,22 @@ def generate_ticket_pdf_bytes(event: dict, reg_info) -> bytes:
     maps_query = urllib.parse.quote_plus(f"{venue_name} {venue_addr}".strip())
     maps_search_url = f"https://www.google.com/maps/search/?api=1&query={maps_query}"
     event_id = event.get('id', 1)
-    ticket_num = f"TKT-{event_id:03d}-{reg_id:05d}"
-    pass_type_str = f"Team Pass ({team_name})" if team_name else "Solo Entry Pass"
+    reg_pass_type = 'in_person'
+    if isinstance(reg_info, dict):
+        reg_pass_type = reg_info.get('pass_type') or 'in_person'
+        ticket_num = reg_info.get('ticket_code') or f"{'LIVE' if reg_pass_type == 'live_stream' else 'TKT'}-{event_id:03d}-{reg_id:05d}"
+    else:
+        reg_pass_type = reg_info[13] if len(reg_info) > 13 and reg_info[13] else 'in_person'
+        ticket_num = (reg_info[12] if len(reg_info) > 12 and reg_info[12] else '') or f"{'LIVE' if reg_pass_type == 'live_stream' else 'TKT'}-{event_id:03d}-{reg_id:05d}"
+
+    if reg_pass_type == 'live_stream':
+        pass_type_str = "Virtual Live Stream Pass (Unlimited Broadcast Access)"
+        header_title = "EVENTS - OFFICIAL LIVE STREAM PASS"
+        sub_title = "Global Live Video Broadcast & Virtual Interactive Stage | E-Pass"
+    else:
+        pass_type_str = f"Team Pass ({team_name})" if team_name else "In-Person Solo Entry Pass"
+        header_title = "EVENTS - OFFICIAL ADMISSION PASS"
+        sub_title = "Premier Tech Innovation & Student Developer Fest | E-Ticket"
     category_name = get_category(event.get('title', ''))
 
     # Generate A4 PDF Ticket (210mm x 297mm)
@@ -1623,7 +7083,7 @@ def generate_ticket_pdf_bytes(event: dict, reg_info) -> bytes:
     pdf.set_font("Helvetica", 'B', 18)
     pdf.set_text_color(255, 255, 255)
     pdf.set_xy(14, 13)
-    pdf.cell(120, 8, "EVENTS - OFFICIAL ADMISSION PASS", align='L')
+    pdf.cell(120, 8, header_title, align='L')
     
     pdf.set_font("Helvetica", 'B', 10)
     pdf.set_text_color(0, 242, 254)
@@ -1633,7 +7093,7 @@ def generate_ticket_pdf_bytes(event: dict, reg_info) -> bytes:
     pdf.set_font("Helvetica", '', 9)
     pdf.set_text_color(203, 213, 225)
     pdf.set_xy(14, 22)
-    pdf.cell(120, 6, "Premier Tech Innovation & Student Developer Fest | E-Ticket", align='L')
+    pdf.cell(120, 6, sub_title, align='L')
     
     if reg_status == 'cancelled':
         pdf.set_font("Helvetica", 'B', 9)
@@ -1663,7 +7123,7 @@ def generate_ticket_pdf_bytes(event: dict, reg_info) -> bytes:
     pdf.set_font("Helvetica", 'B', 9.5)
     pdf.set_text_color(0, 242, 254)
     pdf.set_xy(16, 50)
-    pdf.cell(178, 6, f"Date: {event.get('date', '')} | Category: {category_name} | Fee: {event.get('price', 'Free')} | {pass_type_str}", align='L')
+    pdf.cell(178, 6, f"Date: {event.get('date', '')} | Category: {category_name} | Fee: {str(event.get('price', 'Free')).replace('₹', 'Rs. ')} | {pass_type_str}", align='L')
     
     pdf.set_font("Helvetica", '', 8.5)
     pdf.set_text_color(203, 213, 225)
@@ -2525,20 +7985,28 @@ def register_event(event_id):
         flash("Event not found.", "error")
         return redirect(url_for('dashboard'))
     
-    # Enforce 2-hour cutoff rule & expiry checks
+    # Enforce cutoff & status checks
     current_date = datetime.now()
     status_info = get_event_status_info(event, ref_now=current_date)
-    if not status_info['is_open']:
-        if status_info['is_cutoff_reached']:
-            flash(f"Registration is closed. For today's events, registrations close strictly 2 hours before the start time ({status_info['cutoff_time_str']}).", "error")
-        elif status_info['is_sold_out']:
-            flash("Registration is closed as all seats for this event are fully booked.", "error")
-        else:
-            flash("Registration is closed for this event as it has already passed.", "error")
+    event['stream_price'] = status_info.get('stream_price') or '₹199'
+    event['seats_total'] = status_info.get('seats_total') or 100
+    event['seats_filled'] = status_info.get('seats_filled') or 0
+    event['seats_left'] = status_info.get('seats_left') or max(0, event['seats_total'] - event['seats_filled'])
+    event['is_in_person_sold_out'] = status_info.get('is_in_person_sold_out') or (event['seats_filled'] >= event['seats_total'])
+
+    # If the event has completely concluded in the past, close all registrations
+    if status_info.get('is_past_date') or (status_info.get('is_expired') and not status_info.get('is_today')):
+        flash("Registration is closed for this event as it has already passed.", "error")
         return redirect(url_for('event_detail', event_id=event_id))
+
+    requested_type = request.args.get('type') or request.form.get('pass_type') or ('live_stream' if event['is_in_person_sold_out'] else 'in_person')
 
     if request.method == 'POST':
         reg_type = request.form.get('reg_type', 'solo')
+        pass_type = (request.form.get('pass_type') or 'in_person').strip().lower()
+        if pass_type not in ('in_person', 'live_stream'):
+            pass_type = 'in_person'
+
         full_name = request.form.get('full_name')
         email = request.form.get('email')
         phone = request.form.get('phone')
@@ -2551,13 +8019,13 @@ def register_event(event_id):
         is_email_v, clean_email = validate_email_address(email or '')
         if not is_email_v:
             flash(clean_email, "error")
-            return render_template('registration.html', event=event, username=username, is_host=is_host(), error=clean_email)
+            return render_template('registration.html', event=event, username=username, is_host=is_host(), error=clean_email, requested_type=pass_type)
         email = clean_email
 
         is_phone_v, clean_phone = validate_mobile(phone or '')
         if not is_phone_v:
             flash(clean_phone, "error")
-            return render_template('registration.html', event=event, username=username, is_host=is_host(), error=clean_phone)
+            return render_template('registration.html', event=event, username=username, is_host=is_host(), error=clean_phone, requested_type=pass_type)
         phone = clean_phone
 
         team_name = request.form.get('team_name', '').strip() if reg_type == 'team' else ''
@@ -2575,14 +8043,14 @@ def register_event(event_id):
                     if not is_tm_e_v:
                         err = f"Teammate #{i} ({m_name or 'Member'}): {clean_tm_email}"
                         flash(err, "error")
-                        return render_template('registration.html', event=event, username=username, is_host=is_host(), error=err)
+                        return render_template('registration.html', event=event, username=username, is_host=is_host(), error=err, requested_type=pass_type)
                     m_email = clean_tm_email
                 if m_phone:
                     is_tm_p_v, clean_tm_phone = validate_mobile(m_phone)
                     if not is_tm_p_v:
                         err = f"Teammate #{i} ({m_name or 'Member'}): {clean_tm_phone}"
                         flash(err, "error")
-                        return render_template('registration.html', event=event, username=username, is_host=is_host(), error=err)
+                        return render_template('registration.html', event=event, username=username, is_host=is_host(), error=err, requested_type=pass_type)
                     m_phone = clean_tm_phone
 
                 if m_name:
@@ -2594,6 +8062,29 @@ def register_event(event_id):
                     })
         team_members_json = json.dumps(team_members)
         total_people = 1 + len(team_members)
+
+        # Capacity check for In-Person Pass (Live Stream has NO LIMIT)
+        if pass_type == 'in_person':
+            seats_total = event.get('seats_total') or 100
+            seats_filled = event.get('seats_filled') or 0
+            seats_left = max(0, seats_total - seats_filled)
+            
+            if seats_filled + total_people > seats_total or status_info.get('is_sold_out'):
+                err = f"In-person registration is full! This event has reached its capacity limit of {seats_total} seats ({seats_left} seat(s) left). Please choose the unlimited Live Stream Pass below."
+                flash(err, "error")
+                return render_template('registration.html', event=event, username=username, is_host=is_host(), error=err, requested_type='live_stream')
+            
+            if status_info.get('is_cutoff_reached'):
+                err = f"Registration is closed for in-person attendance 2 hours prior to start time ({status_info.get('cutoff_time_str')}). Please select the unlimited Live Stream Pass below."
+                flash(err, "error")
+                return render_template('registration.html', event=event, username=username, is_host=is_host(), error=err, requested_type='live_stream')
+
+            seats_to_add = total_people
+            ticket_prefix = "TKT"
+        else:
+            # Live Stream Pass has NO capacity restriction
+            seats_to_add = 0
+            ticket_prefix = "LIVE"
         
         try:
             conn = get_db()
@@ -2605,23 +8096,30 @@ def register_event(event_id):
             
             if existing_row:
                 reg_id = existing_row[0]
-                ticket_code = f"TKT-{event_id:03d}-{reg_id:05d}"
+                ticket_code = f"{ticket_prefix}-{event_id:03d}-{reg_id:05d}"
                 c.execute("""UPDATE registrations 
                              SET full_name = ?, email = ?, phone = ?, college_id = ?, payment_method = ?, upi_id = ?, 
                                  team_name = ?, team_members = ?, status = 'active', cancelled_at = NULL, checked_in = 0, 
-                                 checkin_time = NULL, timestamp = CURRENT_TIMESTAMP, ticket_code = ? 
+                                 checkin_time = NULL, timestamp = CURRENT_TIMESTAMP, ticket_code = ?, pass_type = ? 
                              WHERE id = ?""",
-                          (full_name, email, phone, college_id, payment_method, upi_id, team_name, team_members_json, ticket_code, reg_id))
+                          (full_name, email, phone, college_id, payment_method, upi_id, team_name, team_members_json, ticket_code, pass_type, reg_id))
             else:
                 c.execute("""INSERT INTO registrations 
-                             (username, event_id, full_name, email, phone, college_id, payment_method, upi_id, team_name, team_members, status) 
-                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')""",
-                          (username, event_id, full_name, email, phone, college_id, payment_method, upi_id, team_name, team_members_json))
+                             (username, event_id, full_name, email, phone, college_id, payment_method, upi_id, team_name, team_members, pass_type, status) 
+                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')""",
+                          (username, event_id, full_name, email, phone, college_id, payment_method, upi_id, team_name, team_members_json, pass_type))
                 reg_id = c.lastrowid
-                ticket_code = f"TKT-{event_id:03d}-{reg_id:05d}"
+                ticket_code = f"{ticket_prefix}-{event_id:03d}-{reg_id:05d}"
                 c.execute("UPDATE registrations SET ticket_code = ? WHERE id = ?", (ticket_code, reg_id))
                 
-            c.execute("UPDATE events SET seats_filled = COALESCE(seats_filled, 0) + ? WHERE id = ?", (total_people, event_id))
+            if seats_to_add > 0:
+                c.execute("UPDATE events SET seats_filled = COALESCE(seats_filled, 0) + ? WHERE id = ?", (seats_to_add, event_id))
+
+            # Automatically unlock live video room for both pass types
+            c.execute("""INSERT OR REPLACE INTO live_stream_passes (event_id, username, pass_type, ticket_code, payment_method)
+                         VALUES (?, ?, ?, ?, ?)""",
+                      (event_id, username, 'virtual_pass' if pass_type == 'live_stream' else 'registered_ticket', ticket_code, payment_method or 'registered'))
+
             conn.commit()
             conn.close()
             invalidate_user_regs(username)
@@ -2640,7 +8138,8 @@ def register_event(event_id):
                 'team_name': team_name,
                 'team_members': team_members,
                 'ticket_code': ticket_code,
-                'username': username
+                'username': username,
+                'pass_type': pass_type
             }
 
             try:
@@ -2666,15 +8165,15 @@ def register_event(event_id):
                         daemon=True
                     ).start()
 
-            details_str = f"Event: {event['title']} (ID {event_id})" + (f" [Team: {team_name}, {total_people} members]" if team_name else "")
+            details_str = f"Event: {event['title']} (ID {event_id}) [{pass_type.upper()}]" + (f" [Team: {team_name}, {total_people} members]" if team_name else "")
             log_action(username, 'register_event', details_str)
-            push_notification(username, f" You are registered for {event['title']}!", url_for('download_ticket', event_id=event_id))
-            return render_template('registration.html', event=event, success=True, username=username, is_host=is_host(), team_name=team_name, total_people=total_people, email=email)
+            push_notification(username, f" You are registered for {event['title']} ({'Live Stream Pass' if pass_type == 'live_stream' else 'In-Person Pass'})!", url_for('download_ticket', event_id=event_id))
+            return render_template('registration.html', event=event, success=True, username=username, is_host=is_host(), team_name=team_name, total_people=total_people, email=email, pass_type=pass_type, ticket_code=ticket_code)
 
         except Exception as e:
             return f"Error: {str(e)}", 500
             
-    return render_template('registration.html', event=event, username=session.get('username'), is_host=is_host())
+    return render_template('registration.html', event=event, username=session.get('username'), is_host=is_host(), requested_type=requested_type)
 
 @app.route('/unregister/<int:event_id>', methods=['POST'])
 def unregister_event(event_id):
@@ -2690,19 +8189,36 @@ def unregister_event(event_id):
         c = conn.cursor()
         
         # Check active registration details
-        c.execute("""SELECT id, team_name, team_members, full_name, email, phone, ticket_code 
+        c.execute("""SELECT id, team_name, team_members, full_name, email, phone, ticket_code, checked_in, pass_type 
                      FROM registrations 
                      WHERE username = ? AND event_id = ? AND (status IS NULL OR status = 'active') 
                      ORDER BY id DESC LIMIT 1""", (username, event_id))
         reg_row = c.fetchone()
         
         if reg_row:
+            # Block cancellation if ticket was already scanned / checked in
+            is_checked_in = False
+            if isinstance(reg_row, dict):
+                is_checked_in = reg_row.get('checked_in') == 1
+            else:
+                try:
+                    is_checked_in = reg_row['checked_in'] == 1
+                except Exception:
+                    is_checked_in = len(reg_row) > 7 and reg_row[7] == 1
+            
+            if is_checked_in:
+                conn.close()
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.is_json:
+                    return jsonify({'ok': False, 'error': 'Cannot cancel registration: Ticket has already been scanned/checked in at the venue.'}), 400
+                flash("Cannot cancel registration: Ticket has already been scanned/checked in at the venue.", "error")
+                return redirect(url_for('event_detail', event_id=event_id))
             reg_id = reg_row[0]
             team_name = reg_row[1] or ''
             team_members_raw = reg_row[2]
             reg_full_name = reg_row[3] or username
             reg_email = reg_row[4]
             ticket_code = reg_row[6] or f"TKT-{event_id:03d}-{reg_id:05d}"
+            reg_pass_type = reg_row[8] if len(reg_row) > 8 and reg_row[8] else 'in_person'
 
             # Fallback: if email wasn't recorded directly on registration, fetch from users table
             if not reg_email:
@@ -2717,14 +8233,16 @@ def unregister_event(event_id):
                 team_members = json.loads(team_members_raw) if team_members_raw else []
             except Exception:
                 team_members = []
-            seats_freed = 1 + len(team_members)
+            seats_freed = (1 + len(team_members)) if reg_pass_type == 'in_person' else 0
             
             now_str = datetime.now().strftime('%d %b %Y, %I:%M %p')
             # Soft-cancel: Mark as cancelled with timestamp, reason, and feedback
             c.execute("""UPDATE registrations 
                          SET status = 'cancelled', cancelled_at = ?, cancellation_reason = ?, cancellation_feedback = ? 
                          WHERE id = ?""", (now_str, reason, feedback, reg_id))
-            c.execute("UPDATE events SET seats_filled = MAX(0, COALESCE(seats_filled, 0) - ?) WHERE id = ?", (seats_freed, event_id))
+            if seats_freed > 0:
+                c.execute("UPDATE events SET seats_filled = MAX(0, COALESCE(seats_filled, 0) - ?) WHERE id = ?", (seats_freed, event_id))
+            c.execute("DELETE FROM live_stream_passes WHERE username = ? AND event_id = ?", (username, event_id))
             conn.commit()
             invalidate_user_regs(username)
             invalidate_events_cache()
@@ -2789,7 +8307,7 @@ def download_ticket(event_id):
         
     conn = get_db()
     c = conn.cursor()
-    c.execute("""SELECT id, full_name, email, phone, college_id, payment_method, upi_id, timestamp, team_name, team_members, status, cancelled_at 
+    c.execute("""SELECT id, full_name, email, phone, college_id, payment_method, upi_id, timestamp, team_name, team_members, status, cancelled_at, ticket_code, pass_type 
                  FROM registrations 
                  WHERE username = ? AND event_id = ? 
                  ORDER BY id DESC LIMIT 1""", (username, event_id))
@@ -2800,7 +8318,7 @@ def download_ticket(event_id):
         flash("Registration not found. Please register first.", "error")
         return redirect(url_for('event_detail', event_id=event_id))
         
-    reg_id, full_name, email, phone, college_id, payment_method, upi_id, reg_time, team_name, team_members_raw, reg_status, cancelled_at = registration
+    reg_id, full_name, email, phone, college_id, payment_method, upi_id, reg_time, team_name, team_members_raw, reg_status, cancelled_at, ticket_code, pass_type = registration
     
     if reg_status == 'cancelled':
         flash(f"Ticket Revoked: You unregistered from '{event['title']}' on {cancelled_at or 'earlier'}. This pass is void.", "error")
@@ -2823,7 +8341,9 @@ def download_ticket(event_id):
         'reg_time': reg_time,
         'team_name': team_name,
         'team_members': team_members,
-        'username': username
+        'username': username,
+        'ticket_code': ticket_code,
+        'pass_type': pass_type or 'in_person'
     }
     
     pdf_bytes = generate_ticket_pdf_bytes(event, reg_dict)
@@ -2836,6 +8356,220 @@ def download_ticket(event_id):
         download_name=f"Ticket_{safe_title}.pdf",
         mimetype="application/pdf"
     )
+
+def generate_ticket_qr_base64(ticket_code: str, event_title: str, attendee_name: str, verify_url: str) -> str:
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_M,
+        box_size=8,
+        border=2,
+    )
+    qr_data = f"{verify_url}\nTicket: {ticket_code}\nEvent: {event_title}\nAttendee: {attendee_name}"
+    qr.add_data(qr_data)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+    buffered = io.BytesIO()
+    img.save(buffered, format="PNG")
+    return base64.b64encode(buffered.getvalue()).decode('utf-8')
+
+@app.route('/ticket/view/<int:event_id>')
+@app.route('/ticket/<ticket_code>')
+def view_ticket_interactive(event_id=None, ticket_code=None):
+    if not session.get('loggedin'):
+        return redirect(url_for('login'))
+
+    username = session.get('username')
+    conn = get_db()
+    c = conn.cursor()
+
+    if ticket_code:
+        c.execute("""SELECT id, event_id, full_name, email, phone, college_id, payment_method, upi_id, timestamp, team_name, team_members, status, cancelled_at, ticket_code, username, pass_type
+                     FROM registrations WHERE ticket_code = ?""", (ticket_code,))
+    elif event_id:
+        c.execute("""SELECT id, event_id, full_name, email, phone, college_id, payment_method, upi_id, timestamp, team_name, team_members, status, cancelled_at, ticket_code, username, pass_type
+                     FROM registrations WHERE username = ? AND event_id = ? ORDER BY id DESC LIMIT 1""", (username, event_id))
+    else:
+        conn.close()
+        return redirect(url_for('dashboard'))
+
+    registration = c.fetchone()
+    conn.close()
+
+    if not registration:
+        flash("Ticket registration not found. Please register first.", "error")
+        return redirect(url_for('dashboard'))
+
+    reg_id, ev_id, full_name, email, phone, college_id, payment_method, upi_id, reg_time, team_name, team_members_raw, reg_status, cancelled_at, t_code, reg_user = registration[:15]
+    reg_pass_type = registration[15] if len(registration) > 15 and registration[15] else 'in_person'
+    event = get_event(ev_id)
+    if not event:
+        flash("Event details not found.", "error")
+        return redirect(url_for('dashboard'))
+
+    try:
+        team_members = json.loads(team_members_raw) if team_members_raw else []
+    except Exception:
+        team_members = []
+
+    final_ticket_code = t_code or f"{'LIVE' if reg_pass_type == 'live_stream' else 'TKT'}-{ev_id:03d}-{reg_id:05d}"
+    if reg_pass_type == 'live_stream':
+        pass_type_str = "Virtual Live Stream Pass (Unlimited Broadcast Access)"
+        seat_zone = "VIRTUAL ACCESS • UNLIMITED BROADCAST"
+        gate_num = "STREAM ROOM 📡"
+    else:
+        pass_type_str = f"Team Pass ({team_name})" if team_name else "Solo Entry Pass"
+        zone_letter = chr(65 + (reg_id % 4))
+        seat_num = ((reg_id * 7) % 60) + 1
+        seat_zone = f"ZONE {zone_letter} • SEAT #{seat_num:02d}"
+        gate_num = f"GATE-0{((reg_id % 3) + 1)}"
+
+    base_url = request.host_url.rstrip('/') if request else 'http://127.0.0.1:5000'
+    verify_url = f"{base_url}/verify/{final_ticket_code}"
+
+    qr_b64 = generate_ticket_qr_base64(final_ticket_code, event.get('title', ''), full_name or username, verify_url)
+
+    venue_name = event.get('venue') or 'Main Campus Auditorium'
+    venue_addr = event.get('venue_address') or 'Tech Park Campus, Bangalore'
+    maps_query = urllib.parse.quote_plus(f"{venue_name} {venue_addr}".strip())
+    maps_search_url = f"https://www.google.com/maps/search/?api=1&query={maps_query}"
+
+    reg_info = {
+        'id': reg_id,
+        'full_name': full_name or username,
+        'email': email,
+        'phone': phone,
+        'college_id': college_id,
+        'team_name': team_name,
+        'team_members': team_members,
+        'reg_time': reg_time,
+        'status': reg_status
+    }
+
+    security_hash = hashlib.sha256(f"{final_ticket_code}:{ev_id}:{reg_user}:SECURE_GATE".encode()).hexdigest()[:16].upper()
+    if reg_pass_type != 'live_stream':
+        zone_letter = chr(65 + (reg_id % 4))
+        seat_num = ((reg_id * 7) % 60) + 1
+        seat_zone = f"ZONE {zone_letter} • SEAT #{seat_num:02d}"
+        gate_num = f"GATE-0{((reg_id % 3) + 1)}"
+
+    return render_template(
+        'ticket.html',
+        event=event,
+        reg=reg_info,
+        ticket_code=final_ticket_code,
+        pass_type_str=pass_type_str,
+        qr_base64=qr_b64,
+        maps_search_url=maps_search_url,
+        security_hash=security_hash,
+        seat_zone=seat_zone,
+        gate_num=gate_num,
+        verify_url=verify_url
+    )
+
+@app.route('/passport')
+def passport_page():
+    if not session.get('loggedin'):
+        return redirect(url_for('login'))
+
+    username = session.get('username')
+    conn = get_db(row_factory=True)
+    c = conn.cursor()
+
+    c.execute("SELECT full_name FROM users WHERE username = ?", (username,))
+    u_row = c.fetchone()
+    full_name = u_row['full_name'] if u_row and u_row['full_name'] else username
+
+    c.execute("""SELECT r.id, r.event_id, r.checked_in, r.timestamp, e.title, e.category, e.date
+                 FROM registrations r
+                 JOIN events e ON r.event_id = e.id
+                 WHERE r.username = ? AND (r.status IS NULL OR r.status = 'active')
+                 ORDER BY r.id DESC""", (username,))
+    all_regs = [dict(row) for row in c.fetchall()]
+    conn.close()
+
+    stamps = []
+    user_xp = 50
+    for reg in all_regs:
+        user_xp += 100
+        if reg.get('checked_in') == 1:
+            user_xp += 250
+            stamps.append(reg)
+        else:
+            stamps.append(reg)
+
+    level = max(1, user_xp // 250 + 1)
+    rank_titles = {
+        1: "Tech Explorer",
+        2: "Code Hacker",
+        3: "Summit Specialist",
+        4: "Innovation Fellow",
+        5: "Grandmaster"
+    }
+    user_rank_title = rank_titles.get(min(level, 5), "Grandmaster")
+    next_level_xp = level * 250
+    xp_percentage = min(100, int((user_xp % 250) / 250 * 100))
+
+    return render_template(
+        'passport.html',
+        username=username,
+        full_name=full_name,
+        stamps=stamps,
+        user_xp=user_xp,
+        user_level=level,
+        user_rank_title=user_rank_title,
+        next_level_xp=next_level_xp,
+        xp_percentage=xp_percentage
+    )
+
+@app.route('/teams')
+def teams_page():
+    if not session.get('loggedin'):
+        return redirect(url_for('login'))
+
+    conn = get_db(row_factory=True)
+    c = conn.cursor()
+    c.execute("""SELECT t.id, t.title, t.skills, t.description, t.created_at, t.username, e.title as event_title, u.full_name as host_name, u.college_id, u.email as contact_email
+                 FROM team_match_posts t
+                 JOIN events e ON t.event_id = e.id
+                 JOIN users u ON t.username = u.username
+                 WHERE t.status = 'open'
+                 ORDER BY t.id DESC LIMIT 30""")
+    raw_posts = [dict(row) for row in c.fetchall()]
+    conn.close()
+
+    posts = []
+    for p in raw_posts:
+        skills_list = [s.strip() for s in p.get('skills', '').split(',') if s.strip()]
+        p['skills'] = skills_list
+        posts.append(p)
+
+    events = get_events()
+    return render_template('teams.html', team_posts=posts, events=events)
+
+@app.route('/teams/post', methods=['POST'])
+def post_team_match():
+    if not session.get('loggedin'):
+        return redirect(url_for('login'))
+
+    username = session.get('username')
+    event_id = request.form.get('event_id')
+    title = sanitize_text(request.form.get('title', 'Looking for Teammates'))
+    skills = sanitize_text(request.form.get('skills', 'General'))
+    description = sanitize_text(request.form.get('description', ''))
+
+    if event_id and title:
+        try:
+            conn = get_db()
+            c = conn.cursor()
+            c.execute("""INSERT INTO team_match_posts (event_id, username, title, skills, description)
+                         VALUES (?, ?, ?, ?, ?)""", (int(event_id), username, title, skills, description))
+            conn.commit()
+            conn.close()
+            flash("Squad opening published! Other attendees can now connect with you.", "success")
+        except Exception as e:
+            flash(f"Error posting opening: {e}", "danger")
+
+    return redirect(url_for('teams_page'))
 
 @app.route('/download_certificate/<int:event_id>')
 def download_certificate(event_id):
@@ -3524,13 +9258,17 @@ def add_event():
         purpose = request.form.get('purpose')
         full_details = request.form.get('full_details')
         outcome = request.form.get('outcome')
+        seats_total = request.form.get('seats_total', type=int) or 100
+        stream_price = request.form.get('stream_price', '').strip()
+        if not stream_price:
+            stream_price = 'Free' if (price or '').strip().lower() == 'free' else '₹199'
 
         try:
             conn = get_db()
             c = conn.cursor()
-            c.execute("""INSERT INTO events (title, date, time, end_time, desc, price, color, image, purpose, full_details, outcome, venue, venue_address) 
-                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", 
-                      (title, date, time_val, end_time_val, desc, price, color, image, purpose, full_details, outcome, venue, venue_address))
+            c.execute("""INSERT INTO events (title, date, time, end_time, desc, price, color, image, purpose, full_details, outcome, venue, venue_address, seats_total, seats_filled, stream_price) 
+                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)""", 
+                      (title, date, time_val, end_time_val, desc, price, color, image, purpose, full_details, outcome, venue, venue_address, seats_total, stream_price))
             conn.commit()
             conn.close()
             invalidate_events_cache()
@@ -3566,7 +9304,8 @@ def logout():
     session.pop('captcha_answer', None)
     return redirect(url_for('login'))
 
-@app.route('/event/<int:event_id>/ical')
+@app.route('/event/<int:event_id>/ical', endpoint='event_ical')
+@app.route('/event/<int:event_id>/calendar.ics', endpoint='event_calendar_ics')
 def event_ical(event_id):
     if not session.get('loggedin'):
         return redirect(url_for('login'))
@@ -3807,6 +9546,11 @@ def api_events():
         ev_copy['status_reason'] = status_info['status_reason']
         ev_copy['maps_url'] = status_info['maps_url']
         ev_copy['maps_directions_url'] = status_info['maps_directions_url']
+        ev_copy['seats_total'] = status_info.get('seats_total') or 100
+        ev_copy['seats_filled'] = status_info.get('seats_filled') or 0
+        ev_copy['seats_left'] = status_info.get('seats_left') or max(0, ev_copy['seats_total'] - ev_copy['seats_filled'])
+        ev_copy['is_in_person_sold_out'] = status_info.get('is_in_person_sold_out') or (ev_copy['seats_filled'] >= ev_copy['seats_total'])
+        ev_copy['stream_price'] = status_info.get('stream_price') or '₹199'
         ev_copy['is_registered'] = ev_copy['id'] in registered_ids
         event_list.append(ev_copy)
         
@@ -4735,6 +10479,284 @@ except Exception:
         asgi_app = WsgiToAsgi(app)
     except Exception:
         asgi_app = None
+
+
+
+# ─── Live Video Projection & Host Studio Endpoints ─────────────────────────
+STREAM_UPLOAD_FOLDER = os.path.join(STATIC_DIR, 'uploads', 'streams')
+if not os.path.exists(STREAM_UPLOAD_FOLDER):
+    os.makedirs(STREAM_UPLOAD_FOLDER, exist_ok=True)
+
+_STREAM_CONFIGS = {}
+
+def get_stream_config(event_id):
+    if event_id not in _STREAM_CONFIGS:
+        _STREAM_CONFIGS[event_id] = {
+            'stream_status': 'offline',
+            'source_type': 'youtube',
+            'stream_url': '',
+            'stream_title': 'Live Stage Broadcast',
+            'stream_announcement': 'Welcome to the live interactive broadcast!',
+            'pinned_question': None
+        }
+    return _STREAM_CONFIGS[event_id]
+
+@app.route('/event/<int:event_id>/live')
+def live_event_page(event_id):
+    if not session.get('loggedin'):
+        flash("Please log in to access the live stream room.", "error")
+        return redirect(url_for('login'))
+    
+    event = get_event(event_id)
+    if not event:
+        return "Event not found", 404
+        
+    username = session.get('username')
+    stream_config = get_stream_config(event_id)
+    
+    has_access = False
+    access_type = 'none'
+    if username:
+        if is_host() or is_admin():
+            has_access = True
+            access_type = 'host'
+        else:
+            conn = get_db()
+            c = conn.cursor()
+            c.execute("SELECT id FROM registrations WHERE username = ? AND event_id = ? AND (status IS NULL OR status = 'active')", (username, event_id))
+            if c.fetchone():
+                has_access = True
+                access_type = 'registered_ticket'
+            else:
+                c.execute("SELECT id, pass_type FROM live_stream_passes WHERE username = ? AND event_id = ?", (username, event_id))
+                row = c.fetchone()
+                if row:
+                    has_access = True
+                    access_type = row[1] if (len(row) > 1 and row[1]) else 'virtual_pass'
+            conn.close()
+
+    access_info = {'has_access': has_access, 'access_type': access_type}
+    return render_template('live_event.html', event=event, username=username, is_host=is_host(), stream_config=stream_config, access_info=access_info)
+
+@app.route('/api/event/<int:event_id>/live/data')
+def api_live_event_data(event_id):
+    username = session.get('username')
+    has_access = False
+    access_type = 'none'
+    
+    if username:
+        if is_host() or is_admin():
+            has_access = True
+            access_type = 'host'
+        else:
+            conn = get_db()
+            c = conn.cursor()
+            c.execute("SELECT id FROM registrations WHERE username = ? AND event_id = ? AND (status IS NULL OR status = 'active')", (username, event_id))
+            if c.fetchone():
+                has_access = True
+                access_type = 'registered_ticket'
+            else:
+                c.execute("SELECT id, pass_type FROM live_stream_passes WHERE username = ? AND event_id = ?", (username, event_id))
+                row = c.fetchone()
+                if row:
+                    has_access = True
+                    access_type = row[1] if (len(row) > 1 and row[1]) else 'virtual_pass'
+            conn.close()
+
+    cfg = get_stream_config(event_id)
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT id, username, question, upvotes, is_answered, created_at FROM live_questions WHERE event_id = ? ORDER BY upvotes DESC, id DESC LIMIT 50", (event_id,))
+    questions = [dict(r) for r in c.fetchall()]
+    conn.close()
+    
+    return jsonify({
+        'ok': True,
+        'access': {'has_access': has_access, 'access_type': access_type},
+        'stream_config': cfg,
+        'questions': questions
+    })
+
+@app.route('/api/event/<int:event_id>/live/unlock-ticket', methods=['POST'])
+def api_live_unlock_ticket(event_id):
+    if not session.get('loggedin'):
+        return jsonify({'success': False, 'error': 'Please log in.'}), 401
+    username = session.get('username')
+    data = request.get_json() or {}
+    ticket_code = (data.get('ticket_code') or '').strip()
+    
+    if not ticket_code:
+        return jsonify({'success': False, 'error': 'Please enter your Ticket ID.'}), 400
+        
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""SELECT id, username FROM registrations 
+                 WHERE (ticket_code = ? OR id = ?) AND event_id = ? AND (status IS NULL OR status = 'active')""", 
+              (ticket_code, ticket_code.replace('TKT-', '').split('-')[-1] if 'TKT-' in ticket_code else 0, event_id))
+    reg = c.fetchone()
+    if not reg:
+        conn.close()
+        return jsonify({'success': False, 'error': 'Invalid or cancelled Ticket ID for this event.'}), 400
+        
+    c.execute("""INSERT OR REPLACE INTO live_stream_passes (event_id, username, pass_type, ticket_code, payment_method)
+                 VALUES (?, ?, 'registered_ticket', ?, 'ticket_verification')""",
+              (event_id, username, ticket_code))
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True, 'access_type': 'registered_ticket', 'message': '🎉 Ticket verified! Free live stream projection access unlocked.'})
+
+@app.route('/api/event/<int:event_id>/live/purchase-pass', methods=['POST'])
+def api_live_purchase_pass(event_id):
+    if not session.get('loggedin'):
+        return jsonify({'success': False, 'error': 'Please log in.'}), 401
+    username = session.get('username')
+    data = request.get_json() or {}
+    payment_method = data.get('payment_method', 'UPI')
+    
+    event = get_event(event_id)
+    stream_price_str = (event.get('stream_price') if event else None) or '₹199'
+    numeric_match = re.search(r'(\d+(?:\.\d+)?)', stream_price_str)
+    amount_paid = float(numeric_match.group(1)) if numeric_match else 0.0
+
+    pass_code = f"VPASS-{event_id:03d}-{random.randint(10000, 99999)}"
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""INSERT OR REPLACE INTO live_stream_passes (event_id, username, pass_type, ticket_code, amount_paid, payment_method)
+                 VALUES (?, ?, 'paid_virtual', ?, ?, ?)""",
+              (event_id, username, pass_code, amount_paid, payment_method))
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True, 'access_type': 'paid_virtual', 'pass_code': pass_code, 'amount_paid': amount_paid, 'stream_price': stream_price_str, 'message': f'🎉 Virtual Pass Purchased ({stream_price_str})! Stream unlocked.'})
+
+@app.route('/api/event/<int:event_id>/live/questions', methods=['GET', 'POST'])
+def api_live_questions(event_id):
+    if request.method == 'GET':
+        conn = get_db()
+        c = conn.cursor()
+        c.execute("SELECT id, username, question, upvotes, is_answered, created_at FROM live_questions WHERE event_id = ? ORDER BY upvotes DESC, id DESC", (event_id,))
+        questions = [dict(r) for r in c.fetchall()]
+        conn.close()
+        return jsonify({'ok': True, 'questions': questions})
+        
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Please log in.'}), 401
+    username = session.get('username')
+    
+    has_access = is_host() or is_admin()
+    if not has_access:
+        conn = get_db()
+        c = conn.cursor()
+        c.execute("SELECT id FROM registrations WHERE username = ? AND event_id = ? AND (status IS NULL OR status = 'active')", (username, event_id))
+        if c.fetchone():
+            has_access = True
+        else:
+            c.execute("SELECT id FROM live_stream_passes WHERE username = ? AND event_id = ?", (username, event_id))
+            if c.fetchone():
+                has_access = True
+        conn.close()
+        
+    if not has_access:
+        return jsonify({'ok': False, 'error': 'Access denied: Please unlock access with a ticket or virtual pass to submit Q&A.'}), 403
+        
+    data = request.get_json() or {}
+    q_text = (data.get('question') or '').strip()
+    if not q_text:
+        return jsonify({'ok': False, 'error': 'Question cannot be empty.'}), 400
+        
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("INSERT INTO live_questions (event_id, username, question) VALUES (?, ?, ?)", (event_id, username, q_text))
+    qid = c.lastrowid
+    conn.commit()
+    conn.close()
+    return jsonify({'ok': True, 'question_id': qid, 'message': 'Question submitted!'})
+
+@app.route('/api/event/<int:event_id>/live/stream-config', methods=['GET', 'POST'])
+def api_live_stream_config(event_id):
+    cfg = get_stream_config(event_id)
+    if request.method == 'GET':
+        return jsonify({'ok': True, 'config': cfg})
+        
+    if not is_host() and not is_admin():
+        return jsonify({'ok': False, 'error': 'Forbidden: Host privileges required.'}), 403
+        
+    data = request.get_json() or {}
+    if 'stream_status' in data:
+        cfg['stream_status'] = data['stream_status']
+    if 'source_type' in data:
+        cfg['source_type'] = data['source_type']
+    if 'stream_title' in data:
+        cfg['stream_title'] = data['stream_title']
+    if 'stream_announcement' in data:
+        cfg['stream_announcement'] = data['stream_announcement']
+    if 'stream_url' in data:
+        raw_url = data['stream_url']
+        if 'youtube.com/watch?v=' in raw_url:
+            vid_id = raw_url.split('watch?v=')[1].split('&')[0]
+            raw_url = f"https://www.youtube-nocookie.com/embed/{vid_id}"
+        elif 'youtu.be/' in raw_url:
+            vid_id = raw_url.split('youtu.be/')[1].split('?')[0]
+            raw_url = f"https://www.youtube-nocookie.com/embed/{vid_id}"
+        cfg['stream_url'] = raw_url
+        
+    _STREAM_CONFIGS[event_id] = cfg
+    return jsonify({'ok': True, 'config': cfg})
+
+@app.route('/api/event/<int:event_id>/live/upload-stream-video', methods=['POST'])
+def api_upload_stream_video(event_id):
+    if not is_host() and not is_admin():
+        return jsonify({'ok': False, 'error': 'Forbidden: Host privileges required.'}), 403
+        
+    if 'video' not in request.files:
+        return jsonify({'ok': False, 'error': 'No video file provided.'}), 400
+    file = request.files['video']
+    if not file or file.filename == '':
+        return jsonify({'ok': False, 'error': 'No video file selected.'}), 400
+        
+    ext = file.filename.rsplit('.', 1)[-1].lower() if '.' in file.filename else 'mp4'
+    sec_name = f"stream_{event_id}_{int(time.time())}.{ext}"
+    dest_path = os.path.join(STREAM_UPLOAD_FOLDER, sec_name)
+    file.save(dest_path)
+    
+    video_url = f"/static/uploads/streams/{sec_name}"
+    cfg = get_stream_config(event_id)
+    cfg['source_type'] = 'uploaded_video'
+    cfg['stream_status'] = 'live'
+    cfg['stream_url'] = video_url
+    _STREAM_CONFIGS[event_id] = cfg
+    
+    return jsonify({'ok': True, 'video_url': video_url, 'config': cfg})
+
+@app.route('/api/event/<int:event_id>/live/pin-question', methods=['POST'])
+def api_pin_question(event_id):
+    if not is_host() and not is_admin():
+        return jsonify({'ok': False, 'error': 'Forbidden: Host privileges required.'}), 403
+    data = request.get_json() or {}
+    qid = data.get('question_id')
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT id, username, question, upvotes FROM live_questions WHERE id = ?", (qid,))
+    q = c.fetchone()
+    conn.close()
+    if not q:
+        return jsonify({'ok': False, 'error': 'Question not found.'}), 404
+        
+    cfg = get_stream_config(event_id)
+    cfg['pinned_question'] = dict(q)
+    _STREAM_CONFIGS[event_id] = cfg
+    return jsonify({'ok': True, 'pinned_question': dict(q)})
+
+@app.route('/host/studio/<int:event_id>')
+def host_studio_page(event_id):
+    if not session.get('loggedin'):
+        flash("Please log in.", "error")
+        return redirect(url_for('login'))
+    if not is_host() and not is_admin():
+        return "Forbidden: Host privileges required", 403
+    event = get_event(event_id)
+    if not event:
+        return "Event not found", 404
+    return render_template('live_event.html', event=event, username=session.get('username'), is_host=True, is_studio=True)
 
 
 if __name__ == '__main__':

@@ -9,17 +9,19 @@
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <style>
         .scanner-container {
-            max-width: 1100px;
+            max-width: 1280px;
             margin: 2rem auto;
             padding: 0 1.5rem;
+            box-sizing: border-box;
         }
         .scanner-grid {
             display: grid;
             grid-template-columns: 1.1fr 0.9fr;
             gap: 2rem;
-            margin-top: 2rem;
+            margin-top: 1.5rem;
+            align-items: start;
         }
-        @media (max-width: 850px) {
+        @media (max-width: 900px) {
             .scanner-grid { grid-template-columns: 1fr; }
         }
         .scanner-card {
@@ -27,27 +29,209 @@
             backdrop-filter: blur(16px);
             border: 1px solid var(--glass-border);
             border-radius: 20px;
-            padding: 2rem;
+            padding: 1.8rem;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
         }
+
+        /* Viewport & Camera Container */
+        .scanner-viewport-box {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            background: rgba(10, 15, 29, 0.7);
+            border: 1px solid rgba(0, 242, 254, 0.25);
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        .scanner-viewport-box.drag-over {
+            border-color: #00f2fe;
+            background: rgba(0, 242, 254, 0.12);
+            box-shadow: 0 0 25px rgba(0, 242, 254, 0.35);
+        }
+
+        /* Reticle corners */
+        .reticle-corner {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            border-color: #00f2fe;
+            border-style: solid;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .reticle-corner.top-left {
+            top: 14px;
+            left: 14px;
+            border-width: 3px 0 0 3px;
+            border-top-left-radius: 6px;
+        }
+        .reticle-corner.top-right {
+            top: 14px;
+            right: 14px;
+            border-width: 3px 3px 0 0;
+            border-top-right-radius: 6px;
+        }
+        .reticle-corner.bottom-left {
+            bottom: 14px;
+            left: 14px;
+            border-width: 0 0 3px 3px;
+            border-bottom-left-radius: 6px;
+        }
+        .reticle-corner.bottom-right {
+            bottom: 14px;
+            right: 14px;
+            border-width: 0 3px 3px 0;
+            border-bottom-right-radius: 6px;
+        }
+
+        /* Laser Sweep Animation */
+        @keyframes scanLaserSweep {
+            0% { top: 18%; opacity: 0.2; }
+            50% { top: 82%; opacity: 0.9; }
+            100% { top: 18%; opacity: 0.2; }
+        }
+        .laser-scanline {
+            position: absolute;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00f2fe 35%, #4facfe 65%, transparent);
+            box-shadow: 0 0 12px #00f2fe, 0 0 20px #00f2fe;
+            animation: scanLaserSweep 2.8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 2;
+        }
+
         #reader {
             width: 100%;
             border-radius: 14px;
             overflow: hidden;
-            border: 2px dashed rgba(0, 242, 254, 0.4);
-            background: rgba(0,0,0,0.3);
+            background: rgba(0,0,0,0.5);
+            display: none;
         }
+        #reader video {
+            border-radius: 12px;
+        }
+
+        /* Metrics Chips */
+        .scanner-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 1.2rem;
+        }
+        @media (max-width: 550px) {
+            .scanner-metrics-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        .stat-chip {
+            background: rgba(15, 23, 42, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 0.65rem 0.5rem;
+            text-align: center;
+            transition: all 0.25s ease;
+        }
+        .stat-chip:hover {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(0, 242, 254, 0.3);
+            transform: translateY(-2px);
+        }
+        .stat-chip-num {
+            font-size: 1.25rem;
+            font-weight: 800;
+            line-height: 1.1;
+            color: #ffffff;
+        }
+        .stat-chip-label {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--text-muted);
+            margin-top: 3px;
+            font-weight: 700;
+        }
+
+        /* Guide Card */
+        .scanner-guide-card {
+            margin-top: 1.2rem;
+            background: rgba(15, 23, 42, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 14px;
+            padding: 1.1rem;
+            transition: all 0.25s ease;
+        }
+        .guide-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(0, 242, 254, 0.09);
+            border: 1px solid rgba(0, 242, 254, 0.25);
+            color: #00f2fe;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 0.74rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .guide-pill:hover {
+            background: rgba(0, 242, 254, 0.22);
+            border-color: #00f2fe;
+            transform: scale(1.03);
+        }
+
+        /* Control Toggle Buttons */
+        .control-pill-btn {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #e2e8f0;
+            padding: 0.35rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s ease;
+        }
+        .control-pill-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(0, 242, 254, 0.4);
+            color: #ffffff;
+        }
+        .control-pill-btn.active {
+            background: rgba(0, 242, 254, 0.15);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Status Result Box */
         .status-box {
             display: none;
-            padding: 1.5rem;
+            padding: 1.3rem;
             border-radius: 16px;
-            margin-top: 1.5rem;
+            margin-top: 1.2rem;
             animation: fadeIn 0.4s ease-out;
+            position: relative;
+        }
+        .status-preview {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.12), rgba(30, 41, 59, 0.8));
+            border: 2px solid var(--primary);
+            color: #ffffff;
+            box-shadow: 0 0 25px rgba(0, 242, 254, 0.2);
         }
         .status-success {
-            background: rgba(16, 185, 129, 0.15);
-            border: 1px solid #10b981;
+            background: rgba(16, 185, 129, 0.18);
+            border: 2px solid #10b981;
             color: #ecfdf5;
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.25);
         }
         .status-warning {
             background: rgba(245, 158, 11, 0.15);
@@ -59,16 +243,157 @@
             border: 1px solid #ef4444;
             color: #fef2f2;
         }
+
+        #checkinFeed {
+            max-height: 520px;
+            overflow-y: auto;
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+        }
+        #checkinFeed::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
         .feed-item {
-            padding: 0.9rem 1rem;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 0.85rem 1rem;
+            margin-bottom: 0.65rem;
+            background: rgba(15, 23, 42, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 0.9rem;
-            transition: background 0.2s;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
-        .feed-item:hover { background: rgba(255,255,255,0.02); }
+        .feed-item:hover {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(0, 242, 254, 0.35);
+            transform: translateY(-2px);
+        }
+        .feed-item.new-scan {
+            animation: pulseHighlight 2s ease-out;
+            border-color: rgba(16, 185, 129, 0.8) !important;
+            background: rgba(16, 185, 129, 0.12) !important;
+        }
+        @keyframes pulseHighlight {
+            0% { transform: scale(1.02); box-shadow: 0 0 25px rgba(16, 185, 129, 0.5); }
+            50% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }
+            100% { transform: scale(1); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
+        }
+        .feed-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(0,242,254,0.2), rgba(79,70,229,0.3));
+            border: 1px solid rgba(0,242,254,0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--primary);
+            flex-shrink: 0;
+            text-transform: uppercase;
+        }
+        .tkt-badge {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 0.76rem;
+            font-weight: 700;
+            color: #00f2fe;
+            background: rgba(0, 242, 254, 0.12);
+            border: 1px solid rgba(0, 242, 254, 0.35);
+            padding: 2px 7px;
+            border-radius: 6px;
+            display: inline-block;
+            letter-spacing: 0.5px;
+        }
+        .verified-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 800;
+            font-size: 0.72rem;
+            padding: 3px 9px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .verified-pill.success {
+            background: rgba(16, 185, 129, 0.18);
+            border: 1px solid #10b981;
+            color: #10b981;
+        }
+        .verified-pill.warning {
+            background: rgba(245, 158, 11, 0.18);
+            border: 1px solid #f59e0b;
+            color: #f59e0b;
+        }
+        .verified-pill.pending {
+            background: rgba(0, 242, 254, 0.18);
+            border: 1px solid #00f2fe;
+            color: #00f2fe;
+        }
+        .verified-pill .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            display: inline-block;
+        }
+
+        /* Light Mode Harmonization */
+        body.light-mode .scanner-card {
+            background: rgba(255, 255, 255, 0.92);
+            border-color: rgba(0, 0, 0, 0.08);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+        }
+        body.light-mode .scanner-viewport-box {
+            background: rgba(241, 245, 249, 0.95);
+            border-color: rgba(0, 0, 0, 0.12);
+        }
+        body.light-mode .stat-chip {
+            background: #ffffff;
+            border-color: #e2e8f0;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+        }
+        body.light-mode .stat-chip-num {
+            color: #0f172a;
+        }
+        body.light-mode .scanner-guide-card {
+            background: #f8fafc;
+            border-color: #e2e8f0;
+        }
+        body.light-mode .guide-pill {
+            background: rgba(2, 132, 199, 0.08);
+            border-color: rgba(2, 132, 199, 0.25);
+            color: #0284c7;
+        }
+        body.light-mode .control-pill-btn {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+            color: #334155;
+        }
+        body.light-mode .feed-item {
+            background: #ffffff;
+            border-color: #e2e8f0;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+        }
+        body.light-mode .feed-item:hover {
+            background: #f8fafc;
+            border-color: #00f2fe;
+        }
+        body.light-mode .feed-item strong,
+        body.light-mode .feed-item span[style*="color: #ffffff"] {
+            color: #0f172a !important;
+        }
+        body.light-mode .status-preview {
+            background: #f0fdfa;
+            border-color: #0284c7;
+            color: #0f172a;
+        }
     </style>
 </head>
 <body>
@@ -100,7 +425,7 @@
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
             <div>
                 <h1 style="font-family: var(--font-heading); color: white; font-size: 2rem; margin: 0;">🎟️ Ticket QR Scanner</h1>
-                <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 4px;">Scan attendee PDF tickets or enter registration ID to check-in students in real time.</p>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 4px;">2-Step Gate Verification: Scan/Lookup QR, verify attendee credentials, and approve event admission.</p>
             </div>
             <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
                 <div style="background: rgba(0, 242, 254, 0.1); border: 1px solid var(--primary); padding: 0.7rem 1.4rem; border-radius: 14px; text-align: center;">
@@ -111,48 +436,139 @@
         </div>
 
         <div class="scanner-grid">
-            <!-- Left: QR Camera Scanner -->
+            <!-- Left: QR Camera Scanner, Viewfinder & Verification Panel -->
             <div class="scanner-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                    <h3 style="color: white; margin: 0; font-size: 1.2rem;">📷 Camera Scanner</h3>
-                    <div style="display: flex; gap: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.1rem; flex-wrap: wrap; gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <h3 style="color: white; margin: 0; font-size: 1.2rem;">📷 Camera Scanner</h3>
+                        <span id="camStatusBadge" style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.72rem; font-weight: 700; color: #94a3b8; background: rgba(148,163,184,0.15); border: 1px solid rgba(148,163,184,0.3); padding: 2px 8px; border-radius: 20px;">
+                            <span style="width: 6px; height: 6px; border-radius: 50%; background: #94a3b8;"></span> Standby
+                        </span>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <button id="soundToggleBtn" onclick="toggleSound()" class="control-pill-btn active" title="Toggle audio chime on scan">
+                            🔊 Sound: ON
+                        </button>
                         <button id="startCamBtn" onclick="startScanner()" class="register-btn-sm" style="background: var(--primary); color: #0f172a; padding: 0.4rem 0.9rem; font-weight: 700;">Start Camera</button>
                         <button id="stopCamBtn" onclick="stopScanner()" class="register-btn-sm" style="background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid rgba(239,68,68,0.4); padding: 0.4rem 0.9rem; display: none;">Stop</button>
                     </div>
                 </div>
 
-                <div id="reader"></div>
+                <!-- Interactive Viewport Box (Standby + Camera) -->
+                <div id="scannerViewport" class="scanner-viewport-box" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleFileDrop(event)">
+                    <!-- Standby HUD Viewfinder -->
+                    <div id="standbyViewfinder" style="width: 100%; height: 100%; padding: 2.2rem 1.5rem; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+                        <!-- Reticle Corners -->
+                        <div class="reticle-corner top-left"></div>
+                        <div class="reticle-corner top-right"></div>
+                        <div class="reticle-corner bottom-left"></div>
+                        <div class="reticle-corner bottom-right"></div>
+                        <div class="laser-scanline"></div>
+
+                        <div style="font-size: 2.4rem; margin-bottom: 8px; filter: drop-shadow(0 0 10px rgba(0,242,254,0.5));">🎯</div>
+                        <div style="color: #ffffff; font-weight: 700; font-size: 1.05rem;">Optical QR Scanner Ready</div>
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin: 4px 0 16px; max-width: 320px;">
+                            Start live camera feed or drag & drop a ticket image/PDF to verify instantly.
+                        </p>
+
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+                            <button onclick="startScanner()" class="register-btn-sm" style="background: var(--primary); color: #0f172a; font-weight: 700; padding: 0.5rem 1.1rem; box-shadow: 0 0 15px rgba(0,242,254,0.3);">
+                                📸 Start Camera Feed
+                            </button>
+                            <label for="qrFileInput" class="control-pill-btn" style="cursor: pointer; padding: 0.5rem 1rem;">
+                                📁 Upload QR Image
+                            </label>
+                            <input type="file" id="qrFileInput" accept="image/*" style="display: none;" onchange="handleFileInput(event)">
+                        </div>
+                    </div>
+
+                    <!-- Active Camera Reader View -->
+                    <div id="reader"></div>
+                </div>
+                <div id="fileReaderTemp" style="display: none;"></div>
+
+                <!-- Session Metrics Bar -->
+                <div class="scanner-metrics-grid">
+                    <div class="stat-chip">
+                        <div id="statTotal" class="stat-chip-num">0</div>
+                        <div class="stat-chip-label">Total Checks</div>
+                    </div>
+                    <div class="stat-chip">
+                        <div id="statVerified" class="stat-chip-num" style="color: #10b981;">0</div>
+                        <div class="stat-chip-label">Verified Passes</div>
+                    </div>
+                    <div class="stat-chip">
+                        <div id="statDuplicate" class="stat-chip-num" style="color: #f59e0b;">0</div>
+                        <div class="stat-chip-label">Duplicates</div>
+                    </div>
+                    <div class="stat-chip">
+                        <div id="statInvalid" class="stat-chip-num" style="color: #ef4444;">0</div>
+                        <div class="stat-chip-label">Denied / Void</div>
+                    </div>
+                </div>
 
                 <!-- Manual Fallback Input -->
-                <div style="margin-top: 1.5rem; padding-top: 1.2rem; border-top: 1px solid var(--glass-border);">
-                    <label style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 6px;">Manual Ticket Lookup (ID / Name / Student ID)</label>
+                <div style="margin-top: 1.4rem; padding-top: 1.2rem; border-top: 1px solid var(--glass-border);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <label style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600;">Manual Ticket Lookup (ID / Name / Student ID)</label>
+                        <button type="button" onclick="pasteClipboard()" class="control-pill-btn" style="font-size: 0.72rem; padding: 2px 8px;">
+                            📋 Paste Code
+                        </button>
+                    </div>
                     <form onsubmit="handleManualVerify(event)" style="display: flex; gap: 8px;">
-                        <input type="text" id="manualInput" class="input-field" placeholder="Enter Registration ID or Name..." style="flex: 1;" required>
-                        <button type="submit" class="register-btn-sm" style="background: var(--primary); color: #0f172a; font-weight: 700; white-space: nowrap; padding: 0.6rem 1.2rem;">Verify</button>
+                        <input type="text" id="manualInput" class="input-field" placeholder="Enter Ticket Code (e.g. TKT-001-00042) or Name..." style="flex: 1;" required>
+                        <button type="submit" class="register-btn-sm" style="background: var(--primary); color: #0f172a; font-weight: 700; white-space: nowrap; padding: 0.6rem 1.2rem;">Verify & Preview</button>
                     </form>
                 </div>
 
-                <!-- Scan Result Status Box -->
+                <!-- 2-Step Gate Verification Status / Preview Box -->
                 <div id="statusBox" class="status-box">
-                    <div style="display: flex; align-items: center; gap: 12px;">
+                    <button onclick="dismissStatus()" style="position: absolute; top: 12px; right: 14px; background: rgba(255,255,255,0.1); border: none; color: inherit; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; font-weight: 700; display: flex; align-items: center; justify-content: center;" title="Dismiss Result">✕</button>
+                    
+                    <div id="statusHeader" style="display: flex; align-items: center; gap: 12px; padding-right: 25px;">
                         <span id="statusIcon" style="font-size: 2rem;">✓</span>
                         <div>
                             <h4 id="statusTitle" style="margin: 0; font-size: 1.1rem; font-weight: 800;">Valid Ticket Verified!</h4>
                             <p id="statusMsg" style="margin: 4px 0 0; font-size: 0.88rem; opacity: 0.9;"></p>
                         </div>
                     </div>
-                    <div id="attendeeCard" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.85rem; line-height: 1.6;"></div>
+
+                    <!-- Attendee Details & Actions -->
+                    <div id="attendeeCard" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.88rem; line-height: 1.6;"></div>
+                </div>
+
+                <!-- Quick Reference & Shortcuts Guide -->
+                <div class="scanner-guide-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <div style="font-size: 0.82rem; font-weight: 800; color: #ffffff; text-transform: uppercase; letter-spacing: 0.5px;">💡 Accepted Search Formats</div>
+                        <span style="font-size: 0.72rem; color: var(--text-muted);">Click to sample</span>
+                    </div>
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px;">
+                        <span class="guide-pill" onclick="fillSample('TKT-001-00042')">🎟️ TKT-001-00042</span>
+                        <span class="guide-pill" onclick="fillSample('REG-104')">🆔 REG-104</span>
+                        <span class="guide-pill" onclick="fillSample('1MS21CS042')">🎓 1MS21CS042</span>
+                        <span class="guide-pill" onclick="fillSample('John Doe')">👤 Student Name</span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.78rem; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px;">
+                        <div>⚡ <strong>2-Step Verification:</strong> Review photo ID & approve admission.</div>
+                        <div>⌨️ <strong>Shortcuts:</strong> <kbd style="background: rgba(255,255,255,0.1); padding: 1px 4px; border-radius: 4px;">Enter</kbd> Approve &bull; <kbd style="background: rgba(255,255,255,0.1); padding: 1px 4px; border-radius: 4px;">Esc</kbd> Cancel</div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Right: Recent Check-in Stream -->
+            <!-- Right: Recent Check-in Stream Feed -->
             <div class="scanner-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                    <h3 style="color: white; margin: 0; font-size: 1.2rem;">📋 Recent Check-in Feed</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <h3 style="color: white; margin: 0; font-size: 1.2rem;">📋 Recent Check-in Feed</h3>
+                        <span id="feedLiveBadge" style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem; font-weight: 700; color: #10b981; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); padding: 2px 8px; border-radius: 20px;">
+                            <span style="width: 6px; height: 6px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981;"></span> LIVE
+                        </span>
+                    </div>
                     <a href="{{ url_for('checkin_history') }}" style="color: var(--primary); font-size: 0.85rem; font-weight: 700; text-decoration: none; padding: 5px 12px; background: rgba(0,242,254,0.12); border: 1px solid rgba(0,242,254,0.3); border-radius: 8px; transition: all 0.2s;">View All History →</a>
                 </div>
-                <div id="checkinFeed" style="max-height: 400px; overflow-y: auto;">
-                    <div style="text-align: center; color: var(--text-muted); padding: 2rem; font-size: 0.9rem;">
+                <div id="checkinFeed">
+                    <div style="text-align: center; color: var(--text-muted); padding: 2.5rem 1rem; font-size: 0.9rem;">
                         No check-ins recorded yet in this session.
                     </div>
                 </div>
@@ -165,9 +581,42 @@
         let html5QrcodeScanner = null;
         let isScanning = false;
         let sessionCheckins = [];
+        let soundEnabled = true;
+        let pendingApprovalData = null; // Holds the 2-step verification preview state
+
+        // Session Stats Tracking
+        const sessionStats = {
+            total: 0,
+            verified: 0,
+            duplicate: 0,
+            invalid: 0
+        };
+
+        function updateStatsUI() {
+            document.getElementById('statTotal').textContent = sessionStats.total;
+            document.getElementById('statVerified').textContent = sessionStats.verified;
+            document.getElementById('statDuplicate').textContent = sessionStats.duplicate;
+            document.getElementById('statInvalid').textContent = sessionStats.invalid;
+        }
+
+        // Toggle Sound Effects
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const btn = document.getElementById('soundToggleBtn');
+            if (soundEnabled) {
+                btn.className = 'control-pill-btn active';
+                btn.innerHTML = '🔊 Sound: ON';
+                if (window.showToast) showToast('Audio feedback enabled', 'info');
+            } else {
+                btn.className = 'control-pill-btn';
+                btn.innerHTML = '🔇 Sound: OFF';
+                if (window.showToast) showToast('Audio feedback muted', 'info');
+            }
+        }
 
         // Audio Beep generator using Web Audio API
         function playBeep(type = 'success') {
+            if (!soundEnabled) return;
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
                 const osc = ctx.createOscillator();
@@ -175,16 +624,32 @@
                 osc.connect(gain);
                 gain.connect(ctx.destination);
 
-                if (type === 'success') {
-                    osc.frequency.setValueAtTime(800, ctx.currentTime);
-                    osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.15);
-                    gain.gain.setValueAtTime(0.3, ctx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+                if (type === 'preview') {
+                    // Soft high-tech double chime for Step 1 verification preview
+                    osc.frequency.setValueAtTime(600, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(900, ctx.currentTime + 0.12);
+                    gain.gain.setValueAtTime(0.25, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.18);
                     osc.start();
-                    osc.stop(ctx.currentTime + 0.2);
+                    osc.stop(ctx.currentTime + 0.18);
+                } else if (type === 'success') {
+                    // Triumphant check-in approved chime
+                    osc.frequency.setValueAtTime(750, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(1300, ctx.currentTime + 0.18);
+                    gain.gain.setValueAtTime(0.35, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.25);
+                } else if (type === 'warning') {
+                    osc.frequency.setValueAtTime(500, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(350, ctx.currentTime + 0.2);
+                    gain.gain.setValueAtTime(0.35, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.25);
                 } else {
                     osc.frequency.setValueAtTime(300, ctx.currentTime);
-                    osc.frequency.setValueAtTime(200, ctx.currentTime + 0.15);
+                    osc.frequency.setValueAtTime(180, ctx.currentTime + 0.15);
                     gain.gain.setValueAtTime(0.4, ctx.currentTime);
                     gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
                     osc.start();
@@ -193,17 +658,48 @@
             } catch (e) {}
         }
 
+        async function loadRecentCheckins() {
+            try {
+                const resp = await fetch('/api/recent_checkins');
+                const data = await resp.json();
+                if (data && data.checkins && data.checkins.length > 0) {
+                    sessionCheckins = data.checkins.map(c => ({
+                        id: c.id,
+                        reg_id: c.id,
+                        ticket_id: c.ticket_id || (c.event_id ? `TKT-${String(c.event_id).padStart(3, '0')}-${String(c.id).padStart(5, '0')}` : `TKT-#${c.id}`),
+                        attendee: c.attendee || c.full_name || c.username,
+                        username: c.username || '',
+                        college_id: c.college_id || 'N/A',
+                        event_title: c.event_title || '',
+                        checkin_time: c.checkin_time || 'Recorded',
+                        already_checked_in: false
+                    }));
+                    sessionStats.verified = sessionCheckins.length;
+                    sessionStats.total = sessionCheckins.length;
+                    updateStatsUI();
+                    renderFeed();
+                }
+            } catch (e) {
+                console.error("Could not load recent checkins:", e);
+            }
+        }
+
+        // STEP 1: Verify & Preview Attendee Details
         async function verifyTicketPayload(payload) {
+            sessionStats.total++;
+            updateStatsUI();
             try {
                 const resp = await fetch('/api/verify_ticket', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ code: payload })
+                    body: JSON.stringify({ code: payload, preview: true })
                 });
                 const data = await resp.json();
                 displayResult(data);
             } catch (err) {
-                displayResult({ ok: false, error: 'Network error verifying ticket.' });
+                sessionStats.invalid++;
+                updateStatsUI();
+                displayResult({ ok: false, error: 'Network error communicating with server.' });
             }
         }
 
@@ -218,41 +714,135 @@
             box.className = 'status-box';
 
             if (data.ok) {
+                const ticketId = data.ticket_id || ('TKT-#' + (data.reg_id || ''));
+
                 if (data.already_checked_in) {
+                    pendingApprovalData = null;
+                    sessionStats.duplicate++;
                     playBeep('warning');
                     box.classList.add('status-warning');
                     icon.textContent = '⚠️';
-                    title.textContent = 'Already Checked In';
-                    msg.textContent = `This ticket was already verified at ${data.checkin_time || 'earlier today'}.`;
-                } else {
-                    playBeep('success');
-                    box.classList.add('status-success');
-                    icon.textContent = '✓';
-                    title.textContent = 'Check-in Verified!';
-                    msg.textContent = `Successfully checked-in for ${data.event_title}.`;
-                    addToFeed(data);
-                }
+                    title.textContent = 'Already Checked In & Completed';
+                    msg.textContent = `This pass was already verified at ${data.checkin_time || 'earlier today'}. Event attendance is complete.`;
 
-                card.innerHTML = `
-                    <div><strong>👤 Attendee:</strong> ${data.attendee} (${data.username})</div>
-                    <div><strong>🎓 College ID:</strong> ${data.college_id}</div>
-                    <div><strong>🗓️ Event:</strong> ${data.event_title}</div>
-                    ${data.team_name ? `<div><strong>👥 Team:</strong> ${data.team_name}</div>` : ''}
-                `;
+                    card.innerHTML = `
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-top: 6px; background: rgba(0,0,0,0.22); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
+                            <div>
+                                <strong style="color: var(--text-muted); font-size: 0.74rem; display: block; text-transform: uppercase;">Attendee Name</strong>
+                                <span style="font-weight: 700; color: #fff; font-size: 0.98rem;">👤 ${data.attendee}</span> 
+                                <span style="font-size: 0.78rem; color: var(--text-muted);">(${data.username})</span>
+                            </div>
+                            <div>
+                                <strong style="color: var(--text-muted); font-size: 0.74rem; display: block; text-transform: uppercase;">Ticket ID</strong>
+                                <span class="tkt-badge" style="font-size: 0.82rem; padding: 3px 8px;">🎟️ ${ticketId}</span>
+                            </div>
+                            <div>
+                                <strong style="color: var(--text-muted); font-size: 0.74rem; display: block; text-transform: uppercase;">Status</strong>
+                                <span class="verified-pill warning"><span class="dot"></span> Already Admitted</span>
+                            </div>
+                            <div>
+                                <strong style="color: var(--text-muted); font-size: 0.74rem; display: block; text-transform: uppercase;">Event</strong>
+                                <span style="color: #fff; font-weight: 600;">🗓️ ${data.event_title}</span>
+                            </div>
+                            <div>
+                                <strong style="color: var(--text-muted); font-size: 0.74rem; display: block; text-transform: uppercase;">College ID</strong>
+                                <span style="color: #fff;">🎓 ${data.college_id}</span>
+                            </div>
+                            <div>
+                                <strong style="color: var(--text-muted); font-size: 0.74rem; display: block; text-transform: uppercase;">Check-in Timestamp</strong>
+                                <span style="color: #fff;">🕒 ${data.checkin_time || 'Earlier'}</span>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // STEP 1: AWAITING VOLUNTEER APPROVAL
+                    pendingApprovalData = data;
+                    playBeep('preview');
+                    box.classList.add('status-preview');
+                    icon.textContent = '🛡️';
+                    title.textContent = 'Step 1: Verify Attendee Details';
+                    msg.textContent = `Match the credentials below before approving gate admission.`;
+
+                    card.innerHTML = `
+                        <!-- Step Progress Banner -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0, 242, 254, 0.12); border: 1px solid var(--primary); padding: 8px 12px; border-radius: 10px; margin-bottom: 12px; flex-wrap: wrap; gap: 6px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="background: var(--primary); color: #0f172a; font-size: 0.74rem; font-weight: 800; padding: 2px 7px; border-radius: 4px; text-transform: uppercase;">Step 1 of 2</span>
+                                <strong style="color: #ffffff; font-size: 0.88rem;">Identity & Registration Check</strong>
+                            </div>
+                            <span class="verified-pill pending"><span class="dot"></span> Awaiting Gate Approval</span>
+                        </div>
+
+                        <!-- Attendee Profile Spotlight -->
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; background: rgba(0,0,0,0.25); padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+                            <div style="grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                                <div class="feed-avatar" style="width: 44px; height: 44px; font-size: 1.2rem;">${data.attendee.trim().charAt(0).toUpperCase()}</div>
+                                <div>
+                                    <div style="font-size: 1.15rem; font-weight: 800; color: #ffffff;">${data.attendee}</div>
+                                    <div style="color: var(--text-muted); font-size: 0.8rem;">@${data.username} &bull; ${data.email || ''}</div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <strong style="color: var(--text-muted); font-size: 0.74rem; display: block; text-transform: uppercase;">🎓 Student ID / USN</strong>
+                                <span style="font-weight: 800; color: #00f2fe; font-size: 1rem;">${data.college_id}</span>
+                            </div>
+
+                            <div>
+                                <strong style="color: var(--text-muted); font-size: 0.74rem; display: block; text-transform: uppercase;">🎟️ Ticket Code</strong>
+                                <span class="tkt-badge" style="font-size: 0.85rem; padding: 3px 8px;">${ticketId}</span>
+                            </div>
+
+                            <div>
+                                <strong style="color: var(--text-muted); font-size: 0.74rem; display: block; text-transform: uppercase;">🗓️ Event</strong>
+                                <span style="color: #ffffff; font-weight: 700;">${data.event_title}</span>
+                            </div>
+
+                            <div>
+                                <strong style="color: var(--text-muted); font-size: 0.74rem; display: block; text-transform: uppercase;">📅 Event Date / Venue</strong>
+                                <span style="color: #cbd5e1;">${data.event_date || 'Today'} (${data.venue || 'Auditorium'})</span>
+                            </div>
+
+                            ${data.team_name ? `<div style="grid-column: 1 / -1;"><strong style="color: var(--text-muted); font-size: 0.74rem; display: block; text-transform: uppercase;">👥 Registered Team</strong><span style="color: #00f2fe; font-weight: 700;">${data.team_name}</span></div>` : ''}
+                        </div>
+
+                        <!-- Step 2 Approval Action Bar -->
+                        <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.12); display: flex; flex-direction: column; gap: 10px;">
+                            <div style="font-size: 0.82rem; color: #cbd5e1; display: flex; align-items: center; gap: 6px;">
+                                <span>🔒</span>
+                                <span><strong>Step 2:</strong> Verify attendee's physical ID card. Clicking Approve will admit attendee and mark this event as <strong>Completed</strong>.</span>
+                            </div>
+                            
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <button id="approveGateBtn" onclick="confirmApproval()" class="register-btn-sm" style="flex: 1.5; min-width: 220px; background: #10b981; color: #0f172a; font-weight: 800; font-size: 0.95rem; padding: 0.75rem 1.4rem; border-radius: 10px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);">
+                                    ✓ Step 2: Approve & Admit (Enter ↵)
+                                </button>
+                                <button onclick="dismissStatus()" class="control-pill-btn" style="padding: 0.75rem 1.2rem; border-radius: 10px; font-weight: 700;">
+                                    ✕ Reject / Cancel (Esc)
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
             } else {
+                pendingApprovalData = null;
+                sessionStats.invalid++;
                 playBeep('error');
                 box.classList.add('status-error');
+
                 if (data.is_cancelled) {
                     icon.textContent = '🚫';
                     title.textContent = 'TICKET REVOKED / UNREGISTERED';
                     msg.textContent = data.error || 'Attendee unregistered from this event. Admission strictly denied.';
                     card.innerHTML = `
-                        <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 8px; padding: 10px; margin-top: 8px; text-align: left;">
-                            <div style="color: #fca5a5; font-weight: 800; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 4px;">⛔ Pass Status: Revoked & Void</div>
-                            <div><strong>👤 Attendee:</strong> ${data.attendee || 'Unknown'} (${data.username || ''})</div>
-                            <div><strong>🎓 College ID:</strong> ${data.college_id || 'N/A'}</div>
-                            <div><strong>🗓️ Event:</strong> ${data.event_title || 'N/A'}</div>
-                            <div><strong>🕒 Unregistered:</strong> ${data.cancelled_at || 'Recorded in system'}</div>
+                        <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 8px; padding: 12px; margin-top: 8px; text-align: left;">
+                            <div style="color: #fca5a5; font-weight: 800; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 6px;">⛔ Pass Status: Revoked & Void</div>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px;">
+                                <div><strong>👤 Attendee:</strong> ${data.attendee || 'Unknown'} (${data.username || ''})</div>
+                                <div><strong>🎓 College ID:</strong> ${data.college_id || 'N/A'}</div>
+                                <div><strong>🗓️ Event:</strong> ${data.event_title || 'N/A'}</div>
+                                <div><strong>🕒 Unregistered:</strong> ${data.cancelled_at || 'Recorded in system'}</div>
+                            </div>
                         </div>
                     `;
                 } else {
@@ -262,23 +852,181 @@
                     card.innerHTML = '';
                 }
             }
+            updateStatsUI();
+        }
+
+        // STEP 2: Volunteer Confirms and Approves Admission
+        async function confirmApproval() {
+            if (!pendingApprovalData) return;
+            const btn = document.getElementById('approveGateBtn');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '⏳ Approving Admission...';
+            }
+
+            try {
+                const resp = await fetch('/api/approve_ticket', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reg_id: pendingApprovalData.reg_id })
+                });
+                const data = await resp.json();
+
+                if (data.ok) {
+                    sessionStats.verified++;
+                    updateStatsUI();
+                    playBeep('success');
+
+                    const box = document.getElementById('statusBox');
+                    box.className = 'status-box status-success';
+                    document.getElementById('statusIcon').textContent = '✓';
+                    document.getElementById('statusTitle').textContent = '🎉 Admission Approved & Event Completed!';
+                    document.getElementById('statusMsg').textContent = `Pass verified for ${data.attendee}. Registration marked as Completed.`;
+
+                    document.getElementById('attendeeCard').innerHTML = `
+                        <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; border-radius: 12px; padding: 14px; margin-top: 6px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;">
+                                <div style="font-weight: 800; font-size: 1.1rem; color: #ecfdf5;">👤 ${data.attendee}</div>
+                                <span class="verified-pill success"><span class="dot"></span> Verified & Completed</span>
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; font-size: 0.85rem; color: #ecfdf5;">
+                                <div><strong>Ticket ID:</strong> ${data.ticket_id}</div>
+                                <div><strong>College ID:</strong> ${data.college_id}</div>
+                                <div><strong>Event:</strong> ${data.event_title}</div>
+                                <div><strong>Check-in Time:</strong> ${data.checkin_time}</div>
+                            </div>
+                            <div style="margin-top: 10px; font-size: 0.8rem; color: #a7f3d0;">
+                                ✓ Event completed status locked in database. Attendee certificate is now unlocked.
+                            </div>
+                        </div>
+                    `;
+
+                    addToFeed(data);
+                    pendingApprovalData = null;
+
+                    // Auto-resume scanner after brief delay if camera was active
+                    if (isScanning && html5QrcodeScanner) {
+                        setTimeout(() => {
+                            try { html5QrcodeScanner.resume(); } catch(e){}
+                        }, 2000);
+                    }
+                } else {
+                    playBeep('error');
+                    if (window.showToast) showToast(data.error || 'Approval failed.', 'error');
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '✓ Step 2: Approve & Admit (Enter ↵)';
+                    }
+                }
+            } catch (err) {
+                playBeep('error');
+                if (window.showToast) showToast('Network error approving ticket.', 'error');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '✓ Step 2: Approve & Admit (Enter ↵)';
+                }
+            }
+        }
+
+        function dismissStatus() {
+            pendingApprovalData = null;
+            const box = document.getElementById('statusBox');
+            if (box) box.style.display = 'none';
+
+            // If camera is waiting, resume scanning
+            if (isScanning && html5QrcodeScanner) {
+                try { html5QrcodeScanner.resume(); } catch(e){}
+            }
+        }
+
+        function fillSample(val) {
+            const input = document.getElementById('manualInput');
+            if (input) {
+                input.value = val;
+                input.focus();
+            }
+        }
+
+        async function pasteClipboard() {
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text) {
+                    fillSample(text.trim());
+                    if (window.showToast) showToast('Pasted ticket code from clipboard', 'info');
+                }
+            } catch (e) {
+                if (window.showToast) showToast('Clipboard access was blocked by browser permissions', 'warning');
+            }
         }
 
         function addToFeed(item) {
-            sessionCheckins.unshift(item);
-            document.getElementById('checkinCounter').textContent = sessionCheckins.length;
+            const ticketId = item.ticket_id || (item.event_id ? `TKT-${String(item.event_id).padStart(3, '0')}-${String(item.reg_id || item.id).padStart(5, '0')}` : `TKT-#${item.reg_id || item.id}`);
+            const formattedItem = {
+                id: item.reg_id || item.id,
+                reg_id: item.reg_id || item.id,
+                ticket_id: ticketId,
+                attendee: item.attendee || item.full_name || item.username,
+                username: item.username || '',
+                college_id: item.college_id || 'N/A',
+                event_title: item.event_title || '',
+                checkin_time: item.checkin_time || 'Just now',
+                already_checked_in: !!item.already_checked_in
+            };
+
+            sessionCheckins = sessionCheckins.filter(c => c.ticket_id !== formattedItem.ticket_id && c.id !== formattedItem.id);
+            sessionCheckins.unshift(formattedItem);
+            renderFeed(formattedItem.ticket_id);
+        }
+
+        function renderFeed(highlightTicketId = null) {
+            const counter = document.getElementById('checkinCounter');
+            if (counter) counter.textContent = sessionCheckins.length;
+            
             const feed = document.getElementById('checkinFeed');
-            feed.innerHTML = sessionCheckins.map(c => `
-                <div class="feed-item">
-                    <div>
-                        <strong style="color: white;">${c.attendee}</strong>
-                        <div style="color: var(--text-muted); font-size: 0.78rem;">${c.event_title} • ${c.college_id}</div>
+            if (!feed) return;
+
+            if (sessionCheckins.length === 0) {
+                feed.innerHTML = `
+                    <div style="text-align: center; color: var(--text-muted); padding: 2.5rem 1rem; font-size: 0.9rem;">
+                        No check-ins recorded yet in this session.
                     </div>
-                    <span style="background: rgba(16,185,129,0.2); color: #10b981; font-weight: 700; font-size: 0.75rem; padding: 3px 8px; border-radius: 4px;">
-                        ${c.checkin_time || 'Just now'}
-                    </span>
-                </div>
-            `).join('');
+                `;
+                return;
+            }
+
+            feed.innerHTML = sessionCheckins.map(c => {
+                const isHighlighted = highlightTicketId && c.ticket_id === highlightTicketId;
+                const nameStr = c.attendee || c.username || 'Attendee';
+                const initial = nameStr.trim().charAt(0).toUpperCase();
+                return `
+                    <div class="feed-item ${isHighlighted ? 'new-scan' : ''}">
+                        <div style="display: flex; align-items: center; gap: 12px; flex-1; min-width: 0;">
+                            <div class="feed-avatar">${initial}</div>
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                    <span style="font-weight: 700; color: #ffffff; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px;" title="${nameStr}">
+                                        ${nameStr}
+                                    </span>
+                                    <span class="tkt-badge">${c.ticket_id}</span>
+                                </div>
+                                <div style="color: var(--text-muted); font-size: 0.78rem; margin-top: 3px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                                    <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px;">🗓️ ${c.event_title}</span>
+                                    ${c.college_id && c.college_id !== 'N/A' ? `<span>• 🎓 ${c.college_id}</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <div style="text-align: right; flex-shrink: 0; margin-left: 8px;">
+                            <span class="verified-pill ${c.already_checked_in ? 'warning' : 'success'}">
+                                <span class="dot"></span>
+                                ${c.already_checked_in ? 'Already Verified' : 'Completed'}
+                            </span>
+                            <div style="color: var(--text-muted); font-size: 0.72rem; margin-top: 4px;">
+                                🕒 ${c.checkin_time || 'Just now'}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
         function handleManualVerify(e) {
@@ -291,8 +1039,16 @@
             }
         }
 
+        // Camera Live Scanning
         function startScanner() {
             if (isScanning) return;
+            const standby = document.getElementById('standbyViewfinder');
+            const reader = document.getElementById('reader');
+            const badge = document.getElementById('camStatusBadge');
+
+            reader.style.display = 'block';
+            standby.style.display = 'none';
+
             html5QrcodeScanner = new Html5Qrcode("reader");
             const config = { fps: 10, qrbox: { width: 250, height: 250 } };
 
@@ -300,20 +1056,25 @@
                 { facingMode: "environment" },
                 config,
                 (decodedText) => {
+                    // Pause scanner while volunteer verifies Step 1 & Step 2
+                    try { html5QrcodeScanner.pause(true); } catch(e){}
                     verifyTicketPayload(decodedText);
-                    // Pause briefly to avoid rapid duplicate triggers
-                    html5QrcodeScanner.pause(true);
-                    setTimeout(() => {
-                        try { html5QrcodeScanner.resume(); } catch(e){}
-                    }, 2500);
                 },
                 (errorMessage) => {}
             ).then(() => {
                 isScanning = true;
                 document.getElementById('startCamBtn').style.display = 'none';
                 document.getElementById('stopCamBtn').style.display = 'inline-block';
+                if (badge) {
+                    badge.style.color = '#10b981';
+                    badge.style.background = 'rgba(16,185,129,0.15)';
+                    badge.style.borderColor = 'rgba(16,185,129,0.3)';
+                    badge.innerHTML = '<span style="width: 6px; height: 6px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981;"></span> Live';
+                }
             }).catch(err => {
-                if (window.showToast) showToast('Could not access camera. Please allow camera permissions or use manual entry.', 'error');
+                reader.style.display = 'none';
+                standby.style.display = 'flex';
+                if (window.showToast) showToast('Could not access camera. Please check camera permissions or use manual entry / file upload.', 'error');
             });
         }
 
@@ -323,10 +1084,91 @@
                     isScanning = false;
                     document.getElementById('startCamBtn').style.display = 'inline-block';
                     document.getElementById('stopCamBtn').style.display = 'none';
+                    document.getElementById('reader').style.display = 'none';
                     document.getElementById('reader').innerHTML = '';
+                    document.getElementById('standbyViewfinder').style.display = 'flex';
+                    
+                    const badge = document.getElementById('camStatusBadge');
+                    if (badge) {
+                        badge.style.color = '#94a3b8';
+                        badge.style.background = 'rgba(148,163,184,0.15)';
+                        badge.style.borderColor = 'rgba(148,163,184,0.3)';
+                        badge.innerHTML = '<span style="width: 6px; height: 6px; border-radius: 50%; background: #94a3b8;"></span> Standby';
+                    }
                 });
             }
         }
+
+        // File / Drag & Drop QR Decoding
+        async function processQRImageFile(file) {
+            if (!file) return;
+            if (!file.type.startsWith('image/')) {
+                if (window.showToast) showToast('Please select an image file (PNG, JPG, etc.)', 'warning');
+                return;
+            }
+            try {
+                if (window.showToast) showToast('Decoding QR from image...', 'info');
+                const html5Qr = new Html5Qrcode("fileReaderTemp");
+                const decodedText = await html5Qr.scanFile(file, true);
+                if (decodedText) {
+                    verifyTicketPayload(decodedText);
+                    if (window.showToast) showToast('QR Pass successfully decoded!', 'success');
+                }
+            } catch (err) {
+                if (window.showToast) {
+                    showToast('No valid QR code found in selected image. Please check image clarity.', 'error');
+                } else {
+                    alert('No QR code detected in the selected image.');
+                }
+            }
+        }
+
+        function handleFileInput(e) {
+            const file = e.target.files && e.target.files[0];
+            if (file) {
+                processQRImageFile(file);
+                e.target.value = '';
+            }
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            document.getElementById('scannerViewport').classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            document.getElementById('scannerViewport').classList.remove('drag-over');
+        }
+
+        function handleFileDrop(e) {
+            e.preventDefault();
+            document.getElementById('scannerViewport').classList.remove('drag-over');
+            if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+                processQRImageFile(e.dataTransfer.files[0]);
+            }
+        }
+
+        // Keyboard Shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                dismissStatus();
+            } else if (e.key === 'Enter' && pendingApprovalData) {
+                // If active element is not the manual input textfield, enter confirms approval
+                if (document.activeElement !== document.getElementById('manualInput')) {
+                    e.preventDefault();
+                    confirmApproval();
+                }
+            } else if (e.altKey && (e.key === 'c' || e.key === 'C')) {
+                if (isScanning) stopScanner();
+                else startScanner();
+            }
+        });
+
+        // Initialize and load recent check-ins on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadRecentCheckins();
+        });
     </script>
     <script src="{{ url_for('static', filename='animations.js') }}"></script>
 </body>

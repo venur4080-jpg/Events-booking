@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Event Passport & XP | EVENTS</title>
+    <meta name="description" content="Your Official EVENTS Digital Passport, Attendance Stamps & Gamification Achievements">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=6.0">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800;900&family=Inter:wght@400;500;600;700&family=Cinzel:wght@700;800&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='themes.js') }}?v=6.0"></script>
+    <style>
+        .passport-container {
+            max-width: 1100px;
+            margin: 2rem auto 5rem;
+            padding: 0 1.5rem;
+            box-sizing: border-box;
+        }
+
+        .passport-hero {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.85) 100%);
+            border: 1.5px solid rgba(245, 158, 11, 0.35);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(245, 158, 11, 0.15);
+            margin-bottom: 2.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .passport-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #f59e0b, #ec4899, #00f2fe, #10b981);
+        }
+
+        .passport-emblem {
+            font-family: 'Cinzel', serif;
+            color: #f59e0b;
+            font-size: 0.88rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .passport-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin: 0 0 1rem 0;
+        }
+
+        /* XP & Level Bar */
+        .xp-level-card {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .xp-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .xp-rank-badge {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #0f172a;
+            font-weight: 800;
+            font-size: 0.82rem;
+            padding: 4px 12px;
+            border-radius: 50px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .xp-progress-track {
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .xp-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00f2fe, #f59e0b);
+            border-radius: 10px;
+            transition: width 1s ease-out;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.6);
+        }
+
+        /* Passport Stamp Booklet Grid */
+        .stamps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .passport-stamp-card {
+            background: rgba(15, 23, 42, 0.8);
+            border: 2px dashed rgba(0, 242, 254, 0.3);
+            border-radius: 20px;
+            padding: 1.8rem;
+            position: relative;
+            backdrop-filter: blur(14px);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 200px;
+        }
+
+        .passport-stamp-card:hover {
+            transform: translateY(-5px) rotate(1deg);
+            border-color: var(--primary);
+            box-shadow: 0 15px 35px rgba(0, 242, 254, 0.25);
+        }
+
+        .passport-stamp-card.verified-stamp {
+            border-color: #10b981;
+            background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(16, 185, 129, 0.08));
+        }
+
+        .stamp-seal {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            border: 2px solid #10b981;
+            color: #10b981;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transform: rotate(-15deg);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+            margin-bottom: 1rem;
+        }
+
+        .stamp-seal span {
+            font-size: 1.2rem;
+            margin-bottom: 2px;
+        }
+
+        /* Achievements Section */
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.2rem;
+            margin-top: 1.5rem;
+        }
+
+        .badge-box {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.4rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .badge-box.unlocked {
+            border-color: rgba(245, 158, 11, 0.5);
+            background: rgba(245, 158, 11, 0.06);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.15);
+        }
+
+        .badge-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .passport-container {
+                padding: 0 1rem !important;
+                margin: 1.5rem auto 3rem !important;
+            }
+            .passport-hero {
+                padding: 1.5rem 1.2rem !important;
+                border-radius: 18px !important;
+            }
+            .passport-title {
+                font-size: 1.6rem !important;
+            }
+            .xp-level-card {
+                padding: 1.1rem !important;
+            }
+            .xp-header {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 10px !important;
+            }
+            .stamps-grid {
+                grid-template-columns: 1fr !important;
+                gap: 1rem !important;
+            }
+            .badges-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 0.8rem !important;
+            }
+        }
+        @media (max-width: 480px) {
+            .badges-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navigation Bar -->
+<nav class="navbar">
+    <div class="nav-container">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <a href="{{ url_for('dashboard') }}" class="logo" style="display: flex; align-items: center; gap: 8px;">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" style="height: 35px; border-radius: 8px;">
+                <div>EV<span>ENTS</span></div>
+            </a>
+        </div>
+        <div class="nav-links" style="display: flex; align-items: center; gap: 12px;">
+            <a href="{{ url_for('dashboard') }}" class="nav-btn-dash">🏠 Dashboard</a>
+            <a href="{{ url_for('history') }}" class="nav-btn-dash">📋 Bookings</a>
+            <a href="{{ url_for('profile') }}" class="nav-btn-dash">👤 Profile</a>
+            <a href="{{ url_for('logout') }}" class="logout-btn-unique">⏻ Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="passport-container">
+    <!-- Hero Passport Card -->
+    <div class="passport-hero">
+        <div class="passport-emblem">
+            <span>🛡️</span> Republic of Innovators • Official Citizen Passport
+        </div>
+        <h1 class="passport-title">{{ full_name or username }}'s Event Passport</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin: 0; max-width: 650px; line-height: 1.6;">
+            Every event you attend earns you verified digital admission visas, unlocks exclusive achievement badges, and builds your permanent technical pedigree.
+        </p>
+
+        <!-- XP & Level Stats -->
+        <div class="xp-level-card">
+            <div class="xp-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 1.5rem;">⚡</span>
+                    <div>
+                        <div style="font-weight: 800; font-size: 1.1rem; color: #ffffff;">Level {{ user_level }} • {{ user_rank_title }}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">{{ user_xp }} Total XP Earned</div>
+                    </div>
+                </div>
+                <div class="xp-rank-badge">🏆 {{ user_rank_title }}</div>
+            </div>
+            <div class="xp-progress-track">
+                <div class="xp-progress-fill" {{ ('style="width: ' ~ xp_percentage ~ '%;"') | safe }}></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 0.75rem; color: #94a3b8;">
+                <span>{{ user_xp }} XP</span>
+                <span>Next Rank: {{ next_level_xp }} XP</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Verified Visa Stamps Section -->
+    <div style="margin-bottom: 3.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div>
+                <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.6rem; color: #ffffff; margin: 0 0 4px 0;">
+                    🛂 Verified Attendance Visas
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0;">Official stamped records for completed check-ins</p>
+            </div>
+            <span style="background: rgba(0, 242, 254, 0.15); color: var(--primary); font-weight: 700; padding: 4px 12px; border-radius: 50px; font-size: 0.85rem;">
+                {{ stamps|length }} Visas Stamped
+            </span>
+        </div>
+
+        {% if stamps %}
+        <div class="stamps-grid">
+            {% for stamp in stamps %}
+            <div class="passport-stamp-card verified-stamp">
+                <div>
+                    <div class="stamp-seal">
+                        <span>✓</span>
+                        ADMITTED
+                    </div>
+                    <h3 style="color: #ffffff; font-size: 1.15rem; font-weight: 700; margin: 0 0 6px 0;">{{ stamp.title }}</h3>
+                    <div style="font-size: 0.82rem; color: var(--primary); font-weight: 600; margin-bottom: 4px;">🏷️ {{ stamp.category }} Domain</div>
+                    <div style="font-size: 0.78rem; color: #94a3b8;">📅 Stamped on {{ stamp.date }}</div>
+                </div>
+                <div style="margin-top: 1.2rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 0.8rem;">
+                    <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #10b981;">TKT-{{ stamp.id }}</span>
+                    <a href="{{ url_for('view_ticket_interactive', event_id=stamp.id) }}" class="btn-domain-link" style="font-size: 0.75rem; padding: 4px 10px;">View E-Pass ➔</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 3rem 1.5rem; background: rgba(15, 23, 42, 0.5); border-radius: 20px; border: 1px dashed rgba(255,255,255,0.15); margin-top: 1.5rem;">
+            <div style="font-size: 3rem; margin-bottom: 0.8rem;">🎟️</div>
+            <h3 style="color: #ffffff; margin-bottom: 0.5rem;">No Visas Stamped Yet</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 480px; margin: 0 auto 1.5rem auto;">
+                Register for events on the dashboard and complete your QR check-in at the venue gate to earn your first digital visa stamp!
+            </p>
+            <a href="{{ url_for('dashboard') }}" class="btn-primary" style="display: inline-flex; width: auto; padding: 0.7rem 1.5rem; text-decoration: none; border-radius: 10px;">
+                🚀 Discover Events
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Achievement Badges Showcase -->
+    <div>
+        <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.6rem; color: #ffffff; margin: 0 0 4px 0;">
+            🏅 Technical Achievements & Badges
+        </h2>
+        <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0 0 1.5rem 0;">Milestone badges unlocked through community participation</p>
+
+        <div class="badges-grid">
+            <div class="badge-box {% if user_xp >= 100 %}unlocked{% endif %}">
+                <div class="badge-icon">🚀</div>
+                <div style="font-weight: 700; font-size: 0.95rem; color: #ffffff; margin-bottom: 3px;">First Flight</div>
+                <div style="font-size: 0.76rem; color: var(--text-muted);">Joined EVENTS & registered for first event</div>
+            </div>
+
+            <div class="badge-box {% if stamps|length >= 1 %}unlocked{% endif %}">
+                <div class="badge-icon">🛡️</div>
+                <div style="font-weight: 700; font-size: 0.95rem; color: #ffffff; margin-bottom: 3px;">Gate Verified</div>
+                <div style="font-size: 0.76rem; color: var(--text-muted);">Completed optical QR check-in at venue</div>
+            </div>
+
+            <div class="badge-box {% if stamps|length >= 3 %}unlocked{% endif %}">
+                <div class="badge-icon">💻</div>
+                <div style="font-weight: 700; font-size: 0.95rem; color: #ffffff; margin-bottom: 3px;">Hackathon Veteran</div>
+                <div style="font-size: 0.76rem; color: var(--text-muted);">Attended 3+ premier innovation summits</div>
+            </div>
+
+            <div class="badge-box {% if user_xp >= 300 %}unlocked{% endif %}">
+                <div class="badge-icon">🌟</div>
+                <div style="font-weight: 700; font-size: 0.95rem; color: #ffffff; margin-bottom: 3px;">Top Reviewer</div>
+                <div style="font-size: 0.76rem; color: var(--text-muted);">Shared constructive event feedback</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

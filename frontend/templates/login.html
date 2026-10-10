@@ -43,6 +43,16 @@
             .grid-3, .grid-2 {
                 grid-template-columns: 1fr;
             }
+            .login-container {
+                padding: 1.5rem 0.8rem !important;
+            }
+            .login-card {
+                padding: 1.6rem 1.1rem !important;
+                border-radius: 16px !important;
+            }
+            .register-container-card {
+                padding: 1.5rem 1rem !important;
+            }
         }
 
         .login-card, .login-card * {
@@ -132,6 +142,43 @@
             -webkit-text-fill-color: #ffffff !important;
             color: #ffffff !important;
         }
+        .login-feedback-banner {
+            padding: 12px 14px;
+            border-radius: 10px;
+            margin: 1.2rem 0;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            text-align: left;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .login-feedback-banner.success {
+            background: rgba(16, 185, 129, 0.14);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #34d399;
+        }
+        .login-feedback-banner.error {
+            background: rgba(239, 68, 68, 0.14);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #f87171;
+        }
+        .login-feedback-banner.info {
+            background: rgba(0, 242, 254, 0.14);
+            border: 1px solid rgba(0, 242, 254, 0.4);
+            color: #38bdf8;
+        }
+        .login-feedback-banner.warning {
+            background: rgba(245, 158, 11, 0.14);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            color: #fde68a;
+        }
+        .login-feedback-banner.deletion {
+            background: linear-gradient(135deg, rgba(244, 63, 94, 0.14) 0%, rgba(245, 158, 11, 0.12) 100%);
+            border: 1px solid rgba(244, 63, 94, 0.45);
+            color: #fecdd3;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
     </style>
 </head>
 
@@ -195,7 +242,7 @@
                 {% with flashed = get_flashed_messages(with_categories=true) %}
                 {% if flashed %}
                     {% for category, fmsg in flashed %}
-                    <div class="login-feedback-banner {{ category }}" style="background: {% if category == 'success' %}rgba(16, 185, 129, 0.14){% elif category == 'error' %}rgba(239, 68, 68, 0.14){% else %}rgba(0, 242, 254, 0.14){% endif %}; border: 1px solid {% if category == 'success' %}rgba(16, 185, 129, 0.4){% elif category == 'error' %}rgba(239, 68, 68, 0.4){% else %}rgba(0, 242, 254, 0.4){% endif %}; color: {% if category == 'success' %}#34d399{% elif category == 'error' %}#f87171{% else %}#38bdf8{% endif %}; padding: 12px 14px; border-radius: 10px; margin: 1.2rem 0; font-size: 0.88rem; line-height: 1.5; text-align: left; display: flex; align-items: flex-start; gap: 8px;">
+                    <div class="login-feedback-banner {{ category }}">
                         <span style="font-size: 1.1rem; line-height: 1;">{% if category == 'success' %}✨{% elif category == 'error' %}❌{% else %}ℹ️{% endif %}</span>
                         <div>{{ fmsg }}</div>
                     </div>
@@ -204,14 +251,14 @@
                 {% endwith %}
 
                 {% if error %}
-                <div class="login-feedback-banner error" style="background: rgba(239, 68, 68, 0.14); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; padding: 12px 14px; border-radius: 10px; margin: 1.2rem 0; font-size: 0.88rem; line-height: 1.5; text-align: left; display: flex; align-items: flex-start; gap: 8px;">
+                <div class="login-feedback-banner error">
                     <span style="font-size: 1.1rem; line-height: 1;">❌</span>
                     <div>{{ error }}</div>
                 </div>
                 {% endif %}
 
                 {% if msg %}
-                <div class="login-feedback-banner msg" style="background: {% if 'Scheduled for Deletion' in msg %}linear-gradient(135deg, rgba(244, 63, 94, 0.14) 0%, rgba(245, 158, 11, 0.12) 100%){% elif 'deactivated' in msg %}rgba(245, 158, 11, 0.14){% else %}rgba(16, 185, 129, 0.14){% endif %}; border: 1px solid {% if 'Scheduled for Deletion' in msg %}rgba(244, 63, 94, 0.45){% elif 'deactivated' in msg %}rgba(245, 158, 11, 0.4){% else %}rgba(16, 185, 129, 0.4){% endif %}; color: {% if 'Scheduled for Deletion' in msg %}#fecdd3{% elif 'deactivated' in msg %}#fde68a{% else %}#a7f3d0{% endif %}; padding: 14px 16px; border-radius: 12px; margin: 1.2rem 0; font-size: 0.88rem; line-height: 1.6; text-align: left; display: flex; align-items: flex-start; gap: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+                <div class="login-feedback-banner {% if 'Scheduled for Deletion' in msg %}deletion{% elif 'deactivated' in msg %}warning{% else %}success{% endif %}">
                     <span style="font-size: 1.25rem; line-height: 1; flex-shrink: 0;">{% if 'Scheduled for Deletion' in msg %}⏳{% elif 'deactivated' in msg %}⏸️{% else %}✨{% endif %}</span>
                     <div>{{ msg }}</div>
                 </div>
@@ -465,6 +512,7 @@
             return true;
         }
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/motion@latest/dist/motion.js"></script>
     <script src="{{ url_for('static', filename='animations.js') }}"></script>
 </body>
 

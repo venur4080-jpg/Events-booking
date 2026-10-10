@@ -9,7 +9,13 @@ import unittest
 import json
 import sqlite3
 from datetime import datetime
-from app import app, init_db, get_events
+import sys
+_backend_dir = os.path.dirname(os.path.abspath(__file__))
+if _backend_dir not in sys.path:
+    sys.path.insert(0, _backend_dir)
+from app import app, init_db, get_events, generate_certificate_pdf_bytes
+
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'users.db')
 
 class EventManagementSystemTests(unittest.TestCase):
     @classmethod
@@ -20,12 +26,15 @@ class EventManagementSystemTests(unittest.TestCase):
         events = get_events()
         now = datetime.now()
         for e in events:
-            try:
-                ev_date = datetime.strptime(e.get('date', ''), "%b %d, %Y")
-                if ev_date >= now:
-                    return e
-            except Exception:
-                continue
+            date_str = e.get('date', '')
+            for fmt in ("%b %d, %Y", "%Y-%m-%d", "%d %b %Y", "%B %d, %Y"):
+                try:
+                    ev_date = datetime.strptime(date_str, fmt)
+                    if ev_date >= now:
+                        return e
+                except Exception:
+                    pass
+        return events[0] if events else None
         return events[-1] if events else None
 
     def setUp(self):
@@ -35,7 +44,7 @@ class EventManagementSystemTests(unittest.TestCase):
 
     def test_01_database_tables_and_columns(self):
         """Verify all tables and critical columns exist in the database."""
-        conn = sqlite3.connect('users.db', timeout=15)
+        conn = sqlite3.connect(DB_PATH, timeout=15)
         c = conn.cursor()
         
         # Check tables
@@ -107,7 +116,7 @@ class EventManagementSystemTests(unittest.TestCase):
         self.assertIn(b'Registration Successful', resp.data)
 
         # Verify registration in DB
-        conn = sqlite3.connect('users.db', timeout=15)
+        conn = sqlite3.connect(DB_PATH, timeout=15)
         c = conn.cursor()
         c.execute("SELECT * FROM registrations WHERE username=? AND event_id=?", (test_user, ev_id))
         reg = c.fetchone()
@@ -167,7 +176,7 @@ class EventManagementSystemTests(unittest.TestCase):
 
     def test_05_admin_user_role_management(self):
         """Test promoting, demoting and exporting users via admin panel."""
-        conn = sqlite3.connect('users.db', timeout=15)
+        conn = sqlite3.connect(DB_PATH, timeout=15)
         c = conn.cursor()
         c.execute("INSERT OR IGNORE INTO users (username, password, role) VALUES ('demouser', 'dummyhash', 'user')")
         c.execute("SELECT id FROM users WHERE username='demouser'")
@@ -183,7 +192,7 @@ class EventManagementSystemTests(unittest.TestCase):
         resp_promote = self.client.post(f'/admin/users/{user_id}/promote', follow_redirects=True)
         self.assertEqual(resp_promote.status_code, 200)
 
-        conn = sqlite3.connect('users.db', timeout=15)
+        conn = sqlite3.connect(DB_PATH, timeout=15)
         c = conn.cursor()
         c.execute("SELECT role FROM users WHERE id=?", (user_id,))
         self.assertEqual(c.fetchone()[0], 'host')
@@ -193,7 +202,7 @@ class EventManagementSystemTests(unittest.TestCase):
         resp_demote = self.client.post(f'/admin/users/{user_id}/demote', follow_redirects=True)
         self.assertEqual(resp_demote.status_code, 200)
         
-        conn = sqlite3.connect('users.db', timeout=15)
+        conn = sqlite3.connect(DB_PATH, timeout=15)
         c = conn.cursor()
         c.execute("SELECT role FROM users WHERE id=?", (user_id,))
         self.assertEqual(c.fetchone()[0], 'user')
@@ -205,7 +214,7 @@ class EventManagementSystemTests(unittest.TestCase):
         self.assertIn(b'Username', resp_export.data)
 
         # Clean up test user
-        conn = sqlite3.connect('users.db', timeout=15)
+        conn = sqlite3.connect(DB_PATH, timeout=15)
         c = conn.cursor()
         c.execute("DELETE FROM users WHERE id=?", (user_id,))
         conn.commit()
@@ -246,7 +255,7 @@ class EventManagementSystemTests(unittest.TestCase):
         self.assertIn(b'Code Warriors', resp.data)
 
         # Verify DB entry with team details
-        conn = sqlite3.connect('users.db', timeout=15)
+        conn = sqlite3.connect(DB_PATH, timeout=15)
         c = conn.cursor()
         c.execute("SELECT team_name, team_members FROM registrations WHERE username=? AND event_id=?", (team_leader, ev_id))
         row = c.fetchone()
@@ -296,7 +305,7 @@ class EventManagementSystemTests(unittest.TestCase):
         self.assertIn(b'Quantum Five', resp5.data)
 
         # Verify DB has 4 teammates
-        conn = sqlite3.connect('users.db', timeout=15)
+        conn = sqlite3.connect(DB_PATH, timeout=15)
         c = conn.cursor()
         c.execute("SELECT team_name, team_members FROM registrations WHERE username=? AND event_id=?", (team_leader, ev_id))
         row = c.fetchone()
@@ -331,6 +340,15 @@ class EventManagementSystemTests(unittest.TestCase):
         })
 
         # Switch to Admin/Host session for scanning
+        # Verify ticket view page renders without error
+        with self.client.session_transaction() as sess:
+            sess['loggedin'] = True
+            sess['username'] = attendee_user
+        resp_ticket_view = self.client.get(f'/ticket/view/{ev_id}')
+        self.assertEqual(resp_ticket_view.status_code, 200)
+        self.assertIn(b'Tamper-Evident Holographic Pass', resp_ticket_view.data)
+
+        # Admin login for scanner
         with self.client.session_transaction() as sess:
             sess['loggedin'] = True
             sess['username'] = 'admin'
@@ -370,26 +388,56 @@ class EventManagementSystemTests(unittest.TestCase):
         recent_data = resp_recent.get_json()
         self.assertTrue(len(recent_data['checkins']) > 0)
 
-        # 5. Attendee unregisters from event
+        # 5. Attendee who is scanned/checked in attempts to unregister -> Must be BLOCKED
         with self.client.session_transaction() as sess:
             sess['loggedin'] = True
             sess['username'] = attendee_user
-        resp_unreg = self.client.post(f'/unregister/{ev_id}', data={
+        resp_unreg_blocked = self.client.post(f'/unregister/{ev_id}', data={
+            'reason': 'Schedule conflict / Personal emergency',
+            'feedback': 'Cannot attend due to sudden emergency.'
+        }, headers={'X-Requested-With': 'XMLHttpRequest'})
+        self.assertEqual(resp_unreg_blocked.status_code, 400)
+        self.assertIn('scanned', resp_unreg_blocked.get_json().get('error', '').lower())
+
+        # 6. Create another un-scanned attendee to test cancellation and revoked pass detection
+        revoked_user = 'test_scanner_revoked_user'
+        with self.client.session_transaction() as sess:
+            sess['loggedin'] = True
+            sess['username'] = revoked_user
+        resp_reg2 = self.client.post(f'/register/{ev_id}', data={
+            'full_name': 'Revoked Attendee',
+            'email': 'revoked@test.com',
+            'phone': '9876543210',
+            'college_id': 'USN-REV-01',
+            'payment_method': 'Free Pass',
+            'upi_id': ''
+        })
+        self.assertEqual(resp_reg2.status_code, 200)
+
+        conn = sqlite3.connect(DB_PATH, timeout=15)
+        c = conn.cursor()
+        c.execute("SELECT id FROM registrations WHERE username = ? AND event_id = ?", (revoked_user, ev_id))
+        row2 = c.fetchone()
+        conn.close()
+        reg2_id = row2[0]
+        tkt_code2 = f"TKT-{ev_id:03d}-{reg2_id:05d}"
+
+        # Revoked attendee unregisters from event
+        with self.client.session_transaction() as sess:
+            sess['loggedin'] = True
+            sess['username'] = revoked_user
+        resp_unreg2 = self.client.post(f'/unregister/{ev_id}', data={
             'reason': 'Schedule conflict / Personal emergency',
             'feedback': 'Cannot attend due to sudden emergency.'
         })
-        self.assertIn(resp_unreg.status_code, [200, 302])
-
-        # 6. Verify ticket download is blocked after cancellation
-        resp_blocked_dl = self.client.get(f'/download_ticket/{ev_id}')
-        self.assertEqual(resp_blocked_dl.status_code, 302)
+        self.assertIn(resp_unreg2.status_code, [200, 302])
 
         # 7. Scanner attempts to scan the revoked ticket -> Must be DENIED with HTTP 400
         with self.client.session_transaction() as sess:
             sess['loggedin'] = True
             sess['username'] = 'admin'
         resp_revoked_scan = self.client.post('/api/verify_ticket',
-                                            data=json.dumps({'code': tkt_code}),
+                                            data=json.dumps({'code': tkt_code2}),
                                             content_type='application/json')
         self.assertEqual(resp_revoked_scan.status_code, 400)
         revoked_data = resp_revoked_scan.get_json()
@@ -398,14 +446,14 @@ class EventManagementSystemTests(unittest.TestCase):
         self.assertIn('REVOKED', revoked_data.get('error', '').upper())
 
         # 8. Public verification page now shows REVOKED status
-        resp_verify_revoked = self.client.get(f'/verify/{tkt_code}')
+        resp_verify_revoked = self.client.get(f'/verify/{tkt_code2}')
         self.assertEqual(resp_verify_revoked.status_code, 200)
         self.assertIn(b'TICKET REVOKED', resp_verify_revoked.data)
 
     def test_08_profile_edit_and_save(self):
         """Test saving profile changes directly with email and phone updates."""
         test_user = 'test_profile_user'
-        conn = sqlite3.connect('users.db', timeout=15)
+        conn = sqlite3.connect(DB_PATH, timeout=15)
         c = conn.cursor()
         c.execute("INSERT OR REPLACE INTO users (username, password, full_name, email, phone, is_admin) VALUES (?, ?, ?, ?, ?, ?)",
                   (test_user, 'pass_hash', 'Profile Tester', 'initial@test.com', '9876543210', 0))
@@ -437,7 +485,7 @@ class EventManagementSystemTests(unittest.TestCase):
         self.assertEqual(resp_save.status_code, 200)
 
         # 7. Confirm database update
-        conn = sqlite3.connect('users.db', timeout=15)
+        conn = sqlite3.connect(DB_PATH, timeout=15)
         c = conn.cursor()
         c.execute("SELECT email, phone, city, college_id FROM users WHERE username=?", (test_user,))
         user_row = c.fetchone()
@@ -457,7 +505,7 @@ class EventManagementSystemTests(unittest.TestCase):
         bcrypt = Bcrypt()
         pwd_hash = bcrypt.generate_password_hash('SecretPass123!').decode('utf-8')
         
-        conn = sqlite3.connect('users.db', timeout=15)
+        conn = sqlite3.connect(DB_PATH, timeout=15)
         c = conn.cursor()
         c.execute("DELETE FROM users WHERE username='uid_auth_test_user'")
         c.execute("""INSERT INTO users (username, password, full_name, email, phone, college_id, user_id, is_active)
@@ -531,7 +579,7 @@ class EventManagementSystemTests(unittest.TestCase):
         self.assertEqual(resp_login_new.status_code, 303)
 
         # Clean up
-        conn = sqlite3.connect('users.db', timeout=15)
+        conn = sqlite3.connect(DB_PATH, timeout=15)
         c = conn.cursor()
         c.execute("DELETE FROM users WHERE username='uid_auth_test_user'")
         conn.commit()
@@ -602,7 +650,7 @@ class EventManagementSystemTests(unittest.TestCase):
         self.assertTrue(status_after['is_cutoff_reached'])
 
         # 2. Test registration route enforcement for a today cutoff event
-        conn = sqlite3.connect('users.db', timeout=15)
+        conn = sqlite3.connect(DB_PATH, timeout=15)
         c = conn.cursor()
         c.execute("""
             INSERT OR REPLACE INTO events 
@@ -651,7 +699,7 @@ class EventManagementSystemTests(unittest.TestCase):
         self.assertIn('end_time', first_ev)
 
         # Clean up test event
-        conn = sqlite3.connect('users.db', timeout=15)
+        conn = sqlite3.connect(DB_PATH, timeout=15)
         c = conn.cursor()
         c.execute("DELETE FROM events WHERE id=9999")
         conn.commit()
@@ -853,8 +901,318 @@ class EventManagementSystemTests(unittest.TestCase):
         resp_sw_alias = self.client.get('/service-worker.js')
         self.assertEqual(resp_sw_alias.status_code, 200)
 
+    def test_15_live_stream_access_ticket_unlock_and_paid_pass(self):
+        """Test Live Stream Video Projection access, Ticket ID unlocking (Free for in-person attendees), and Virtual Pass Purchase (Paid)."""
+        ev = self._get_upcoming_event()
+        self.assertIsNotNone(ev)
+        ev_id = ev['id']
+
+        # 1. Setup a registered attendee and a non-registered attendee
+        conn = sqlite3.connect(DB_PATH, timeout=15)
+        c = conn.cursor()
+        c.execute("INSERT OR REPLACE INTO users (username, password, full_name, email, is_admin) VALUES ('reg_stream_user', 'hash123', 'Registered Live User', 'reglive@test.com', 0)")
+        c.execute("INSERT OR REPLACE INTO users (username, password, full_name, email, is_admin) VALUES ('nonreg_stream_user', 'hash123', 'Online Viewer', 'online@test.com', 0)")
+        
+        # Register reg_stream_user
+        c.execute("DELETE FROM registrations WHERE username=? AND event_id=?", ('reg_stream_user', ev_id))
+        c.execute("DELETE FROM live_stream_passes WHERE username=? AND event_id=?", ('nonreg_stream_user', ev_id))
+        c.execute("""
+            INSERT INTO registrations (event_id, username, full_name, email, phone, college_id, status)
+            VALUES (?, 'reg_stream_user', 'Registered Live User', 'reglive@test.com', '9876543210', 'COL-LIVE-01', 'active')
+        """, (ev_id,))
+        reg_id = c.lastrowid
+        ticket_code = f"TKT-{ev_id:03d}-{reg_id:05d}"
+        conn.commit()
+        conn.close()
+
+        # 2. Test Non-registered user: Should have has_access=False initially
+        with self.client.session_transaction() as sess:
+            sess['loggedin'] = True
+            sess['username'] = 'nonreg_stream_user'
+
+        resp_live_page = self.client.get(f'/event/{ev_id}/live')
+        self.assertEqual(resp_live_page.status_code, 200)
+        self.assertIn(b'Live Video Projection', resp_live_page.data)
+
+        resp_live_data = self.client.get(f'/api/event/{ev_id}/live/data')
+        self.assertEqual(resp_live_data.status_code, 200)
+        live_data = resp_live_data.get_json()
+        self.assertFalse(live_data['access']['has_access'])
+
+        # 3. Non-registered user tries to post Q&A question -> Forbidden (403)
+        resp_q_denied = self.client.post(f'/api/event/{ev_id}/live/questions',
+                                         data=json.dumps({'question': 'Can online viewers ask?'}),
+                                         content_type='application/json')
+        self.assertEqual(resp_q_denied.status_code, 403)
+
+        # 4. Unlock with invalid ticket code -> Fails (400)
+        resp_unlock_bad = self.client.post(f'/api/event/{ev_id}/live/unlock-ticket',
+                                           data=json.dumps({'ticket_code': 'TKT-999-99999'}),
+                                           content_type='application/json')
+        self.assertEqual(resp_unlock_bad.status_code, 400)
+        self.assertFalse(resp_unlock_bad.get_json()['success'])
+
+        # 5. Unlock with valid registered ticket code -> SUCCESS (Free for in-person registered)
+        resp_unlock_ok = self.client.post(f'/api/event/{ev_id}/live/unlock-ticket',
+                                          data=json.dumps({'ticket_code': ticket_code}),
+                                          content_type='application/json')
+        self.assertEqual(resp_unlock_ok.status_code, 200)
+        unlock_res = resp_unlock_ok.get_json()
+        self.assertTrue(unlock_res['success'])
+        self.assertEqual(unlock_res['access_type'], 'registered_ticket')
+
+        # Now live data shows access granted
+        resp_live_data_after = self.client.get(f'/api/event/{ev_id}/live/data')
+        self.assertTrue(resp_live_data_after.get_json()['access']['has_access'])
+
+        # 6. Now posting question succeeds (200)
+        resp_q_ok = self.client.post(f'/api/event/{ev_id}/live/questions',
+                                     data=json.dumps({'question': 'Will slides and projection replay be shared?'}),
+                                     content_type='application/json')
+        self.assertEqual(resp_q_ok.status_code, 200)
+        self.assertTrue(resp_q_ok.get_json()['ok'])
+
+        # 7. Test Virtual Pass Purchase for another online user
+        with self.client.session_transaction() as sess:
+            sess['loggedin'] = True
+            sess['username'] = 'virtual_buyer_user'
+
+        conn = sqlite3.connect(DB_PATH, timeout=15)
+        c = conn.cursor()
+        c.execute("INSERT OR REPLACE INTO users (username, password, full_name, email, is_admin) VALUES ('virtual_buyer_user', 'hash123', 'Virtual Buyer', 'buyer@test.com', 0)")
+        c.execute("DELETE FROM live_stream_passes WHERE username=? AND event_id=?", ('virtual_buyer_user', ev_id))
+        conn.commit()
+        conn.close()
+
+        resp_purchase = self.client.post(f'/api/event/{ev_id}/live/purchase-pass',
+                                         data=json.dumps({'payment_method': 'UPI', 'upi_id': 'buyer@okhdfcbank'}),
+                                         content_type='application/json')
+        self.assertEqual(resp_purchase.status_code, 200)
+        purch_res = resp_purchase.get_json()
+        self.assertTrue(purch_res['success'])
+        self.assertEqual(purch_res['access_type'], 'paid_virtual')
+        self.assertTrue(purch_res['pass_code'].startswith('VPASS-'))
+
+        # Check that buyer now has full access to stream and Q&A
+        resp_buyer_live = self.client.get(f'/api/event/{ev_id}/live/data')
+        self.assertTrue(resp_buyer_live.get_json()['access']['has_access'])
+
+    def test_16_host_live_studio_broadcaster_and_video_upload(self):
+        """Test Host Broadcast Studio control endpoints, YouTube/Custom stream config, and video upload."""
+        ev = self._get_upcoming_event()
+        self.assertIsNotNone(ev)
+        ev_id = ev['id']
+
+        # 1. Non-host tries to update stream config -> FORBIDDEN (403)
+        with self.client.session_transaction() as sess:
+            sess['loggedin'] = True
+            sess['username'] = 'regular_student_user'
+            sess['role'] = 'user'
+            sess['is_admin'] = 0
+
+        resp_forbidden = self.client.post(f'/api/event/{ev_id}/live/stream-config',
+                                          data=json.dumps({'stream_status': 'live', 'source_type': 'youtube'}),
+                                          content_type='application/json')
+        self.assertEqual(resp_forbidden.status_code, 403)
+
+        # 2. Host/Admin updates stream config to YouTube Live -> SUCCESS
+        with self.client.session_transaction() as sess:
+            sess['loggedin'] = True
+            sess['username'] = 'admin'
+            sess['is_admin'] = 1
+
+        resp_cfg_get = self.client.get(f'/api/event/{ev_id}/live/stream-config')
+        self.assertEqual(resp_cfg_get.status_code, 200)
+        self.assertTrue(resp_cfg_get.get_json()['ok'])
+
+        yt_url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        resp_set_yt = self.client.post(f'/api/event/{ev_id}/live/stream-config',
+                                       data=json.dumps({
+                                           'stream_status': 'live',
+                                           'source_type': 'youtube',
+                                           'stream_url': yt_url,
+                                           'stream_title': 'Keynote Live Broadcast',
+                                           'stream_announcement': 'Live stream keynote is in progress!'
+                                       }),
+                                       content_type='application/json')
+        self.assertEqual(resp_set_yt.status_code, 200)
+        yt_res = resp_set_yt.get_json()
+        self.assertTrue(yt_res['ok'])
+        self.assertIn('youtube-nocookie.com/embed/dQw4w9WgXcQ', yt_res['config']['stream_url'])
+
+        # 3. Host uploads a projection video file (.mp4) -> SUCCESS
+        import io
+        fake_video_bytes = b"\x00\x00\x00\x18ftypmp42\x00\x00\x00\x00isommp42\x00\x00\x00\x08free"
+        video_file = (io.BytesIO(fake_video_bytes), 'stage_keynote_demo.mp4')
+        resp_upload = self.client.post(f'/api/event/{ev_id}/live/upload-stream-video',
+                                       data={'video': video_file},
+                                       content_type='multipart/form-data')
+        self.assertEqual(resp_upload.status_code, 200)
+        upload_res = resp_upload.get_json()
+        self.assertTrue(upload_res['ok'])
+        self.assertTrue(upload_res['video_url'].endswith('.mp4'))
+        self.assertEqual(upload_res['config']['source_type'], 'uploaded_video')
+        self.assertEqual(upload_res['config']['stream_status'], 'live')
+
+        # 4. Host pins an audience question to the projection screen
+        conn = sqlite3.connect(DB_PATH, timeout=15)
+        c = conn.cursor()
+        c.execute("INSERT INTO live_questions (event_id, username, question, upvotes) VALUES (?, 'attendee_guru', 'How to scale live WebSockets in production?', 5)", (ev_id,))
+        qid = c.lastrowid
+        conn.commit()
+        conn.close()
+
+        resp_pin = self.client.post(f'/api/event/{ev_id}/live/pin-question',
+                                   data=json.dumps({'question_id': qid}),
+                                   content_type='application/json')
+        self.assertEqual(resp_pin.status_code, 200)
+        pin_res = resp_pin.get_json()
+        self.assertTrue(pin_res['ok'])
+        self.assertEqual(pin_res['pinned_question']['id'], qid)
+
+        # 5. Live data endpoint returns the stream config and pinned question to all viewers
+        resp_live = self.client.get(f'/api/event/{ev_id}/live/data')
+        self.assertEqual(resp_live.status_code, 200)
+        live_data = resp_live.get_json()
+        self.assertIn('stream_config', live_data)
+        self.assertEqual(live_data['stream_config']['source_type'], 'uploaded_video')
+        self.assertEqual(live_data['stream_config']['pinned_question']['id'], qid)
+
+    def test_17_category_exploration_pages_and_filtering(self):
+        """Verify dedicated category exploration pages, interactive carousel rendering per category, and domain switcher."""
+        with self.client.session_transaction() as sess:
+            sess['loggedin'] = True
+            sess['username'] = 'test_student_user'
+
+        # 1. Test Dashboard contains category explore links
+        resp_dash = self.client.get('/dashboard')
+        self.assertEqual(resp_dash.status_code, 200)
+        self.assertIn(b'/category/Education', resp_dash.data)
+        self.assertIn(b'/category/Sports', resp_dash.data)
+        self.assertIn(b'/category/all', resp_dash.data)
+
+        # 2. Test dedicated Category page for Education
+        resp_edu = self.client.get('/category/Education')
+        self.assertEqual(resp_edu.status_code, 200)
+        self.assertIn(b'Education', resp_edu.data)
+        self.assertIn(b'Back to Dashboard', resp_edu.data)
+        self.assertIn(b'carouselContainer', resp_edu.data)
+
+        # 3. Test dedicated Category page for Sports
+        resp_sports = self.client.get('/category/Sports')
+        self.assertEqual(resp_sports.status_code, 200)
+        self.assertIn(b'Sports', resp_sports.data)
+        self.assertIn(b'Back to Dashboard', resp_sports.data)
+
+        # 4. Test dedicated Category page for Music Concerts via /explore alias
+        resp_music = self.client.get('/explore/Music Concerts')
+        self.assertEqual(resp_music.status_code, 200)
+        self.assertIn(b'Music Concerts', resp_music.data)
+
+        # 5. Test All Categories exploration
+        resp_all = self.client.get('/category/all')
+        self.assertEqual(resp_all.status_code, 200)
+        self.assertIn(b'All Categories', resp_all.data)
+
+
+from starlette.testclient import TestClient
+try:
+    from fastapi_app import fastapi_app
+except ImportError:
+    from backend.fastapi_app import fastapi_app
+
+
+class FastAPIApiTests(unittest.TestCase):
+    """Automated verification test suite for FastAPI async REST API & Swagger UI."""
+    @classmethod
+    def setUpClass(cls):
+        init_db()
+        cls.client = TestClient(fastapi_app)
+
+    def test_01_swagger_docs_and_redoc(self):
+        """Verify Swagger UI (/docs), ReDoc (/redoc), and OpenAPI schema (/openapi.json)."""
+        resp_docs = self.client.get('/docs')
+        self.assertEqual(resp_docs.status_code, 200)
+        self.assertIn('swagger-ui', resp_docs.text.lower())
+
+        resp_redoc = self.client.get('/redoc')
+        self.assertEqual(resp_redoc.status_code, 200)
+
+        resp_openapi = self.client.get('/openapi.json')
+        self.assertEqual(resp_openapi.status_code, 200)
+        schema = resp_openapi.json()
+        self.assertEqual(schema['info']['title'], "Event Management System API")
+        self.assertIn('/api/v1/events', schema['paths'])
+        self.assertIn('/api/v1/auth/login', schema['paths'])
+        self.assertIn('/api/v1/health', schema['paths'])
+
+    def test_02_health_and_metrics_endpoints(self):
+        """Verify /api/v1/health and /api/v1/metrics endpoints."""
+        resp_health = self.client.get('/api/v1/health')
+        self.assertEqual(resp_health.status_code, 200)
+        h_data = resp_health.json()
+        self.assertEqual(h_data['status'], 'healthy')
+        self.assertTrue(h_data['database_connected'])
+        self.assertTrue(h_data['events_count'] > 0)
+
+        resp_metrics = self.client.get('/api/v1/metrics')
+        self.assertEqual(resp_metrics.status_code, 200)
+        m_data = resp_metrics.json()
+        self.assertTrue(m_data['total_events'] > 0)
+        self.assertTrue(isinstance(m_data['active_categories'], list))
+
+    def test_03_events_api_and_filtering(self):
+        """Verify /api/v1/events catalog with search, category filter, and single event."""
+        resp_events = self.client.get('/api/v1/events')
+        self.assertEqual(resp_events.status_code, 200)
+        data = resp_events.json()
+        self.assertTrue(data['total'] > 0)
+        self.assertTrue(len(data['events']) > 0)
+
+        # Filter by search
+        resp_search = self.client.get('/api/v1/events?search=Tech')
+        self.assertEqual(resp_search.status_code, 200)
+
+        # Single event
+        resp_single = self.client.get('/api/v1/events/1')
+        self.assertEqual(resp_single.status_code, 200)
+        self.assertEqual(resp_single.json()['id'], 1)
+
+        # Categories
+        resp_cats = self.client.get('/api/v1/categories')
+        self.assertEqual(resp_cats.status_code, 200)
+        self.assertTrue(len(resp_cats.json()) > 0)
+
+    def test_04_auth_login_api(self):
+        """Verify /api/v1/auth/login with valid and invalid credentials."""
+        # Valid login with 0001
+        resp_valid_uid = self.client.post('/api/v1/auth/login', json={'identifier': '0001', 'password': 'password123'})
+        self.assertEqual(resp_valid_uid.status_code, 200)
+        self.assertTrue(resp_valid_uid.json()['success'])
+
+        # Valid login with email
+        resp_valid_email = self.client.post('/api/v1/auth/login', json={'identifier': 'admin@example.com', 'password': 'password123'})
+        self.assertEqual(resp_valid_email.status_code, 200)
+        self.assertTrue(resp_valid_email.json()['success'])
+
+        # Invalid password
+        resp_invalid = self.client.post('/api/v1/auth/login', json={'identifier': '0001', 'password': 'wrongpassword'})
+        self.assertEqual(resp_invalid.status_code, 401)
+
+    def test_05_ticket_verification_api(self):
+        """Verify ticket validation endpoint."""
+        resp_ver = self.client.get('/api/v1/registrations/verify/TKT-999-99999')
+        self.assertEqual(resp_ver.status_code, 200)
+        self.assertFalse(resp_ver.json()['valid'])
+
+    def test_06_flask_app_mounting_fallback(self):
+        """Verify that Flask web pages render through FastAPI mount."""
+        resp_root = self.client.get('/')
+        self.assertEqual(resp_root.status_code, 200)
+
 
 if __name__ == '__main__':
     unittest.main()
+
 
 

@@ -9,13 +9,14 @@
     <script src="{{ url_for('static', filename='themes.js') }}?v=5.0"></script>
     <style>
         .form-container {
-            max-width: 800px;
-            margin: 4rem auto;
+            max-width: 860px;
+            margin: 2rem auto 4rem;
             padding: 2.5rem;
             background: rgba(30, 41, 59, 0.4);
             backdrop-filter: blur(12px);
             border-radius: 24px;
             border: 1px solid var(--glass-border);
+            box-sizing: border-box;
             animation: fadeIn 0.8s ease-out;
         }
 
@@ -78,8 +79,21 @@
         }
 
         @media (max-width: 768px) {
+            .form-container {
+                padding: 1.4rem 1rem !important;
+                margin: 1rem auto 3rem !important;
+                border-radius: 16px !important;
+            }
             .grid-2 {
                 grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            #aiPromptInput {
+                min-width: 0 !important;
+                width: 100% !important;
+            }
+            #aiGenBtn {
+                width: 100% !important;
             }
         }
     </style>
@@ -109,11 +123,57 @@
             </a>
         </div>
 
-        <h2 style="color: white; margin-bottom: 2rem; text-align: center;">Add New Event</h2>
+        <h2 style="color: white; margin-bottom: 1rem; text-align: center;">Add New Event</h2>
+        
+        <!-- ✨ AI Smart Event Content Generator -->
+        <div style="background: linear-gradient(135deg, rgba(0, 242, 254, 0.12), rgba(139, 92, 246, 0.15)); border: 1px solid rgba(0, 242, 254, 0.35); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 0.8rem;">
+                <div style="display: flex; align-items: center; gap: 8px; color: #00f2fe; font-weight: 700; font-size: 1.05rem;">
+                    <span>✨</span> AI Event Generator & Auto-Fill
+                </div>
+                <span style="font-size: 0.75rem; background: rgba(0, 242, 254, 0.2); color: #7dd3fc; padding: 2px 10px; border-radius: 999px; font-weight: 600;">Gemini 2.0 / Smart AI</span>
+            </div>
+            <p style="color: #cbd5e1; font-size: 0.88rem; margin: 0 0 1rem; line-height: 1.45;">
+                Enter a theme or brief idea (e.g. <em>"24h Quantum AI Hackathon in Bangalore with prizes"</em>) and our AI will automatically structure titles, agendas, banners, and learning outcomes!
+            </p>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <input type="text" id="aiPromptInput" class="form-control" style="flex: 1; min-width: 260px;" placeholder="Describe your event theme or title...">
+                <button type="button" id="aiGenBtn" class="btn-primary" style="width: auto; padding: 0.8rem 1.6rem; border-radius: 12px; margin: 0; font-weight: 700; white-space: nowrap;" onclick="runAIGenerator()">
+                    ✨ Auto-Fill with AI
+                </button>
+            </div>
+            <!-- Quick Chips -->
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 0.8rem;">
+                <button type="button" class="btn-secondary" style="font-size: 0.75rem; padding: 4px 10px; border-radius: 20px; border-color: rgba(255,255,255,0.15);" onclick="setAIPrompt('48-hour Generative AI & LLM Agent Hackathon')">🤖 GenAI Hackathon</button>
+                <button type="button" class="btn-secondary" style="font-size: 0.75rem; padding: 4px 10px; border-radius: 20px; border-color: rgba(255,255,255,0.15);" onclick="setAIPrompt('Hands-on Cybersecurity CTF & Ethical Hacking Bootcamp')">🛡️ Cyber CTF Bootcamp</button>
+                <button type="button" class="btn-secondary" style="font-size: 0.75rem; padding: 4px 10px; border-radius: 20px; border-color: rgba(255,255,255,0.15);" onclick="setAIPrompt('Web3 & DeFi Smart Contracts Developer Summit')">🌐 Web3 Summit</button>
+                <button type="button" class="btn-secondary" style="font-size: 0.75rem; padding: 4px 10px; border-radius: 20px; border-color: rgba(255,255,255,0.15);" onclick="setAIPrompt('Autonomous Drone & Robotics Engineering Workshop')">🚀 Robotics Workshop</button>
+            </div>
+        </div>
+
         <form action="{{ url_for('add_event') }}" method="POST">
-            <div class="form-group">
-                <label for="title">Event Title</label>
-                <input type="text" id="title" name="title" class="form-control" placeholder="e.g. TechNova Codeathon" required>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label for="title">Event Title</label>
+                    <input type="text" id="title" name="title" class="form-control" placeholder="e.g. TechNova Codeathon" required>
+                </div>
+                <div class="form-group">
+                    <label for="category">Event Category</label>
+                    <select id="category" name="category" class="form-control" required>
+                        <option value="Education">🎓 Education</option>
+                        <option value="Sports">⚽ Sports</option>
+                        <option value="Music Concerts">🎵 Music Concerts</option>
+                        <option value="Movie Promotions">🎬 Movie Promotions</option>
+                        <option value="Celebrity Meet-ups">⭐ Celebrity Meet-ups</option>
+                        <option value="Agriculture">🌾 Agriculture</option>
+                        <option value="Government">🏛️ Government</option>
+                        <option value="Gaming & E-Sports">🎮 Gaming & E-Sports</option>
+                        <option value="Business & Startup">💼 Business & Startup</option>
+                        <option value="Art, Culture & Theater">🎨 Art, Culture & Theater</option>
+                        <option value="Health, Fitness & Yoga">🧘 Health, Fitness & Yoga</option>
+                        <option value="Food, Tech & Festivals">🍔 Food, Tech & Festivals</option>
+                    </select>
+                </div>
             </div>
 
             <div class="grid-2">
@@ -123,8 +183,22 @@
                     <small style="color: var(--text-muted); font-size: 0.8rem;">Format: MMM DD, YYYY</small>
                 </div>
                 <div class="form-group">
-                    <label for="price">Price / Registration Fee</label>
+                    <label for="price">In-Person Ticket Price</label>
                     <input type="text" id="price" name="price" class="form-control" placeholder="e.g. Free or ₹800" required>
+                    <small style="color: var(--text-muted); font-size: 0.8rem;">Physical attendance price</small>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="form-group">
+                    <label for="seats_total">In-Person Registration Limit (Seats)</label>
+                    <input type="number" id="seats_total" name="seats_total" class="form-control" placeholder="e.g. 100" value="100" min="1" required>
+                    <small style="color: var(--text-muted); font-size: 0.8rem;">Maximum in-person registrations allowed (Capacity limit)</small>
+                </div>
+                <div class="form-group">
+                    <label for="stream_price">Live Stream Pass Amount (Separate)</label>
+                    <input type="text" id="stream_price" name="stream_price" class="form-control" placeholder="e.g. ₹199 or Free" value="₹199" required>
+                    <small style="color: #34d399; font-size: 0.8rem;">Separate fee • Unlimited virtual registrations (No limit)</small>
                 </div>
             </div>
 
@@ -191,6 +265,76 @@
 
 
     <script src="{{ url_for('static', filename='animations.js') }}"></script>
+    <script>
+        function setAIPrompt(text) {
+            document.getElementById('aiPromptInput').value = text;
+            runAIGenerator();
+        }
+
+        async function runAIGenerator() {
+            const promptInput = document.getElementById('aiPromptInput');
+            const btn = document.getElementById('aiGenBtn');
+            const prompt = promptInput.value.trim();
+
+            if (!prompt) {
+                alert("Please enter a theme or prompt first!");
+                promptInput.focus();
+                return;
+            }
+
+            const originalBtnText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<span style="display: inline-block; animation: spin 1s linear infinite;">⏳</span> Generating...`;
+
+            try {
+                const res = await fetch('/api/ai/generate-event', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: prompt })
+                });
+                const data = await res.json();
+
+                if (data.ok && data.data) {
+                    const ev = data.data;
+                    document.getElementById('title').value = ev.title || '';
+                    if (ev.category && document.getElementById('category')) {
+                        document.getElementById('category').value = ev.category;
+                    }
+                    document.getElementById('date').value = ev.date || '';
+                    document.getElementById('price').value = ev.price || 'Free';
+                    document.getElementById('time').value = ev.time || '09:30 AM';
+                    document.getElementById('end_time').value = ev.end_time || '05:00 PM';
+                    document.getElementById('color').value = ev.color || '#00f2fe';
+                    document.getElementById('venue').value = ev.venue || 'Main Auditorium';
+                    document.getElementById('venue_address').value = ev.venue_address || 'Tech Park Campus, Bangalore';
+                    document.getElementById('purpose').value = ev.purpose || '';
+                    document.getElementById('full_details').value = ev.full_details || '';
+                    document.getElementById('outcome').value = ev.outcome || '';
+                    
+                    if (ev.image) {
+                        const imgInput = document.getElementById('image');
+                        imgInput.value = ev.image;
+                        const preview = document.getElementById('preview-img');
+                        preview.src = ev.image;
+                        document.getElementById('preview-container').style.display = 'block';
+                    }
+
+                    // Visual highlight
+                    const formContainer = document.querySelector('.form-container');
+                    formContainer.style.boxShadow = '0 0 40px rgba(0, 242, 254, 0.4)';
+                    setTimeout(() => { formContainer.style.boxShadow = ''; }, 1500);
+                } else {
+                    alert(data.error || "Failed to generate event content.");
+                }
+            } catch (err) {
+                console.error("AI Gen Error:", err);
+                alert("Network error connecting to AI service.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalBtnText;
+            }
+        }
+    </script>
 </body>
 
 </html>

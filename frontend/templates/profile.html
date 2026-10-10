@@ -23,6 +23,9 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             padding-bottom: 6px;
         }
+        .is-hidden {
+            display: none !important;
+        }
         .grid-3 {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -38,6 +41,23 @@
         @media (max-width: 720px) {
             .grid-3, .grid-2 {
                 grid-template-columns: 1fr;
+            }
+            .profile-card {
+                padding: 1.5rem 1rem !important;
+                margin: 1rem auto 2.5rem auto !important;
+            }
+            .otp-row {
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+            .otp-action-btn {
+                width: 100% !important;
+                height: 44px !important;
+            }
+            .unique-save-btn {
+                width: 100% !important;
+                padding: 1rem 1.5rem !important;
+                font-size: 0.95rem !important;
             }
         }
         .profile-card, .profile-card * {
@@ -296,6 +316,7 @@
             margin: 0;
         }
         input[type="number"] {
+            appearance: textfield;
             -moz-appearance: textfield;
         }
         
@@ -453,7 +474,7 @@
                     <div class="profile-pic-wrapper">
                         <img src="{{ url_for('static', filename=user.profile_photo) if not user.profile_photo.startswith('http') else user.profile_photo }}" alt="Profile" class="profile-pic" id="profilePreview">
                         <label for="photoUpload" class="pic-edit-btn" title="Upload Photo">✎</label>
-                        <button type="button" class="pic-delete-btn" id="deletePicBtn" title="Delete Profile Photo" style="{% if user.profile_photo.startswith('http') %}display: none;{% endif %}">🗑</button>
+                        <button type="button" class="pic-delete-btn {% if user.profile_photo.startswith('http') %}is-hidden{% endif %}" id="deletePicBtn" title="Delete Profile Photo">🗑</button>
                         <input type="file" id="photoUpload" name="profile_photo" hidden accept="image/*" onchange="previewImage(this)">
                         <input type="hidden" name="cropped_image_data" id="croppedImageData">
                         <input type="hidden" name="delete_profile_photo" id="deleteProfilePhoto" value="false">
@@ -467,6 +488,19 @@
                         {% endif %}
                     </div>
                     <p style="color: var(--text-muted); font-size: 0.95rem;">Manage your personal profile, credentials, and verification settings</p>
+                </div>
+
+                <!-- 🏆 POAP Proof of Attendance Badges -->
+                <div style="background: linear-gradient(135deg, rgba(0, 242, 254, 0.08), rgba(139, 92, 246, 0.08)); border: 1px solid rgba(0, 242, 254, 0.25); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <div style="color: #00f2fe; font-weight: 700; font-size: 1.05rem; display: flex; align-items: center; gap: 8px;">
+                            <span>🏆</span> Verified POAP Achievement Badges
+                        </div>
+                        <span style="font-size: 0.75rem; color: #a78bfa; background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.3); padding: 2px 10px; border-radius: 999px; font-weight: 600;">Cryptographic POAP</span>
+                    </div>
+                    <div id="poapBadgesList" style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <div style="color: var(--text-muted); font-size: 0.88rem;">Loading achievement badges...</div>
+                    </div>
                 </div>
 
                 <!-- 0. Account Identification (User ID vs Username) -->
@@ -777,7 +811,35 @@
 
             return true;
         }
+
+        async function loadUserPOAPBadges() {
+            try {
+                const res = await fetch('/api/user/badges');
+                const data = await res.json();
+                const container = document.getElementById('poapBadgesList');
+                if (container && data.ok && data.badges) {
+                    if (data.badges.length === 0) {
+                        container.innerHTML = `<div style="color: var(--text-muted); font-size: 0.88rem;">Check in to upcoming events to unlock cryptographic POAP achievement badges!</div>`;
+                    } else {
+                        container.innerHTML = data.badges.map(b => `
+                            <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(0,242,254,0.3); border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: transform 0.25s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">
+                                <span style="font-size: 1.8rem;">${b.badge_icon || '🏆'}</span>
+                                <div>
+                                    <div style="color: #00f2fe; font-weight: 700; font-size: 0.9rem;">${b.badge_name}</div>
+                                    <div style="color: var(--text-muted); font-size: 0.75rem;">${b.event_title}</div>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                }
+            } catch (err) {
+                console.error("POAP load error:", err);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadUserPOAPBadges);
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/motion@latest/dist/motion.js"></script>
     <script src="{{ url_for('static', filename='animations.js') }}"></script>
     <script src="{{ url_for('static', filename='chatbot.js') }}?v=5.0"></script>
 </body>

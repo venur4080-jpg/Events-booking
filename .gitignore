@@ -98,3 +98,6 @@ coverage/
 cloudflared.exe
 *.db-wal
 *.db-shm
+scratch/
+/users.db
+database.db

@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Video Projection & Stage | {{ event.title }}</title>
+    <meta name="description" content="Live Interactive Video Stage, Dashcam Broadcast, and Q&A for {{ event.title }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=6.0">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='themes.js') }}?v=6.0"></script>
+    <style>
+        :root {
+            --live-cyan: #00f2fe;
+            --live-blue: #4facfe;
+            --live-red: #ef4444;
+            --live-green: #10b981;
+            --live-bg: #070c18;
+            --live-panel: rgba(15, 23, 42, 0.88);
+        }
+
+        body {
+            background-color: var(--live-bg);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 242, 254, 0.06) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(239, 68, 68, 0.08) 0%, transparent 45%),
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+            color: #ffffff;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .live-page-container {
+            max-width: 1400px;
+            margin: 1.5rem auto 4rem;
+            padding: 0 1.5rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Top Bar */
+        .live-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .live-title-group h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.85rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin: 0.2rem 0 0;
+            letter-spacing: -0.5px;
+        }
+
+        .live-indicator-pill {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #fca5a5;
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ef4444;
+            box-shadow: 0 0 8px #ef4444;
+            display: inline-block;
+            animation: pulseGlow 1.5s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { opacity: 0.5; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1.15); box-shadow: 0 0 14px #ef4444; }
+        }
+
+        /* Theater Grid Layout */
+        .theater-grid {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        @media (max-width: 1020px) {
+            .theater-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Video Projection Stage */
+        .projection-stage {
+            background: #000000;
+            border-radius: 24px;
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 16 / 9;
+            border: 1.5px solid rgba(0, 242, 254, 0.35);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 242, 254, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stage-media-element {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border: none;
+            display: block;
+        }
+
+        .stage-overlay-badge {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 5px 14px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+
+        /* Broadcaster Studio Tool Tabs */
+        .broadcaster-studio-card {
+            background: var(--live-panel);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 20px;
+            padding: 1.25rem 1.5rem;
+            margin-top: 1.5rem;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .studio-tab-bar {
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.8rem;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .studio-tab-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #cbd5e1;
+            padding: 0.55rem 1.1rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .studio-tab-btn:hover {
+            background: rgba(0, 242, 254, 0.12);
+            color: var(--live-cyan);
+            border-color: rgba(0, 242, 254, 0.35);
+        }
+
+        .studio-tab-btn.active {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.25), rgba(79, 172, 254, 0.25));
+            border-color: var(--live-cyan);
+            color: var(--live-cyan);
+            box-shadow: 0 0 14px rgba(0, 242, 254, 0.25);
+        }
+
+        .studio-panel-content {
+            display: none;
+        }
+
+        .studio-panel-content.active {
+            display: block;
+            animation: fadeIn 0.25s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .studio-input-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .studio-text-input {
+            flex: 1 1 280px;
+            min-width: 240px;
+            background: rgba(10, 16, 30, 0.85);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            border-radius: 12px;
+            padding: 0.75rem 1.1rem;
+            color: #ffffff;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .studio-text-input:focus {
+            border-color: var(--live-cyan);
+            box-shadow: 0 0 14px rgba(0, 242, 254, 0.3);
+            background: rgba(15, 23, 42, 0.95);
+        }
+
+        .studio-action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 0.75rem 1.4rem;
+            background: linear-gradient(135deg, var(--live-cyan), var(--live-blue));
+            color: #040914 !important;
+            font-weight: 800;
+            font-size: 0.88rem;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 16px rgba(0, 242, 254, 0.35);
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .studio-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 24px rgba(0, 242, 254, 0.6);
+            filter: brightness(1.1);
+        }
+
+        .studio-danger-btn {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            color: #fca5a5 !important;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .studio-danger-btn:hover {
+            background: #ef4444;
+            color: #ffffff !important;
+        }
+
+        .quick-chip-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #cbd5e1;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 4px 11px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .quick-chip-btn:hover {
+            background: rgba(0, 242, 254, 0.16);
+            color: var(--live-cyan);
+            border-color: var(--live-cyan);
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
+        }
+
+        .studio-screenshare-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 0.75rem 1.4rem;
+            background: linear-gradient(135deg, #a855f7 0%, #6366f1 50%, #3b82f6 100%) !important;
+            color: #ffffff !important;
+            font-weight: 800;
+            font-size: 0.88rem;
+            border-radius: 12px;
+            border: 1px solid rgba(192, 132, 252, 0.6) !important;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.5), 0 4px 14px rgba(0, 0, 0, 0.35) !important;
+            transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+            white-space: nowrap;
+            letter-spacing: 0.2px;
+        }
+
+        .studio-screenshare-btn:hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.85), 0 6px 22px rgba(0, 0, 0, 0.45) !important;
+            filter: brightness(1.15);
+            border-color: #e9d5ff !important;
+        }
+
+        .stage-ctrl-pill {
+            background: rgba(15, 23, 42, 0.88);
+            border: 1px solid rgba(0, 242, 254, 0.35);
+            color: #ffffff;
+            padding: 6px 13px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(12px);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+        }
+
+        .stage-ctrl-pill:hover {
+            background: rgba(0, 242, 254, 0.2);
+            border-color: var(--live-cyan);
+            color: var(--live-cyan);
+            box-shadow: 0 0 16px rgba(0, 242, 254, 0.45);
+            transform: translateY(-1px);
+        }
+
+        /* Drag & Drop Upload Zone */
+        .video-drop-zone {
+            border: 2px dashed rgba(0, 242, 254, 0.35);
+            background: rgba(0, 242, 254, 0.04);
+            border-radius: 16px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .video-drop-zone:hover, .video-drop-zone.dragover {
+            border-color: var(--live-cyan);
+            background: rgba(0, 242, 254, 0.08);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.2);
+        }
+
+        /* Right Q&A and Chat Panel */
+        .live-qa-box {
+            background: var(--live-panel);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 24px;
+            padding: 1.4rem;
+            display: flex;
+            flex-direction: column;
+            height: 640px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            box-sizing: border-box;
+        }
+
+        .qa-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 0.8rem;
+        }
+
+        .qa-list-scroll {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 1rem 0;
+            padding-right: 6px;
+        }
+
+        .qa-list-scroll::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .qa-list-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        .qa-item {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 0.85rem 1rem;
+            font-size: 0.88rem;
+            transition: all 0.2s ease;
+        }
+
+        .qa-item:hover {
+            border-color: rgba(0, 242, 254, 0.25);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        /* Form & Send Button Layout (FIXED FOR IMAGE 2) */
+        .qa-form-container {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            gap: 10px !important;
+            margin-top: auto !important;
+            padding-top: 0.8rem !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }
+
+        .qa-input-field {
+            flex: 1 1 auto !important;
+            min-width: 0 !important;
+            width: 100% !important;
+            background: rgba(10, 16, 30, 0.85) !important;
+            border: 1.5px solid rgba(0, 242, 254, 0.3) !important;
+            border-radius: 12px !important;
+            padding: 0.75rem 1.1rem !important;
+            font-size: 0.9rem !important;
+            color: #ffffff !important;
+            outline: none !important;
+            transition: all 0.2s ease !important;
+            box-sizing: border-box !important;
+        }
+
+        .qa-input-field:focus {
+            border-color: var(--live-cyan) !important;
+            box-shadow: 0 0 14px rgba(0, 242, 254, 0.3) !important;
+            background: rgba(15, 23, 42, 0.95) !important;
+        }
+
+        .qa-send-btn {
+            flex: 0 0 auto !important;
+            width: auto !important;
+            min-width: 90px !important;
+            margin: 0 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 6px !important;
+            padding: 0.75rem 1.3rem !important;
+            background: linear-gradient(135deg, #00f2fe, #4facfe) !important;
+            color: #040914 !important;
+            font-weight: 800 !important;
+            font-size: 0.9rem !important;
+            border-radius: 12px !important;
+            border: none !important;
+            cursor: pointer !important;
+            box-shadow: 0 0 16px rgba(0, 242, 254, 0.4) !important;
+            transition: all 0.2s ease !important;
+            white-space: nowrap !important;
+        }
+
+        .qa-send-btn:hover {
+            transform: translateY(-2px) scale(1.03) !important;
+            box-shadow: 0 0 25px rgba(0, 242, 254, 0.65) !important;
+            filter: brightness(1.12) !important;
+        }
+
+        /* Progress Bar */
+        .upload-progress-container {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            height: 8px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .upload-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #00f2fe, #10b981);
+            transition: width 0.2s ease;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar" role="navigation">
+        <div class="nav-container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <div class="logo" style="display: flex; align-items: center; gap: 10px;">
+                <a href="{{ url_for('dashboard') }}" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit;">
+                    <img src="{{ url_for('static', filename='logo.png') }}" alt="EVENTS Logo" style="height: 35px; border-radius: 8px;">
+                    <div>EV<span>ENTS</span></div>
+                </a>
+            </div>
+            <div class="nav-links" style="display: flex; align-items: center; gap: 12px;">
+                <a href="{{ url_for('event_detail', event_id=event.id) }}" class="category-back-btn" style="padding: 0.5rem 1.1rem; font-size: 0.85rem; border-radius: 10px; text-decoration: none;">← Back to Event</a>
+                <a href="{{ url_for('view_ticket_interactive', event_id=event.id) }}" class="category-back-btn" style="background: rgba(0, 242, 254, 0.15); color: var(--primary); border: 1px solid var(--primary); padding: 0.5rem 1.1rem; font-size: 0.85rem; border-radius: 10px; text-decoration: none;">🎟️ My Pass</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="live-page-container">
+        <!-- Live Header Info -->
+        <div class="live-header-bar">
+            <div class="live-title-group">
+                <div class="live-indicator-pill">
+                    <span class="pulse-dot"></span>
+                    <span id="liveStatusText">LIVE INTERACTIVE STAGE</span>
+                </div>
+                <h1>Live Video Projection: <span style="background: linear-gradient(135deg, #00f2fe, #4facfe); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">{{ event.title }}</span></h1>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <span style="background: rgba(0, 242, 254, 0.12); color: var(--primary); border: 1px solid rgba(0, 242, 254, 0.3); padding: 6px 14px; border-radius: 999px; font-weight: 700; font-size: 0.85rem;">
+                    🏷️ {{ event.category }}
+                </span>
+                <span style="background: rgba(255, 255, 255, 0.08); color: #cbd5e1; border: 1px solid rgba(255, 255, 255, 0.15); padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: 0.85rem;">
+                    🗓️ {{ event.date }} • {{ event.time or '10:00 AM' }}
+                </span>
+            </div>
+        </div>
+
+        <!-- Main Theater Layout -->
+        <div class="theater-grid">
+
+            <!-- Left: Video Projection Stage & Broadcaster Studio -->
+            <div>
+                <!-- Projection Screen -->
+                <div class="projection-stage" id="projectionPlayer">
+                    <div class="stage-overlay-badge" id="sourceBadge">
+                        <span class="pulse-dot"></span>
+                        <span id="sourceLabel">Stage Transmission Standby</span>
+                    </div>
+
+                    <!-- Right Overlay: Stop/Reset Broadcast Button & Interactive Stage Controls -->
+                    <div id="stageRightControls" style="position: absolute; top: 16px; right: 16px; z-index: 10; display: none; gap: 8px; flex-wrap: wrap; align-items: center;">
+                        <button type="button" class="stage-ctrl-pill" id="stageOverlayPauseBtn" onclick="toggleActiveStreamPlayback()" title="Pause / Resume Live Broadcast">
+                            <span id="stagePauseIcon">⏸️</span> <span id="stagePauseText">Pause</span>
+                        </button>
+                        <button type="button" class="stage-ctrl-pill" id="stageOverlayMuteBtn" onclick="toggleActiveStreamMute()" title="Mute / Unmute Live Audio">
+                            <span id="stageMuteIcon">🔇</span> <span id="stageMuteText">Mute</span>
+                        </button>
+                        <button type="button" class="studio-danger-btn" style="padding: 6px 14px; border-radius: 20px; font-size: 0.82rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);" onclick="stopStream()">
+                            <span>⏹️</span> Stop Broadcast
+                        </button>
+                    </div>
+
+                    <!-- Dynamic Video Container -->
+                    <div id="videoMediaHolder" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                        {% if access_info.has_access %}
+                        <div style="text-align: center; padding: 2rem;" id="standbyScreen">
+                            <div style="font-size: 4.5rem; margin-bottom: 1rem; animation: floatGently 3s infinite;">📡</div>
+                            <h3 style="color: #ffffff; font-size: 1.5rem; margin-bottom: 0.5rem;">Live Broadcast Room Ready</h3>
+                            <p style="color: var(--text-muted); font-size: 0.92rem; max-width: 500px; margin: 0 auto 1.5rem;">
+                                Select a live stream link, connect your Dashcam/Camera, or upload a video file using the broadcaster studio below.
+                            </p>
+                            <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); padding: 6px 18px; border-radius: 999px; font-weight: 700; font-size: 0.85rem;">
+                                ✓ Pass Verified & Unlocked ({{ access_info.access_type }})
+                            </div>
+                        </div>
+                        {% else %}
+                        <div style="text-align: center; padding: 2.5rem 1.5rem; max-width: 540px;">
+                            <div style="font-size: 3.5rem; margin-bottom: 0.8rem;">🔒</div>
+                            <h3 style="color: #ffffff; font-size: 1.4rem; margin-bottom: 0.4rem;">Live Stream Access Required</h3>
+                            <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; margin-bottom: 1rem;">
+                                Unlock this live projection stage with your Ticket ID or obtain an unlimited virtual Live Stream Pass.
+                            </p>
+                            
+                            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 0.8rem 1rem; margin-bottom: 1.5rem; display: inline-flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 1.2rem;">📡</span>
+                                <div style="text-align: left;">
+                                    <div style="color: #ffffff; font-size: 0.85rem; font-weight: 700;">Live Stream Pass: <span style="color: #34d399; font-weight: 800;">{{ event.stream_price or '₹199' }}</span></div>
+                                    <div style="color: #94a3b8; font-size: 0.74rem;">🌐 Unlimited Virtual Registrations • No Seat Limit</div>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                                <a href="{{ url_for('register_event', event_id=event.id) }}?type=live_stream" class="studio-action-btn" style="text-decoration: none; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; padding: 0.75rem 1.4rem; border-radius: 12px; font-weight: 700;">
+                                    📡 Get Stream Pass ({{ event.stream_price or '₹199' }})
+                                </a>
+                                <button type="button" class="studio-action-btn" onclick="unlockWithTicket()">
+                                    🎟️ Unlock with Ticket
+                                </button>
+                                <a href="{{ url_for('event_detail', event_id=event.id) }}" class="category-back-btn" style="text-decoration: none; padding: 0.75rem 1.4rem; border-radius: 12px; font-size: 0.88rem;">
+                                    Event Details
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Broadcaster Studio Controls (Upload Live Link, Dashcam, Upload Video) -->
+                <div class="broadcaster-studio-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.15rem; color: #ffffff; margin: 0; display: flex; align-items: center; gap: 8px;">
+                            <span>🎙️</span> Broadcast Studio & Video Sources
+                        </h3>
+                        <span style="font-size: 0.75rem; color: var(--live-cyan); font-family: 'JetBrains Mono', monospace;">SOURCE CONTROL</span>
+                    </div>
+
+                    <!-- Studio Tabs -->
+                    <div class="studio-tab-bar">
+                        <button class="studio-tab-btn active" id="btnTabLink" onclick="switchStudioTab('tabLink', this)">
+                            <span>🔗</span> Upload Live Stream Link
+                        </button>
+                        <button class="studio-tab-btn" id="btnTabDashcam" onclick="switchStudioTab('tabDashcam', this)">
+                            <span>📹</span> Dashcam / Live Camera
+                        </button>
+                        <button class="studio-tab-btn" id="btnTabUpload" onclick="switchStudioTab('tabUpload', this)">
+                            <span>📁</span> Upload Video File
+                        </button>
+                    </div>
+
+                    <!-- Tab 1: Live Stream Link -->
+                    <div class="studio-panel-content active" id="tabLink">
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0 0 0.8rem 0;">
+                            Paste any YouTube Live stream, YouTube video, Twitch, Vimeo, or MP4 link:
+                        </p>
+                        <div class="studio-input-group">
+                            <input type="url" id="streamUrlInput" class="studio-text-input" placeholder="e.g. https://www.youtube.com/live/... or https://www.youtube.com/watch?v=..." value="{{ stream_config.stream_url or '' }}">
+                            <button type="button" class="studio-action-btn" onclick="applyStreamLink()">
+                                <span>🚀</span> Go Live with Link
+                            </button>
+                            <div id="linkControlsExtra" style="display: none; gap: 8px; flex-wrap: wrap; align-items: center;">
+                                <button type="button" class="studio-action-btn" id="linkPauseBtn" style="background: rgba(255,255,255,0.12); color: #ffffff;" onclick="toggleStreamLinkPlayback()">
+                                    <span>⏸️</span> Pause Stream
+                                </button>
+                                <button type="button" class="studio-action-btn" id="linkMuteBtn" style="background: rgba(255,255,255,0.12); color: #ffffff;" onclick="toggleStreamLinkMute()">
+                                    <span>🔇</span> Mute Audio
+                                </button>
+                            </div>
+                            <button type="button" class="studio-action-btn studio-danger-btn" onclick="stopStream()">
+                                <span>⏹️</span> Reset Stage
+                            </button>
+                        </div>
+                        <!-- Quick-Test Sample Streams -->
+                        <div style="margin-top: 10px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                            <span style="font-size: 0.78rem; color: #94a3b8; font-weight: 600;">⚡ Quick Demo Feeds:</span>
+                            <button type="button" class="quick-chip-btn" onclick="fillAndPlayStream('https://www.youtube.com/watch?v=21X5lGlDOfg')">🚀 NASA Live Stream</button>
+                            <button type="button" class="quick-chip-btn" onclick="fillAndPlayStream('https://www.youtube.com/watch?v=jfKfPfyJRdk')">🎧 Lofi Beats Live</button>
+                            <button type="button" class="quick-chip-btn" onclick="fillAndPlayStream('https://www.youtube.com/watch?v=dQw4w9WgXcQ')">🎵 Keynote Demo</button>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Dashcam / Live Camera -->
+                    <div class="studio-panel-content" id="tabDashcam">
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0 0 0.8rem 0;">
+                            Connect your USB Dashcam, Integrated Webcam, or Screen Share directly to broadcast stage video in real-time.
+                        </p>
+                        <div class="studio-input-group">
+                            <select id="cameraSelect" class="studio-text-input" style="cursor: pointer;" onchange="onCameraDeviceChanged()">
+                                <option value="">🎥 Auto-Detect Cameras (Dashcam / Webcam)...</option>
+                            </select>
+                            <button type="button" class="studio-action-btn" id="startCamBtn" onclick="startCameraBroadcast()">
+                                <span>🔴</span> Start Dashcam Stream
+                            </button>
+                            <button type="button" class="studio-screenshare-btn" id="startScreenBtn" onclick="startScreenShare()">
+                                <span>🖥️</span> Share Screen
+                            </button>
+                            <div id="camControlsExtra" style="display: none; gap: 8px; flex-wrap: wrap; align-items: center;">
+                                <button type="button" class="studio-action-btn" id="camPauseBtn" style="background: rgba(255,255,255,0.12); color: #ffffff;" onclick="toggleCamVideoPause()">
+                                    <span>⏸️</span> Pause Feed
+                                </button>
+                                <button type="button" class="studio-action-btn" id="micToggleBtn" style="background: rgba(255,255,255,0.12); color: #ffffff;" onclick="toggleMicMute()">
+                                    <span>🎤</span> Mute Mic
+                                </button>
+                                <button type="button" class="studio-action-btn" style="background: rgba(255,255,255,0.12); color: #ffffff;" onclick="snapshotDashcam()" title="Capture High-Res Photo Frame">
+                                    <span>📸</span> Snap
+                                </button>
+                                <button type="button" class="studio-action-btn studio-danger-btn" id="stopCamBtn" onclick="stopCameraBroadcast()">
+                                    <span>⏹️</span> Stop Camera
+                                </button>
+                            </div>
+                        </div>
+                        <div id="camStatusNote" style="display: none; margin-top: 10px; font-size: 0.82rem; color: #a7f3d0; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); padding: 8px 12px; border-radius: 8px;"></div>
+                    </div>
+
+                    <!-- Tab 3: Upload Video File -->
+                    <div class="studio-panel-content" id="tabUpload">
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0 0 0.8rem 0;">
+                            Upload a recorded video presentation (MP4, WebM, MOV) to stream with full playback and stop controls:
+                        </p>
+                        <div class="video-drop-zone" id="videoDropZone" onclick="document.getElementById('videoFileInput').click()">
+                            <input type="file" id="videoFileInput" accept="video/mp4,video/webm,video/quicktime,video/m4v" style="display: none;" onchange="handleVideoFileSelect(this)">
+                            <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">📁</div>
+                            <strong style="color: #ffffff; font-size: 0.95rem; display: block;" id="uploadStatusText">Click or Drag & Drop Video File (MP4 / WebM / MOV)</strong>
+                            <span style="color: var(--text-muted); font-size: 0.8rem;">Max size: 100MB • Local & Cloud Playback Supported</span>
+                        </div>
+
+                        <!-- Active Video Card & Control Bar -->
+                        <div id="videoControlCard" style="display: none; margin-top: 12px; background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.25); border-radius: 14px; padding: 12px 16px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                                <div>
+                                    <strong style="color: #ffffff; font-size: 0.92rem; display: block;" id="videoFileNameDisplay">video.mp4</strong>
+                                    <span style="color: var(--live-cyan); font-size: 0.8rem;" id="videoFileSizeDisplay">Ready to broadcast</span>
+                                </div>
+                                <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                                    <button type="button" class="studio-action-btn" id="playUploadedBtn" onclick="broadcastCurrentVideo()">
+                                        <span>▶️</span> Broadcast Video
+                                    </button>
+                                    <button type="button" class="studio-action-btn" id="pauseUploadedBtn" style="background: rgba(255,255,255,0.12); color: #ffffff;" onclick="toggleVideoPlayback()">
+                                        <span>⏸️</span> Pause / Resume
+                                    </button>
+                                    <button type="button" class="studio-action-btn studio-danger-btn" onclick="stopStream()">
+                                        <span>⏹️</span> Stop Video
+                                    </button>
+                                    <button type="button" class="studio-action-btn" style="background: rgba(255,255,255,0.08); color: #94a3b8;" onclick="clearUploadedVideo()">
+                                        <span>🗑️</span> Change File
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="upload-progress-container" id="uploadProgressBox">
+                            <div class="upload-progress-bar" id="uploadProgressBar"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Venue & Timing Footer Strip -->
+                <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--glass-border); border-radius: 18px; padding: 1.2rem 1.5rem; margin-top: 1.2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <strong style="color: #ffffff; font-size: 1.05rem; display: block;">📍 {{ event.venue or 'Main Stage Auditorium' }}</strong>
+                        <span style="color: var(--text-muted); font-size: 0.82rem;">{{ event.venue_address or 'Tech Park Campus' }} &bull; ⏰ {{ event.time }} - {{ event.end_time }}</span>
+                    </div>
+                    <a href="{{ url_for('event_detail', event_id=event.id) }}" class="studio-action-btn" style="text-decoration: none; padding: 0.6rem 1.2rem; font-size: 0.85rem;">
+                        View Event Page ➔
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right: Interactive Q&A Panel (FIXED LAYOUT) -->
+            <div class="live-qa-box">
+                <div class="qa-header-row">
+                    <h3 style="color: #ffffff; font-size: 1.15rem; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px;">
+                        <span>💬</span> Live Q&A & Chat
+                    </h3>
+                    <span style="font-size: 0.75rem; background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; color: #34d399; padding: 3px 10px; border-radius: 12px; font-weight: 700;">Active</span>
+                </div>
+
+                <!-- Chat Message List -->
+                <div class="qa-list-scroll" id="qaList">
+                    <div class="qa-item">
+                        <strong style="color: var(--live-cyan);">Host Team:</strong>
+                        <p style="color: #e2e8f0; margin: 4px 0 0 0; line-height: 1.45;">Welcome everyone to {{ event.title }}! Post your questions below and our speakers will answer during the live stream.</p>
+                    </div>
+                </div>
+
+                <!-- Fixed Bottom Input & Send Button -->
+                <form id="qaForm" onsubmit="return submitQuestion(event)" class="qa-form-container">
+                    <input type="text" id="qaInput" class="qa-input-field" placeholder="Ask a question or share thoughts..." autocomplete="off" required>
+                    <button type="submit" class="qa-send-btn" id="qaSendBtn">
+                        <span>Send</span>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let currentStream = null;
+        let isMicMuted = false;
+        let isCamPaused = false;
+        let isStreamLinkPaused = false;
+        let isStreamLinkMuted = false;
+        let activeSourceType = null; // 'dashcam' | 'screen' | 'link' | 'video' | null
+
+        // Studio Tab Switcher
+        function switchStudioTab(tabId, btnElement) {
+            document.querySelectorAll('.studio-tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.studio-panel-content').forEach(p => p.classList.remove('active'));
+            
+            if (btnElement) {
+                btnElement.classList.add('active');
+            } else if (window.event && window.event.currentTarget) {
+                window.event.currentTarget.classList.add('active');
+            } else {
+                const targetBtn = document.querySelector(`[onclick*="${tabId}"]`);
+                if (targetBtn) targetBtn.classList.add('active');
+            }
+
+            const target = document.getElementById(tabId);
+            if (target) target.classList.add('active');
+
+            if (tabId === 'tabDashcam') {
+                initCameraDevices();
+            }
+        }
+
+        // 1. Live Stream Link Handler (Comprehensive YouTube / Twitch / Vimeo / Live Stream Embedder)
+        function parseEmbedUrl(url) {
+            if (!url) return '';
+            url = url.trim();
+
+            // YouTube formats (youtube.com/watch?v=, youtu.be/, youtube.com/live/, youtube.com/embed/, youtube.com/shorts/)
+            const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|live\/|shorts\/))([\w-]{11})/i);
+            if (ytMatch && ytMatch[1]) {
+                const vidId = ytMatch[1];
+                return `https://www.youtube-nocookie.com/embed/${vidId}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1`;
+            }
+
+            // Twitch channel format: https://www.twitch.tv/CHANNEL_NAME
+            const twitchMatch = url.match(/twitch\.tv\/([a-zA-Z0-9_]+)/i);
+            if (twitchMatch && twitchMatch[1]) {
+                const hostname = window.location.hostname || 'localhost';
+                return `https://player.twitch.tv/?channel=${twitchMatch[1]}&parent=${hostname}&parent=127.0.0.1&parent=localhost&autoplay=true&muted=false`;
+            }
+
+            // Vimeo format: https://vimeo.com/VIDEO_ID
+            const vimeoMatch = url.match(/vimeo\.com\/(?:video\/)?([0-9]+)/i);
+            if (vimeoMatch && vimeoMatch[1]) {
+                return `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=1`;
+            }
+
+            return url;
+        }
+
+        async function applyStreamLink() {
+            const input = document.getElementById('streamUrlInput');
+            const url = input ? input.value.trim() : '';
+            if (!url) {
+                alert('Please enter a valid YouTube, Twitch, Vimeo, or live stream URL.');
+                return;
+            }
+
+            if (currentStream) {
+                currentStream.getTracks().forEach(t => t.stop());
+                currentStream = null;
+            }
+
+            const embedUrl = parseEmbedUrl(url);
+            const holder = document.getElementById('videoMediaHolder');
+
+            // If direct mp4/webm link
+            if (url.endsWith('.mp4') || url.endsWith('.webm') || url.endsWith('.m4v')) {
+                holder.innerHTML = `<video id="activeVideoPlayer" class="stage-media-element" controls autoplay playsinline loop src="${url}"></video>`;
+            } else {
+                holder.innerHTML = `<iframe id="stageIframe" class="stage-media-element" src="${embedUrl}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
+            }
+            
+            activeSourceType = 'link';
+            isStreamLinkPaused = false;
+            isStreamLinkMuted = false;
+
+            document.getElementById('sourceLabel').innerText = 'Live Link Stream Active';
+            document.getElementById('liveStatusText').innerText = 'LIVE STREAM BROADCASTING';
+            
+            const rightCtrl = document.getElementById('stageRightControls');
+            if (rightCtrl) rightCtrl.style.display = 'inline-flex';
+
+            const linkExtra = document.getElementById('linkControlsExtra');
+            if (linkExtra) linkExtra.style.display = 'inline-flex';
+
+            const pBtn = document.getElementById('linkPauseBtn');
+            if (pBtn) { pBtn.innerHTML = '<span>⏸️</span> Pause Stream'; pBtn.style.background = 'rgba(255,255,255,0.12)'; pBtn.style.color = '#ffffff'; }
+            const mBtn = document.getElementById('linkMuteBtn');
+            if (mBtn) { mBtn.innerHTML = '<span>🔇</span> Mute Audio'; mBtn.style.background = 'rgba(255,255,255,0.12)'; mBtn.style.color = '#ffffff'; }
+
+            updateStageOverlayControls();
+
+            // Sync to backend config
+            try {
+                await fetch('/api/event/{{ event.id }}/live/stream-config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        source_type: 'live_link',
+                        stream_status: 'live',
+                        stream_url: embedUrl
+                    })
+                });
+            } catch (err) {
+                console.log('Stream config updated locally.');
+            }
+        }
+
+        function fillAndPlayStream(url) {
+            const input = document.getElementById('streamUrlInput');
+            if (input) {
+                input.value = url;
+                applyStreamLink();
+            }
+        }
+
+        function toggleStreamLinkPlayback() {
+            const iframe = document.querySelector('#videoMediaHolder iframe');
+            const vid = document.querySelector('#videoMediaHolder video');
+            isStreamLinkPaused = !isStreamLinkPaused;
+
+            if (iframe && iframe.contentWindow) {
+                // Send postMessage for YouTube Player API
+                const cmd = isStreamLinkPaused ? 'pauseVideo' : 'playVideo';
+                iframe.contentWindow.postMessage(JSON.stringify({
+                    event: 'command',
+                    func: cmd,
+                    args: ''
+                }), '*');
+                
+                // Twitch player event message
+                iframe.contentWindow.postMessage(JSON.stringify({
+                    eventName: isStreamLinkPaused ? 'pause' : 'play'
+                }), '*');
+            }
+            if (vid) {
+                if (isStreamLinkPaused) vid.pause();
+                else vid.play().catch(() => {});
+            }
+
+            const btn = document.getElementById('linkPauseBtn');
+            if (btn) {
+                btn.innerHTML = isStreamLinkPaused ? '<span>▶️</span> Resume Stream' : '<span>⏸️</span> Pause Stream';
+                btn.style.background = isStreamLinkPaused ? 'rgba(234, 179, 8, 0.3)' : 'rgba(255, 255, 255, 0.12)';
+                btn.style.color = isStreamLinkPaused ? '#fde047' : '#ffffff';
+            }
+
+            updateStageOverlayControls();
+        }
+
+        function toggleStreamLinkMute() {
+            const iframe = document.querySelector('#videoMediaHolder iframe');
+            const vid = document.querySelector('#videoMediaHolder video');
+            isStreamLinkMuted = !isStreamLinkMuted;
+
+            if (iframe && iframe.contentWindow) {
+                const cmd = isStreamLinkMuted ? 'mute' : 'unMute';
+                iframe.contentWindow.postMessage(JSON.stringify({
+                    event: 'command',
+                    func: cmd,
+                    args: ''
+                }), '*');
+            }
+            if (vid) {
+                vid.muted = isStreamLinkMuted;
+            }
+
+            const btn = document.getElementById('linkMuteBtn');
+            if (btn) {
+                btn.innerHTML = isStreamLinkMuted ? '<span>🔊</span> Unmute Audio' : '<span>🔇</span> Mute Audio';
+                btn.style.background = isStreamLinkMuted ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255, 255, 255, 0.12)';
+                btn.style.color = isStreamLinkMuted ? '#fca5a5' : '#ffffff';
+            }
+
+            updateStageOverlayControls();
+        }
+
+        // 2. Dashcam / Live Camera WebRTC Handler
+        async function initCameraDevices() {
+            try {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const videoDevices = devices.filter(d => d.kind === 'videoinput');
+                const select = document.getElementById('cameraSelect');
+                if (select && videoDevices.length > 0) {
+                    const currentVal = select.value;
+                    select.innerHTML = '<option value="">🎥 Auto-Detect Cameras (Dashcam / Webcam)...</option>';
+                    videoDevices.forEach((dev, idx) => {
+                        const opt = document.createElement('option');
+                        opt.value = dev.deviceId;
+                        opt.text = dev.label || `Camera Device #${idx + 1}`;
+                        if (dev.deviceId === currentVal) opt.selected = true;
+                        select.appendChild(opt);
+                    });
+                }
+            } catch (err) {
+                console.warn('Camera device enumeration unavailable:', err);
+            }
+        }
+
+        function onCameraDeviceChanged() {
+            if (currentStream) {
+                startCameraBroadcast();
+            }
+        }
+
+        async function startCameraBroadcast() {
+            const select = document.getElementById('cameraSelect');
+            const selectedDeviceId = select ? select.value : null;
+            const statusNote = document.getElementById('camStatusNote');
+
+            if (statusNote) {
+                statusNote.style.display = 'block';
+                statusNote.innerHTML = '🔄 Initializing Dashcam/Webcam video feed...';
+            }
+
+            if (currentStream) {
+                currentStream.getTracks().forEach(t => t.stop());
+                currentStream = null;
+            }
+
+            let stream = null;
+            let audioEnabled = true;
+
+            // Tier 1: Try requested device + audio
+            try {
+                const constraints = {
+                    video: selectedDeviceId ? { deviceId: { exact: selectedDeviceId } } : { width: { ideal: 1920 }, height: { ideal: 1080 } },
+                    audio: true
+                };
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+            } catch (e1) {
+                console.warn('Tier 1 Camera+Audio request failed, trying video only:', e1);
+                audioEnabled = false;
+                // Tier 2: Try requested device without audio
+                try {
+                    const constraints = {
+                        video: selectedDeviceId ? { deviceId: { exact: selectedDeviceId } } : true,
+                        audio: false
+                    };
+                    stream = await navigator.mediaDevices.getUserMedia(constraints);
+                } catch (e2) {
+                    console.warn('Tier 2 Exact Device request failed, trying generic video:', e2);
+                    // Tier 3: Try generic video
+                    try {
+                        stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                    } catch (e3) {
+                        console.error('All camera initialization attempts failed:', e3);
+                        if (statusNote) {
+                            statusNote.innerHTML = '⚠️ <strong>Camera access blocked.</strong> Please allow camera permissions in your browser or connect your USB Dashcam.';
+                        }
+                        alert('Could not access camera/dashcam. Please check your browser camera permissions or ensure your Dashcam/Webcam is plugged in.');
+                        return;
+                    }
+                }
+            }
+
+            currentStream = stream;
+            isMicMuted = false;
+            isCamPaused = false;
+            activeSourceType = 'dashcam';
+
+            // Refresh camera labels now that permission has been granted
+            await initCameraDevices();
+
+            const holder = document.getElementById('videoMediaHolder');
+            holder.innerHTML = `<video id="dashcamFeed" class="stage-media-element" autoplay playsinline muted></video>`;
+            
+            const vid = document.getElementById('dashcamFeed');
+            vid.muted = true;
+            vid.srcObject = currentStream;
+            vid.onloadedmetadata = () => {
+                vid.play().catch(e => console.warn('Autoplay prevented:', e));
+            };
+            vid.play().catch(() => {});
+
+            document.getElementById('sourceLabel').innerText = 'Dashcam / Camera Live Feed';
+            document.getElementById('liveStatusText').innerText = 'LIVE DASHCAM TRANSMISSION';
+            document.getElementById('startCamBtn').style.display = 'none';
+            document.getElementById('camControlsExtra').style.display = 'inline-flex';
+
+            const rightCtrl = document.getElementById('stageRightControls');
+            if (rightCtrl) rightCtrl.style.display = 'inline-flex';
+
+            const pBtn = document.getElementById('camPauseBtn');
+            if (pBtn) { pBtn.innerHTML = '<span>⏸️</span> Pause Feed'; pBtn.style.background = 'rgba(255,255,255,0.12)'; pBtn.style.color = '#ffffff'; }
+            const mBtn = document.getElementById('micToggleBtn');
+            if (mBtn) { mBtn.innerHTML = '<span>🎤</span> Mute Mic'; mBtn.style.background = 'rgba(255,255,255,0.12)'; mBtn.style.color = '#ffffff'; }
+
+            updateStageOverlayControls();
+
+            if (statusNote) {
+                const track = currentStream.getVideoTracks()[0];
+                const trackName = track ? (track.label || 'Dashcam Video') : 'Live Feed';
+                statusNote.innerHTML = `🟢 <strong>Live Broadcasting:</strong> ${trackName} ${audioEnabled ? '(with Audio 🎙️)' : '(Video Only 🔇)'}`;
+            }
+        }
+
+        function toggleCamVideoPause() {
+            if (!currentStream) return;
+            const videoTracks = currentStream.getVideoTracks();
+            const vid = document.getElementById('dashcamFeed');
+            isCamPaused = !isCamPaused;
+            
+            videoTracks.forEach(t => { t.enabled = !isCamPaused; });
+            if (vid) {
+                if (isCamPaused) {
+                    vid.pause();
+                } else {
+                    vid.play().catch(e => console.warn('Resume error:', e));
+                }
+            }
+            
+            const btn = document.getElementById('camPauseBtn');
+            if (btn) {
+                btn.innerHTML = isCamPaused ? '<span>▶️</span> Resume Feed' : '<span>⏸️</span> Pause Feed';
+                btn.style.background = isCamPaused ? 'rgba(234, 179, 8, 0.3)' : 'rgba(255, 255, 255, 0.12)';
+                btn.style.color = isCamPaused ? '#fde047' : '#ffffff';
+            }
+            
+            updateStageOverlayControls();
+        }
+
+        function toggleMicMute() {
+            if (!currentStream) return;
+            const audioTracks = currentStream.getAudioTracks();
+            if (audioTracks.length === 0) {
+                alert('No microphone track active on this stream.');
+                return;
+            }
+            isMicMuted = !isMicMuted;
+            audioTracks.forEach(t => { t.enabled = !isMicMuted; });
+            const btn = document.getElementById('micToggleBtn');
+            if (btn) {
+                btn.innerHTML = isMicMuted ? '<span>🔊</span> Unmute Mic' : '<span>🎤</span> Mute Mic';
+                btn.style.background = isMicMuted ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255, 255, 255, 0.12)';
+                btn.style.color = isMicMuted ? '#fca5a5' : '#ffffff';
+            }
+
+            updateStageOverlayControls();
+        }
+
+        function snapshotDashcam() {
+            const vid = document.getElementById('dashcamFeed');
+            if (!vid) {
+                alert('No active video feed to capture.');
+                return;
+            }
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = vid.videoWidth || 1280;
+                canvas.height = vid.videoHeight || 720;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(vid, 0, 0, canvas.width, canvas.height);
+                
+                const link = document.createElement('a');
+                link.download = `dashcam_snapshot_${Date.now()}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } catch (err) {
+                console.error('Snapshot error:', err);
+            }
+        }
+
+        async function startScreenShare() {
+            try {
+                if (currentStream) {
+                    currentStream.getTracks().forEach(t => t.stop());
+                }
+                currentStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+                activeSourceType = 'screen';
+                isCamPaused = false;
+                isMicMuted = false;
+                
+                const holder = document.getElementById('videoMediaHolder');
+                holder.innerHTML = `<video id="dashcamFeed" class="stage-media-element" autoplay playsinline muted></video>`;
+                
+                const vid = document.getElementById('dashcamFeed');
+                vid.muted = true;
+                vid.srcObject = currentStream;
+                vid.play().catch(() => {});
+
+                // Listen for screen share ended event
+                currentStream.getVideoTracks().forEach(t => {
+                    t.onended = () => {
+                        stopCameraBroadcast();
+                    };
+                });
+
+                document.getElementById('sourceLabel').innerText = 'Screen Share Broadcast';
+                document.getElementById('liveStatusText').innerText = 'LIVE SCREEN TRANSMISSION';
+                document.getElementById('startCamBtn').style.display = 'none';
+                document.getElementById('camControlsExtra').style.display = 'inline-flex';
+
+                const rightCtrl = document.getElementById('stageRightControls');
+                if (rightCtrl) rightCtrl.style.display = 'inline-flex';
+
+                const pBtn = document.getElementById('camPauseBtn');
+                if (pBtn) { pBtn.innerHTML = '<span>⏸️</span> Pause Feed'; pBtn.style.background = 'rgba(255,255,255,0.12)'; pBtn.style.color = '#ffffff'; }
+                const mBtn = document.getElementById('micToggleBtn');
+                if (mBtn) { mBtn.innerHTML = '<span>🎤</span> Mute Mic'; mBtn.style.background = 'rgba(255,255,255,0.12)'; mBtn.style.color = '#ffffff'; }
+
+                updateStageOverlayControls();
+            } catch (err) {
+                console.log('Screen sharing cancelled.');
+            }
+        }
+
+        function stopCameraBroadcast() {
+            if (currentStream) {
+                currentStream.getTracks().forEach(t => t.stop());
+                currentStream = null;
+            }
+            document.getElementById('startCamBtn').style.display = 'inline-flex';
+            document.getElementById('camControlsExtra').style.display = 'none';
+            const statusNote = document.getElementById('camStatusNote');
+            if (statusNote) statusNote.style.display = 'none';
+            stopStream();
+        }
+
+        // 3. Video File Upload & Playback Handler
+        let currentUploadedUrl = null;
+        let currentUploadedTitle = null;
+
+        async function handleVideoFileSelect(input) {
+            if (!input.files || !input.files[0]) return;
+            const file = input.files[0];
+
+            const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+            document.getElementById('uploadStatusText').innerText = `Selected: ${file.name} (${sizeMb} MB)`;
+            
+            // Create local blob URL for instant zero-latency playback
+            const blobUrl = URL.createObjectURL(file);
+            currentUploadedUrl = blobUrl;
+            currentUploadedTitle = file.name;
+
+            // Show control card
+            const card = document.getElementById('videoControlCard');
+            if (card) {
+                card.style.display = 'block';
+                document.getElementById('videoFileNameDisplay').innerText = file.name;
+                document.getElementById('videoFileSizeDisplay').innerText = `${sizeMb} MB • Ready to broadcast`;
+            }
+
+            // Immediately broadcast video to stage with controls
+            broadcastCurrentVideo();
+
+            // Background upload to server
+            const pBox = document.getElementById('uploadProgressBox');
+            const pBar = document.getElementById('uploadProgressBar');
+            if (pBox && pBar) {
+                pBox.style.display = 'block';
+                pBar.style.width = '45%';
+                const formData = new FormData();
+                formData.append('video', file);
+
+                try {
+                    pBar.style.width = '80%';
+                    const resp = await fetch('/api/event/{{ event.id }}/live/upload-stream-video', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await resp.json();
+                    pBar.style.width = '100%';
+                    setTimeout(() => {
+                        pBox.style.display = 'none';
+                        pBar.style.width = '0%';
+                    }, 800);
+
+                    if (data.ok && data.video_url) {
+                        currentUploadedUrl = data.video_url;
+                        const sizeDisplay = document.getElementById('videoFileSizeDisplay');
+                        if (sizeDisplay) sizeDisplay.innerText = `${sizeMb} MB • Cloud Hosted & Streaming`;
+                    }
+                } catch (err) {
+                    pBox.style.display = 'none';
+                }
+            }
+        }
+
+        function broadcastCurrentVideo() {
+            if (!currentUploadedUrl) {
+                alert('Please select a video file first.');
+                return;
+            }
+            if (currentStream) {
+                currentStream.getTracks().forEach(t => t.stop());
+                currentStream = null;
+            }
+
+            const holder = document.getElementById('videoMediaHolder');
+            holder.innerHTML = `<video id="activeVideoPlayer" class="stage-media-element" controls autoplay playsinline loop src="${currentUploadedUrl}"></video>`;
+            
+            const vid = document.getElementById('activeVideoPlayer');
+            if (vid) {
+                vid.play().catch(e => console.warn('Autoplay prevented:', e));
+            }
+
+            activeSourceType = 'video';
+            document.getElementById('sourceLabel').innerText = `Video: ${currentUploadedTitle || 'Stage Video'}`;
+            document.getElementById('liveStatusText').innerText = 'RECORDED BROADCAST STREAMING';
+            const rightCtrl = document.getElementById('stageRightControls');
+            if (rightCtrl) rightCtrl.style.display = 'inline-flex';
+
+            updateStageOverlayControls();
+        }
+
+        function toggleVideoPlayback() {
+            const vid = document.getElementById('activeVideoPlayer');
+            const btn = document.getElementById('pauseUploadedBtn');
+            if (!vid) {
+                broadcastCurrentVideo();
+                return;
+            }
+            if (vid.paused) {
+                vid.play();
+                if (btn) btn.innerHTML = '<span>⏸️</span> Pause Video';
+            } else {
+                vid.pause();
+                if (btn) btn.innerHTML = '<span>▶️</span> Resume Video';
+            }
+            updateStageOverlayControls();
+        }
+
+        function clearUploadedVideo() {
+            stopStream();
+            currentUploadedUrl = null;
+            currentUploadedTitle = null;
+            const fileInput = document.getElementById('videoFileInput');
+            if (fileInput) fileInput.value = '';
+            const card = document.getElementById('videoControlCard');
+            if (card) card.style.display = 'none';
+            document.getElementById('uploadStatusText').innerText = 'Click or Drag & Drop Video File (MP4 / WebM / MOV)';
+        }
+
+        // 4. Unified Stage Overlay & Global Playback / Mute Controls
+        function toggleActiveStreamPlayback() {
+            if (activeSourceType === 'dashcam' || activeSourceType === 'screen') {
+                toggleCamVideoPause();
+            } else if (activeSourceType === 'link') {
+                toggleStreamLinkPlayback();
+            } else if (activeSourceType === 'video') {
+                toggleVideoPlayback();
+            }
+        }
+
+        function toggleActiveStreamMute() {
+            if (activeSourceType === 'dashcam' || activeSourceType === 'screen') {
+                toggleMicMute();
+            } else if (activeSourceType === 'link') {
+                toggleStreamLinkMute();
+            } else if (activeSourceType === 'video') {
+                const vid = document.getElementById('activeVideoPlayer');
+                if (vid) {
+                    vid.muted = !vid.muted;
+                    updateStageOverlayControls();
+                }
+            }
+        }
+
+        function updateStageOverlayControls() {
+            const pauseIcon = document.getElementById('stagePauseIcon');
+            const pauseText = document.getElementById('stagePauseText');
+            const muteIcon = document.getElementById('stageMuteIcon');
+            const muteText = document.getElementById('stageMuteText');
+            const overlayPauseBtn = document.getElementById('stageOverlayPauseBtn');
+            const overlayMuteBtn = document.getElementById('stageOverlayMuteBtn');
+
+            let paused = false;
+            let muted = false;
+
+            if (activeSourceType === 'dashcam' || activeSourceType === 'screen') {
+                paused = isCamPaused;
+                muted = isMicMuted;
+            } else if (activeSourceType === 'link') {
+                paused = isStreamLinkPaused;
+                muted = isStreamLinkMuted;
+            } else if (activeSourceType === 'video') {
+                const vid = document.getElementById('activeVideoPlayer');
+                paused = vid ? vid.paused : false;
+                muted = vid ? vid.muted : false;
+            }
+
+            if (pauseIcon && pauseText) {
+                pauseIcon.innerText = paused ? '▶️' : '⏸️';
+                pauseText.innerText = paused ? 'Resume' : 'Pause';
+            }
+            if (muteIcon && muteText) {
+                muteIcon.innerText = muted ? '🔊' : '🔇';
+                muteText.innerText = muted ? 'Unmute' : 'Mute';
+            }
+            if (overlayPauseBtn) {
+                overlayPauseBtn.style.borderColor = paused ? '#facc15' : 'rgba(0, 242, 254, 0.35)';
+                overlayPauseBtn.style.color = paused ? '#fde047' : '#ffffff';
+            }
+            if (overlayMuteBtn) {
+                overlayMuteBtn.style.borderColor = muted ? '#ef4444' : 'rgba(0, 242, 254, 0.35)';
+                overlayMuteBtn.style.color = muted ? '#fca5a5' : '#ffffff';
+            }
+        }
+
+        function stopStream() {
+            if (currentStream) {
+                currentStream.getTracks().forEach(t => t.stop());
+                currentStream = null;
+            }
+            const vid = document.getElementById('activeVideoPlayer');
+            if (vid) {
+                vid.pause();
+                vid.src = '';
+            }
+
+            activeSourceType = null;
+            isCamPaused = false;
+            isMicMuted = false;
+            isStreamLinkPaused = false;
+            isStreamLinkMuted = false;
+
+            const holder = document.getElementById('videoMediaHolder');
+            holder.innerHTML = `
+                <div style="text-align: center; padding: 2rem;" id="standbyScreen">
+                    <div style="font-size: 4.5rem; margin-bottom: 1rem; animation: floatGently 3s infinite;">📡</div>
+                    <h3 style="color: #ffffff; font-size: 1.5rem; margin-bottom: 0.5rem;">Live Broadcast Room Ready</h3>
+                    <p style="color: var(--text-muted); font-size: 0.92rem; max-width: 500px; margin: 0 auto 1.5rem;">
+                        Select a live stream link, connect your Dashcam/Camera, or upload a video file using the broadcaster studio below.
+                    </p>
+                    <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); padding: 6px 18px; border-radius: 999px; font-weight: 700; font-size: 0.85rem;">
+                        ✓ Pass Verified & Unlocked ({{ access_info.access_type }})
+                    </div>
+                </div>
+            `;
+            document.getElementById('sourceLabel').innerText = 'Stage Transmission Standby';
+            document.getElementById('liveStatusText').innerText = 'LIVE INTERACTIVE STAGE';
+            const rightCtrl = document.getElementById('stageRightControls');
+            if (rightCtrl) rightCtrl.style.display = 'none';
+
+            const linkExtra = document.getElementById('linkControlsExtra');
+            if (linkExtra) linkExtra.style.display = 'none';
+
+            // Reset camera buttons if active
+            const startCam = document.getElementById('startCamBtn');
+            const extraCam = document.getElementById('camControlsExtra');
+            const statusNote = document.getElementById('camStatusNote');
+            if (startCam) startCam.style.display = 'inline-flex';
+            if (extraCam) extraCam.style.display = 'none';
+            if (statusNote) statusNote.style.display = 'none';
+        }
+
+        // Q&A Chat Submission
+        async function submitQuestion(e) {
+            e.preventDefault();
+            const input = document.getElementById('qaInput');
+            const text = input ? input.value.trim() : '';
+            if (!text) return false;
+
+            const list = document.getElementById('qaList');
+            if (list) {
+                const div = document.createElement('div');
+                div.className = 'qa-item';
+                div.innerHTML = `<strong style="color: var(--live-cyan);">You:</strong><p style="color: #e2e8f0; margin: 4px 0 0 0; line-height: 1.45;">${text}</p>`;
+                list.appendChild(div);
+                list.scrollTop = list.scrollHeight;
+            }
+            if (input) input.value = '';
+
+            try {
+                await fetch('/api/event/{{ event.id }}/live/questions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question: text })
+                });
+            } catch (err) {
+                console.error(err);
+            }
+            return false;
+        }
+
+        // Unlock Ticket Handler
+        async function unlockWithTicket() {
+            const code = prompt('Please enter your 15-character Ticket Code (e.g. TKT-015-00196):');
+            if (!code) return;
+            try {
+                const resp = await fetch('/api/event/{{ event.id }}/live/unlock-ticket', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ticket_code: code.trim() })
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    alert('Ticket verified successfully! Refreshing live stream...');
+                    window.location.reload();
+                } else {
+                    alert(data.message || 'Invalid ticket code for this event.');
+                }
+            } catch (err) {
+                alert('Error verifying ticket code.');
+            }
+        }
+
+        // Initialize cameras on page load and listen for device plug/unplug events
+        document.addEventListener('DOMContentLoaded', () => {
+            initCameraDevices();
+            if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) {
+                navigator.mediaDevices.addEventListener('devicechange', () => {
+                    console.log('Camera hardware device change detected, refreshing list...');
+                    initCameraDevices();
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

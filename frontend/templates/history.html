@@ -94,6 +94,12 @@
             color: #000000;
             font-weight: 700;
         }
+        .filter-tab-btn:hover:not(.active) {
+            background: rgba(0, 242, 254, 0.15);
+            color: #ffffff;
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.25);
+            transform: translateY(-1px);
+        }
 
         /* Booking Cards & Grid Layout */
         .bookings-grid {
@@ -238,6 +244,47 @@
             width: 16px !important;
             height: 16px !important;
         }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem 1rem 4rem !important;
+            }
+            .bookings-summary-bar {
+                grid-template-columns: 1fr !important;
+                gap: 0.8rem !important;
+            }
+            .filter-search-bar {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 0.85rem !important;
+            }
+            .filter-tabs {
+                overflow-x: auto !important;
+                flex-wrap: nowrap !important;
+                padding: 4px !important;
+                width: 100% !important;
+                -webkit-overflow-scrolling: touch !important;
+            }
+            .filter-tab-btn {
+                flex-shrink: 0 !important;
+                font-size: 0.8rem !important;
+                padding: 6px 12px !important;
+            }
+            .booking-actions {
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+            .booking-actions a, .booking-actions span {
+                width: 100% !important;
+                justify-content: center !important;
+                text-align: center !important;
+            }
+            .unreg-modal-content {
+                padding: 1.4rem 1.1rem !important;
+                border-radius: 16px !important;
+                max-width: calc(100vw - 24px) !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -267,6 +314,9 @@
         </div>
         <ul class="sidebar-links">
             <li><a href="{{ url_for('dashboard') }}">🏠 Dashboard</a></li>
+            <li><a href="{{ url_for('category_events', category_name='all') }}">🎪 Explore Categories</a></li>
+            <li><a href="{{ url_for('passport_page') }}">🛂 Event Passport & XP</a></li>
+            <li><a href="{{ url_for('teams_page') }}">🤝 AI Team Matcher</a></li>
             <li><a href="{{ url_for('profile') }}">👤 My Profile</a></li>
             <li><a href="{{ url_for('history') }}" class="active">📋 My Bookings</a></li>
             <li><a href="{{ url_for('settings') }}">⚙️ Settings</a></li>
@@ -289,7 +339,7 @@
         </ul>
     </div>
 
-    <main class="container" style="max-width: 1360px; width: 100%; margin: 0 auto; padding: 2rem 2rem 5rem 2rem; min-height: calc(100vh - 90px); display: flex; flex-direction: column; box-sizing: border-box;">
+    <main class="container" style="max-width: 1280px; width: 100%; margin: 0 auto; padding: 2rem 1.5rem 5rem; min-height: calc(100vh - 90px); display: flex; flex-direction: column; box-sizing: border-box;">
         <!-- Back Button -->
         <div style="margin-bottom: 1.5rem; width: 100%;">
             <a href="{{ url_for('dashboard') }}" class="back-btn-unified">
@@ -306,14 +356,15 @@
             {% if messages %}
                 <div style="max-width: 700px; width: 100%; margin: 0 auto 2rem auto;">
                     {% for category, message in messages %}
-                        <div style="padding: 1rem 1.4rem; border-radius: 12px; margin-bottom: 0.8rem; font-size: 0.95rem; font-weight: 500; text-align: center;
-                            {% if category == 'error' %}
-                                background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171;
-                            {% else %}
-                                background: rgba(0, 242, 254, 0.12); border: 1px solid rgba(0, 242, 254, 0.3); color: var(--primary);
-                            {% endif %}">
+                        {% if category == 'error' %}
+                        <div style="padding: 1rem 1.4rem; border-radius: 12px; margin-bottom: 0.8rem; font-size: 0.95rem; font-weight: 500; text-align: center; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171;">
                             {{ message }}
                         </div>
+                        {% else %}
+                        <div style="padding: 1rem 1.4rem; border-radius: 12px; margin-bottom: 0.8rem; font-size: 0.95rem; font-weight: 500; text-align: center; background: rgba(0, 242, 254, 0.12); border: 1px solid rgba(0, 242, 254, 0.3); color: var(--primary);">
+                            {{ message }}
+                        </div>
+                        {% endif %}
                     {% endfor %}
                 </div>
             {% endif %}
@@ -379,9 +430,13 @@
                             <span style="background: rgba(239, 68, 68, 0.85); backdrop-filter: blur(8px); color: white; font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 50px;">
                                 🚫 Revoked
                             </span>
+                            {% elif item.checked_in or item.reg_status == 'completed' %}
+                            <span style="background: rgba(16, 185, 129, 0.85); backdrop-filter: blur(8px); color: white; font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 50px;">
+                                ✓ Attended & Completed
+                            </span>
                             {% elif item.is_expired %}
                             <span style="background: rgba(148, 163, 184, 0.85); backdrop-filter: blur(8px); color: white; font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 50px;">
-                                Completed
+                                Concluded
                             </span>
                             {% else %}
                             <span style="background: rgba(16, 185, 129, 0.85); backdrop-filter: blur(8px); color: white; font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 50px;">
@@ -418,6 +473,8 @@
                             {% endif %}
                             {% if item.reg_status == 'cancelled' %}
                             <div style="font-size: 0.82rem; color: #ef4444; font-weight: 600; margin-top: 4px;">🚫 Cancelled on: {{ item.cancelled_at or 'Earlier' }}</div>
+                            {% elif item.checked_in or item.reg_status == 'completed' %}
+                            <div style="font-size: 0.82rem; color: #10b981; font-weight: 700; margin-top: 4px;">✓ Verified Attendance: {{ item.checkin_time or 'Recorded' }}</div>
                             {% else %}
                             <div style="font-size: 0.8rem; color: rgba(255,255,255,0.45); margin-top: 4px;">📝 Registered on: {{ item.reg_time }}</div>
                             {% endif %}
@@ -433,19 +490,21 @@
                                 🔍 Live Status
                             </a>
                             {% else %}
-                            <a href="{{ url_for('download_ticket', event_id=item.id) }}" class="register-btn-sm" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; text-decoration: none; padding: 0.5rem 0.9rem; font-size: 0.85rem; border-radius: 8px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;" target="_blank">
-                                📥 Ticket
+                            <a href="{{ url_for('view_ticket_interactive', event_id=item.id) }}" class="register-btn-sm" style="background: rgba(0, 242, 254, 0.15); color: var(--primary); border: 1px solid var(--primary); text-decoration: none; padding: 0.5rem 0.9rem; font-size: 0.85rem; border-radius: 8px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
+                                🎟️ Holographic Pass
                             </a>
-                            {% if item.checked_in %}
+                            {% if item.checked_in or item.reg_status == 'completed' %}
                             <a href="{{ url_for('download_certificate', event_id=item.id) }}" class="register-btn-sm" style="background: linear-gradient(135deg, rgba(234, 179, 8, 0.2), rgba(245, 158, 11, 0.25)); color: #fbbf24; border: 1px solid #f59e0b; text-decoration: none; padding: 0.5rem 0.9rem; font-size: 0.85rem; border-radius: 8px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;" target="_blank" title="Download Verified Certificate of Participation">
                                 🎓 Certificate
                             </a>
+                            <span class="register-btn-sm" style="background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.35); padding: 0.5rem 0.9rem; font-size: 0.85rem; border-radius: 8px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
+                                ✓ Event Completed
+                            </span>
                             {% elif item.is_expired %}
                             <span class="register-btn-sm" style="background: rgba(148, 163, 184, 0.1); color: #94a3b8; border: 1px dashed rgba(148, 163, 184, 0.3); padding: 0.5rem 0.75rem; font-size: 0.8rem; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;" title="Certificate available upon venue check-in verification">
                                 🎓 Check-in Needed
                             </span>
-                            {% endif %}
-                            {% if not item.is_expired %}
+                            {% else %}
                             <button type="button" class="register-btn-sm unregister-btn" style="background: rgba(239, 68, 68, 0.12); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.35); padding: 0.5rem 0.9rem; font-size: 0.85rem; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;" onclick="openUnregisterModal('{{ item.id }}', '{{ item.title | escape }}')">
                                 ❌ Cancel
                             </button>
@@ -693,6 +752,7 @@
             }
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/motion@latest/dist/motion.js"></script>
     <script src="{{ url_for('static', filename='animations.js') }}"></script>
     <script src="{{ url_for('static', filename='pwa.js') }}"></script>
     <script src="{{ url_for('static', filename='chatbot.js') }}?v=5.0"></script>

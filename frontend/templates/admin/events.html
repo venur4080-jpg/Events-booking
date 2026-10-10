@@ -37,10 +37,10 @@
                     <div style="font-size:0.8rem">
                         {{ ev.seats_filled or 0 }} / {{ ev.seats_total or 100 }}
                     </div>
+                    {% set ev_fill_pct = [(ev.seats_filled or 0) / (ev.seats_total or 100) * 100, 100]|min|round %}
+                    {% set ev_fill_bg = '#ef4444' if (ev.seats_filled or 0) >= (ev.seats_total or 100) else ('#f59e0b' if (ev.seats_filled or 0) > (ev.seats_total or 100) * 0.7 else '#10b981') %}
                     <div style="background:rgba(255,255,255,0.05);border-radius:4px;height:4px;margin-top:4px;overflow:hidden">
-                        <div style="height:100%;width:{{ [(ev.seats_filled or 0) / (ev.seats_total or 100) * 100, 100]|min|round }}%;
-                                    background:{% if (ev.seats_filled or 0) >= (ev.seats_total or 100) %}#ef4444{% elif (ev.seats_filled or 0) > (ev.seats_total or 100) * 0.7 %}#f59e0b{% else %}#10b981{% endif %};
-                                    transition:width 0.4s"></div>
+                        <div {{ ('style="height:100%;width:' ~ ev_fill_pct ~ '%;background:' ~ ev_fill_bg ~ ';transition:width 0.4s"') | safe }}></div>
                     </div>
                 </td>
                 <td><span class="badge badge-active">{{ ev.reg_count }}</span></td>

@@ -5,11 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | EVENTS</title>
-    <meta name="description"
+    <meta name="description" content="Discover exclusive hackathons, workshops, esports, concerts, and summits across 12 domain categories.">
     <meta name="theme-color" content="#00f2fe">
     <link rel="manifest" href="/manifest.json">
     <!-- Fonts and CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=5.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=5.1">
     <style>
         .calendar-container,
         .calendar-container * {
@@ -22,77 +22,6 @@
             width: 0 !important;
             height: 0 !important;
             background: transparent !important;
-        }
-        .calendar-container {
-            max-width: 1100px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
-            gap: 12px;
-            width: 100% !important;
-            box-sizing: border-box !important;
-        }
-        .calendar-weekday {
-            min-width: 0 !important;
-            box-sizing: border-box !important;
-        }
-        .calendar-day {
-            min-width: 0 !important;
-            box-sizing: border-box !important;
-        }
-        .calendar-day.empty {
-            min-width: 0 !important;
-            box-sizing: border-box !important;
-        }
-        .calendar-events-list {
-            min-width: 0 !important;
-            max-width: 100% !important;
-            box-sizing: border-box !important;
-            overflow-x: hidden !important;
-            overflow-y: auto !important;
-            scrollbar-width: none !important;
-            -ms-overflow-style: none !important;
-        }
-        .calendar-events-list::-webkit-scrollbar {
-            display: none !important;
-            width: 0 !important;
-            height: 0 !important;
-        }
-        .calendar-event-item {
-            min-width: 0 !important;
-            max-width: 100% !important;
-            box-sizing: border-box !important;
-            white-space: nowrap !important;
-            overflow: hidden !important;
-            display: flex !important;
-            align-items: center !important;
-            gap: 6px !important;
-            scrollbar-width: none !important;
-            -ms-overflow-style: none !important;
-        }
-        .calendar-event-item::-webkit-scrollbar {
-            display: none !important;
-        }
-        .calendar-event-title-wrapper {
-            flex: 1 !important;
-            min-width: 0 !important;
-            overflow: hidden !important;
-            white-space: nowrap !important;
-            text-overflow: ellipsis !important;
-            scrollbar-width: none !important;
-            -ms-overflow-style: none !important;
-        }
-        .calendar-event-title-wrapper::-webkit-scrollbar {
-            display: none !important;
-        }
-        .calendar-event-title {
-            display: inline-block !important;
-            white-space: nowrap !important;
-            will-change: transform !important;
-            pointer-events: none !important;
         }
         .event-status-dot {
             width: 8px;
@@ -115,55 +44,279 @@
             background-color: #ef4444;
             box-shadow: 0 0 6px rgba(239, 68, 68, 0.7);
         }
-        .calendar-legend {
+
+        /* Dashboard Highlights Strip */
+        .dashboard-stats-strip {
+            max-width: 1280px;
+            margin: 1.5rem auto 3rem;
+            padding: 0 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+            box-sizing: border-box;
+        }
+        .dashboard-stat-card {
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(14px);
+            border-radius: 18px;
+            padding: 1.25rem 1.5rem;
             display: flex;
-            gap: 14px;
-            justify-content: center;
             align-items: center;
-            margin-top: 6px;
+            gap: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+        .dashboard-stat-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(0, 242, 254, 0.4);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 15px rgba(0, 242, 254, 0.2);
+        }
+        .dashboard-stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: rgba(0, 242, 254, 0.12);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        .dashboard-stat-number {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.2;
+        }
+        .dashboard-stat-label {
             font-size: 0.8rem;
             color: var(--text-muted);
-            flex-wrap: wrap;
+            font-weight: 500;
         }
-        .day-events-pill {
-            position: absolute;
-            top: 6px;
-            right: 8px;
-            font-size: 0.65rem;
+
+        /* Highlights Grid on Dashboard */
+        .highlights-section {
+            max-width: 1280px;
+            margin: 3.5rem auto 4rem;
+            padding: 0 1.5rem;
+            box-sizing: border-box;
+        }
+        .highlights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .highlight-card {
+            background: rgba(15, 23, 42, 0.82);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            backdrop-filter: blur(16px);
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+        .highlight-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--primary);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5), 0 0 25px rgba(0, 242, 254, 0.25);
+        }
+        .highlight-card-title {
+            font-size: 1.12rem;
             font-weight: 700;
-            background: rgba(0, 242, 254, 0.2);
-            color: var(--primary);
-            border: 1px solid rgba(0, 242, 254, 0.4);
-            padding: 1px 6px;
-            border-radius: 10px;
-            pointer-events: none;
+            margin: 0 0 0.45rem 0;
+            color: #ffffff;
+            line-height: 1.35;
+            min-height: 2.85rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
-        .calendar-nav-btn {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid var(--glass-border);
-            color: white;
-            padding: 0.45rem 0.9rem;
-            border-radius: 10px;
-            cursor: pointer;
+        .highlight-card-title a {
+            color: inherit;
+            text-decoration: none;
+        }
+        .highlight-venue-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 0.45rem;
             font-size: 0.82rem;
-            font-weight: 600;
-            transition: all 0.25s ease;
+            height: 1.35rem;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        .highlight-timing-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-bottom: 0.6rem;
+            color: var(--text-muted);
+            height: 1.4rem;
+            flex-wrap: nowrap;
+            gap: 4px;
+        }
+        .highlight-desc-clamped {
+            font-size: 0.86rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+            min-height: 2.55rem;
+            margin: 0 0 1rem 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .highlight-card-footer {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 0.85rem;
+        }
+        .card-btn-action {
+            height: 34px;
+            padding: 0 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-decoration: none;
+            transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
             white-space: nowrap;
         }
-        .calendar-nav-btn:hover {
-            background: var(--primary);
-            color: var(--bg-dark);
-            box-shadow: 0 0 12px rgba(0, 242, 254, 0.4);
-            transform: translateY(-2px);
+        .card-btn-action:hover:not([disabled]) {
+            transform: translateY(-2px) scale(1.03);
+            filter: brightness(1.2);
+            box-shadow: 0 0 16px rgba(0, 242, 254, 0.45);
         }
-        body.light-mode .calendar-nav-btn {
+        .btn-domain-link {
+            height: 34px;
+            padding: 0 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-decoration: none;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            background: transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .btn-domain-link:hover {
+            background: rgba(0, 242, 254, 0.12);
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.3);
+        }
+
+        body.light-mode .dashboard-stat-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(0, 0, 0, 0.08);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+        }
+        body.light-mode .dashboard-stat-number {
+            color: #0f172a;
+        }
+        body.light-mode .highlight-card {
             background: #ffffff;
             border-color: rgba(0, 0, 0, 0.1);
-            color: #1e293b;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
         }
-        body.light-mode .calendar-nav-btn:hover {
-            background: #0284c7;
-            color: #ffffff;
+        body.light-mode .highlight-card-title {
+            color: #0f172a;
+        }
+        /* Seat Status Pills & Badges */
+        .seat-status-pill {
+            position: absolute;
+            bottom: 8px;
+            left: 10px;
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(8px);
+            padding: 3px 9px;
+            border-radius: 12px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            z-index: 5;
+        }
+        .seat-status-pill.soldout {
+            color: #f87171;
+        }
+        .seat-status-pill.warning {
+            color: #fbbf24;
+        }
+        .seat-status-pill.open {
+            color: #34d399;
+        }
+
+        .seat-reg-badge {
+            font-weight: 700;
+            font-size: 0.72rem;
+            padding: 2px 7px;
+            border-radius: 999px;
+        }
+        .seat-reg-badge.soldout {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+        .seat-reg-badge.warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+        .seat-reg-badge.open {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-stats-strip {
+                grid-template-columns: repeat(2, 1fr) !important;
+                padding: 0 1rem !important;
+                gap: 0.75rem !important;
+                margin: 1rem auto 2rem !important;
+            }
+            .dashboard-stat-card {
+                padding: 0.85rem 0.95rem !important;
+                border-radius: 14px !important;
+            }
+            .highlights-section {
+                padding: 0 1rem !important;
+                margin: 2rem auto !important;
+            }
+            .highlights-grid {
+                grid-template-columns: 1fr !important;
+                gap: 1.2rem !important;
+            }
+            .category-hub-section {
+                padding: 0 1rem !important;
+            }
+        }
+        @media (max-width: 480px) {
+            .dashboard-stats-strip {
+                grid-template-columns: 1fr !important;
+            }
         }
     </style>
     <!-- Theme loader (before paint to avoid flash) -->
@@ -178,6 +331,11 @@
         }
         // Apply saved colour theme
         if (window.loadPersistedTheme) loadPersistedTheme();
+        function openCategoryUrl(el) {
+            if (el && el.dataset && el.dataset.url) {
+                window.location.href = el.dataset.url;
+            }
+        }
     </script>
 
     <!-- Skip Navigation (Accessibility) -->
@@ -185,15 +343,16 @@
 
     <!-- Navigation -->
     <nav class="navbar" role="navigation" aria-label="Main navigation">
-        <div class="nav-container"
-            style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <div class="nav-container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
             <div style="display: flex; align-items: center;">
                 <button class="hamburger" id="hamburger" aria-label="Open sidebar menu" aria-expanded="false"
                     aria-controls="sidebar" style="background:none;border:none;cursor:pointer;">☰</button>
                 <div class="logo" style="display: flex; align-items: center; gap: 10px;">
-                    <img src="{{ url_for('static', filename='logo.png') }}" alt="EVENTS Logo"
-                        style="height: 35px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);">
-                    <div aria-label="EVENTS home">EV<span>ENTS</span></div>
+                    <a href="{{ url_for('dashboard') }}" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit;">
+                        <img src="{{ url_for('static', filename='logo.png') }}" alt="EVENTS Logo"
+                            style="height: 35px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);">
+                        <div aria-label="EVENTS home">EV<span>ENTS</span></div>
+                    </a>
                 </div>
             </div>
             <div class="nav-links" style="display: flex; align-items: center; gap: 10px;">
@@ -261,12 +420,14 @@
         </div>
         <ul class="sidebar-links" role="list">
             <li><a href="{{ url_for('dashboard') }}" class="active" aria-current="page">🏠 Dashboard</a></li>
+            <li><a href="{{ url_for('category_events', category_name='all') }}">🎪 Browse All Categories</a></li>
+            <li><a href="{{ url_for('passport_page') }}">🛂 Event Passport & XP</a></li>
+            <li><a href="{{ url_for('teams_page') }}">🤝 AI Team Matcher</a></li>
             <li><a href="{{ url_for('profile') }}">👤 My Profile</a></li>
             <li><a href="{{ url_for('history') }}">📋 My Bookings</a></li>
             <li><a href="{{ url_for('settings') }}">⚙️ Settings</a></li>
             {% if is_admin or session.get('username') in ['admin', 'Venu R'] %}
-            <li><a href="{{ url_for('admin_dashboard') }}" style="color:var(--admin-accent,#f59e0b);font-weight:700">⚡
-                    Admin Panel</a></li>
+            <li><a href="{{ url_for('admin_dashboard') }}" style="color:var(--admin-accent,#f59e0b);font-weight:700">⚡ Admin Panel</a></li>
             {% endif %}
             {% if is_host %}
             <li role="separator">
@@ -282,8 +443,7 @@
             <li role="separator">
                 <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 1rem 0;">
             </li>
-            <li
-                style="display: flex; align-items: center; font-size: 0.85rem; gap: 0.8rem; color: var(--text-muted); padding: 0.7rem 1.5rem; user-select: text;">
+            <li style="display: flex; align-items: center; font-size: 0.85rem; gap: 0.8rem; color: var(--text-muted); padding: 0.7rem 1.5rem; user-select: text;">
                 <span aria-hidden="true" style="font-size: 1.1rem;">📞</span> +91 9686837274</li>
             <li><a href="https://mail.google.com/mail/?view=cm&fs=1&to=venu.rachakondaa@gmail.com" target="_blank"
                     rel="noopener noreferrer" aria-label="Email venu.rachakondaa@gmail.com on Gmail"
@@ -297,421 +457,449 @@
         </ul>
     </nav>
 
-
     <!-- Hero Section -->
-    <header class="hero-section">
-        <h1 class="hero-title">Future Tech<br>Experience</h1>
-        <p class="hero-subtitle">Discover exclusive hackathons, workshops, and seminars. <br>Design the future with
-            code.</p>
-        {% if is_host %}
+    <header class="hero-section" id="mainContent">
+        <h1 class="hero-title">Future Tech & Domain<br><span style="background: linear-gradient(135deg, #00f2fe, #4facfe, #ff0080); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Experience Hub</span></h1>
+        <p class="hero-subtitle">
+            Explore 12 vibrant event domains — from AI Hackathons & Music Concerts to Esports Arenas and Startup Summits.<br>Select any category below to immerse in its live interactive carousel & event passes.
+        </p>
         <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="{{ url_for('category_events', category_name='all') }}" class="register-btn"
+                style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; padding: 0.9rem 2rem; font-size: 1.05rem; background: var(--primary); color: var(--bg-dark); font-weight: 700; border-radius: 50px; box-shadow: 0 0 25px rgba(0, 242, 254, 0.45); transition: all 0.3s ease;">
+                🌐 Explore All Events ({{ total_events_count }})
+            </a>
+            {% if is_host %}
             <a href="{{ url_for('add_event') }}" class="register-btn"
-                style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; padding: 1rem 2rem; font-size: 1.1rem; background: var(--primary); color: var(--bg-dark); font-weight: 700; border-radius: 50px; box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);">+
-                Add New Event</a>
+                style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; padding: 0.9rem 1.8rem; font-size: 1.05rem; background: rgba(0, 242, 254, 0.15); color: var(--primary); border: 1px solid var(--primary); font-weight: 700; border-radius: 50px;">
+                + Add New Event
+            </a>
             <a href="{{ url_for('scan_ticket') }}" class="register-btn"
-                style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; padding: 1rem 2rem; font-size: 1.1rem; background: rgba(0, 242, 254, 0.15); color: var(--primary); border: 1px solid var(--primary); font-weight: 700; border-radius: 50px;">🎟️
-                Check-In Scanner</a>
+                style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; padding: 0.9rem 1.8rem; font-size: 1.05rem; background: rgba(255, 255, 255, 0.08); color: #ffffff; border: 1px solid var(--glass-border); font-weight: 700; border-radius: 50px;">
+                🎟️ Scanner
+            </a>
+            {% endif %}
         </div>
-        {% endif %}
     </header>
 
-    <!-- Floating Standalone Search, Filter & View Controls -->
-    <div class="search-filter-container">
-        <!-- Standalone Search Pill -->
-        <div class="search-input-wrapper">
-            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"/>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            </svg>
-            <input type="text" id="searchInput" class="search-input-field" placeholder="Search events by title, topic, or keyword..." oninput="filterEvents()" autocomplete="off">
-        </div>
-
-        <!-- Floating Filters & View Mode Group -->
-        <div class="filters-group">
-            <div class="select-wrapper">
-                <select id="categoryFilter" class="filter-select" onchange="filterEvents()">
-                    <option value="all">All Categories</option>
-                    <option value="AI & ML">AI & ML</option>
-                    <option value="Cybersecurity">Cybersecurity</option>
-                    <option value="Web Development">Web Development</option>
-                    <option value="Cloud & DevOps">Cloud & DevOps</option>
-                    <option value="Data Science">Data Science</option>
-                    <option value="IoT & Robotics">IoT & Robotics</option>
-                    <option value="UI/UX Design">UI/UX Design</option>
-                    <option value="Gaming">Gaming</option>
-                    <option value="General Tech">General Tech</option>
-                </select>
-            </div>
-
-            <div class="select-wrapper">
-                <select id="priceFilter" class="filter-select" onchange="filterEvents()">
-                    <option value="all">All Prices</option>
-                    <option value="free">Free Only</option>
-                    <option value="paid">Paid Only</option>
-                </select>
-            </div>
-
-            <button class="view-toggle-btn" id="viewToggleBtn" onclick="toggleView()" title="Toggle Calendar and Grid view">
-                📅 Calendar View
-            </button>
-        </div>
-    </div>
-
-    <!-- Calendar View Container (initially hidden) -->
-    <div id="calendarViewContainer" class="calendar-container" style="display: none;">
-        <div class="calendar-header" style="flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center;">
-            <div style="display: flex; gap: 6px; align-items: center;">
-                <button class="calendar-nav-btn" onclick="prevMonth()" title="Previous Month">◀ Prev</button>
-                <button class="calendar-nav-btn" onclick="jumpToToday()" title="Jump to Current Month" style="background: rgba(0, 242, 254, 0.15); border-color: var(--primary); color: var(--primary);">⚡ Today</button>
-            </div>
-            <div style="text-align: center; flex: 1; min-width: 260px;">
-                <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 4px;">
-                    <h2 id="calendarTitle" style="margin: 0; font-size: 1.5rem; color: white;">Month Year</h2>
-                    <span id="calendarEventCountBadge" style="background: rgba(0, 242, 254, 0.18); color: var(--primary); border: 1px solid rgba(0, 242, 254, 0.4); font-size: 0.75rem; font-weight: 700; padding: 2px 10px; border-radius: 12px;">0 Events</span>
-                </div>
-                <div class="calendar-legend">
-                    <span style="display: inline-flex; align-items: center; gap: 5px;"><span class="event-status-dot dot-open"></span> Open / Upcoming</span>
-                    <span style="display: inline-flex; align-items: center; gap: 5px;"><span class="event-status-dot dot-today"></span> Held Today (Open - Closes 2h before start)</span>
-                    <span style="display: inline-flex; align-items: center; gap: 5px;"><span class="event-status-dot dot-closed"></span> Closed / Cutoff Reached</span>
-                </div>
-            </div>
-            <div style="display: flex; gap: 6px; align-items: center;">
-                <button class="calendar-nav-btn" onclick="jumpToNextEventMonth()" title="Jump to Next Month with Events" style="background: rgba(255, 255, 255, 0.08);">🎯 Next Event</button>
-                <button class="calendar-nav-btn" onclick="nextMonth()" title="Next Month">Next ▶</button>
+    <!-- Platform Stats Strip -->
+    <section class="dashboard-stats-strip" aria-label="Platform Statistics">
+        <div class="dashboard-stat-card">
+            <div class="dashboard-stat-icon">🌐</div>
+            <div>
+                <div class="dashboard-stat-number">12</div>
+                <div class="dashboard-stat-label">Specialized Domains</div>
             </div>
         </div>
-        <div class="calendar-grid" id="calendarGrid">
-            <!-- Dynamically populated weekdays and days -->
+        <div class="dashboard-stat-card">
+            <div class="dashboard-stat-icon" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.35);">🎪</div>
+            <div>
+                <div class="dashboard-stat-number">{{ total_events_count }}</div>
+                <div class="dashboard-stat-label">Total Curated Events</div>
+            </div>
         </div>
-    </div>
+        <div class="dashboard-stat-card">
+            <div class="dashboard-stat-icon" style="background: rgba(236, 72, 153, 0.15); border-color: rgba(236, 72, 153, 0.35);">🎟️</div>
+            <div>
+                <div class="dashboard-stat-number">Instant QR</div>
+                <div class="dashboard-stat-label">Digital Admission Passes</div>
+            </div>
+        </div>
+        <div class="dashboard-stat-card">
+            <div class="dashboard-stat-icon" style="background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.35);">📍</div>
+            <div>
+                <div class="dashboard-stat-number">Real-Time</div>
+                <div class="dashboard-stat-label">Google Maps Directions</div>
+            </div>
+        </div>
+    </section>
 
-    <!-- Events Grid -->
-    <main id="mainGridContainer" id="mainContent" role="main" aria-label="Upcoming events">
-        {% if upcoming_events %}
-        <div class="carousel-container" id="carouselContainer" style="--carousel-radius: {{ carousel_radius }}px;">
-            <div class="circle-carousel" id="carousel"
-                style="transform: translateZ(calc(-1 * var(--carousel-radius)));">
-                {% for event in upcoming_events %}
-                <!-- Carousel Item Wrapper handles 3D placement -->
-                <div class="carousel-item" data-id="{{ event.id }}"
-                    style="--carousel-angle: {{ event.carousel_angle }}deg; --carousel-tz: {{ event.carousel_tz }}px;"
-                    data-title="{{ event.title|lower }}" data-category="{{ event.category }}"
-                    data-date="{{ event.date }}" data-time="{{ event.time }}" data-end-time="{{ event.end_time }}"
-                    data-cutoff-time="{{ event.cutoff_time }}"
-                    data-venue="{{ event.venue }}"
-                    data-venue-address="{{ event.venue_address }}"
-                    data-maps-url="{{ event.maps_url or ('https://www.google.com/maps/search/?api=1&query=' ~ ((event.venue ~ ' ' ~ event.venue_address) | urlencode)) }}"
-                    data-is-today="{{ '1' if event.is_today else '0' }}"
-                    data-is-open="{{ '1' if event.is_open else '0' }}"
-                    data-is-cutoff="{{ '1' if event.is_cutoff_reached else '0' }}"
-                    data-status-label="{{ event.status_label }}"
-                    data-price="{% if event.price.lower() == 'free' %}free{% else %}paid{% endif %}">
-                    <div class="glass-panel event-card {% if event.is_expired and not event.is_today %}event-expired{% endif %}">
-                        <!-- Event Image -->
-                        <a href="{{ url_for('event_detail', event_id=event.id) }}" class="image-wrapper"
-                            style="display: block; overflow: hidden; border-radius: 16px 16px 0 0; position: relative; text-decoration: none;">
-                            <img src="{{ event.image }}" alt="{{ event.title }}" class="card-image" loading="lazy"
-                                onerror="this.src='https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070&auto=format&fit=crop';">
-                            <div class="date-badge">{{ event.date }}</div>
-                        </a>
-
-                        <div class="card-content">
-                            <h3 class="event-title">
-                                <a href="{{ url_for('event_detail', event_id=event.id) }}"
-                                    style="color: inherit; text-decoration: none;">{{ event.title }}</a>
-                            </h3>
-
-                            <!-- Event Real-Time Location & Google Maps Navigation Link -->
-                            <div class="event-venue-row" style="display: flex; align-items: center; gap: 6px; margin-bottom: 0.4rem; font-size: 0.8rem; overflow: hidden;">
-                                <a href="{{ event.maps_url or ('https://www.google.com/maps/search/?api=1&query=' ~ ((event.venue ~ ' ' ~ event.venue_address) | urlencode)) }}"
-                                   target="_blank" rel="noopener noreferrer" class="event-venue-link"
-                                   title="Open {{ event.venue }} on Google Maps"
-                                   onclick="event.stopPropagation();"
-                                   style="color: var(--primary); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; transition: opacity 0.2s;"
-                                   onmouseover="this.style.textDecoration='underline'; this.style.opacity='0.9';"
-                                   onmouseout="this.style.textDecoration='none'; this.style.opacity='1';">
-                                    <span style="flex-shrink: 0;">📍</span> <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ event.venue or 'Main Auditorium' }}</span> <span style="font-size: 0.72rem; opacity: 0.85; flex-shrink: 0;">↗</span>
-                                </a>
-                            </div>
-
-                            <!-- Event Timing & 2-Hour Cutoff Badge -->
-                            <div class="event-time-row" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; margin-bottom: 0.5rem; font-size: 0.82rem;">
-                                <span style="color: var(--primary); font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
-                                    ⏰ {{ event.time }} - {{ event.end_time }}
-                                </span>
-                                {% if event.is_today %}
-                                    {% if event.is_open %}
-                                    <span style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); padding: 2px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 700;">⚡ Today (Closes {{ event.cutoff_time }})</span>
-                                    {% else %}
-                                    <span style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); padding: 2px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 700;">⛔ Closed (2h Cutoff)</span>
-                                    {% endif %}
-                                {% endif %}
-                            </div>
-
-                            <p class="event-desc">{{ event.desc }}</p>
-
-                            <!-- Moved Price Tag above the line -->
-                            <div style="margin-top: auto; padding-bottom: 1rem; text-align: left;">
-                                <span class="price-tag"
-                                    style="font-size: 1.5rem; font-weight: 800; letter-spacing: 1px;">
-                                    {% if event.is_expired and not event.is_today %}Not Available{% else %}{{ event.price }}{% endif %}
-                                </span>
-                            </div>
-
-                            <div class="card-footer" style="justify-content: center;">
-                                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: nowrap;">
-                                    {% if event.is_open %}
-                                        {% if event.is_registered %}
-                                        <a href="{{ url_for('download_ticket', event_id=event.id) }}"
-                                            class="register-btn-sm"
-                                            style="background: rgba(0, 242, 254, 0.2); color: var(--primary); text-decoration: none; padding: 0.4rem 0.6rem; font-size: 0.8rem; white-space: nowrap;"
-                                            target="_blank">📥 Ticket</a>
-                                        <button type="button" class="register-btn-sm unregister-btn"
-                                            style="padding: 0.4rem 0.8rem; font-size: 0.8rem; white-space: nowrap; cursor: pointer;"
-                                            onclick="openUnregisterModal('{{ event.id }}', '{{ event.title | escape }}')">Unregister</button>
-                                        {% else %}
-                                        <a href="{{ url_for('register_event', event_id=event.id) }}" class="register-btn-sm"
-                                            style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; padding: 0.4rem 0.8rem; font-size: 0.8rem; white-space: nowrap;">Register</a>
-                                        {% endif %}
-                                    {% else %}
-                                        {% if event.is_registered %}
-                                        <a href="{{ url_for('download_ticket', event_id=event.id) }}"
-                                            class="register-btn-sm"
-                                            style="background: rgba(0, 242, 254, 0.2); color: var(--primary); text-decoration: none; padding: 0.4rem 0.6rem; font-size: 0.8rem; white-space: nowrap;"
-                                            target="_blank">📥 Ticket</a>
-                                        <button type="button" class="register-btn-sm unregister-btn"
-                                            style="padding: 0.4rem 0.8rem; font-size: 0.8rem; white-space: nowrap; cursor: pointer;"
-                                            onclick="openUnregisterModal('{{ event.id }}', '{{ event.title | escape }}')">Unregister</button>
-                                        {% else %}
-                                        <button class="register-btn-sm"
-                                            style="padding: 0.4rem 0.8rem; font-size: 0.8rem; white-space: nowrap; background: rgba(255,255,255,0.08); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1); cursor: not-allowed;"
-                                            title="{{ event.status_reason }}" disabled>{% if event.is_cutoff_reached %}Cutoff Reached{% elif event.is_sold_out %}Sold Out{% else %}Closed{% endif %}</button>
-                                        {% endif %}
-                                    {% endif %}
-
-                                    {% if is_host %}
-                                    <form action="{{ url_for('delete_event', event_id=event.id) }}" method="POST"
-                                        style="display: inline; margin: 0;"
-                                        onsubmit="return confirmDelete(this, event);">
-                                        <button type="submit" class="register-btn-sm"
-                                            style="padding: 0.4rem 0.8rem; font-size: 0.8rem; white-space: nowrap; background: rgba(255,255,255,0.1); color: var(--text-muted); border: 1px solid var(--glass-border); cursor: pointer;">Delete</button>
-                                    </form>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div style="margin-top: 10px; text-align: center;">
-                                <a href="{{ url_for('event_detail', event_id=event.id) }}"
-                                    style="font-size: 0.8rem; color: var(--primary); text-decoration: none; font-weight: 600;">View
-                                    Purpose & Details →</a>
-                            </div>
-                        </div>
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- 📦 12 Core Event Category Hub Boxes                         -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <section class="category-hub-section" id="categoryHub" aria-label="Event Categories Hub">
+        <div class="category-hub-header">
+            <div class="category-hub-header-left">
+                <span class="category-hub-kicker">✨ EXPLORE BY DOMAIN</span>
+                <h2 class="category-hub-title">Event <span class="category-hub-title-gradient">Categories</span></h2>
+                <p class="category-hub-subtitle">Click on any domain box below to open its dedicated page with interactive carousel, registration, and schedules.</p>
+            </div>
+            <div class="category-hub-header-right">
+                <a href="{{ url_for('category_events', category_name='all') }}" class="category-all-btn active" id="catBtn-all" title="View All Event Categories" style="text-decoration: none;">
+                    <span class="cat-icon-wrap" style="width: 36px; height: 36px; font-size: 1.2rem;">🌐</span>
+                    <div style="text-align: left;">
+                        <div style="font-weight: 700; font-size: 0.92rem; color: #ffffff;">All Categories</div>
+                        <div style="font-size: 0.76rem; color: var(--primary);">{{ total_events_count }} Events Total ➔</div>
                     </div>
-                </div>
-                {% endfor %}
-            </div>
-
-            <div class="carousel-controls">
-                <button class="carousel-btn" onclick="rotateCarousel(-1)">◀ Prev</button>
-                <button class="carousel-btn" onclick="rotateCarousel(1)">Next ▶</button>
-            </div>
-        </div>
-        {% else %}
-        <div style="text-align: center; padding: 4rem 2rem; color: var(--text-muted);">
-            <h2 style="color: var(--text-light); margin-bottom: 1rem;">No Upcoming Events</h2>
-            <p>Stay tuned for exciting future events!</p>
-        </div>
-        {% endif %}
-    </main>
-
-    {% if past_events %}
-    <section class="past-events-section" style="max-width: 1200px; margin: 4rem auto; padding: 0 2rem;">
-        <div style="text-align: center; margin-bottom: 3rem;">
-            <button type="button" id="togglePastEventsBtn" class="btn-past-events">Past Events</button>
-        </div>
-        <div id="pastEventsContainer"
-            style="display: none; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2.5rem;">
-            {% for event in past_events %}
-            <div class="glass-panel event-card event-expired" data-id="{{ event.id }}"
-                style="height: auto; opacity: 0.85; transition: transform 0.3s; transform: scale(0.98);"
-                data-title="{{ event.title|lower }}" data-category="{{ event.category }}"
-                data-date="{{ event.date }}" data-time="{{ event.time }}" data-end-time="{{ event.end_time }}"
-                data-cutoff-time="{{ event.cutoff_time }}"
-                data-venue="{{ event.venue }}"
-                data-venue-address="{{ event.venue_address }}"
-                data-maps-url="{{ event.maps_url or ('https://www.google.com/maps/search/?api=1&query=' ~ ((event.venue ~ ' ' ~ event.venue_address) | urlencode)) }}"
-                data-is-today="{{ '1' if event.is_today else '0' }}"
-                data-is-open="0"
-                data-is-cutoff="{{ '1' if event.is_cutoff_reached else '0' }}"
-                data-status-label="{{ event.status_label }}"
-                data-price="{% if event.price.lower() == 'free' %}free{% else %}paid{% endif %}">
-                <a href="{{ url_for('event_detail', event_id=event.id) }}" class="image-wrapper"
-                    style="display: block; overflow: hidden; border-radius: 16px 16px 0 0; position: relative; text-decoration: none;">
-                    <img src="{{ event.image }}" alt="{{ event.title }}"
-                        style="width: 100%; height: 220px; object-fit: cover; filter: grayscale(80%);" loading="lazy"
-                        onerror="this.src='https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070&auto=format&fit=crop';">
-                    <div class="date-badge"
-                        style="position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.8); padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; color: white; border: 1px solid rgba(255,255,255,0.2);">
-                        {{ event.date }}</div>
                 </a>
-                <div class="card-content" style="padding: 1.5rem;">
-                    <h3 class="event-title" style="color: var(--text-muted); margin-bottom: 0.3rem;">
-                        <a href="{{ url_for('event_detail', event_id=event.id) }}"
-                            style="color: inherit; text-decoration: none;">{{ event.title }}</a>
-                    </h3>
-                    <!-- Event Real-Time Location & Google Maps Navigation Link -->
-                    <div class="event-venue-row" style="display: flex; align-items: center; gap: 6px; margin-bottom: 0.4rem; font-size: 0.8rem; overflow: hidden;">
-                        <a href="{{ event.maps_url or ('https://www.google.com/maps/search/?api=1&query=' ~ ((event.venue ~ ' ' ~ event.venue_address) | urlencode)) }}"
-                           target="_blank" rel="noopener noreferrer" class="event-venue-link"
-                           title="Open {{ event.venue }} on Google Maps"
-                           style="color: var(--text-muted); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%;">
-                            <span style="flex-shrink: 0;">📍</span> <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ event.venue or 'Main Auditorium' }}</span> <span style="font-size: 0.72rem; opacity: 0.85; flex-shrink: 0;">↗</span>
-                        </a>
+            </div>
+        </div>
+
+        <!-- Category Grid -->
+        <div class="category-hub-grid">
+            <!-- 1. Education -->
+            <div class="category-box-card" id="catBtn-Education" data-category="Education" data-url="{{ url_for('category_events', category_name='Education') }}" onclick="openCategoryUrl(this)" role="button" tabindex="0">
+                <div class="cat-card-top">
+                    <div class="cat-icon-wrap cat-icon-education">🎓</div>
+                    <span class="cat-badge">{{ category_counts.get('Education', 0) }} Events</span>
+                </div>
+                <div class="cat-card-body">
+                    <h3 class="cat-title">Education</h3>
+                    <p class="cat-desc">Tech hackathons, AI summits, coding bootcamps, workshops & seminars.</p>
+                </div>
+                <div class="cat-card-footer">
+                    <a href="{{ url_for('category_events', category_name='Education') }}" class="cat-explore-link">Explore ➔</a>
+                </div>
+            </div>
+
+            <!-- 2. Sports -->
+            <div class="category-box-card" id="catBtn-Sports" data-category="Sports" data-url="{{ url_for('category_events', category_name='Sports') }}" onclick="openCategoryUrl(this)" role="button" tabindex="0">
+                <div class="cat-card-top">
+                    <div class="cat-icon-wrap cat-icon-sports">⚽</div>
+                    <span class="cat-badge">{{ category_counts.get('Sports', 0) }} Events</span>
+                </div>
+                <div class="cat-card-body">
+                    <h3 class="cat-title">Sports</h3>
+                    <p class="cat-desc">Cricket cups, football tournaments, athletics, chess & sports championships.</p>
+                </div>
+                <div class="cat-card-footer">
+                    <a href="{{ url_for('category_events', category_name='Sports') }}" class="cat-explore-link">Explore ➔</a>
+                </div>
+            </div>
+
+            <!-- 3. Music Concerts -->
+            <div class="category-box-card" id="catBtn-Music-Concerts" data-category="Music Concerts" data-url="{{ url_for('category_events', category_name='Music Concerts') }}" onclick="openCategoryUrl(this)" role="button" tabindex="0">
+                <div class="cat-card-top">
+                    <div class="cat-icon-wrap cat-icon-music">🎵</div>
+                    <span class="cat-badge">{{ category_counts.get('Music Concerts', 0) }} Events</span>
+                </div>
+                <div class="cat-card-body">
+                    <h3 class="cat-title">Music Concerts</h3>
+                    <p class="cat-desc">EDM festivals, rock fests, acoustic nights, classical recitals & indie concerts.</p>
+                </div>
+                <div class="cat-card-footer">
+                    <a href="{{ url_for('category_events', category_name='Music Concerts') }}" class="cat-explore-link">Explore ➔</a>
+                </div>
+            </div>
+
+            <!-- 4. Movie Promotions -->
+            <div class="category-box-card" id="catBtn-Movie-Promotions" data-category="Movie Promotions" data-url="{{ url_for('category_events', category_name='Movie Promotions') }}" onclick="openCategoryUrl(this)" role="button" tabindex="0">
+                <div class="cat-card-top">
+                    <div class="cat-icon-wrap cat-icon-movie">🎬</div>
+                    <span class="cat-badge">{{ category_counts.get('Movie Promotions', 0) }} Events</span>
+                </div>
+                <div class="cat-card-body">
+                    <h3 class="cat-title">Movie Promotions</h3>
+                    <p class="cat-desc">Film premieres, star cast meets, trailer launches & film festivals.</p>
+                </div>
+                <div class="cat-card-footer">
+                    <a href="{{ url_for('category_events', category_name='Movie Promotions') }}" class="cat-explore-link">Explore ➔</a>
+                </div>
+            </div>
+
+            <!-- 5. Celebrity Meet-ups -->
+            <div class="category-box-card" id="catBtn-Celebrity-Meet-ups" data-category="Celebrity Meet-ups" data-url="{{ url_for('category_events', category_name='Celebrity Meet-ups') }}" onclick="openCategoryUrl(this)" role="button" tabindex="0">
+                <div class="cat-card-top">
+                    <div class="cat-icon-wrap cat-icon-celebrity">⭐</div>
+                    <span class="cat-badge">{{ category_counts.get('Celebrity Meet-ups', 0) }} Events</span>
+                </div>
+                <div class="cat-card-body">
+                    <h3 class="cat-title">Celebrity Meet-ups</h3>
+                    <p class="cat-desc">VIP fan meetings, creator summits, fireside Q&As & autograph sessions.</p>
+                </div>
+                <div class="cat-card-footer">
+                    <a href="{{ url_for('category_events', category_name='Celebrity Meet-ups') }}" class="cat-explore-link">Explore ➔</a>
+                </div>
+            </div>
+
+            <!-- 6. Agriculture -->
+            <div class="category-box-card" id="catBtn-Agriculture" data-category="Agriculture" data-url="{{ url_for('category_events', category_name='Agriculture') }}" onclick="openCategoryUrl(this)" role="button" tabindex="0">
+                <div class="cat-card-top">
+                    <div class="cat-icon-wrap cat-icon-agri">🌾</div>
+                    <span class="cat-badge">{{ category_counts.get('Agriculture', 0) }} Events</span>
+                </div>
+                <div class="cat-card-body">
+                    <h3 class="cat-title">Agriculture</h3>
+                    <p class="cat-desc">AgriTech expos, organic farming, drone irrigation & Kisan summits.</p>
+                </div>
+                <div class="cat-card-footer">
+                    <a href="{{ url_for('category_events', category_name='Agriculture') }}" class="cat-explore-link">Explore ➔</a>
+                </div>
+            </div>
+
+            <!-- 7. Government -->
+            <div class="category-box-card" id="catBtn-Government" data-category="Government" data-url="{{ url_for('category_events', category_name='Government') }}" onclick="openCategoryUrl(this)" role="button" tabindex="0">
+                <div class="cat-card-top">
+                    <div class="cat-icon-wrap cat-icon-gov">🏛️</div>
+                    <span class="cat-badge">{{ category_counts.get('Government', 0) }} Events</span>
+                </div>
+                <div class="cat-card-body">
+                    <h3 class="cat-title">Government</h3>
+                    <p class="cat-desc">Civic forums, public scheme expos, youth festivals & governance summits.</p>
+                </div>
+                <div class="cat-card-footer">
+                    <a href="{{ url_for('category_events', category_name='Government') }}" class="cat-explore-link">Explore ➔</a>
+                </div>
+            </div>
+
+            <!-- 8. Gaming & E-Sports -->
+            <div class="category-box-card" id="catBtn-Gaming-&-E-Sports" data-category="Gaming & E-Sports" data-url="{{ url_for('category_events', category_name='Gaming & E-Sports') }}" onclick="openCategoryUrl(this)" role="button" tabindex="0">
+                <div class="cat-card-top">
+                    <div class="cat-icon-wrap cat-icon-gaming">🎮</div>
+                    <span class="cat-badge">{{ category_counts.get('Gaming & E-Sports', 0) }} Events</span>
+                </div>
+                <div class="cat-card-body">
+                    <h3 class="cat-title">Gaming & E-Sports</h3>
+                    <p class="cat-desc">Competitive LAN tourneys, BGMI championships, Valorant & FIFA showdowns.</p>
+                </div>
+                <div class="cat-card-footer">
+                    <a href="{{ url_for('category_events', category_name='Gaming & E-Sports') }}" class="cat-explore-link">Explore ➔</a>
+                </div>
+            </div>
+
+            <!-- 9. Business & Startup -->
+            <div class="category-box-card" id="catBtn-Business-&-Startup" data-category="Business & Startup" data-url="{{ url_for('category_events', category_name='Business & Startup') }}" onclick="openCategoryUrl(this)" role="button" tabindex="0">
+                <div class="cat-card-top">
+                    <div class="cat-icon-wrap cat-icon-business">💼</div>
+                    <span class="cat-badge">{{ category_counts.get('Business & Startup', 0) }} Events</span>
+                </div>
+                <div class="cat-card-body">
+                    <h3 class="cat-title">Business & Startup</h3>
+                    <p class="cat-desc">Pitch fests, angel investor summits, founder networking & venture keynotes.</p>
+                </div>
+                <div class="cat-card-footer">
+                    <a href="{{ url_for('category_events', category_name='Business & Startup') }}" class="cat-explore-link">Explore ➔</a>
+                </div>
+            </div>
+
+            <!-- 10. Art, Culture & Theater -->
+            <div class="category-box-card" id="catBtn-Art,-Culture-&-Theater" data-category="Art, Culture & Theater" data-url="{{ url_for('category_events', category_name='Art, Culture & Theater') }}" onclick="openCategoryUrl(this)" role="button" tabindex="0">
+                <div class="cat-card-top">
+                    <div class="cat-icon-wrap cat-icon-art">🎨</div>
+                    <span class="cat-badge">{{ category_counts.get('Art, Culture & Theater', 0) }} Events</span>
+                </div>
+                <div class="cat-card-body">
+                    <h3 class="cat-title">Art, Culture & Theater</h3>
+                    <p class="cat-desc">Stage plays, modern art exhibitions, cultural dances & photography expos.</p>
+                </div>
+                <div class="cat-card-footer">
+                    <a href="{{ url_for('category_events', category_name='Art, Culture & Theater') }}" class="cat-explore-link">Explore ➔</a>
+                </div>
+            </div>
+
+            <!-- 11. Health, Fitness & Yoga -->
+            <div class="category-box-card" id="catBtn-Health,-Fitness-&-Yoga" data-category="Health, Fitness & Yoga" data-url="{{ url_for('category_events', category_name='Health, Fitness & Yoga') }}" onclick="openCategoryUrl(this)" role="button" tabindex="0">
+                <div class="cat-card-top">
+                    <div class="cat-icon-wrap cat-icon-wellness">🧘</div>
+                    <span class="cat-badge">{{ category_counts.get('Health, Fitness & Yoga', 0) }} Events</span>
+                </div>
+                <div class="cat-card-body">
+                    <h3 class="cat-title">Health, Fitness & Yoga</h3>
+                    <p class="cat-desc">Sound baths, breathwork retreats, marathons, crossfit & wellness expos.</p>
+                </div>
+                <div class="cat-card-footer">
+                    <a href="{{ url_for('category_events', category_name='Health, Fitness & Yoga') }}" class="cat-explore-link">Explore ➔</a>
+                </div>
+            </div>
+
+            <!-- 12. Food, Tech & Festivals -->
+            <div class="category-box-card" id="catBtn-Food,-Tech-&-Festivals" data-category="Food, Tech & Festivals" data-url="{{ url_for('category_events', category_name='Food, Tech & Festivals') }}" onclick="openCategoryUrl(this)" role="button" tabindex="0">
+                <div class="cat-card-top">
+                    <div class="cat-icon-wrap cat-icon-food">🍔</div>
+                    <span class="cat-badge">{{ category_counts.get('Food, Tech & Festivals', 0) }} Events</span>
+                </div>
+                <div class="cat-card-body">
+                    <h3 class="cat-title">Food & Festivals</h3>
+                    <p class="cat-desc">Food truck carnivals, artisanal coffee brewing, baking masterclasses & BBQ fests.</p>
+                </div>
+                <div class="cat-card-footer">
+                    <a href="{{ url_for('category_events', category_name='Food, Tech & Festivals') }}" class="cat-explore-link">Explore ➔</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 🎯 Recommended For You Ribbon -->
+    <section id="aiRecommendationsSection" style="max-width: 1280px; margin: 2rem auto 3rem; padding: 0 1.5rem; box-sizing: border-box; display: none;">
+        <div style="background: linear-gradient(135deg, rgba(0, 242, 254, 0.08), rgba(139, 92, 246, 0.1)); border: 1px solid rgba(0, 242, 254, 0.28); border-radius: 20px; padding: 1.8rem; box-shadow: 0 10px 30px rgba(0,0,0,0.4);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 8px;">
+                <div>
+                    <h2 style="color: #ffffff; font-size: 1.35rem; font-weight: 800; margin: 0 0 0.2rem; display: flex; align-items: center; gap: 8px;">
+                        <span>🎯</span> Recommended For You
+                    </h2>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">Personalized picks matched to your skills, past bookings, and interests.</p>
+                </div>
+                <span style="font-size: 0.76rem; background: rgba(0, 242, 254, 0.15); color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.35); padding: 3px 12px; border-radius: 999px; font-weight: 700;">✨ Handpicked For You</span>
+            </div>
+            <div id="aiRecGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem;">
+                <!-- Dynamically filled by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- ⚡ Happening Today & Trending Highlights (Compact Grid Preview) -->
+    <section class="highlights-section" aria-label="Trending Highlights">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 10px;">
+            <div>
+                <span style="font-size: 0.8rem; font-weight: 800; letter-spacing: 1.5px; color: var(--primary); text-transform: uppercase;">⚡ ACTIVE HIGHLIGHTS</span>
+                <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 800; margin: 0.2rem 0 0;">Trending & Upcoming <span style="background: linear-gradient(135deg, #00f2fe, #4facfe); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Events</span></h2>
+            </div>
+            <div class="calendar-legend" style="margin: 0;">
+                <span style="display: inline-flex; align-items: center; gap: 5px;"><span class="event-status-dot dot-open"></span> Open</span>
+                <span style="display: inline-flex; align-items: center; gap: 5px;"><span class="event-status-dot dot-today"></span> Today</span>
+                <span style="display: inline-flex; align-items: center; gap: 5px;"><span class="event-status-dot dot-closed"></span> Closed</span>
+            </div>
+        </div>
+
+        <div class="highlights-grid">
+            {% for event in upcoming_events[:6] %}
+            <div class="highlight-card" data-id="{{ event.id }}" data-category="{{ event.category }}" data-cutoff-time="{{ event.cutoff_time }}" data-is-today="{{ '1' if event.is_today else '0' }}">
+                <a href="{{ url_for('event_detail', event_id=event.id) }}" style="display: block; position: relative; height: 180px; overflow: hidden; text-decoration: none;">
+                    <img src="{{ event.image }}" alt="{{ event.title }}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease;" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070&auto=format&fit=crop';">
+                    <a href="{{ url_for('category_events', category_name=event.category) }}" onclick="event.stopPropagation();" style="position: absolute; top: 10px; left: 10px; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(8px); padding: 4px 10px; border-radius: 20px; font-size: 0.74rem; color: var(--primary); font-weight: 700; border: 1px solid rgba(0, 242, 254, 0.35); text-decoration: none; z-index: 5;">
+                        {{ event.category }} ➔
+                    </a>
+                    <div class="date-badge" style="position: absolute; top: 10px; right: 10px; bottom: auto; left: auto; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(8px); padding: 4px 10px; border-radius: 20px; font-size: 0.74rem; color: #ffffff; font-weight: 700; border: 1px solid rgba(255, 255, 255, 0.15); height: auto; max-height: 28px; z-index: 5; display: inline-flex; align-items: center; white-space: nowrap;">
+                        {{ event.date }}
                     </div>
-                    <div style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 0.5rem;">
-                        ⏰ {{ event.time }} - {{ event.end_time }}
+                    {% if event.is_in_person_sold_out %}
+                    <div class="seat-status-pill soldout">🪑 0/{{ event.seats_total or 100 }} seats</div>
+                    {% elif (event.seats_left or 100) < 15 %}
+                    <div class="seat-status-pill warning">🪑 {{ event.seats_left }}/{{ event.seats_total or 100 }} seats</div>
+                    {% else %}
+                    <div class="seat-status-pill open">🪑 {{ event.seats_left }}/{{ event.seats_total or 100 }} seats</div>
+                    {% endif %}
+                </a>
+                <div style="padding: 1.25rem; display: flex; flex-direction: column; flex: 1; justify-content: space-between;">
+                    <div>
+                        <h3 class="highlight-card-title">
+                            <a href="{{ url_for('event_detail', event_id=event.id) }}">{{ event.title }}</a>
+                        </h3>
+
+                        <!-- Venue & Google Maps Link -->
+                        <div class="highlight-venue-row">
+                            <a href="{{ event.maps_url or ('https://www.google.com/maps/search/?api=1&query=' ~ ((event.venue ~ ' ' ~ event.venue_address) | urlencode)) }}"
+                               target="_blank" rel="noopener noreferrer" class="event-venue-link"
+                               title="Open {{ event.venue }} on Google Maps">
+                                <span>📍</span> <span>{{ event.venue or 'Auditorium' }}</span> <span>↗</span>
+                            </a>
+                        </div>
+
+                        <!-- Timing & Cutoff -->
+                        <div class="highlight-timing-row">
+                            <span>⏰ {{ event.time }} - {{ event.end_time }}</span>
+                            {% if event.is_today %}
+                                {% if event.is_open %}
+                                <span style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); padding: 1px 7px; border-radius: 10px; font-size: 0.7rem; font-weight: 700;">⚡ Closes {{ event.cutoff_time }}</span>
+                                {% else %}
+                                <span style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); padding: 1px 7px; border-radius: 10px; font-size: 0.7rem; font-weight: 700;">⛔ Closed</span>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+
+                        <!-- Available Seats with Total Seats to Register -->
+                        <div style="margin: 0.6rem 0; padding: 6px 10px; background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem;">
+                            <span style="color: #cbd5e1; display: inline-flex; align-items: center; gap: 5px;">
+                                <span>🪑</span> Available: <strong style="color: #00f2fe;">{{ event.seats_left }}</strong> / {{ event.seats_total or 100 }} Total
+                            </span>
+                            {% if event.is_in_person_sold_out %}
+                            <span class="seat-reg-badge soldout">Sold Out</span>
+                            {% elif (event.seats_left or 100) < 15 %}
+                            <span class="seat-reg-badge warning">{{ event.seats_left }} Left to Register</span>
+                            {% else %}
+                            <span class="seat-reg-badge open">{{ event.seats_left }} Left to Register</span>
+                            {% endif %}
+                        </div>
+
+                        <p class="highlight-desc-clamped">{{ event.desc }}</p>
                     </div>
-                    <p class="event-desc" style="color: var(--text-muted); font-size: 0.95rem;">{{ event.desc }}</p>
-                    <div
-                        style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 10px; align-items: center;">
-                        <button class="register-btn-sm"
-                            style="padding: 0.4rem 0.8rem; font-size: 0.85rem; background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1); cursor: not-allowed;"
-                            disabled>Closed</button>
-                        {% if is_host %}
-                        <form action="{{ url_for('delete_event', event_id=event.id) }}" method="POST"
-                            style="display: inline; margin: 0;" onsubmit="return confirmDelete(this, event);">
-                            <button type="submit" class="register-btn-sm"
-                                style="padding: 0.4rem 0.8rem; font-size: 0.85rem; white-space: nowrap; background: rgba(255,255,255,0.1); color: var(--text-muted); border: 1px solid var(--glass-border); cursor: pointer;">Delete</button>
-                        </form>
-                        {% endif %}
-                        <a href="{{ url_for('event_detail', event_id=event.id) }}"
-                            style="font-size: 0.85rem; color: var(--primary); text-decoration: none; font-weight: 600; margin-left: auto;">Details
-                            →</a>
+
+                    <div class="highlight-card-footer">
+                        <span class="event-price-tag">{{ event.price }}</span>
+                        <div class="card-action-btn-group">
+                            {% if event.is_registered %}
+                            <a href="{{ url_for('view_ticket_interactive', event_id=event.id) }}" class="card-btn-action" style="background: rgba(0, 242, 254, 0.2); color: var(--primary);" title="Open Holographic Pass">🎟️ Pass</a>
+                            {% elif event.is_open %}
+                            <a href="{{ url_for('register_event', event_id=event.id) }}" class="card-btn-action" style="background: var(--primary); color: #0f172a;">Register</a>
+                            {% else %}
+                            <button class="card-btn-action" style="background: rgba(255,255,255,0.08); color: var(--text-muted); cursor: not-allowed; border: 1px solid rgba(255,255,255,0.1);" disabled>Closed</button>
+                            {% endif %}
+                            <a href="{{ url_for('category_events', category_name=event.category) }}" class="btn-domain-link" title="Open {{ event.category }} Carousel">Domain ➔</a>
+                        </div>
                     </div>
                 </div>
             </div>
             {% endfor %}
         </div>
-    </section>
-    {% endif %}
 
+    </section>
+
+    <!-- Footer -->
     <footer class="site-footer glass-panel"
         style="margin-top: 6rem; padding: 4rem 2rem 2rem; border-radius: 0; border-left: none; border-right: none; border-bottom: none; position: relative;">
-        <div
-            style="max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 3rem;">
+        <div style="max-width: 1280px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 3rem; box-sizing: border-box;">
             <div style="flex: 1 1 300px;">
-                <h3
-                    style="color: var(--primary); font-size: 1.8rem; margin-bottom: 1rem; font-weight: 800; display: flex; align-items: center; gap: 12px;">
+                <h3 style="color: var(--primary); font-size: 1.8rem; margin-bottom: 1rem; font-weight: 800; display: flex; align-items: center; gap: 12px;">
                     <img src="{{ url_for('static', filename='logo.png') }}" alt="EVENTS Logo"
                         style="height: 45px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);">
                     <div>EV<span style="color: white;">ENTS</span></div>
                 </h3>
                 <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem;">
-                    Empowering students to design the future with code. Join our exclusive hackathons, workshops, and
-                    seminars tailored for BCA students.</p>
+                    Empowering students & innovators to design the future with code. Explore hackathons, summits, esports, and concerts across 12 distinct categories.
+                </p>
+            </div>
+            <div style="flex: 1 1 180px;">
+                <h4 style="color: white; margin-bottom: 1.2rem; font-size: 1.2rem;">Quick Links</h4>
+                <ul style="list-style: none; padding: 0; line-height: 2.2;">
+                    <li><a href="{{ url_for('dashboard') }}" class="footer-nav-link active">🏠 Dashboard</a></li>
+                    <li><a href="{{ url_for('category_events', category_name='all') }}" class="footer-nav-link">🎪 Explore Categories</a></li>
+                    <li><a href="{{ url_for('history') }}" class="footer-nav-link">📋 My Bookings</a></li>
+                    <li><a href="{{ url_for('profile') }}" class="footer-nav-link">👤 My Profile</a></li>
+                    <li><a href="{{ url_for('settings') }}" class="footer-nav-link">⚙️ Settings</a></li>
+                </ul>
             </div>
             <div style="flex: 1 1 200px;">
-                <h4 style="color: white; margin-bottom: 1.2rem; font-size: 1.2rem;">Quick Links</h4>
-                <ul style="list-style: none; padding: 0; line-height: 2;">
-                    <li><a href="{{ url_for('dashboard') }}"
-                            style="color: var(--text-muted); text-decoration: none; transition: color 0.3s;"
-                            onmouseover="this.style.color='var(--primary)'"
-                            onmouseout="this.style.color='var(--text-muted)'">Dashboard</a></li>
-                    <li><a href="{{ url_for('profile') }}"
-                            style="color: var(--text-muted); text-decoration: none; transition: color 0.3s;"
-                            onmouseover="this.style.color='var(--primary)'"
-                            onmouseout="this.style.color='var(--text-muted)'">My Profile</a></li>
-                    <li><a href="{{ url_for('history') }}"
-                            style="color: var(--text-muted); text-decoration: none; transition: color 0.3s;"
-                            onmouseover="this.style.color='var(--primary)'"
-                            onmouseout="this.style.color='var(--text-muted)'">My Bookings</a></li>
+                <h4 style="color: white; margin-bottom: 1.2rem; font-size: 1.2rem;">Features</h4>
+                <ul style="list-style: none; padding: 0; line-height: 2.2;">
+                    <li><a href="{{ url_for('passport_page') }}" class="footer-nav-link">🛂 Event Passport & XP</a></li>
+                    <li><a href="{{ url_for('teams_page') }}" class="footer-nav-link">🤖 AI Team Matcher</a></li>
+                    <li><a href="{{ url_for('category_events', category_name='all') }}" class="footer-nav-link">🎟️ Holographic Pass</a></li>
+                    <li><a href="{{ url_for('category_events', category_name='all') }}" class="footer-nav-link">📹 Live Video Room & Dashcam</a></li>
+                    <li><a href="{{ url_for('history') }}" class="footer-nav-link">🎓 Verified Certificates</a></li>
+                    <li><a href="{{ url_for('category_events', category_name='all') }}" class="footer-nav-link">🗺️ Interactive Venue Maps</a></li>
                 </ul>
             </div>
             <div style="flex: 1 1 250px;">
                 <h4 style="color: white; margin-bottom: 1.2rem; font-size: 1.2rem;">Contact Us</h4>
-                <p
-                    style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 0.5rem; user-select: text;">
+                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 0.5rem; user-select: text;">
                     <span style="font-size: 1.2rem; vertical-align: middle; margin-right: 8px;">📞</span> +91 9686837274
                 </p>
-                <p
-                    style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem; word-break: break-all;">
+                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem; word-break: break-all;">
                     <a href="https://mail.google.com/mail/?view=cm&fs=1&to=venu.rachakondaa@gmail.com" target="_blank"
-                        rel="noopener noreferrer"
-                        style="color: var(--text-muted); text-decoration: none; transition: color 0.3s;"
-                        onmouseover="this.style.color='var(--primary)'"
-                        onmouseout="this.style.color='var(--text-muted)'"><span
-                            style="font-size: 1.2rem; vertical-align: middle; margin-right: 8px;">📧</span>
-                        venu.rachakondaa@gmail.com</a></p>
-                <div style="display: flex; gap: 1rem;">
-                    <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer"
-                        style="display: inline-flex; align-items: center; justify-content: center; width: 45px; height: 45px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; color: var(--text-muted); text-decoration: none; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.2);"
-                        onmouseover="this.style.background='rgba(0,242,254,0.15)'; this.style.transform='translateY(-5px)'; this.style.borderColor='var(--primary)'; this.style.color='white'"
-                        onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.transform='translateY(0)'; this.style.borderColor='rgba(255,255,255,0.1)'; this.style.color='var(--text-muted)'"
-                        title="Facebook">
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                        </svg>
+                        rel="noopener noreferrer" style="color: var(--text-muted); text-decoration: none;">
+                        <span style="font-size: 1.2rem; vertical-align: middle; margin-right: 8px;">📧</span> venu.rachakondaa@gmail.com
                     </a>
-                    <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"
-                        style="display: inline-flex; align-items: center; justify-content: center; width: 45px; height: 45px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; color: var(--text-muted); text-decoration: none; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.2);"
-                        onmouseover="this.style.background='rgba(0,242,254,0.15)'; this.style.transform='translateY(-5px)'; this.style.borderColor='var(--primary)'; this.style.color='white'"
-                        onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.transform='translateY(0)'; this.style.borderColor='rgba(255,255,255,0.1)'; this.style.color='var(--text-muted)'"
-                        title="Twitter">
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723 10.054 10.054 0 01-3.127 1.184 4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
-                        </svg>
-                    </a>
-                    <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer"
-                        style="display: inline-flex; align-items: center; justify-content: center; width: 45px; height: 45px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; color: var(--text-muted); text-decoration: none; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.2);"
-                        onmouseover="this.style.background='rgba(0,242,254,0.15)'; this.style.transform='translateY(-5px)'; this.style.borderColor='var(--primary)'; this.style.color='white'"
-                        onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.transform='translateY(0)'; this.style.borderColor='rgba(255,255,255,0.1)'; this.style.color='var(--text-muted)'"
-                        title="Instagram">
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
-                        </svg>
-                    </a>
-                    <a href="https://www.linkedin.com/in/venu-rachakondaa" target="_blank" rel="noopener noreferrer"
-                        style="display: inline-flex; align-items: center; justify-content: center; width: 45px; height: 45px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; color: var(--text-muted); text-decoration: none; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.2);"
-                        onmouseover="this.style.background='rgba(0,242,254,0.15)'; this.style.transform='translateY(-5px)'; this.style.borderColor='var(--primary)'; this.style.color='white'"
-                        onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.transform='translateY(0)'; this.style.borderColor='rgba(255,255,255,0.1)'; this.style.color='var(--text-muted)'"
-                        title="LinkedIn">
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                        </svg>
-                    </a>
-                </div>
+                </p>
             </div>
         </div>
-        <div
-            style="width: 100%; text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05); color: var(--text-muted); font-size: 0.85rem;">
-            &copy; 2026 EVENTS. All rights reserved. Designed with <span style="color: var(--primary);">❤</span> by
-            Venu.
+        <div style="width: 100%; text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05); color: var(--text-muted); font-size: 0.85rem;">
+            &copy; 2026 EVENTS. All rights reserved.
         </div>
     </footer>
 
-    <!-- Custom Delete Confirmation Modal -->
+    <!-- Delete Modal -->
     <div id="deleteModal" class="custom-modal">
         <div class="modal-content glass-panel">
             <h3 style="color: white; margin-bottom: 1rem; font-size: 1.5rem;">Delete Event</h3>
-            <p style="color: var(--text-muted); margin-bottom: 2rem;">Are you absolutely sure you want to delete this
-                event? This action cannot be undone.</p>
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">Are you absolutely sure you want to delete this event? This action cannot be undone.</p>
             <div style="display: flex; gap: 1rem; justify-content: flex-end;">
-                <button class="register-btn-sm"
-                    style="background: transparent; border: 1px solid var(--glass-border); color: white;"
-                    onclick="closeDeleteModal()">Cancel</button>
-                <button class="register-btn-sm" style="background: #ef4444; color: white;"
-                    onclick="executeDelete()">Yes, Delete</button>
+                <button class="register-btn-sm" style="background: transparent; border: 1px solid var(--glass-border); color: white;" onclick="closeDeleteModal()">Cancel</button>
+                <button class="register-btn-sm" style="background: #ef4444; color: white;" onclick="executeDelete()">Yes, Delete</button>
             </div>
         </div>
     </div>
 
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/motion@latest/dist/motion.js"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script src="{{ url_for('static', filename='animations.js') }}"></script>
     <script src="{{ url_for('static', filename='onboarding.js') }}"></script>
@@ -720,994 +908,111 @@
         const sidebar = document.getElementById('sidebar');
         const closeSidebar = document.getElementById('closeSidebar');
 
-        function openSidebar() {
-            sidebar.classList.add('active');
-            sidebar.setAttribute('aria-hidden', 'false');
-            hamburger.setAttribute('aria-expanded', 'true');
+        if (hamburger && sidebar) {
+            hamburger.onclick = () => {
+                sidebar.classList.add('active');
+                sidebar.setAttribute('aria-hidden', 'false');
+                hamburger.setAttribute('aria-expanded', 'true');
+            };
         }
-        function closeSidebarFn() {
-            sidebar.classList.remove('active');
-            sidebar.setAttribute('aria-hidden', 'true');
-            hamburger.setAttribute('aria-expanded', 'false');
+        if (closeSidebar && sidebar) {
+            closeSidebar.onclick = () => {
+                sidebar.classList.remove('active');
+                sidebar.setAttribute('aria-hidden', 'true');
+                hamburger.setAttribute('aria-expanded', 'false');
+            };
         }
-        hamburger.onclick = openSidebar;
-        closeSidebar.onclick = closeSidebarFn;
-
-        // Close sidebar when clicking outside or pressing Escape
         document.addEventListener('click', (e) => {
-            if (!sidebar.contains(e.target) && !hamburger.contains(e.target)) {
-                closeSidebarFn();
+            if (sidebar && hamburger && !sidebar.contains(e.target) && !hamburger.contains(e.target)) {
+                sidebar.classList.remove('active');
             }
         });
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeSidebarFn();
+            if (e.key === 'Escape' && sidebar) sidebar.classList.remove('active');
         });
 
-
-
-        // Carousel Rotation Logic
-        let currentAngle = 0;
-        let rotationStep = 0;
-        let upcomingEventsData = [];
-
-        // Touchpad & Wheel Swipe Navigation
-        let wheelAccX = 0;
-        let wheelAccY = 0;
-        let isWheelCooldown = false;
-        let wheelResetTimer = null;
-        const WHEEL_THRESHOLD = 20; // Highly responsive threshold for trackpads
-        const WHEEL_COOLDOWN = 400; // Cooldown to ensure 1 swipe = 1 card rotation
-
-        function handleCarouselWheel(e) {
-            // 1. Normalize delta across different browser modes (pixel / line / page)
-            let rawDx = e.deltaX;
-            let rawDy = e.deltaY;
-
-            // Handle Shift + wheel on mouse wheel devices
-            if (e.shiftKey && !rawDx && rawDy) {
-                rawDx = rawDy;
-                rawDy = 0;
-            }
-
-            if (e.deltaMode === 1) { // Line mode
-                rawDx *= 24;
-                rawDy *= 24;
-            } else if (e.deltaMode === 2) { // Page mode
-                rawDx *= 300;
-                rawDy *= 300;
-            }
-
-            const absDx = Math.abs(rawDx);
-            const absDy = Math.abs(rawDy);
-
-            // If in cooldown, prevent horizontal jumping from trailing swipe momentum
-            if (isWheelCooldown) {
-                if (absDx > absDy && e.cancelable) {
-                    e.preventDefault();
-                }
-                return;
-            }
-
-            // Reset accumulator after idle pause
-            if (wheelResetTimer) {
-                clearTimeout(wheelResetTimer);
-            }
-            wheelResetTimer = setTimeout(() => {
-                wheelAccX = 0;
-                wheelAccY = 0;
-            }, 180);
-
-            // Accumulate delta
-            wheelAccX += rawDx;
-            wheelAccY += rawDy;
-
-            const totalAbsX = Math.abs(wheelAccX);
-            const totalAbsY = Math.abs(wheelAccY);
-
-            // 2. Detect predominantly horizontal touchpad gesture
-            if (totalAbsX > totalAbsY && totalAbsX > 5) {
-                // Prevent browser horizontal back/forward history navigation or horizontal scroll
-                if (e.cancelable) {
-                    e.preventDefault();
-                }
-
-                // 3. Trigger card rotation when threshold is reached
-                if (totalAbsX >= WHEEL_THRESHOLD) {
-                    if (wheelAccX > 0) {
-                        // Two-finger swipe LEFT (deltaX > 0) -> NEXT event (carousel rotates left)
-                        rotateCarousel(1);
-                    } else {
-                        // Two-finger swipe RIGHT (deltaX < 0) -> PREV event (carousel rotates right)
-                        rotateCarousel(-1);
-                    }
-
-                    // Reset accumulator and enter cooldown
-                    wheelAccX = 0;
-                    wheelAccY = 0;
-                    if (wheelResetTimer) clearTimeout(wheelResetTimer);
-
-                    isWheelCooldown = true;
-                    setTimeout(() => {
-                        isWheelCooldown = false;
-                        wheelAccX = 0;
-                        wheelAccY = 0;
-                    }, WHEEL_COOLDOWN);
-                }
-            } else if (totalAbsY > 30 && totalAbsY > totalAbsX * 1.5) {
-                // Vertical scrolling dominant: clear horizontal accumulator so page scrolls normally
-                wheelAccX = 0;
-            }
-        }
-
-        function initCarouselTouchpad() {
-            const container = document.getElementById('carouselContainer');
-            if (!container) return;
-
-            // Attach active wheel listener for laptop trackpad two-finger horizontal swipes
-            container.removeEventListener('wheel', handleCarouselWheel);
-            container.addEventListener('wheel', handleCarouselWheel, { passive: false });
-
-            // Also attach Pointer / Touch swipe support (works with touch displays and mouse drags)
-            let isPointerDown = false;
-            let startPointerX = 0;
-            let startPointerY = 0;
-            let currentPointerDx = 0;
-            let currentPointerDy = 0;
-
-            container.addEventListener('pointerdown', (e) => {
-                // Don't intercept button clicks or interactive links
-                if (e.target.closest('button, a, input, form')) return;
-                isPointerDown = true;
-                startPointerX = e.clientX;
-                startPointerY = e.clientY;
-                currentPointerDx = 0;
-                currentPointerDy = 0;
-            });
-
-            container.addEventListener('pointermove', (e) => {
-                if (!isPointerDown) return;
-                currentPointerDx = e.clientX - startPointerX;
-                currentPointerDy = e.clientY - startPointerY;
-            });
-
-            const endPointerSwipe = () => {
-                if (!isPointerDown) return;
-                isPointerDown = false;
-                if (Math.abs(currentPointerDx) > Math.abs(currentPointerDy) && Math.abs(currentPointerDx) > 40) {
-                    if (currentPointerDx < 0) {
-                        // Dragged / Swiped Left -> NEXT
-                        rotateCarousel(1);
-                    } else {
-                        // Dragged / Swiped Right -> PREV
-                        rotateCarousel(-1);
-                    }
-                }
-                currentPointerDx = 0;
-                currentPointerDy = 0;
-            };
-
-            container.addEventListener('pointerup', endPointerSwipe);
-            container.addEventListener('pointercancel', endPointerSwipe);
-        }
-
-        let pastEventsData = [];
-
-        function initEventsData() {
-            upcomingEventsData = [];
-            pastEventsData = [];
-            const items = document.querySelectorAll('.carousel-item');
-            items.forEach(item => {
-                const titleEl = item.querySelector('.event-title');
-                const imageEl = item.querySelector('.card-image');
-                const dateEl = item.querySelector('.date-badge');
-                const descEl = item.querySelector('.event-desc');
-                const id = item.getAttribute('data-id') || '';
-                const isExpired = item.querySelector('.event-expired') !== null;
-                const time = item.getAttribute('data-time') || '10:00 AM';
-                const endTime = item.getAttribute('data-end-time') || '05:00 PM';
-                const cutoffTime = item.getAttribute('data-cutoff-time') || '';
-                const isToday = item.getAttribute('data-is-today') === '1';
-                const isOpen = item.getAttribute('data-is-open') === '1';
-                const isCutoff = item.getAttribute('data-is-cutoff') === '1';
-                const statusLabel = item.getAttribute('data-status-label') || '';
-
-                upcomingEventsData.push({
-                    id: parseInt(id) || 0,
-                    title: titleEl ? titleEl.textContent.trim() : '',
-                    category: item.getAttribute('data-category'),
-                    price: item.getAttribute('data-price'),
-                    date: dateEl ? dateEl.textContent.trim() : (item.getAttribute('data-date') || ''),
-                    time: time,
-                    endTime: endTime,
-                    cutoffTime: cutoffTime,
-                    venue: item.getAttribute('data-venue') || 'Main Auditorium',
-                    venueAddress: item.getAttribute('data-venue-address') || '',
-                    mapsUrl: item.getAttribute('data-maps-url') || '',
-                    isToday: isToday,
-                    isOpen: isOpen,
-                    isCutoff: isCutoff,
-                    statusLabel: statusLabel,
-                    desc: descEl ? descEl.textContent.trim() : '',
-                    image: imageEl ? imageEl.src : '',
-                    element: item,
-                    isPast: isExpired
-                });
-            });
-
-            const pastCards = document.querySelectorAll('#pastEventsContainer .event-card');
-            pastCards.forEach(card => {
-                const titleEl = card.querySelector('.event-title');
-                const dateEl = card.querySelector('.date-badge');
-                const id = card.getAttribute('data-id') || '';
-                const category = card.getAttribute('data-category');
-                const price = card.getAttribute('data-price');
-                const descEl = card.querySelector('.event-desc');
-                const time = card.getAttribute('data-time') || '10:00 AM';
-                const endTime = card.getAttribute('data-end-time') || '05:00 PM';
-                const cutoffTime = card.getAttribute('data-cutoff-time') || '';
-                const isToday = card.getAttribute('data-is-today') === '1';
-                const isOpen = card.getAttribute('data-is-open') === '1';
-                const isCutoff = card.getAttribute('data-is-cutoff') === '1';
-
-                pastEventsData.push({
-                    id: parseInt(id) || 0,
-                    title: titleEl ? titleEl.textContent.trim() : '',
-                    category: category,
-                    price: price,
-                    date: dateEl ? dateEl.textContent.trim() : (card.getAttribute('data-date') || ''),
-                    time: time,
-                    endTime: endTime,
-                    cutoffTime: cutoffTime,
-                    venue: card.getAttribute('data-venue') || 'Main Auditorium',
-                    venueAddress: card.getAttribute('data-venue-address') || '',
-                    mapsUrl: card.getAttribute('data-maps-url') || '',
-                    isToday: isToday,
-                    isOpen: isOpen,
-                    isCutoff: isCutoff,
-                    statusLabel: 'Registration Closed',
-                    desc: descEl ? descEl.textContent.trim() : '',
-                    element: card,
-                    isPast: true
-                });
-            });
-
-            // Smart Initial Calendar Navigation based on active events
-            autoSelectRelevantMonth();
-
-            const totalEvents = upcomingEventsData.length;
-            rotationStep = totalEvents > 0 ? 360 / totalEvents : 0;
-            initCarouselTouchpad();
-            
-            // If calendar is open, auto-update it
-            const calendar = document.getElementById('calendarViewContainer');
-            if (calendar && calendar.style.display !== 'none') {
-                renderCalendar();
-            }
-        }
-
-        function autoSelectRelevantMonth() {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-
-            // Check if current month already has events
-            const allEvents = [...upcomingEventsData, ...pastEventsData];
-            const hasCurrentMonthEvents = allEvents.some(ev => {
-                const d = new Date(ev.date);
-                return !isNaN(d.getTime()) && d.getMonth() === currentMonth && d.getFullYear() === currentYear;
-            });
-
-            if (!hasCurrentMonthEvents && upcomingEventsData.length > 0) {
-                // Find first upcoming event date
-                for (const ev of upcomingEventsData) {
-                    const d = new Date(ev.date);
-                    if (!isNaN(d.getTime()) && d >= today) {
-                        currentMonth = d.getMonth();
-                        currentYear = d.getFullYear();
-                        break;
-                    }
-                }
-            }
-        }
-
-        function rotateCarousel(direction) {
-            currentAngle -= direction * rotationStep;
-            const carousel = document.getElementById('carousel');
-            if (carousel) {
-                carousel.style.transform = `translateZ(calc(-1 * var(--carousel-radius))) rotateY(${currentAngle}deg)`;
-            }
-        }
-
-        // Filter and Search Logic
-        function filterEvents() {
-            const searchVal = (document.getElementById('searchInput') ? document.getElementById('searchInput').value : '').toLowerCase().trim();
-            const catVal = document.getElementById('categoryFilter') ? document.getElementById('categoryFilter').value : 'all';
-            const priceVal = document.getElementById('priceFilter') ? document.getElementById('priceFilter').value : 'all';
-
-            // 1. Filter upcoming carousel items
-            let visibleCount = 0;
-            upcomingEventsData.forEach(ev => {
-                const matchSearch = !searchVal || ev.title.toLowerCase().includes(searchVal) || ev.desc.toLowerCase().includes(searchVal);
-                const matchCat = catVal === 'all' || ev.category === catVal;
-                const matchPrice = priceVal === 'all' || ev.price === priceVal;
-
-                if (matchSearch && matchCat && matchPrice) {
-                    if (ev.element) ev.element.style.display = 'block';
-                    visibleCount++;
-                } else {
-                    if (ev.element) ev.element.style.display = 'none';
-                }
-            });
-
-            recalculateCarousel(visibleCount);
-
-            // 2. Filter past events
-            const pastContainer = document.getElementById('pastEventsContainer');
-            if (pastContainer) {
-                const pastCards = pastContainer.querySelectorAll('.event-card');
-                pastCards.forEach(card => {
-                    const title = (card.getAttribute('data-title') || '').toLowerCase();
-                    const descEl = card.querySelector('.event-desc');
-                    const desc = descEl ? descEl.textContent.toLowerCase() : '';
-                    const category = card.getAttribute('data-category');
-                    const price = card.getAttribute('data-price');
-
-                    const matchSearch = !searchVal || title.includes(searchVal) || desc.includes(searchVal);
-                    const matchCat = catVal === 'all' || category === catVal;
-                    const matchPrice = priceVal === 'all' || price === priceVal;
-
-                    if (matchSearch && matchCat && matchPrice) {
-                        card.style.display = 'flex';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-            }
-
-            // 3. Auto-update Calendar with filtered events
-            renderCalendar();
-        }
-
-        function resetFiltersAndCalendar() {
-            const searchInput = document.getElementById('searchInput');
-            const catFilter = document.getElementById('categoryFilter');
-            const priceFilter = document.getElementById('priceFilter');
-            if (searchInput) searchInput.value = '';
-            if (catFilter) catFilter.value = 'all';
-            if (priceFilter) priceFilter.value = 'all';
-            filterEvents();
-        }
-
-        function recalculateCarousel(visibleCount) {
-            const carousel = document.getElementById('carousel');
-            const carouselContainer = document.getElementById('carouselContainer');
-            if (!carousel || !carouselContainer) return;
-
-            if (visibleCount === 0) {
-                carouselContainer.style.display = 'none';
-                return;
-            }
-            carouselContainer.style.display = 'block';
-
-            let radius = 0;
-            if (visibleCount > 1) {
-                radius = Math.round((350 / 2) / Math.tan(Math.PI / visibleCount));
-            }
-            radius = Math.max(radius + 50, 450);
-            carouselContainer.style.setProperty('--carousel-radius', radius + 'px');
-
-            let index = 0;
-            upcomingEventsData.forEach(ev => {
-                if (ev.element && ev.element.style.display !== 'none') {
-                    const angle = Math.round((360 / visibleCount) * index * 100) / 100;
-                    ev.element.style.setProperty('--carousel-angle', angle + 'deg');
-                    ev.element.style.setProperty('--carousel-tz', radius + 'px');
-                    index++;
-                }
-            });
-
-            rotationStep = visibleCount > 0 ? 360 / visibleCount : 0;
-            currentAngle = 0;
-            carousel.style.transform = `translateZ(calc(-1 * var(--carousel-radius))) rotateY(${currentAngle}deg)`;
-            initCarouselTouchpad();
-        }
-
-        // Calendar View Logic
-        let currentMonth = new Date().getMonth();
-        let currentYear = new Date().getFullYear();
-        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
-        function toggleView() {
-            const grid = document.getElementById('mainGridContainer');
-            const calendar = document.getElementById('calendarViewContainer');
-            const btn = document.getElementById('viewToggleBtn');
-            const pastSection = document.querySelector('.past-events-section');
-
-            if (grid.style.display === 'none') {
-                grid.style.display = 'block';
-                calendar.style.display = 'none';
-                btn.innerHTML = '📅 Calendar View';
-                if (pastSection) pastSection.style.display = 'block';
-            } else {
-                grid.style.display = 'none';
-                calendar.style.display = 'block';
-                btn.innerHTML = '🏠 Grid View';
-                if (pastSection) pastSection.style.display = 'none';
-                renderCalendar();
-            }
-        }
-
-        function renderCalendar() {
-            const gridEl = document.getElementById('calendarGrid');
-            const titleEl = document.getElementById('calendarTitle');
-            const countBadge = document.getElementById('calendarEventCountBadge');
-            if (!gridEl || !titleEl) return;
-
-            gridEl.innerHTML = '';
-            titleEl.textContent = `${monthNames[currentMonth]} ${currentYear}`;
-
-            const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-            weekdays.forEach(day => {
-                const dayEl = document.createElement('div');
-                dayEl.className = 'calendar-weekday';
-                dayEl.textContent = day;
-                gridEl.appendChild(dayEl);
-            });
-
-            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-            const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
-
-            for (let i = 0; i < firstDay; i++) {
-                const emptyDay = document.createElement('div');
-                emptyDay.className = 'calendar-day empty';
-                gridEl.appendChild(emptyDay);
-            }
-
-            // Read active search & filters
-            const searchVal = (document.getElementById('searchInput') ? document.getElementById('searchInput').value : '').toLowerCase().trim();
-            const catVal = document.getElementById('categoryFilter') ? document.getElementById('categoryFilter').value : 'all';
-            const priceVal = document.getElementById('priceFilter') ? document.getElementById('priceFilter').value : 'all';
-
-            const eventsByDay = {};
-            const allEvents = [...upcomingEventsData, ...pastEventsData];
-            let matchingThisMonthCount = 0;
-
-            const now = new Date();
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-
-            allEvents.forEach(ev => {
-                // Apply active filters to calendar
-                const matchSearch = !searchVal || ev.title.toLowerCase().includes(searchVal) || (ev.desc && ev.desc.toLowerCase().includes(searchVal));
-                const matchCat = catVal === 'all' || ev.category === catVal;
-                const matchPrice = priceVal === 'all' || ev.price === priceVal;
-
-                if (!matchSearch || !matchCat || !matchPrice) return;
-
-                try {
-                    const dateObj = new Date(ev.date);
-                    if (!isNaN(dateObj.getTime()) && dateObj.getMonth() === currentMonth && dateObj.getFullYear() === currentYear) {
-                        const day = dateObj.getDate();
-                        if (!eventsByDay[day]) eventsByDay[day] = [];
-                        eventsByDay[day].push(ev);
-                        matchingThisMonthCount++;
-                    }
-                } catch (e) { }
-            });
-
-            if (countBadge) {
-                countBadge.textContent = `${matchingThisMonthCount} Event${matchingThisMonthCount === 1 ? '' : 's'}`;
-                countBadge.style.display = matchingThisMonthCount > 0 ? 'inline-block' : 'none';
-            }
-
-            for (let d = 1; d <= totalDays; d++) {
-                const dayEl = document.createElement('div');
-                dayEl.className = 'calendar-day';
-                dayEl.style.position = 'relative';
-
-                const isTodayCell = (d === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear());
-                if (isTodayCell) {
-                    dayEl.classList.add('today');
-                }
-
-                const numEl = document.createElement('div');
-                numEl.className = 'calendar-day-number';
-                numEl.textContent = d;
-                dayEl.appendChild(numEl);
-
-                if (eventsByDay[d] && eventsByDay[d].length > 0) {
-                    if (eventsByDay[d].length > 1) {
-                        const pillEl = document.createElement('span');
-                        pillEl.className = 'day-events-pill';
-                        pillEl.textContent = `${eventsByDay[d].length} events`;
-                        dayEl.appendChild(pillEl);
-                    }
-
-                    const listEl = document.createElement('div');
-                    listEl.className = 'calendar-events-list';
-
-                    eventsByDay[d].forEach(ev => {
-                        const itemEl = document.createElement('div');
-                        itemEl.className = 'calendar-event-item';
-
-                        const evDateObj = ev.date ? new Date(ev.date) : null;
-                        const isActuallyToday = ev.isToday || (evDateObj && evDateObj.getDate() === today.getDate() && evDateObj.getMonth() === today.getMonth() && evDateObj.getFullYear() === today.getFullYear());
-
-                        // Real-time Cutoff Evaluation for Today's Event
-                        let isCutoffReachedLive = ev.isCutoff;
-                        let cutoffTimeDisplay = ev.cutoffTime;
-
-                        if (isActuallyToday && ev.time) {
-                            try {
-                                const parsedStart = new Date(`${ev.date} ${ev.time}`);
-                                if (!isNaN(parsedStart.getTime())) {
-                                    const cutoffDt = new Date(parsedStart.getTime() - (2 * 60 * 60 * 1000));
-                                    isCutoffReachedLive = (now.getTime() >= cutoffDt.getTime());
-                                    if (!cutoffTimeDisplay) {
-                                        cutoffTimeDisplay = cutoffDt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-                                    }
-                                }
-                            } catch (err) { }
-                        }
-
-                        let dotClass = 'dot-open';
-                        let statusText = 'Open / Upcoming';
-                        let state = 'open'; // 'open', 'today_open', 'today_closed', 'closed'
-
-                        if (isActuallyToday) {
-                            if (!isCutoffReachedLive && !ev.isPast && ev.isOpen !== false) {
-                                state = 'today_open';
-                                dotClass = 'dot-today';
-                                statusText = `Held Today (Open - Closes 2h prior at ${cutoffTimeDisplay || 'start - 2h'})`;
-                            } else {
-                                state = 'today_closed';
-                                dotClass = 'dot-closed';
-                                statusText = `Held Today (Closed - 2h Cutoff Reached at ${cutoffTimeDisplay || 'start - 2h'})`;
-                            }
-                        } else if (ev.isPast || ev.isOpen === false || (evDateObj && evDateObj < today)) {
-                            state = 'closed';
-                            dotClass = 'dot-closed';
-                            statusText = 'Registration Closed';
-                        } else {
-                            state = 'open';
-                            dotClass = 'dot-open';
-                            statusText = 'Open / Upcoming';
-                        }
-
-                        itemEl.title = `${ev.title}\n📍 Venue: ${ev.venue || 'Tech Arena'}\n⏰ Time: ${ev.time || '10:00 AM'} - ${ev.endTime || '05:00 PM'}\nCategory: ${ev.category || 'General'}\nPrice: ${ev.price || 'Free'}\nStatus: ${statusText}`;
-                        itemEl.onclick = (e) => {
-                            e.stopPropagation();
-                            window.location.href = `/event/${ev.id}`;
-                        };
-
-                        const dotEl = document.createElement('span');
-                        dotEl.className = `event-status-dot ${dotClass}`;
-
-                        const titleWrapper = document.createElement('div');
-                        titleWrapper.className = 'calendar-event-title-wrapper';
-
-                        const titleSpan = document.createElement('span');
-                        titleSpan.className = 'calendar-event-title';
-                        titleSpan.textContent = ev.title;
-
-                        titleWrapper.appendChild(titleSpan);
-                        itemEl.appendChild(dotEl);
-                        itemEl.appendChild(titleWrapper);
-
-                        // Smooth horizontal marquee on hover for overflowing titles
-                        itemEl.onmouseenter = () => {
-                            const overflowDist = titleSpan.scrollWidth - titleWrapper.clientWidth;
-                            if (overflowDist > 3) {
-                                titleWrapper.style.textOverflow = 'clip';
-                                const duration = Math.max(1.8, Math.min(5.5, overflowDist / 30));
-                                titleSpan.style.transition = `transform ${duration}s ease-in-out 0.4s`;
-                                titleSpan.style.transform = `translateX(-${overflowDist + 4}px)`;
-                            }
-                        };
-
-                        itemEl.onmouseleave = () => {
-                            titleSpan.style.transition = 'transform 0.25s ease 0s';
-                            titleSpan.style.transform = 'translateX(0px)';
-                            titleWrapper.style.textOverflow = 'ellipsis';
-                        };
-
-                        const isLightMode = document.body.classList.contains('light-mode');
-                        if (state === 'today_open') {
-                            itemEl.style.borderLeftColor = isLightMode ? '#f59e0b' : '#fbbf24';
-                            itemEl.style.background = isLightMode ? '#fffbeb' : 'rgba(245, 158, 11, 0.2)';
-                            itemEl.style.color = isLightMode ? '#b45309' : '#fde68a';
-                        } else if (state === 'today_closed' || state === 'closed') {
-                            itemEl.style.borderLeftColor = isLightMode ? '#ef4444' : '#f87171';
-                            itemEl.style.background = isLightMode ? '#fef2f2' : 'rgba(239, 68, 68, 0.15)';
-                            itemEl.style.color = isLightMode ? '#991b1b' : '#fca5a5';
-                        } else {
-                            itemEl.style.borderLeftColor = isLightMode ? '#10b981' : '#22c55e';
-                            itemEl.style.background = isLightMode ? '#f0fdf4' : 'rgba(34, 197, 94, 0.18)';
-                            itemEl.style.color = isLightMode ? '#166534' : '#86efac';
-                        }
-
-                        listEl.appendChild(itemEl);
-                    });
-                    dayEl.appendChild(listEl);
-                }
-
-                gridEl.appendChild(dayEl);
-            }
-
-            // If no matching events found in this month, display informative status banner
-            if (matchingThisMonthCount === 0) {
-                const emptyMsg = document.createElement('div');
-                emptyMsg.style.gridColumn = '1 / -1';
-                emptyMsg.style.textAlign = 'center';
-                emptyMsg.style.padding = '2.5rem 1rem';
-                emptyMsg.style.color = 'var(--text-muted)';
-                emptyMsg.style.fontSize = '0.92rem';
-                emptyMsg.innerHTML = `📅 No events scheduled in <strong>${monthNames[currentMonth]} ${currentYear}</strong> matching current filters. <button onclick="resetFiltersAndCalendar()" style="background: none; border: none; color: var(--primary); font-weight: 700; cursor: pointer; text-decoration: underline; margin-left: 6px;">Reset Filters</button> or <button onclick="jumpToNextEventMonth()" style="background: none; border: none; color: var(--primary); font-weight: 700; cursor: pointer; text-decoration: underline; margin-left: 4px;">Jump to Next Event 🎯</button>`;
-                gridEl.appendChild(emptyMsg);
-            }
-        }
-
-        function prevMonth() {
-            currentMonth--;
-            if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
-            }
-            renderCalendar();
-        }
-
-        function nextMonth() {
-            currentMonth++;
-            if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
-            }
-            renderCalendar();
-        }
-
-        function jumpToToday() {
-            currentMonth = new Date().getMonth();
-            currentYear = new Date().getFullYear();
-            renderCalendar();
-        }
-
-        function jumpToNextEventMonth() {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const allEvents = [...upcomingEventsData, ...pastEventsData];
-            
-            // Sort events by date ascending
-            const futureEvents = allEvents
-                .map(ev => ({ ev, d: new Date(ev.date) }))
-                .filter(item => !isNaN(item.d.getTime()) && item.d >= today)
-                .sort((a, b) => a.d.getTime() - b.d.getTime());
-
-            if (futureEvents.length > 0) {
-                currentMonth = futureEvents[0].d.getMonth();
-                currentYear = futureEvents[0].d.getFullYear();
-                renderCalendar();
-            } else if (allEvents.length > 0) {
-                jumpToToday();
-            }
-        }
-
-        // Auto-Update Engine: Periodically refreshes 2h Cutoff statuses & Polls API
-        function autoUpdateCalendarState() {
-            // 1. Re-render calendar live if open to transition today dots from yellow to red seamlessly
-            const calendar = document.getElementById('calendarViewContainer');
-            if (calendar && calendar.style.display !== 'none') {
-                renderCalendar();
-            }
-        }
-
-        async function syncEventsFromApi() {
+        // AI Recommendations fetcher
+        async function loadAIRecommendations() {
             try {
-                const resp = await fetch('/api/events');
-                if (!resp.ok) return;
-                const data = await resp.json();
-                if (data && data.status === 'success' && Array.isArray(data.events)) {
-                    // Update upcoming and past events data
-                    upcomingEventsData = [];
-                    pastEventsData = [];
-                    
-                    data.events.forEach(ev => {
-                        const evObj = {
-                            id: ev.id,
-                            title: ev.title || '',
-                            category: ev.category || 'General Tech',
-                            price: (ev.price || 'Free').toLowerCase() === 'free' ? 'free' : 'paid',
-                            date: ev.date || '',
-                            time: ev.time || '10:00 AM',
-                            endTime: ev.end_time || '05:00 PM',
-                            cutoffTime: ev.cutoff_time || '',
-                            venue: ev.venue || '',
-                            venueAddress: ev.venue_address || '',
-                            mapsUrl: ev.maps_url || '',
-                            mapsDirectionsUrl: ev.maps_directions_url || '',
-                            isToday: Boolean(ev.is_today),
-                            isOpen: Boolean(ev.is_open),
-                            isCutoff: Boolean(ev.is_cutoff_reached),
-                            statusLabel: ev.status_label || '',
-                            desc: ev.desc || '',
-                            image: ev.image || '',
-                            isPast: Boolean(ev.is_expired) && !ev.is_today
-                        };
-                        
-                        // Find matching DOM card if present
-                        const existingCard = document.querySelector(`.carousel-item[data-id="${ev.id}"]`);
-                        if (existingCard) {
-                            evObj.element = existingCard;
-                            existingCard.setAttribute('data-time', evObj.time);
-                            existingCard.setAttribute('data-end-time', evObj.endTime);
-                            existingCard.setAttribute('data-cutoff-time', evObj.cutoffTime);
-                            existingCard.setAttribute('data-is-today', evObj.isToday ? '1' : '0');
-                            existingCard.setAttribute('data-is-open', evObj.isOpen ? '1' : '0');
-                            existingCard.setAttribute('data-is-cutoff', evObj.isCutoff ? '1' : '0');
-                        }
-                        
-                        if (evObj.isPast) {
-                            pastEventsData.push(evObj);
-                        } else {
-                            upcomingEventsData.push(evObj);
-                        }
-                    });
-
-                    // Auto-update calendar with fresh events
-                    renderCalendar();
+                const res = await fetch('/api/events/recommendations');
+                const data = await res.json();
+                const sec = document.getElementById('aiRecommendationsSection');
+                const grid = document.getElementById('aiRecGrid');
+                if (data.ok && data.recommendations && data.recommendations.length > 0 && grid && sec) {
+                    sec.style.display = 'block';
+                    grid.innerHTML = data.recommendations.map(ev => `
+                        <div style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(0, 242, 254, 0.25); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 8px 20px rgba(0,0,0,0.35); transition: transform 0.25s, border-color 0.25s;" onmouseover="this.style.transform='translateY(-3px)'; this.style.borderColor='rgba(0,242,254,0.6)';" onmouseout="this.style.transform='none'; this.style.borderColor='rgba(0,242,254,0.25)';">
+                            <div style="position: relative; height: 110px; overflow: hidden;">
+                                <img src="${ev.image}" alt="${ev.title}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070&auto=format&fit=crop';">
+                                <span style="position: absolute; top: 8px; right: 8px; background: rgba(0,242,254,0.9); color: #020617; font-weight: 800; font-size: 0.72rem; padding: 2px 8px; border-radius: 999px;">
+                                    ${ev.match_score}% Match
+                                </span>
+                            </div>
+                            <div style="padding: 0.9rem 1rem; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <span style="font-size: 0.72rem; color: #00f2fe; font-weight: 700; text-transform: uppercase;">${ev.category || 'Tech Event'}</span>
+                                    <h4 style="color: #ffffff; font-size: 0.98rem; font-weight: 700; margin: 0.2rem 0 0.4rem; line-height: 1.3;">
+                                        <a href="/event/${ev.id}" style="color: inherit; text-decoration: none;">${ev.title}</a>
+                                    </h4>
+                                    <div style="color: var(--text-muted); font-size: 0.78rem; margin-bottom: 0.6rem;">
+                                        🗓️ ${ev.date} &bull; 🏷️ ${ev.price}
+                                    </div>
+                                </div>
+                                <a href="/event/${ev.id}" class="btn-primary" style="display: block; text-align: center; text-decoration: none; padding: 0.5rem; font-size: 0.8rem; font-weight: 700; border-radius: 8px; margin: 0;">
+                                    View Event Details →
+                                </a>
+                            </div>
+                        </div>
+                    `).join('');
                 }
             } catch (err) {
-                // Background sync error handled gracefully
+                console.error("AI Recommendations error:", err);
             }
         }
 
-        // Initialize lists
-        initEventsData();
-
-        // Start live auto-update intervals
-        setInterval(autoUpdateCalendarState, 15000); // 15s cutoff live ticker
-        setInterval(syncEventsFromApi, 45000);        // 45s API live sync
-        window.addEventListener('focus', syncEventsFromApi); // Instant sync on tab focus
-
-        // Initialize theme selector value from localStorage
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.loadPersistedTheme) loadPersistedTheme();
-            // Scroll-reveal for glass panels
-            const reveals = document.querySelectorAll('.glass-panel, .history-card, .calendar-container');
-            reveals.forEach(el => el.classList.add('reveal'));
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(e => {
-                    if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
-                });
-            }, { threshold: 0.08 });
-            reveals.forEach(el => observer.observe(el));
-            // Trigger onboarding for first-time users
-            if (window.initOnboarding) initOnboarding();
-            initCarouselTouchpad();
-        });
-
-        // Custom Delete Modal Logic
+        // Delete Modal Logic
         let formToDelete = null;
-
         function confirmDelete(form, event) {
             event.preventDefault();
             formToDelete = form;
             const modal = document.getElementById('deleteModal');
-            modal.style.display = 'flex';
-            setTimeout(() => {
-                modal.classList.add('active');
-            }, 10);
+            if (modal) {
+                modal.style.display = 'flex';
+                setTimeout(() => modal.classList.add('active'), 10);
+            }
             return false;
         }
-
         function closeDeleteModal() {
             formToDelete = null;
             const modal = document.getElementById('deleteModal');
-            modal.classList.remove('active');
-            setTimeout(() => {
-                modal.style.display = 'none';
-            }, 300);
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.style.display = 'none', 300);
+            }
         }
-
         function executeDelete() {
-            if (formToDelete) {
-                formToDelete.submit();
-            }
+            if (formToDelete) formToDelete.submit();
         }
 
-        // Toggle Past Events Visibility
-        const togglePastEventsBtn = document.getElementById('togglePastEventsBtn');
-        const pastEventsContainer = document.getElementById('pastEventsContainer');
-
-        if (togglePastEventsBtn && pastEventsContainer) {
-            togglePastEventsBtn.onclick = () => {
-                const isHidden = pastEventsContainer.style.display === 'none' || pastEventsContainer.style.display === '';
-                if (isHidden) {
-                    pastEventsContainer.style.display = 'grid';
-                    togglePastEventsBtn.textContent = 'Hide Past Events';
-                    togglePastEventsBtn.classList.add('active');
-                } else {
-                    pastEventsContainer.style.display = 'none';
-                    togglePastEventsBtn.textContent = 'Past Events';
-                    togglePastEventsBtn.classList.remove('active');
-                }
-            };
-        }
-    </script>
-
-    <!-- Unregister / Cancellation Reason Modal -->
-    <div id="unregisterModal" class="unreg-modal-overlay">
-        <div class="unreg-modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.2rem;">
-                <div>
-                    <h3 style="color: #ffffff; font-size: 1.35rem; font-weight: 700; margin: 0 0 4px 0;">Cancel Event Registration</h3>
-                    <p id="unregModalEventTitle" style="color: var(--primary); font-size: 0.95rem; font-weight: 600; margin: 0;"></p>
-                </div>
-                <button type="button" onclick="closeUnregisterModal()" style="background: none; border: none; color: var(--text-muted); font-size: 1.6rem; cursor: pointer; line-height: 1; padding: 0 4px;" aria-label="Close modal">&times;</button>
-            </div>
-
-            <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; margin-bottom: 1.2rem;">
-                Please select the reason for unregistering. Your feedback helps us improve future events.
-            </p>
-
-            <form id="unregisterForm" method="POST" action="" onsubmit="return submitUnregisterForm(this)">
-                <input type="hidden" name="event_id" id="unregEventId" value="">
-                
-                <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.2rem; max-height: 320px; overflow-y: auto; padding-right: 4px;">
-                    <label class="unreg-reason-option">
-                        <input type="radio" name="reason" value="Schedule conflict / Personal emergency" required onchange="handleReasonChange(this)">
-                        <span>Schedule conflict / Personal emergency</span>
-                    </label>
-                    <label class="unreg-reason-option">
-                        <input type="radio" name="reason" value="College exams, lectures, or academic submissions" onchange="handleReasonChange(this)">
-                        <span>College exams, lectures, or academic submissions</span>
-                    </label>
-                    <label class="unreg-reason-option">
-                        <input type="radio" name="reason" value="Venue location or transportation constraints" onchange="handleReasonChange(this)">
-                        <span>Venue location or transportation constraints</span>
-                    </label>
-                    <label class="unreg-reason-option">
-                        <input type="radio" name="reason" value="Team members unavailable / Group disbanded" onchange="handleReasonChange(this)">
-                        <span>Team members unavailable / Group disbanded</span>
-                    </label>
-                    <label class="unreg-reason-option">
-                        <input type="radio" name="reason" value="Registration fee or payment concerns" onchange="handleReasonChange(this)">
-                        <span>Registration fee or payment concerns</span>
-                    </label>
-                    <label class="unreg-reason-option">
-                        <input type="radio" name="reason" value="Event timings or duration not convenient" onchange="handleReasonChange(this)">
-                        <span>Event timings or duration not convenient</span>
-                    </label>
-                    <label class="unreg-reason-option">
-                        <input type="radio" name="reason" value="Health or medical condition" onchange="handleReasonChange(this)">
-                        <span>Health or medical condition</span>
-                    </label>
-                    <label class="unreg-reason-option">
-                        <input type="radio" name="reason" value="Registered by mistake / Duplicate entry" onchange="handleReasonChange(this)">
-                        <span>Registered by mistake / Duplicate entry</span>
-                    </label>
-                    <label class="unreg-reason-option">
-                        <input type="radio" name="reason" value="Work or internship commitment" onchange="handleReasonChange(this)">
-                        <span>Work or internship commitment</span>
-                    </label>
-                    <label class="unreg-reason-option">
-                        <input type="radio" name="reason" value="Other" id="reasonOtherRadio" onchange="handleReasonChange(this)">
-                        <span>Other (Please tell us more)</span>
-                    </label>
-                </div>
-
-                <!-- Conditional Feedback Input (Only shown when 'Other' is chosen) -->
-                <div id="otherFeedbackContainer" style="display: none; margin-bottom: 1.5rem; animation: fadeIn 0.3s ease;">
-                    <label for="cancellationFeedback" style="display: block; font-size: 0.85rem; font-weight: 600; color: #ffffff; margin-bottom: 6px;">
-                        Please provide your feedback / reason <span style="color: #ef4444;">*</span>
-                    </label>
-                    <textarea id="cancellationFeedback" name="feedback" rows="3" class="input-field" placeholder="Tell us why you are unregistering..." style="width: 100%; border-radius: 10px; resize: vertical; font-family: inherit; font-size: 0.9rem;"></textarea>
-                    <span id="feedbackErrorMsg" style="display: none; color: #ef4444; font-size: 0.8rem; margin-top: 4px;">Please enter your feedback before confirming.</span>
-                </div>
-
-                <div style="display: flex; gap: 10px; justify-content: flex-end; align-items: center; margin-top: 1.5rem;">
-                    <button type="button" onclick="closeUnregisterModal()" class="btn-secondary" style="padding: 0.65rem 1.2rem; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 0.9rem;">
-                        Keep Registration
-                    </button>
-                    <button type="submit" class="btn-primary" style="padding: 0.65rem 1.4rem; background: #ef4444; color: #ffffff; border-radius: 10px; font-weight: 700; border: none; cursor: pointer; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);">
-                        Confirm Unregister
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        function openUnregisterModal(eventId, eventTitle) {
-            const modal = document.getElementById('unregisterModal');
-            const form = document.getElementById('unregisterForm');
-            const titleEl = document.getElementById('unregModalEventTitle');
-            const feedbackBox = document.getElementById('otherFeedbackContainer');
-            const feedbackInput = document.getElementById('cancellationFeedback');
-            const feedbackErr = document.getElementById('feedbackErrorMsg');
-            
-            if (!modal || !form) return;
-            
-            form.action = `/unregister/${eventId}`;
-            document.getElementById('unregEventId').value = eventId;
-            if (titleEl) titleEl.textContent = eventTitle || `Event #${eventId}`;
-            
-            const radios = form.querySelectorAll('input[name="reason"]');
-            radios.forEach(r => r.checked = false);
-            if (feedbackBox) feedbackBox.style.display = 'none';
-            if (feedbackInput) {
-                feedbackInput.value = '';
-                feedbackInput.removeAttribute('required');
-            }
-            if (feedbackErr) feedbackErr.style.display = 'none';
-            
-            modal.style.display = 'flex';
-        }
-
-        function closeUnregisterModal() {
-            const modal = document.getElementById('unregisterModal');
-            if (modal) modal.style.display = 'none';
-        }
-
-        function handleReasonChange(radio) {
-            const feedbackBox = document.getElementById('otherFeedbackContainer');
-            const feedbackInput = document.getElementById('cancellationFeedback');
-            const feedbackErr = document.getElementById('feedbackErrorMsg');
-            if (feedbackErr) feedbackErr.style.display = 'none';
-            
-            if (radio.value === 'Other') {
-                if (feedbackBox) feedbackBox.style.display = 'block';
-                if (feedbackInput) {
-                    feedbackInput.setAttribute('required', 'required');
-                    feedbackInput.focus();
-                }
-            } else {
-                if (feedbackBox) feedbackBox.style.display = 'none';
-                if (feedbackInput) {
-                    feedbackInput.removeAttribute('required');
-                    feedbackInput.value = '';
-                }
-            }
-        }
-
-        function submitUnregisterForm(form) {
-            const selected = form.querySelector('input[name="reason"]:checked');
-            if (!selected) {
-                alert('Please select a reason for cancellation.');
-                return false;
-            }
-            if (selected.value === 'Other') {
-                const fb = document.getElementById('cancellationFeedback');
-                const feedbackErr = document.getElementById('feedbackErrorMsg');
-                if (!fb || !fb.value.trim()) {
-                    if (feedbackErr) feedbackErr.style.display = 'block';
-                    if (fb) fb.focus();
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        window.addEventListener('click', (e) => {
-            const modal = document.getElementById('unregisterModal');
-            if (modal && e.target === modal) {
-                closeUnregisterModal();
-            }
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.loadPersistedTheme) loadPersistedTheme();
+            if (window.initOnboarding) initOnboarding();
+            loadAIRecommendations();
         });
     </script>
 
-    <!-- New JS Modules -->
+    <!-- Additional Modules -->
     <script src="{{ url_for('static', filename='toast.js') }}"></script>
     <script src="{{ url_for('static', filename='confetti.js') }}"></script>
     <script src="{{ url_for('static', filename='notifications.js') }}"></script>
     <script src="{{ url_for('static', filename='pwa.js') }}"></script>
     <script src="{{ url_for('static', filename='chatbot.js') }}?v=5.0"></script>
 
-    <!-- Flask flash messages via toast -->
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% for category, msg in messages %}
     <div data-flash="{{ msg }}" data-flash-type="{{ category }}"></div>
     {% endfor %}
     {% endwith %}
-
 </body>
 
 </html>

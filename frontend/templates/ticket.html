@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admission Pass: {{ event.title }} | EVENTS</title>
+    <meta name="description" content="Official Holographic E-Pass for {{ event.title }} - Verified Admission Ticket">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=6.0">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700;800&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='themes.js') }}?v=6.0"></script>
+    <style>
+        :root {
+            --tkt-cyan: #00f2fe;
+            --tkt-blue: #4facfe;
+            --tkt-purple: #7928ca;
+            --tkt-pink: #ff0080;
+            --tkt-gold: #f59e0b;
+            --tkt-emerald: #10b981;
+            --tkt-bg: #070c18;
+            --tkt-card-bg: rgba(15, 23, 42, 0.94);
+            --tkt-foil: linear-gradient(135deg, rgba(255, 0, 128, 0.35), rgba(121, 40, 202, 0.35), rgba(0, 242, 254, 0.35), rgba(16, 185, 129, 0.35));
+        }
+
+        /* Holographic Theme Palettes */
+        body.theme-gold {
+            --tkt-cyan: #fbbf24;
+            --tkt-blue: #f59e0b;
+            --tkt-purple: #d97706;
+            --tkt-foil: linear-gradient(135deg, rgba(251, 191, 36, 0.4), rgba(245, 158, 11, 0.3), rgba(217, 119, 6, 0.35));
+        }
+        body.theme-matrix {
+            --tkt-cyan: #34d399;
+            --tkt-blue: #10b981;
+            --tkt-purple: #059669;
+            --tkt-foil: linear-gradient(135deg, rgba(52, 211, 153, 0.4), rgba(16, 185, 129, 0.3), rgba(6, 95, 70, 0.35));
+        }
+        body.theme-nebula {
+            --tkt-cyan: #f472b6;
+            --tkt-blue: #ec4899;
+            --tkt-purple: #a855f7;
+            --tkt-foil: linear-gradient(135deg, rgba(244, 114, 182, 0.4), rgba(236, 72, 153, 0.35), rgba(168, 85, 247, 0.35));
+        }
+
+        body {
+            background-color: var(--tkt-bg);
+            background-image: 
+                radial-gradient(circle at 20% 15%, rgba(0, 242, 254, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 80% 85%, rgba(121, 40, 202, 0.12) 0%, transparent 45%),
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+            color: #ffffff;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .ticket-universe {
+            max-width: 1060px;
+            margin: 2rem auto 5rem;
+            padding: 0 1.5rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Top Action Controls Toolbar */
+        .ticket-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 2rem;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.85rem 1.25rem;
+            border-radius: 18px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .toolbar-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .t-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.6rem 1.15rem;
+            border-radius: 12px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(30, 41, 59, 0.7);
+            color: #f1f5f9;
+            backdrop-filter: blur(8px);
+            transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+            user-select: none;
+        }
+
+        .t-btn:hover {
+            transform: translateY(-2px);
+            border-color: var(--tkt-cyan);
+            color: var(--tkt-cyan);
+            box-shadow: 0 0 16px rgba(0, 242, 254, 0.3);
+            background: rgba(0, 242, 254, 0.1);
+        }
+
+        .t-btn-primary {
+            background: linear-gradient(135deg, var(--tkt-cyan), var(--tkt-blue));
+            color: #040914 !important;
+            border: none;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+        }
+
+        .t-btn-primary:hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 0 28px rgba(0, 242, 254, 0.65);
+            filter: brightness(1.12);
+        }
+
+        /* Palette Theme Selector */
+        .theme-pill-selector {
+            display: flex;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 4px 6px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .theme-dot-btn {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .theme-dot-btn:hover, .theme-dot-btn.active {
+            transform: scale(1.2);
+            border-color: #ffffff;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        /* Perspective Card Stage */
+        .ticket-perspective-stage {
+            perspective: 1400px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .ticket-interactive-card {
+            position: relative;
+            width: 100%;
+            min-height: 480px;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease;
+        }
+
+        .ticket-interactive-card.flipped {
+            transform: rotateY(180deg) !important;
+        }
+
+        .ticket-side {
+            position: relative;
+            width: 100%;
+            border-radius: 28px;
+            background: var(--tkt-card-bg);
+            border: 1.5px solid rgba(0, 242, 254, 0.35);
+            box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.8), 0 0 35px rgba(0, 242, 254, 0.18);
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            overflow: hidden;
+            box-sizing: border-box;
+            display: flex;
+        }
+
+        .ticket-side.ticket-back {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            transform: rotateY(180deg);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 3rem;
+            background: linear-gradient(145deg, #0f172a 0%, #090e1a 100%);
+        }
+
+        /* Hologram Glare & Specular Laser Overlay */
+        .hologram-glare {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.04) 35%, transparent 65%);
+            mix-blend-mode: overlay;
+            z-index: 5;
+            transition: opacity 0.3s;
+        }
+
+        .hologram-shimmer-foil {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: var(--tkt-foil);
+            opacity: 0.15;
+            mix-blend-mode: color-dodge;
+            z-index: 4;
+            background-size: 200% 200%;
+            animation: foilBreathe 8s ease infinite alternate;
+        }
+
+        @keyframes foilBreathe {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+
+        /* Top Rainbow Laser Strip */
+        .hologram-top-foil {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #ff0080, #7928ca, #00f2fe, #4facfe, #10b981, #f59e0b, #ff0080);
+            background-size: 300% 100%;
+            animation: topFoilRun 5s linear infinite;
+            z-index: 10;
+        }
+
+        @keyframes topFoilRun {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 300% 50%; }
+        }
+
+        /* Watermark Background Pattern */
+        .guilloche-bg {
+            position: absolute;
+            right: -20px;
+            bottom: -30px;
+            font-size: 8.5rem;
+            font-weight: 900;
+            font-family: 'Outfit', sans-serif;
+            color: rgba(255, 255, 255, 0.025);
+            pointer-events: none;
+            user-select: none;
+            letter-spacing: -4px;
+            z-index: 1;
+        }
+
+        /* Left Main Pass Body */
+        .ticket-main {
+            flex: 1 1 65%;
+            padding: 2.8rem 3rem;
+            position: relative;
+            z-index: 6;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-sizing: border-box;
+        }
+
+        /* Perforated Divider & Notches */
+        .ticket-perforated-stub {
+            position: relative;
+            width: 0;
+            border-left: 2.5px dashed rgba(255, 255, 255, 0.22);
+            flex-shrink: 0;
+            z-index: 7;
+        }
+
+        .notch-circle-top, .notch-circle-bottom {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            background-color: var(--tkt-bg);
+            border-radius: 50%;
+            z-index: 10;
+        }
+
+        .notch-circle-top {
+            top: -16px;
+            left: -16px;
+            border-bottom: 1.5px solid rgba(0, 242, 254, 0.35);
+        }
+
+        .notch-circle-bottom {
+            bottom: -16px;
+            left: -16px;
+            border-top: 1.5px solid rgba(0, 242, 254, 0.35);
+        }
+
+        /* Right Security & QR Stub */
+        .ticket-stub {
+            flex: 0 0 35%;
+            min-width: 280px;
+            background: rgba(8, 14, 26, 0.85);
+            padding: 2.8rem 2.2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            text-align: center;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 6;
+        }
+
+        /* Header Brand Row */
+        .brand-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .brand-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.7rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-badge span {
+            color: var(--tkt-cyan);
+            text-shadow: 0 0 15px rgba(0, 242, 254, 0.6);
+        }
+
+        .pass-tier-badge {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(121, 40, 202, 0.35));
+            border: 1px solid var(--tkt-cyan);
+            color: var(--tkt-cyan);
+            font-size: 0.76rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.4px;
+            padding: 5px 14px;
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 0 14px rgba(0, 242, 254, 0.25);
+        }
+
+        .event-hero-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.1rem;
+            font-weight: 900;
+            line-height: 1.18;
+            color: #ffffff;
+            margin: 0 0 0.6rem 0;
+            letter-spacing: -0.8px;
+        }
+
+        .category-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #cbd5e1;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 8px;
+            margin-bottom: 1.8rem;
+        }
+
+        /* Attendee & Schedule Matrix Grid */
+        .info-matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.3rem 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .matrix-cell .cell-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #94a3b8;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .matrix-cell .cell-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #ffffff;
+            word-break: break-word;
+        }
+
+        .matrix-cell .cell-value.accent {
+            color: var(--tkt-cyan);
+        }
+
+        .matrix-cell .cell-value.mono {
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.5px;
+        }
+
+        /* Monogram Avatar */
+        .attendee-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .attendee-monogram {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--tkt-cyan), var(--tkt-purple));
+            color: #ffffff;
+            font-weight: 900;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+            flex-shrink: 0;
+        }
+
+        /* Venue Box */
+        .venue-card-strip {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            padding: 1rem 1.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+        }
+
+        .venue-details {
+            font-size: 0.88rem;
+            line-height: 1.45;
+        }
+
+        .venue-details strong {
+            color: #ffffff;
+            font-size: 0.95rem;
+            display: block;
+        }
+
+        .venue-details span {
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
+
+        .maps-action-chip {
+            background: rgba(0, 242, 254, 0.15);
+            border: 1px solid rgba(0, 242, 254, 0.35);
+            color: var(--tkt-cyan);
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 7px 14px;
+            border-radius: 10px;
+            text-decoration: none;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .maps-action-chip:hover {
+            background: var(--tkt-cyan);
+            color: #040914;
+            box-shadow: 0 0 14px rgba(0, 242, 254, 0.5);
+            transform: scale(1.05);
+        }
+
+        /* Right Stub QR & Holographic Seal */
+        .stub-ref-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.92rem;
+            font-weight: 800;
+            color: var(--tkt-cyan);
+            background: rgba(0, 242, 254, 0.12);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            padding: 5px 14px;
+            border-radius: 10px;
+            letter-spacing: 0.8px;
+            margin-bottom: 1.2rem;
+            display: inline-block;
+        }
+
+        .qr-display-frame {
+            background: #ffffff;
+            padding: 14px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 242, 254, 0.2);
+            display: inline-block;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .qr-display-frame img {
+            width: 145px;
+            height: 145px;
+            display: block;
+        }
+
+        .gate-scan-title {
+            font-size: 0.78rem;
+            color: #94a3b8;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+        }
+
+        /* Holographic Animated Security Seal */
+        .crypto-holo-seal {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #ff0080, #7928ca, #00f2fe, #10b981, #f59e0b);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.7rem;
+            box-shadow: 0 0 25px rgba(0, 242, 254, 0.7), inset 0 0 10px rgba(255, 255, 255, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            animation: holoSealRotate 5s ease-in-out infinite alternate;
+            margin: 0.6rem auto;
+            position: relative;
+        }
+
+        @keyframes holoSealRotate {
+            0% { transform: scale(1) rotate(0deg); filter: hue-rotate(0deg) saturate(1.2); }
+            100% { transform: scale(1.08) rotate(20deg); filter: hue-rotate(360deg) saturate(1.6); }
+        }
+
+        .barcode-visual {
+            width: 100%;
+            max-width: 200px;
+            height: 36px;
+            background: repeating-linear-gradient(
+                90deg,
+                #ffffff 0px,
+                #ffffff 2px,
+                transparent 2px,
+                transparent 4px,
+                #ffffff 4px,
+                #ffffff 7px,
+                transparent 7px,
+                transparent 9px,
+                #ffffff 9px,
+                #ffffff 11px,
+                transparent 11px,
+                transparent 14px,
+                #ffffff 14px,
+                #ffffff 18px,
+                transparent 18px,
+                transparent 20px,
+                #ffffff 20px,
+                #ffffff 24px,
+                transparent 24px,
+                transparent 27px
+            );
+            opacity: 0.9;
+            margin-top: 0.6rem;
+        }
+
+        .hash-code-strip {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+            color: #64748b;
+            letter-spacing: 2px;
+            margin-top: 4px;
+        }
+
+        /* Back of the Ticket */
+        .back-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .back-card-box {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.25rem;
+        }
+
+        .back-card-box h4 {
+            color: var(--tkt-cyan);
+            font-size: 0.95rem;
+            margin: 0 0 0.6rem 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-card-box p {
+            color: #94a3b8;
+            font-size: 0.82rem;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 860px) {
+            .ticket-side {
+                flex-direction: column;
+            }
+            .ticket-perforated-stub {
+                width: 100%;
+                height: 0;
+                border-left: none;
+                border-top: 2.5px dashed rgba(255, 255, 255, 0.22);
+            }
+            .notch-circle-top {
+                top: -16px;
+                left: -16px;
+            }
+            .notch-circle-bottom {
+                top: -16px;
+                right: -16px;
+                bottom: unset;
+                left: unset;
+            }
+            .ticket-main, .ticket-stub {
+                padding: 2rem 1.6rem;
+            }
+            .info-matrix-grid {
+                grid-template-columns: 1fr;
+                gap: 1.1rem;
+            }
+            .back-grid {
+                grid-template-columns: 1fr;
+            }
+            .ticket-side.ticket-back {
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .ticket-universe {
+                margin: 1rem auto 3rem !important;
+                padding: 0 0.8rem !important;
+            }
+            .ticket-toolbar {
+                flex-direction: column !important;
+                gap: 10px !important;
+                align-items: stretch !important;
+                padding: 0.8rem !important;
+            }
+            .toolbar-group {
+                justify-content: center !important;
+                width: 100% !important;
+            }
+            .t-btn {
+                flex: 1 1 auto !important;
+                justify-content: center !important;
+                font-size: 0.8rem !important;
+                padding: 0.5rem 0.8rem !important;
+            }
+            .ticket-main, .ticket-stub {
+                padding: 1.5rem 1.1rem !important;
+            }
+            .event-hero-title {
+                font-size: 1.6rem !important;
+            }
+            .qr-display-frame img {
+                width: 125px !important;
+                height: 125px !important;
+            }
+        }
+
+        /* High-Contrast Print Styles */
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+            }
+            .ticket-toolbar, nav, footer, #chatbot-wrapper, .hologram-shimmer-foil, .hologram-glare, .hologram-top-foil, .crypto-holo-seal {
+                display: none !important;
+            }
+            .ticket-universe {
+                margin: 0 !important;
+                padding: 0 !important;
+                max-width: 100% !important;
+            }
+            .ticket-side {
+                background: #ffffff !important;
+                color: #000000 !important;
+                border: 2px solid #000000 !important;
+                box-shadow: none !important;
+            }
+            .ticket-stub {
+                background: #f8fafc !important;
+            }
+            .matrix-cell .cell-value, .event-hero-title, .brand-badge, .venue-details strong {
+                color: #000000 !important;
+            }
+            .matrix-cell .cell-label, .venue-details span, .gate-scan-title {
+                color: #475569 !important;
+            }
+            .barcode-visual {
+                background: repeating-linear-gradient(90deg, #000 0px, #000 2px, transparent 2px, transparent 4px, #000 4px, #000 7px, transparent 7px, transparent 9px, #000 9px, #000 11px, transparent 11px, transparent 14px, #000 14px, #000 18px);
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="ticket-universe">
+    <!-- Top Action Toolbar -->
+    <div class="ticket-toolbar">
+        <div class="toolbar-group">
+            <a href="{{ url_for('dashboard') }}" class="t-btn">
+                <span>←</span> Dashboard
+            </a>
+            <button onclick="toggleCardFlip()" class="t-btn" id="flipBtn" title="Flip pass to view guidelines and Wi-Fi credentials">
+                <span>🔄</span> Flip Pass
+            </button>
+            <button onclick="toggleTiltMode()" class="t-btn" id="tiltToggleBtn" title="Toggle Holographic Perspective Tilt">
+                <span>✨</span> Interactive Tilt: ON
+            </button>
+        </div>
+
+        <div class="toolbar-group">
+            <!-- Palette Shifter -->
+            <div class="theme-pill-selector" title="Switch Holographic Laser Theme">
+                <button class="theme-dot-btn active" style="background: #00f2fe;" onclick="setTicketTheme('cyan')" title="Cyber Cyan"></button>
+                <button class="theme-dot-btn" style="background: #fbbf24;" onclick="setTicketTheme('gold')" title="VIP Gold"></button>
+                <button class="theme-dot-btn" style="background: #f472b6;" onclick="setTicketTheme('nebula')" title="Nebula Pink"></button>
+                <button class="theme-dot-btn" style="background: #34d399;" onclick="setTicketTheme('matrix')" title="Matrix Emerald"></button>
+            </div>
+
+            <a href="{{ url_for('live_event_page', event_id=event.id) }}" class="t-btn" style="border-color: rgba(239, 68, 68, 0.4); color: #fca5a5;" title="Enter Live Video Room">
+                <span>📹</span> Live Room
+            </a>
+            <button onclick="window.print()" class="t-btn" title="Print High-Contrast Pass">
+                <span>🖨️</span> Print
+            </button>
+            <a href="{{ url_for('download_ticket', event_id=event.id) }}" class="t-btn t-btn-primary" target="_blank" title="Download Official PDF E-Ticket">
+                <span>📥</span> PDF E-Ticket
+            </a>
+            <button onclick="copyShareUrl()" class="t-btn" id="shareBtn" title="Copy Verification Link">
+                <span>🔗</span> Share
+            </button>
+        </div>
+    </div>
+
+    <!-- Perspective Card Stage -->
+    <div class="ticket-perspective-stage">
+        <div class="ticket-interactive-card" id="ticketCard">
+
+            <!-- FRONT SIDE: Holographic E-Pass -->
+            <div class="ticket-side ticket-front" id="ticketFront">
+                <!-- Laser Shimmer Layers -->
+                <div class="hologram-top-foil"></div>
+                <div class="hologram-shimmer-foil"></div>
+                <div class="hologram-glare" id="hologramGlare"></div>
+                <div class="guilloche-bg">EVENTS</div>
+
+                <!-- Main Left Section -->
+                <div class="ticket-main">
+                    <div>
+                        <!-- Brand & Pass Status -->
+                        <div class="brand-header-row">
+                            <div class="brand-badge">
+                                <img src="{{ url_for('static', filename='logo.png') }}" alt="EVENTS Logo" style="height: 40px; border-radius: 10px; box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);">
+                                <div>EV<span>ENTS</span></div>
+                            </div>
+
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <div class="pass-tier-badge">
+                                    <span>🛡️</span> {{ pass_type_str }}
+                                </div>
+                                <span style="background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; color: #34d399; font-size: 0.74rem; font-weight: 800; padding: 5px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px;">
+                                    <span style="width: 7px; height: 7px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px #10b981;"></span> ACTIVE
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Event Title & Domain -->
+                        <h1 class="event-hero-title">{{ event.title }}</h1>
+                        <div class="category-chip">
+                            <span>🏷️</span> {{ event.category or 'Technology' }} Domain • Verified Access
+                        </div>
+
+                        <!-- Attendee & Seating Matrix Grid -->
+                        <div class="info-matrix-grid">
+                            <div class="matrix-cell">
+                                <div class="cell-label">👤 Pass Holder</div>
+                                <div class="attendee-row">
+                                    <div class="attendee-monogram">{{ (reg.full_name or 'U')[:1]|upper }}</div>
+                                    <div>
+                                        <div class="cell-value">{{ reg.full_name }}</div>
+                                        <div style="font-size: 0.78rem; color: #94a3b8; font-family: 'JetBrains Mono', monospace;">ID: {{ reg.college_id or 'GENERAL' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="matrix-cell">
+                                <div class="cell-label">🗓️ Date & Schedule</div>
+                                <div class="cell-value accent">{{ event.date }}</div>
+                                <div style="font-size: 0.82rem; color: #cbd5e1; margin-top: 2px;">🕒 {{ event.time or '10:00 AM' }} - {{ event.end_time or '05:00 PM' }}</div>
+                            </div>
+
+                            <div class="matrix-cell">
+                                <div class="cell-label">🚪 Gate & Seat Allocation</div>
+                                <div class="cell-value mono" style="color: var(--tkt-cyan);">{{ gate_num }} • {{ seat_zone }}</div>
+                            </div>
+
+                            <div class="matrix-cell">
+                                <div class="cell-label">🔐 Security Hash Checksum</div>
+                                <div class="cell-value mono" style="font-size: 0.82rem; color: #94a3b8;">{{ security_hash }}</div>
+                            </div>
+
+                            {% if reg.team_name %}
+                            <div class="matrix-cell" style="grid-column: 1 / -1; background: rgba(0, 242, 254, 0.05); padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid rgba(0, 242, 254, 0.2);">
+                                <div class="cell-label">👥 Team Squad: {{ reg.team_name }}</div>
+                                <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px;">
+                                    <span style="background: rgba(0, 242, 254, 0.15); color: var(--tkt-cyan); font-size: 0.76rem; font-weight: 700; padding: 3px 8px; border-radius: 6px;">👑 Leader: {{ reg.full_name }}</span>
+                                    {% for member in reg.team_members %}
+                                    <span style="background: rgba(255, 255, 255, 0.08); color: #cbd5e1; font-size: 0.76rem; font-weight: 600; padding: 3px 8px; border-radius: 6px;">👤 {{ member }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Venue Box with Interactive Maps Link -->
+                    <div class="venue-card-strip">
+                        <div class="venue-details">
+                            <strong>📍 {{ event.venue or 'Main Auditorium' }}</strong>
+                            <span>{{ event.venue_address or 'Tech Park Campus, Bangalore' }}</span>
+                        </div>
+                        <a href="{{ maps_search_url }}" target="_blank" rel="noopener noreferrer" class="maps-action-chip" title="Locate venue on Google Maps">
+                            <span>🗺️</span> Open Maps ➔
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Perforated Stub Divider -->
+                <div class="ticket-perforated-stub">
+                    <div class="notch-circle-top"></div>
+                    <div class="notch-circle-bottom"></div>
+                </div>
+
+                <!-- Right Security Stub -->
+                <div class="ticket-stub">
+                    <div>
+                        <div class="stub-ref-tag">{{ ticket_code }}</div>
+                        
+                        <!-- High-Contrast QR Code Box -->
+                        <div class="qr-display-frame">
+                            <img src="data:image/png;base64,{{ qr_base64 }}" alt="Cryptographic Admission QR Code">
+                        </div>
+
+                        <div class="gate-scan-title">Scan at security turnstile</div>
+                    </div>
+
+                    <div>
+                        <!-- Animated Holographic Seal -->
+                        <div class="crypto-holo-seal" title="Tamper-Proof Holographic Security Seal">
+                            🛡️
+                        </div>
+
+                        <!-- Scannable Barcode & Checksum -->
+                        <div class="barcode-visual"></div>
+                        <div class="hash-code-strip">
+                            *{{ ticket_code }}*
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BACK SIDE: Event Briefing, Wi-Fi & Safety Rules -->
+            <div class="ticket-side ticket-back">
+                <div class="hologram-top-foil"></div>
+                <div class="guilloche-bg">SECURITY</div>
+
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 1rem;">
+                        <div class="brand-badge">
+                            <img src="{{ url_for('static', filename='logo.png') }}" alt="EVENTS Logo" style="height: 35px; border-radius: 8px;">
+                            <div>EV<span>ENTS</span> PROTOCOL</div>
+                        </div>
+                        <button onclick="toggleCardFlip()" class="t-btn" style="padding: 0.4rem 0.9rem; font-size: 0.8rem;">
+                            <span>↩</span> Back to Pass
+                        </button>
+                    </div>
+
+                    <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.6rem; color: #ffffff; margin: 1.5rem 0 0.5rem;">Event Entry Guidelines & Amenities</h2>
+                    <p style="color: #94a3b8; font-size: 0.88rem; margin: 0 0 1.5rem;">Please review the admission protocols and venue connectivity details below.</p>
+
+                    <div class="back-grid">
+                        <div class="back-card-box">
+                            <h4><span>📶</span> High-Speed Wi-Fi</h4>
+                            <p><strong>SSID:</strong> EVENTS-Gigabit-Guest<br><strong>Passkey:</strong> <code style="color: var(--tkt-cyan);">INNOVATE2026</code><br>Unlimited high-speed connection.</p>
+                        </div>
+
+                        <div class="back-card-box">
+                            <h4><span>📋</span> Check-in Protocol</h4>
+                            <p>Bring valid College/Govt Photo ID. Doors open 30 minutes prior to scheduled start time. Re-entry allowed with wristband.</p>
+                        </div>
+
+                        <div class="back-card-box">
+                            <h4><span>🆘</span> Help & Medical</h4>
+                            <p>Help Desk situated in Lobby B.<br><strong>Emergency Hotline:</strong> +91 9686837274<br>First Aid Station: Room 104.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 1rem; font-size: 0.8rem; color: #64748b;">
+                    <div>🔐 Verified Cryptographic Gatekeeper • SHA-256 Validated</div>
+                    <div>Pass Code: <span style="color: var(--tkt-cyan); font-family: 'JetBrains Mono', monospace;">{{ ticket_code }}</span></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Bottom Security Footnote -->
+    <div style="text-align: center; margin-top: 2rem; color: var(--text-muted); font-size: 0.82rem; line-height: 1.6;">
+        🔒 <strong>Tamper-Evident Holographic Pass</strong>. Certified for admission at official venue turnstiles.<br>
+        Powered by <strong>EVENTS Cryptographic Security Gateway</strong>.
+    </div>
+</div>
+
+<script>
+    // Tilt Physics and Mouse Light Tracking
+    const stage = document.querySelector('.ticket-perspective-stage');
+    const card = document.getElementById('ticketCard');
+    const glare = document.getElementById('hologramGlare');
+    let isTiltEnabled = true;
+
+    function handleMouseMove(e) {
+        if (!isTiltEnabled || card.classList.contains('flipped')) return;
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        const rotateX = ((y - centerY) / centerY) * -9;
+        const rotateY = ((x - centerX) / centerX) * 9;
+        
+        card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        
+        const mouseXPercent = (x / rect.width) * 100;
+        const mouseYPercent = (y / rect.height) * 100;
+        glare.style.setProperty('--mouse-x', `${mouseXPercent}%`);
+        glare.style.setProperty('--mouse-y', `${mouseYPercent}%`);
+    }
+
+    function handleMouseLeave() {
+        if (!isTiltEnabled || card.classList.contains('flipped')) return;
+        card.style.transform = 'rotateX(0deg) rotateY(0deg)';
+    }
+
+    card.addEventListener('mousemove', handleMouseMove);
+    card.addEventListener('mouseleave', handleMouseLeave);
+
+    // Flip Card Toggle
+    function toggleCardFlip() {
+        card.classList.toggle('flipped');
+        const flipBtn = document.getElementById('flipBtn');
+        if (card.classList.contains('flipped')) {
+            flipBtn.innerHTML = '<span>🎴</span> View Front';
+        } else {
+            flipBtn.innerHTML = '<span>🔄</span> Flip Pass';
+        }
+    }
+
+    // Interactive Tilt Mode Toggle
+    function toggleTiltMode() {
+        isTiltEnabled = !isTiltEnabled;
+        const btn = document.getElementById('tiltToggleBtn');
+        if (isTiltEnabled) {
+            btn.innerHTML = '<span>✨</span> Interactive Tilt: ON';
+            btn.classList.add('t-btn-primary');
+        } else {
+            btn.innerHTML = '<span>✨</span> Interactive Tilt: OFF';
+            btn.classList.remove('t-btn-primary');
+            card.style.transform = 'rotateX(0deg) rotateY(0deg)';
+        }
+    }
+
+    // Ticket Theme Switcher
+    function setTicketTheme(theme) {
+        document.body.classList.remove('theme-gold', 'theme-nebula', 'theme-matrix');
+        document.querySelectorAll('.theme-dot-btn').forEach(b => b.classList.remove('active'));
+        
+        if (theme === 'gold') {
+            document.body.classList.add('theme-gold');
+            event.target.classList.add('active');
+        } else if (theme === 'nebula') {
+            document.body.classList.add('theme-nebula');
+            event.target.classList.add('active');
+        } else if (theme === 'matrix') {
+            document.body.classList.add('theme-matrix');
+            event.target.classList.add('active');
+        } else {
+            event.target.classList.add('active');
+        }
+    }
+
+    // Share URL Copy Helper
+    function copyShareUrl() {
+        const url = window.location.href;
+        navigator.clipboard.writeText(url).then(() => {
+            const btn = document.getElementById('shareBtn');
+            btn.innerHTML = '<span>✓</span> Copied Link!';
+            setTimeout(() => {
+                btn.innerHTML = '<span>🔗</span> Share';
+            }, 2500);
+        });
+    }
+</script>
+
+</body>
+</html>

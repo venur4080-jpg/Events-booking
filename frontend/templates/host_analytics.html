@@ -9,9 +9,10 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .analytics-container {
-            max-width: 1200px;
-            margin: 4rem auto;
-            padding: 0 2rem;
+            max-width: 1280px;
+            margin: 2rem auto 4rem;
+            padding: 0 1.5rem;
+            box-sizing: border-box;
             animation: fadeIn 0.8s ease-out;
         }
         .metrics-grid {
@@ -271,6 +272,10 @@
         </div>
     </div>
 
+    <script type="application/json" id="chartLabelsJson">{{ chart_labels|tojson }}</script>
+    <script type="application/json" id="chartDataJson">{{ chart_data|tojson }}</script>
+    <script type="application/json" id="catLabelsJson">{{ cat_labels|tojson }}</script>
+    <script type="application/json" id="catDataJson">{{ cat_data|tojson }}</script>
     <script>
         const hamburger = document.getElementById('hamburger');
         const sidebar = document.getElementById('sidebar');
@@ -292,8 +297,8 @@
 
         // 1. Popularity Horizontal Bar Chart
         const popCtx = document.getElementById('popularityChart').getContext('2d');
-        const popLabels = {{ chart_labels|tojson }};
-        const popData = {{ chart_data|tojson }};
+        const popLabels = JSON.parse(document.getElementById('chartLabelsJson').textContent || '[]');
+        const popData = JSON.parse(document.getElementById('chartDataJson').textContent || '[]');
 
         // Slice top 10 for bar chart to keep it clean
         const slicedLabels = popLabels.slice(0, 10);
@@ -334,8 +339,8 @@
 
         // 2. Category Pie Chart
         const catCtx = document.getElementById('categoryChart').getContext('2d');
-        const catLabels = {{ cat_labels|tojson }};
-        const catData = {{ cat_data|tojson }};
+        const catLabels = JSON.parse(document.getElementById('catLabelsJson').textContent || '[]');
+        const catData = JSON.parse(document.getElementById('catDataJson').textContent || '[]');
 
         const categoryChart = new Chart(catCtx, {
             type: 'pie',

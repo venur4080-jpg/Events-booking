@@ -8,7 +8,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=5.0">
     <script src="{{ url_for('static', filename='themes.js') }}?v=5.0"></script>
     <script>
-        if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
+        if (localStorage.getItem('theme') === 'light') {
+            document.documentElement.classList.add('light-mode');
+            if (document.body) document.body.classList.add('light-mode');
+        }
         if (window.loadPersistedTheme) loadPersistedTheme();
     </script>
     <style>
@@ -80,6 +83,47 @@
         body.light-mode .stat-card, body.light-mode .panel-section { background: rgba(255,255,255,0.8); }
         body.light-mode .admin-table td { color: #1e293b; }
         body.light-mode .admin-table th { color: #92400e; }
+
+        @media (max-width: 768px) {
+            .admin-layout {
+                flex-direction: column !important;
+            }
+            .admin-sidebar {
+                width: 100% !important;
+                height: auto !important;
+                position: static !important;
+                padding: 1.2rem 1rem !important;
+                border-right: none !important;
+                border-bottom: 1px solid var(--glass-border) !important;
+            }
+            .admin-sidebar .logo-block {
+                margin-bottom: 0.8rem !important;
+                padding-bottom: 0.8rem !important;
+            }
+            .admin-main {
+                padding: 1.2rem 1rem !important;
+            }
+            .admin-header {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 1rem !important;
+            }
+            .search-admin {
+                width: 100% !important;
+            }
+            .stat-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 1rem !important;
+            }
+            .panel-section {
+                overflow-x: auto !important;
+            }
+        }
+        @media (max-width: 480px) {
+            .stat-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
     </style>
 </head>
 <body>

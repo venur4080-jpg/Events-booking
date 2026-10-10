@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Team Matcher & Squad Hub | EVENTS</title>
+    <meta name="description" content="Find hackathon teammates, study buddies, and squad collaborators across colleges.">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=6.0">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='themes.js') }}?v=6.0"></script>
+    <style>
+        .teams-container {
+            max-width: 1200px;
+            margin: 2rem auto 5rem;
+            padding: 0 1.5rem;
+            box-sizing: border-box;
+        }
+
+        .teams-banner {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.85) 100%);
+            border: 1px solid rgba(0, 242, 254, 0.35);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 242, 254, 0.15);
+            margin-bottom: 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .teams-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #00f2fe, #7928ca, #ff0080);
+        }
+
+        .team-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.8rem;
+            margin-top: 1.5rem;
+        }
+
+        .team-card {
+            background: rgba(15, 23, 42, 0.78);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 20px;
+            padding: 1.8rem;
+            backdrop-filter: blur(16px);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .team-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 16px 40px rgba(0, 242, 254, 0.2);
+        }
+
+        .skill-tag {
+            display: inline-block;
+            background: rgba(0, 242, 254, 0.12);
+            color: var(--primary);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin: 2px;
+        }
+
+        /* Post Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(12px);
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .modal-box {
+            background: #0f172a;
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 540px;
+            width: 100%;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+        }
+
+        @media (max-width: 768px) {
+            .teams-container {
+                padding: 0 1rem !important;
+                margin: 1.5rem auto 3rem !important;
+            }
+            .teams-banner {
+                padding: 1.5rem 1.2rem !important;
+                border-radius: 18px !important;
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 1rem !important;
+            }
+            .teams-banner h1 {
+                font-size: 1.6rem !important;
+            }
+            .team-cards-grid {
+                grid-template-columns: 1fr !important;
+                gap: 1.2rem !important;
+            }
+            .team-card {
+                padding: 1.3rem !important;
+            }
+            .modal-box {
+                padding: 1.5rem 1.1rem !important;
+                border-radius: 16px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="nav-container">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <a href="{{ url_for('dashboard') }}" class="logo" style="display: flex; align-items: center; gap: 8px;">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" style="height: 35px; border-radius: 8px;">
+                <div>EV<span>ENTS</span></div>
+            </a>
+        </div>
+        <div class="nav-links" style="display: flex; align-items: center; gap: 12px;">
+            <a href="{{ url_for('dashboard') }}" class="nav-btn-dash">🏠 Dashboard</a>
+            <a href="{{ url_for('passport_page') }}" class="nav-btn-dash">🛂 Passport</a>
+            <a href="{{ url_for('history') }}" class="nav-btn-dash">📋 Bookings</a>
+            <a href="{{ url_for('logout') }}" class="logout-btn-unique">⏻ Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="teams-container">
+    <!-- Banner -->
+    <div class="teams-banner">
+        <div>
+            <div style="font-size: 0.85rem; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 0.4rem;">
+                🤝 Collaborative Network
+            </div>
+            <h1 style="font-family: 'Outfit', sans-serif; font-size: 2.2rem; font-weight: 800; color: #ffffff; margin: 0 0 0.6rem 0;">
+                AI Team Matcher & Squad Hub
+            </h1>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin: 0; max-width: 620px; line-height: 1.6;">
+                Team up with talented students across branches. Find developers, UI/UX designers, AI specialists, and project leads for upcoming hackathons.
+            </p>
+        </div>
+        <div>
+            <button onclick="openPostModal()" class="btn-primary" style="display: inline-flex; align-items: center; gap: 8px; width: auto; padding: 0.8rem 1.6rem; border-radius: 12px; font-weight: 800; cursor: pointer;">
+                <span>➕</span> Post Team Opening
+            </button>
+        </div>
+    </div>
+
+    <!-- Match Openings Grid -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.5rem; color: #ffffff; margin: 0;">
+            🔥 Active Squad Openings ({{ team_posts|length }})
+        </h2>
+    </div>
+
+    {% if team_posts %}
+    <div class="team-cards-grid">
+        {% for post in team_posts %}
+        <div class="team-card">
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.8rem;">
+                    <div>
+                        <span style="font-size: 0.76rem; font-weight: 700; color: var(--primary); text-transform: uppercase;">{{ post.event_title }}</span>
+                        <h3 style="color: #ffffff; font-size: 1.25rem; font-weight: 700; margin: 4px 0 0 0;">{{ post.title }}</h3>
+                    </div>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">{{ post.created_at }}</span>
+                </div>
+
+                <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; margin-bottom: 1rem;">
+                    {{ post.description }}
+                </p>
+
+                <div style="margin-bottom: 1.2rem;">
+                    <div style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; margin-bottom: 6px; text-transform: uppercase;">Skills Needed:</div>
+                    {% for skill in post.skills %}
+                    <span class="skill-tag">{{ skill }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-size: 0.82rem; font-weight: 700; color: #ffffff;">👤 {{ post.host_name }}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">{{ post.college_id or 'Student' }}</div>
+                </div>
+                <a href="mailto:{{ post.contact_email }}?subject=Joining your team for {{ post.event_title }}" class="btn-primary" style="padding: 0.45rem 1rem; font-size: 0.82rem; border-radius: 8px; text-decoration: none; width: auto; font-weight: 700;">
+                    Connect ➔
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 4rem 2rem; background: rgba(15, 23, 42, 0.5); border-radius: 20px; border: 1px dashed rgba(255,255,255,0.15);">
+        <div style="font-size: 3.5rem; margin-bottom: 1rem;">👥</div>
+        <h3 style="color: #ffffff; margin-bottom: 0.5rem;">Be the First to Form a Squad!</h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem; max-width: 480px; margin: 0 auto 1.5rem auto;">
+            Post a teammate request for upcoming hackathons or coding marathons to find the perfect collaborators.
+        </p>
+        <button onclick="openPostModal()" class="btn-primary" style="display: inline-flex; width: auto; padding: 0.75rem 1.6rem; border-radius: 10px;">
+            ➕ Create Team Opening
+        </button>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal: Post Team Opening -->
+<div id="postTeamModal" class="modal-overlay">
+    <div class="modal-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem;">
+            <h3 style="color: #ffffff; font-size: 1.3rem; margin: 0;">Post Squad Opening</h3>
+            <button onclick="closePostModal()" style="background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer;">&times;</button>
+        </div>
+
+        <form method="POST" action="{{ url_for('post_team_match') }}">
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #ffffff; margin-bottom: 4px;">Target Event</label>
+                <select name="event_id" class="input-field" style="width: 100%; border-radius: 8px; padding: 0.6rem;" required>
+                    {% for ev in events %}
+                    <option value="{{ ev.id }}">{{ ev.title }} ({{ ev.date }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #ffffff; margin-bottom: 4px;">Opening Title</label>
+                <input type="text" name="title" class="input-field" placeholder="e.g. Seeking Fullstack & UI Designer" style="width: 100%; border-radius: 8px; padding: 0.6rem;" required>
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #ffffff; margin-bottom: 4px;">Skills Needed (Comma separated)</label>
+                <input type="text" name="skills" class="input-field" placeholder="e.g. React, Python, Figma, AI/ML" style="width: 100%; border-radius: 8px; padding: 0.6rem;" required>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #ffffff; margin-bottom: 4px;">Project / Team Description</label>
+                <textarea name="description" rows="3" class="input-field" placeholder="Tell potential teammates about your project idea..." style="width: 100%; border-radius: 8px; padding: 0.6rem;" required></textarea>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button type="button" onclick="closePostModal()" class="btn-secondary" style="width: auto; padding: 0.65rem 1.2rem;">Cancel</button>
+                <button type="submit" class="btn-primary" style="width: auto; padding: 0.65rem 1.4rem;">Publish Opening 🚀</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openPostModal() {
+        document.getElementById('postTeamModal').style.display = 'flex';
+    }
+    function closePostModal() {
+        document.getElementById('postTeamModal').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>

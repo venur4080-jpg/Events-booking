@@ -11,10 +11,11 @@
     <script src="{{ url_for('static', filename='themes.js') }}?v=5.0"></script>
     <style>
         .details-container {
-            max-width: 1000px;
-            margin: 4rem auto;
-            padding: 0 5%;
+            max-width: 1280px;
+            margin: 2rem auto 4rem;
+            padding: 0 1.5rem;
             animation: fadeIn 0.8s ease-out;
+            box-sizing: border-box;
         }
 
         .back-link {
@@ -62,12 +63,12 @@
             display: inline-block;
             padding: 6px 15px;
             border-radius: 50px;
-            background: {{ event.color }};
+            background: var(--event-color, #00f2fe);
             color: white;
             font-size: 0.85rem;
             font-weight: 700;
             margin-bottom: 1rem;
-            box-shadow: 0 0 20px {{ event.color }}44;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
         }
 
         .details-grid {
@@ -153,9 +154,35 @@
         @media (max-width: 768px) {
             .details-grid {
                 grid-template-columns: 1fr;
+                gap: 1.5rem;
             }
             .details-hero {
-                height: 300px;
+                height: auto;
+                min-height: 260px;
+                border-radius: 16px;
+                margin-bottom: 1.5rem;
+            }
+            .hero-overlay {
+                position: relative !important;
+                padding: 1.5rem 1rem !important;
+                background: linear-gradient(to top, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.85)) !important;
+            }
+            .details-hero-title {
+                font-size: 1.85rem !important;
+                line-height: 1.25 !important;
+            }
+            .main-info {
+                padding: 1.25rem !important;
+            }
+            .venue-actions {
+                flex-direction: column !important;
+            }
+            .venue-actions a, .venue-actions button {
+                width: 100% !important;
+                justify-content: center !important;
+            }
+            .admission-passes-grid {
+                grid-template-columns: 1fr !important;
             }
         }
 
@@ -170,13 +197,66 @@
             text-align: center;
             font-weight: 600;
         }
+
+        .seat-detail-pill {
+            margin-bottom: 0 !important;
+            font-weight: 800;
+        }
+        .seat-detail-pill.soldout {
+            background: rgba(239, 68, 68, 0.25) !important;
+            border: 1px solid #ef4444 !important;
+            color: #fca5a5 !important;
+        }
+        .seat-detail-pill.warning {
+            background: rgba(245, 158, 11, 0.25) !important;
+            border: 1px solid #f59e0b !important;
+            color: #fbbf24 !important;
+        }
+        .seat-detail-pill.open {
+            background: rgba(16, 185, 129, 0.25) !important;
+            border: 1px solid #10b981 !important;
+            color: #34d399 !important;
+        }
+
+        .seat-sidebar-badge {
+            font-size: 0.74rem;
+            font-weight: 800;
+            padding: 2px 10px;
+            border-radius: 999px;
+        }
+        .seat-sidebar-badge.soldout {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+        .seat-sidebar-badge.warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+        .seat-sidebar-badge.open {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+
+        .seat-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00f2fe, #4facfe);
+        }
+        .seat-progress-fill.soldout {
+            background: #ef4444;
+        }
     </style>
 </head>
 
-<body>
+<body data-event-color="{{ event.color }}" data-event-id="{{ event.id }}" data-is-registered="{{ '1' if event.is_registered else '0' }}" data-is-expired="{{ '1' if event.is_expired else '0' }}">
     <script>
         if (localStorage.getItem('theme') === 'light') {
             document.body.classList.add('light-mode');
+        }
+        if (document.body && document.body.dataset && document.body.dataset.eventColor) {
+            document.documentElement.style.setProperty('--event-color', document.body.dataset.eventColor);
         }
     </script>
 
@@ -261,14 +341,21 @@
         <div class="details-hero {% if event.is_expired and not event.is_today %}event-expired{% endif %}">
             <img src="{{ event.image }}" alt="{{ event.title }}" class="hero-img" onerror="this.src='https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070&auto=format&fit=crop';">
             <div class="hero-overlay">
-                <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem;">
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; align-items: center;">
                     <span class="detail-badge" style="margin-bottom: 0;">📅 {{ event.date }}</span>
                     <span class="detail-badge" style="background: rgba(0, 242, 254, 0.2); border: 1px solid var(--primary); color: var(--primary); margin-bottom: 0;">⏰ {{ event.time }} - {{ event.end_time }}</span>
                     {% if event.is_today and event.is_open %}
                     <span class="detail-badge" style="background: rgba(245, 158, 11, 0.3); border: 1px solid #f59e0b; color: #fbbf24; margin-bottom: 0;">⚡ Closes at {{ event.cutoff_time }}</span>
                     {% endif %}
+                    <span class="detail-badge seat-detail-pill {% if event.is_in_person_sold_out %}soldout{% elif (event.seats_left or 100) < 15 %}warning{% else %}open{% endif %}">
+                        {% if event.is_in_person_sold_out %}
+                        ⛔ 0 / {{ event.seats_total or 100 }} Seats Available (Sold Out)
+                        {% else %}
+                        🪑 {{ event.seats_left }} / {{ event.seats_total or 100 }} Seats Available to Register
+                        {% endif %}
+                    </span>
                 </div>
-                <h1 class="hero-title" style="text-align: left; margin: 0; font-size: 3.5rem;">{{ event.title }}</h1>
+                <h1 class="hero-title details-hero-title" style="text-align: left; margin: 0; font-size: 3.5rem;">{{ event.title }}</h1>
             </div>
         </div>
 
@@ -288,40 +375,131 @@
                     {{ event.full_details }}
                 </p>
                 
-                <div class="action-bar" style="flex-wrap: wrap; gap: 1rem;">
-                    <div>
-                        <span style="display: block; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Ticket Price</span>
-                        <span class="price-large">{% if event.is_expired and not event.is_today %}Not Available{% else %}{{ event.price }}{% endif %}</span>
+                <!-- Dual Admission Pass & Registration Options -->
+                <div style="margin-top: 2rem; margin-bottom: 2rem;">
+                    <div class="section-title" style="margin-bottom: 1.2rem;">
+                        <span>Admission Passes & Registration Limits</span>
                     </div>
-                    <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-                        {% if event.is_open %}
-                            {% if event.is_registered %}
-                            <a href="{{ url_for('download_ticket', event_id=event.id) }}" class="btn-primary" style="width: auto; padding: 0.8rem 1.5rem; text-decoration: none; display: inline-flex; align-items: center; border-radius: 12px; font-weight: 700; white-space: nowrap;" target="_blank">📥 View Ticket</a>
-                            {% if event.checked_in %}
-                            <a href="{{ url_for('download_certificate', event_id=event.id) }}" class="btn-primary" style="width: auto; padding: 0.8rem 1.5rem; background: linear-gradient(135deg, #f59e0b, #d97706); text-decoration: none; display: inline-flex; align-items: center; border-radius: 12px; font-weight: 700; white-space: nowrap; color: #ffffff;" target="_blank" title="Download Official Certificate">🎓 Certificate</a>
-                            {% endif %}
-                            <button type="button" class="btn-primary" style="width: auto; padding: 0.8rem 1.5rem; background: var(--secondary); color: white; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; white-space: nowrap; margin-top: 0;" onclick="openUnregisterModal('{{ event.id }}', '{{ event.title | escape }}')">Unregister</button>
-                            {% else %}
-                            <button class="btn-primary" style="width: auto; padding: 0.8rem 1.5rem; border-radius: 12px; border: none; cursor: pointer; white-space: nowrap; margin-top: 0;" onclick="window.location.href='{{ url_for('register_event', event_id=event.id) }}'">Register Now</button>
-                            {% endif %}
-                        {% else %}
-                            {% if event.is_registered %}
-                            <a href="{{ url_for('download_ticket', event_id=event.id) }}" class="btn-primary" style="width: auto; padding: 0.8rem 1.5rem; text-decoration: none; display: inline-flex; align-items: center; border-radius: 12px; font-weight: 700; white-space: nowrap;" target="_blank">📥 View Ticket</a>
-                            {% if event.checked_in %}
-                            <a href="{{ url_for('download_certificate', event_id=event.id) }}" class="btn-primary" style="width: auto; padding: 0.8rem 1.5rem; background: linear-gradient(135deg, #f59e0b, #d97706); text-decoration: none; display: inline-flex; align-items: center; border-radius: 12px; font-weight: 700; white-space: nowrap; color: #ffffff;" target="_blank" title="Download Official Certificate">🎓 Certificate</a>
-                            {% endif %}
-                            <button type="button" class="btn-primary" style="width: auto; padding: 0.8rem 1.5rem; background: var(--secondary); color: white; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; white-space: nowrap; margin-top: 0;" onclick="openUnregisterModal('{{ event.id }}', '{{ event.title | escape }}')">Unregister</button>
-                            {% else %}
-                            <button class="btn-secondary" style="width: auto; padding: 0.8rem 1.5rem; cursor: not-allowed; opacity: 0.7; border-radius: 12px; white-space: nowrap; margin-top: 0;" disabled title="{{ event.status_reason }}">{% if event.is_cutoff_reached %}Registration Closed (2h Cutoff Reached){% elif event.is_sold_out %}Sold Out{% else %}Registration Closed{% endif %}</button>
-                            {% endif %}
-                        {% endif %}
 
-                        {% if is_host %}
-                        <form action="{{ url_for('delete_event', event_id=event.id) }}" method="POST" style="display: inline; margin: 0;" onsubmit="return confirm('Are you sure you want to delete this event?');">
-                            <button type="submit" class="btn-secondary" style="width: auto; padding: 0.8rem 1.5rem; background: rgba(255,255,255,0.1); color: var(--text-muted); border: 1px solid var(--glass-border); cursor: pointer; border-radius: 12px; white-space: nowrap; margin-top: 0;">Delete Event</button>
-                        </form>
-                        {% endif %}
+                    <div class="admission-passes-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.2rem;">
+                        <!-- Card 1: In-Person Pass with Registration Limit -->
+                        <div style="background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 16px; padding: 1.4rem; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; flex-direction: column; justify-content: space-between;">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.8rem;">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <span style="font-size: 1.4rem;">🎟️</span>
+                                        <div>
+                                            <h4 style="color: #ffffff; margin: 0; font-size: 1.1rem; font-weight: 800;">In-Person Admission Pass</h4>
+                                            <span style="font-size: 0.78rem; color: var(--primary); font-weight: 600;">Seated Physical Access</span>
+                                        </div>
+                                    </div>
+                                    <span class="price-large" style="font-size: 1.5rem; color: #00f2fe;">{% if event.is_expired and not event.is_today %}Closed{% else %}{{ event.price }}{% endif %}</span>
+                                </div>
+                                <p style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.4; margin-bottom: 1rem;">
+                                    Direct auditorium seating, physical badge, networking kit, and venue access.
+                                </p>
+
+                                <!-- Registration Limit Bar -->
+                                <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 0.8rem; margin-bottom: 1.2rem;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; margin-bottom: 6px;">
+                                        <span style="color: var(--text-muted);">Registration Limit: <strong style="color: white;">{{ event.seats_total or 100 }} max</strong></span>
+                                        {% if event.is_in_person_sold_out %}
+                                        <span style="font-weight: 700; color: #f87171;">⛔ Sold Out (0 left)</span>
+                                        {% elif (event.seats_left or 100) < 15 %}
+                                        <span style="font-weight: 700; color: #fbbf24;">⚡ {{ event.seats_left }} seats left</span>
+                                        {% else %}
+                                        <span style="font-weight: 700; color: #34d399;">⚡ {{ event.seats_left }} seats left</span>
+                                        {% endif %}
+                                    </div>
+                                    <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                                        {% set fill_pct = ((((event.seats_filled or 0) / (event.seats_total or 100)) * 100) | round) if event.seats_total else 0 %}
+                                        <div class="seat-progress-fill {% if event.is_in_person_sold_out %}soldout{% endif %}" {{ ('style="width: ' ~ fill_pct ~ '%;"') | safe }}></div>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #64748b; margin-top: 4px;">
+                                        <span>{{ event.seats_filled or 0 }} registered</span>
+                                        <span>Cap: {{ event.seats_total or 100 }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- In-Person Actions -->
+                            <div>
+                                {% if event.is_registered %}
+                                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                    <a href="{{ url_for('view_ticket_interactive', event_id=event.id) }}" class="btn-primary" style="flex: 1; padding: 0.7rem 1rem; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; font-weight: 700; font-size: 0.88rem; text-align: center;">🎟️ View Holographic Pass</a>
+                                    {% if not event.checked_in %}
+                                    <button type="button" class="btn-primary" style="padding: 0.7rem 1rem; background: var(--secondary); color: white; border-radius: 10px; font-weight: 700; font-size: 0.88rem; border: none; cursor: pointer;" onclick="openUnregisterModal('{{ event.id }}', '{{ event.title | escape }}')">Cancel</button>
+                                    {% endif %}
+                                </div>
+                                {% else %}
+                                    {% if event.is_open and not event.is_in_person_sold_out %}
+                                    <a href="{{ url_for('register_event', event_id=event.id) }}?type=in_person" class="btn-primary" style="width: 100%; padding: 0.75rem 1.2rem; border-radius: 10px; font-weight: 700; font-size: 0.92rem; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; text-align: center; box-sizing: border-box;">
+                                        Register In-Person Pass
+                                    </a>
+                                    {% elif event.is_in_person_sold_out %}
+                                    <button class="btn-secondary" style="width: 100%; padding: 0.75rem 1.2rem; border-radius: 10px; font-weight: 700; font-size: 0.92rem; cursor: not-allowed; opacity: 0.65; background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3);" disabled>
+                                        ⛔ Sold Out (Limit Reached)
+                                    </button>
+                                    {% else %}
+                                    <button class="btn-secondary" style="width: 100%; padding: 0.75rem 1.2rem; border-radius: 10px; font-weight: 700; font-size: 0.92rem; cursor: not-allowed; opacity: 0.7;" disabled title="{{ event.status_reason }}">
+                                        {% if event.is_cutoff_reached %}Registration Closed (2h Cutoff){% else %}Registration Closed{% endif %}
+                                    </button>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Live Stream Pass (Separate Price & NO LIMIT) -->
+                        <div style="background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 16px; padding: 1.4rem; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; flex-direction: column; justify-content: space-between;">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.8rem;">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <span style="font-size: 1.4rem;">📡</span>
+                                        <div>
+                                            <h4 style="color: #ffffff; margin: 0; font-size: 1.1rem; font-weight: 800;">Live Stream Virtual Pass</h4>
+                                            <span style="font-size: 0.78rem; color: #34d399; font-weight: 600;">Full HD Projection Stage</span>
+                                        </div>
+                                    </div>
+                                    <span class="price-large" style="font-size: 1.5rem; color: #34d399;">{{ event.stream_price or '₹199' }}</span>
+                                </div>
+                                <p style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.4; margin-bottom: 1rem;">
+                                    Real-time live video broadcast room, interactive live chat, and live Q&A submission.
+                                </p>
+
+                                <!-- Unlimited Virtual Capacity Badge -->
+                                <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 0.8rem; margin-bottom: 1.2rem;">
+                                    <div style="display: flex; align-items: center; gap: 8px; color: #34d399; font-size: 0.82rem; font-weight: 700; margin-bottom: 4px;">
+                                        <span>🌐</span> Unlimited Virtual Capacity
+                                    </div>
+                                    <p style="margin: 0; font-size: 0.76rem; color: #94a3b8; line-height: 1.3;">
+                                        No registration limit! You can always register for live stream access even if in-person seats are full.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Live Stream Actions -->
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <a href="{{ url_for('live_event_page', event_id=event.id) }}" class="btn-primary" style="flex: 1; padding: 0.75rem 1rem; background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(220, 38, 38, 0.45)); border: 1px solid rgba(239, 68, 68, 0.6); color: #fca5a5; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; border-radius: 10px; font-weight: 700; font-size: 0.88rem; text-align: center;">
+                                    <span style="width: 7px; height: 7px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
+                                    📹 Enter Live Room
+                                </a>
+
+                                {% if not event.is_registered %}
+                                <a href="{{ url_for('register_event', event_id=event.id) }}?type=live_stream" class="btn-primary" style="flex: 1; padding: 0.75rem 1rem; background: linear-gradient(135deg, #10b981, #059669); color: white; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; font-weight: 700; font-size: 0.88rem; text-align: center; border: none;">
+                                    📡 Register Stream Pass ({{ event.stream_price or '₹199' }})
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
+
+                    {% if is_host %}
+                    <div style="margin-top: 1rem; text-align: right;">
+                        <form action="{{ url_for('delete_event', event_id=event.id) }}" method="POST" style="display: inline; margin: 0;" onsubmit="return confirm('Are you sure you want to delete this event?');">
+                            <button type="submit" class="btn-secondary" style="padding: 0.6rem 1.2rem; background: rgba(255,255,255,0.08); color: var(--text-muted); border: 1px solid var(--glass-border); cursor: pointer; border-radius: 10px; font-size: 0.85rem;">Delete Event</button>
+                        </form>
+                    </div>
+                    {% endif %}
                 </div>
 
                 <!-- Event Venue & Location Address Section (Below Price & Register Now) -->
@@ -347,14 +525,103 @@
                             🧭 Get Directions
                         </a>
                         <button type="button" class="venue-map-link" style="background: rgba(255,255,255,0.06); border-color: var(--glass-border); color: var(--text-muted); cursor: pointer;"
-                                onclick="navigator.clipboard.writeText('{{ (event.venue or '') ~ ' - ' ~ (event.venue_address or '') }}').then(() => window.showToast && showToast('Venue address copied!', 'success'))">
+                                data-venue="{{ (event.venue or '') ~ ' - ' ~ (event.venue_address or '') }}"
+                                onclick="navigator.clipboard.writeText(this.dataset.venue).then(() => window.showToast && showToast('Venue address copied!', 'success'))">
                             📋 Copy Address
                         </button>
+                    </div>
+                </div>
+
+                <!-- 👥 Attendee Networking Directory ("Who's Attending") -->
+                <div class="info-card" style="margin-top: 2rem; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(0, 242, 254, 0.25); border-radius: 16px; padding: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <div class="section-title" style="margin: 0; color: #00f2fe; font-size: 1.15rem;">
+                            <span>👥</span> Who's Attending (Networking)
+                        </div>
+                        <span id="attendeeCountBadge" style="background: rgba(0, 242, 254, 0.12); color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.3); padding: 3px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700;">Loading...</span>
+                    </div>
+                    <div id="attendeesGrid" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <div style="color: var(--text-muted); font-size: 0.88rem;">Loading registered peers...</div>
+                    </div>
+                </div>
+
+                <!-- ⭐ Community Reviews & Star Ratings -->
+                <div class="info-card" style="margin-top: 2rem; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 16px; padding: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 10px;">
+                        <div class="section-title" style="margin: 0; color: #fbbf24; font-size: 1.15rem;">
+                            <span>⭐</span> Attendee Reviews & Ratings
+                        </div>
+                        <button type="button" class="btn-primary" style="width: auto; padding: 0.45rem 1rem; font-size: 0.82rem; background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; border-radius: 8px; font-weight: 700; margin: 0;" onclick="document.getElementById('reviewModal').style.display='flex'">
+                            ✍️ Write Review
+                        </button>
+                    </div>
+                    <div id="reviewsSummaryBox" style="display: flex; align-items: center; gap: 15px; margin-bottom: 1.2rem; background: rgba(0,0,0,0.25); padding: 1rem; border-radius: 12px;">
+                        <div style="font-size: 2.2rem; font-weight: 800; color: #fbbf24; font-family: var(--font-heading);" id="avgRatingNumber">5.0</div>
+                        <div>
+                            <div style="color: #fbbf24; font-size: 1.1rem; letter-spacing: 2px;" id="avgRatingStars">★★★★★</div>
+                            <div style="color: var(--text-muted); font-size: 0.8rem;" id="totalReviewsCount">Verified Attendee Reviews</div>
+                        </div>
+                    </div>
+                    <div id="reviewsList" style="display: flex; flex-direction: column; gap: 10px;">
+                        <div style="color: var(--text-muted); font-size: 0.88rem;">Loading reviews...</div>
                     </div>
                 </div>
             </div>
 
             <div class="sidebar-info">
+                <!-- 🪑 Available Seats & Registration Limit Card -->
+                <div class="info-card" style="border: 1px solid rgba(0, 242, 254, 0.4); background: linear-gradient(135deg, rgba(0, 242, 254, 0.08), rgba(15, 23, 42, 0.9)); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+                        <span style="color: var(--primary); font-weight: 800; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.8px;">
+                            🪑 Seat Availability
+                        </span>
+                        <span class="seat-sidebar-badge {% if event.is_in_person_sold_out %}soldout{% elif (event.seats_left or 100) < 15 %}warning{% else %}open{% endif %}">
+                            {% if event.is_in_person_sold_out %}SOLD OUT{% else %}{{ event.seats_left }} AVAILABLE{% endif %}
+                        </span>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.4rem;">
+                        <div>
+                            <span style="font-size: 2.2rem; font-weight: 900; color: #ffffff; font-family: var(--font-heading);">{{ event.seats_left }}</span>
+                            <span style="font-size: 1rem; color: #94a3b8; font-weight: 600;">/ {{ event.seats_total or 100 }}</span>
+                        </div>
+                        <span style="font-size: 0.82rem; color: #cbd5e1; font-weight: 600;">
+                            {{ event.seats_filled or 0 }} Registered
+                        </span>
+                    </div>
+
+                    <div style="font-size: 0.82rem; color: #94a3b8; margin-bottom: 0.6rem;">
+                        Seats currently available to register
+                    </div>
+
+                    <!-- Visual Capacity Progress Bar -->
+                    <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 999px; overflow: hidden; margin-bottom: 0.8rem;">
+                        {% set fill_pct = ((((event.seats_filled or 0) / (event.seats_total or 100)) * 100) | round) if event.seats_total else 0 %}
+                        <div class="seat-progress-fill {% if event.is_in_person_sold_out %}soldout{% endif %}" {{ ('style="width: ' ~ fill_pct ~ '%;"') | safe }}></div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: #64748b; padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.06);">
+                        <span>Physical Limit: {{ event.seats_total or 100 }} seats</span>
+                        <span style="color: #34d399; font-weight: 600;">Live Stream: Unlimited</span>
+                    </div>
+                </div>
+
+                <!-- 🔴 Live Interactive Room -->
+                <div class="info-card" style="border: 1px solid rgba(239, 68, 68, 0.45); background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(15, 23, 42, 0.8));">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;">
+                        <span style="display: inline-flex; align-items: center; gap: 6px; color: #f87171; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                            <span style="width: 7px; height: 7px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 8px #ef4444;"></span> Live Session
+                        </span>
+                        <span style="font-size: 0.75rem; background: rgba(239, 68, 68, 0.2); color: #fca5a5; padding: 2px 8px; border-radius: 999px;">Q&A & Polls</span>
+                    </div>
+                    <p style="font-size: 0.88rem; color: #e2e8f0; margin: 0 0 1rem; line-height: 1.45;">
+                        Join the live interactive room to ask questions directly to speakers and vote on audience polls in real-time.
+                    </p>
+                    <a href="{{ url_for('live_event_page', event_id=event.id) }}" class="btn-primary" style="display: block; text-align: center; text-decoration: none; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; padding: 0.75rem; border-radius: 10px; font-weight: 700; font-size: 0.92rem; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);">
+                        🔴 Enter Live Interactive Room →
+                    </a>
+                </div>
+
                 {% if not event.is_expired %}
                 <div class="info-card" style="border-color: var(--primary);">
                     <div class="section-title" style="color: var(--primary);">
@@ -391,9 +658,6 @@
                     <div class="invite-buttons" style="margin-top: 0;">
                         <a href="{{ google_cal_url }}" class="invite-btn google-cal" target="_blank" id="googleCalBtn">
                             📅 Google Cal
-                        </a>
-                        <a href="{{ url_for('event_ical', event_id=event.id) }}" class="invite-btn" id="icalBtn">
-                            📥 Download iCal
                         </a>
                     </div>
                     <!-- Share Buttons -->
@@ -458,11 +722,9 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- ─── Reviews & Ratings Section ─── -->
-    <div class="details-container" style="margin-top:-2rem">
-        <div style="background:rgba(255,255,255,0.04);border:1px solid var(--glass-border);border-radius:20px;padding:2rem;margin-bottom:2rem">
+        <!-- ─── Reviews & Ratings Section ─── -->
+        <div style="background:rgba(255,255,255,0.04);border:1px solid var(--glass-border);border-radius:20px;padding:2rem;margin-top:2.5rem;margin-bottom:2rem">
             <h3 style="color:var(--text-main);font-family:var(--font-heading);margin-bottom:0.5rem">⭐ Ratings & Reviews</h3>
             <div id="reviewsSummary" style="color:var(--text-muted);font-size:0.9rem;margin-bottom:1.5rem">Loading reviews...</div>
 
@@ -598,13 +860,14 @@
             });
 
         // ─── Confetti if just registered ───
-        {% if event.is_registered and not event.is_expired %}
-        if (sessionStorage.getItem('just_registered_{{ event.id }}')) {
-            sessionStorage.removeItem('just_registered_{{ event.id }}');
-            setTimeout(() => window.launchConfetti && launchConfetti(4000), 300);
-            setTimeout(() => window.showToast && showToast('Successfully registered! Enjoy the event 🎉', 'success', 5000), 600);
+        if (document.body && document.body.dataset && document.body.dataset.isRegistered === '1' && document.body.dataset.isExpired !== '1') {
+            const evId = document.body.dataset.eventId;
+            if (evId && sessionStorage.getItem('just_registered_' + evId)) {
+                sessionStorage.removeItem('just_registered_' + evId);
+                setTimeout(() => window.launchConfetti && launchConfetti(4000), 300);
+                setTimeout(() => window.showToast && showToast('Successfully registered! Enjoy the event 🎉', 'success', 5000), 600);
+            }
         }
-        {% endif %}
     </script>
 
     <!-- Unregister / Cancellation Reason Modal -->
@@ -765,13 +1028,113 @@
             if (modal && e.target === modal) {
                 closeUnregisterModal();
             }
+            const revModal = document.getElementById('reviewModal');
+            if (revModal && e.target === revModal) {
+                revModal.style.display = 'none';
+            }
         });
+
+        // Load Attendees and Reviews
+        async function loadAttendeesAndReviews() {
+            const eventId = (document.body && document.body.dataset && document.body.dataset.eventId) || '';
+            // 1. Load Attendees
+            try {
+                const aRes = await fetch(`/api/event/${eventId}/attendees`);
+                const aData = await aRes.json();
+                if (aData.ok && aData.attendees) {
+                    const badge = document.getElementById('attendeeCountBadge');
+                    if (badge) badge.textContent = `${aData.count} Registered Peers`;
+                    const grid = document.getElementById('attendeesGrid');
+                    if (grid) {
+                        if (aData.attendees.length === 0) {
+                            grid.innerHTML = `<div style="color: var(--text-muted); font-size: 0.88rem;">Be the first attendee to register and connect!</div>`;
+                        } else {
+                            grid.innerHTML = aData.attendees.map(a => `
+                                <div style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); padding: 6px 12px; border-radius: 999px; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+                                    <img src="${a.profile_photo}" alt="${a.username}" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;">
+                                    <span style="color: #ffffff; font-size: 0.82rem; font-weight: 600;">${a.full_name}</span>
+                                    <span style="font-size: 0.72rem; color: #00f2fe; background: rgba(0,242,254,0.12); padding: 1px 6px; border-radius: 6px;">${a.role}</span>
+                                </div>
+                            `).join('');
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error("Error loading attendees:", err);
+            }
+
+            // 2. Load Reviews
+            try {
+                const rRes = await fetch(`/api/reviews/${eventId}`);
+                const rData = await rRes.json();
+                if (rData && rData.reviews) {
+                    const avg = rData.avg_rating || 5.0;
+                    const total = rData.total || 0;
+                    const numEl = document.getElementById('avgRatingNumber');
+                    const starsEl = document.getElementById('avgRatingStars');
+                    const countEl = document.getElementById('totalReviewsCount');
+                    
+                    if (numEl) numEl.textContent = avg.toFixed(1);
+                    if (starsEl) starsEl.textContent = '★'.repeat(Math.round(avg)) + '☆'.repeat(5 - Math.round(avg));
+                    if (countEl) countEl.textContent = `${total} Verified Attendee Review${total === 1 ? '' : 's'}`;
+
+                    const listEl = document.getElementById('reviewsList');
+                    if (listEl) {
+                        if (rData.reviews.length === 0) {
+                            listEl.innerHTML = `<div style="color: var(--text-muted); font-size: 0.88rem; padding: 0.5rem 0;">No reviews posted yet. Be the first to share your experience!</div>`;
+                        } else {
+                            listEl.innerHTML = rData.reviews.slice(0, 5).map(r => `
+                                <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); padding: 0.9rem 1.1rem; border-radius: 12px;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
+                                        <strong style="color: #00f2fe; font-size: 0.88rem;">@${r.username}</strong>
+                                        <span style="color: #fbbf24; font-size: 0.85rem;">${'★'.repeat(r.rating)}</span>
+                                    </div>
+                                    <p style="color: #cbd5e1; font-size: 0.85rem; margin: 0; line-height: 1.4;">${r.comment || 'Great event, highly recommended!'}</p>
+                                </div>
+                            `).join('');
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error("Error loading reviews:", err);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadAttendeesAndReviews);
     </script>
+
+    <!-- Review Modal -->
+    <div id="reviewModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; padding: 1.5rem;">
+        <div style="background: #0f172a; border: 1px solid #f59e0b; border-radius: 20px; max-width: 480px; width: 100%; padding: 2rem; box-shadow: 0 20px 50px rgba(0,0,0,0.6);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem;">
+                <h3 style="color: #ffffff; margin: 0; font-size: 1.3rem;">⭐ Share Your Review</h3>
+                <button type="button" style="background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer;" onclick="document.getElementById('reviewModal').style.display='none'">&times;</button>
+            </div>
+            <form action="{{ url_for('submit_review', event_id=event.id) }}" method="POST">
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; color: #cbd5e1; font-size: 0.85rem; margin-bottom: 0.4rem; font-weight: 600;">Rating (1 to 5 Stars)</label>
+                    <select name="rating" class="form-control" style="background: rgba(0,0,0,0.4); color: white; border: 1px solid rgba(255,255,255,0.2); width: 100%; padding: 0.75rem; border-radius: 10px;" required>
+                        <option value="5">★★★★★ (5/5) Outstanding Experience</option>
+                        <option value="4">★★★★☆ (4/5) Very Good</option>
+                        <option value="3">★★★☆☆ (3/5) Average</option>
+                        <option value="2">★★☆☆☆ (2/5) Needs Improvement</option>
+                        <option value="1">★☆☆☆☆ (1/5) Poor</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; color: #cbd5e1; font-size: 0.85rem; margin-bottom: 0.4rem; font-weight: 600;">Your Feedback / Highlights</label>
+                    <textarea name="comment" class="form-control" style="background: rgba(0,0,0,0.4); color: white; border: 1px solid rgba(255,255,255,0.2); width: 100%; padding: 0.75rem; border-radius: 10px; min-height: 90px;" placeholder="What did you like the most about the speakers, tracks, or organization?" required></textarea>
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border-radius: 10px; padding: 0.9rem; font-weight: 700;">Submit Review ⭐</button>
+            </form>
+        </div>
+    </div>
 
     <script src="{{ url_for('static', filename='toast.js') }}"></script>
     <script src="{{ url_for('static', filename='confetti.js') }}"></script>
     <script src="{{ url_for('static', filename='pwa.js') }}"></script>
     <script src="{{ url_for('static', filename='chatbot.js') }}?v=5.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/motion@latest/dist/motion.js"></script>
     <script src="{{ url_for('static', filename='animations.js') }}"></script>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
