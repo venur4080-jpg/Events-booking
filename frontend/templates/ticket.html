@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admission Pass: {{ event.title }} | EVENTS</title>
+    <title>Admission Pass: {{ event.title }} | Events Booking</title>
     <meta name="description" content="Official Holographic E-Pass for {{ event.title }} - Verified Admission Ticket">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=6.0">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700;800&display=swap" rel="stylesheet">
@@ -783,7 +783,7 @@
                 <div class="hologram-top-foil"></div>
                 <div class="hologram-shimmer-foil"></div>
                 <div class="hologram-glare" id="hologramGlare"></div>
-                <div class="guilloche-bg">EVENTS</div>
+                <div class="guilloche-bg">EVENTS BOOKING</div>
 
                 <!-- Main Left Section -->
                 <div class="ticket-main">
@@ -791,8 +791,8 @@
                         <!-- Brand & Pass Status -->
                         <div class="brand-header-row">
                             <div class="brand-badge">
-                                <img src="{{ url_for('static', filename='logo.png') }}" alt="EVENTS Logo" style="height: 40px; border-radius: 10px; box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);">
-                                <div>EV<span>ENTS</span></div>
+                                <img src="{{ url_for('static', filename='logo.png') }}" alt="Events Booking Logo" style="height: 40px; border-radius: 10px; box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);">
+                                <div>Events <span>Booking</span></div>
                             </div>
 
                             <div style="display: flex; gap: 8px; align-items: center;">
@@ -908,8 +908,8 @@
                 <div>
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 1rem;">
                         <div class="brand-badge">
-                            <img src="{{ url_for('static', filename='logo.png') }}" alt="EVENTS Logo" style="height: 35px; border-radius: 8px;">
-                            <div>EV<span>ENTS</span> PROTOCOL</div>
+                            <img src="{{ url_for('static', filename='logo.png') }}" alt="Events Booking Logo" style="height: 35px; border-radius: 8px;">
+                            <div>Events <span>Booking</span> PROTOCOL</div>
                         </div>
                         <button onclick="toggleCardFlip()" class="t-btn" style="padding: 0.4rem 0.9rem; font-size: 0.8rem;">
                             <span>↩</span> Back to Pass
@@ -922,7 +922,7 @@
                     <div class="back-grid">
                         <div class="back-card-box">
                             <h4><span>📶</span> High-Speed Wi-Fi</h4>
-                            <p><strong>SSID:</strong> EVENTS-Gigabit-Guest<br><strong>Passkey:</strong> <code style="color: var(--tkt-cyan);">INNOVATE2026</code><br>Unlimited high-speed connection.</p>
+                            <p><strong>SSID:</strong> EventsBooking-Gigabit-Guest<br><strong>Passkey:</strong> <code style="color: var(--tkt-cyan);">INNOVATE2026</code><br>Unlimited high-speed connection.</p>
                         </div>
 
                         <div class="back-card-box">
@@ -949,7 +949,7 @@
     <!-- Bottom Security Footnote -->
     <div style="text-align: center; margin-top: 2rem; color: var(--text-muted); font-size: 0.82rem; line-height: 1.6;">
         🔒 <strong>Tamper-Evident Holographic Pass</strong>. Certified for admission at official venue turnstiles.<br>
-        Powered by <strong>EVENTS Cryptographic Security Gateway</strong>.
+        Powered by <strong>Events Booking Cryptographic Security Gateway</strong>.
     </div>
 </div>
 

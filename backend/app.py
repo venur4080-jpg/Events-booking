@@ -64,7 +64,7 @@ def _get_smtp_config():
         port = int(os.environ.get('SMTP_PORT', 465))
     except Exception:
         port = 465
-    sender = (os.environ.get('SMTP_SENDER_NAME') or 'EVENTS Team').strip()
+    sender = (os.environ.get('SMTP_SENDER_NAME') or 'Events Booking Team').strip()
     return email, password, server, port, sender
 
 
@@ -6186,7 +6186,7 @@ def _dispatch_html_email(recipient_email: str, subject: str, html_content: str, 
     if brevo_key:
         try:
             payload = {
-                "sender": {"name": sender_name or "EVENTS Team", "email": smtp_email or "contact@eventsplatform.com"},
+                "sender": {"name": sender_name or "Events Booking Team", "email": smtp_email or "contact@eventsbooking.com"},
                 "to": [{"email": recipient_email}],
                 "subject": subject,
                 "htmlContent": html_content,
@@ -6270,8 +6270,8 @@ def send_email_otp(recipient_email: str, otp_code: str):
     if otp_expiry_minutes <= 0:
         otp_expiry_minutes = 10
 
-    subject = f"{otp_code} is your EVENTS Verification Code"
-    text_content = f"Your EVENTS verification code is: {otp_code}. Valid for {otp_expiry_minutes} minutes. Do not share this OTP."
+    subject = f"{otp_code} is your Events Booking Verification Code"
+    text_content = f"Your Events Booking verification code is: {otp_code}. Valid for {otp_expiry_minutes} minutes. Do not share this OTP."
     html_content = f"""
     <!DOCTYPE html>
     <html>
@@ -6290,14 +6290,14 @@ def send_email_otp(recipient_email: str, otp_code: str):
     </head>
     <body>
         <div class="email-container">
-            <div class="logo">EV<span>ENTS</span></div>
+            <div class="logo">Events <span>Booking</span></div>
             <div class="title">Verification Code</div>
             <p style="color: #cbd5e1; font-size: 14px; margin-bottom: 5px;">Use the {len(otp_code)}-digit OTP code below to verify your email address:</p>
             <div class="otp-box">{otp_code}</div>
             <div class="expiry-note">⏱ This code is valid for {otp_expiry_minutes} minutes only.</div>
             <p style="color: #94a3b8; font-size: 13px;">If you did not request this verification, please ignore this email.</p>
             <div class="footer">
-                &copy; 2026 EVENTS Management System. All rights reserved.<br>
+                &copy; 2026 Events Booking. All rights reserved.<br>
                 Automated security notification — do not reply to this email.
             </div>
         </div>
@@ -7050,11 +7050,11 @@ def generate_ticket_pdf_bytes(event: dict, reg_info) -> bytes:
 
     if reg_pass_type == 'live_stream':
         pass_type_str = "Virtual Live Stream Pass (Unlimited Broadcast Access)"
-        header_title = "EVENTS - OFFICIAL LIVE STREAM PASS"
+        header_title = "EVENTS BOOKING - OFFICIAL LIVE STREAM PASS"
         sub_title = "Global Live Video Broadcast & Virtual Interactive Stage | E-Pass"
     else:
         pass_type_str = f"Team Pass ({team_name})" if team_name else "In-Person Solo Entry Pass"
-        header_title = "EVENTS - OFFICIAL ADMISSION PASS"
+        header_title = "EVENTS BOOKING - OFFICIAL ADMISSION PASS"
         sub_title = "Premier Tech Innovation & Student Developer Fest | E-Ticket"
     category_name = get_category(event.get('title', ''))
 
@@ -7300,7 +7300,7 @@ def generate_ticket_pdf_bytes(event: dict, reg_info) -> bytes:
     )
     
     qr_data = f"""{verify_url}
-EVENTS TICKET PASS
+EVENTS BOOKING TICKET PASS
 ===================
 Ticket ID: {ticket_num}
 Live Verify: {verify_url}
@@ -7399,7 +7399,7 @@ def generate_certificate_pdf_bytes(event: dict, reg_info) -> bytes:
     pdf.set_xy(15, 16)
     pdf.set_font("Helvetica", 'B', 12)
     pdf.set_text_color(0, 242, 254)
-    pdf.cell(267, 6, "EVENTS - SMART EVENT & HACKATHON PLATFORM", align='C')
+    pdf.cell(267, 6, "EVENTS BOOKING - SMART EVENT PLATFORM", align='C')
 
     pdf.set_xy(15, 23)
     pdf.set_font("Helvetica", '', 9)
@@ -7453,7 +7453,7 @@ def generate_certificate_pdf_bytes(event: dict, reg_info) -> bytes:
     pdf.set_xy(30, 107)
     pdf.set_font("Helvetica", 'I', 9)
     pdf.set_text_color(148, 163, 184)
-    auth_text = f"Official gate check-in recorded on {checkin_time}. Authenticated via EVENTS Digital QR Validation."
+    auth_text = f"Official gate check-in recorded on {checkin_time}. Authenticated via Events Booking Digital QR Validation."
     pdf.cell(237, 5, auth_text, align='C')
 
     # Bottom Signatures & Verification Area Container Box
@@ -7479,7 +7479,7 @@ def generate_certificate_pdf_bytes(event: dict, reg_info) -> bytes:
     pdf.set_text_color(148, 163, 184)
     pdf.cell(75, 4, "Executive Director & Lead Organizer", align='L')
     pdf.set_xy(26, 148)
-    pdf.cell(75, 4, "EVENTS Management Board", align='L')
+    pdf.cell(75, 4, "Events Booking Board", align='L')
     pdf.set_xy(26, 154)
     pdf.cell(75, 4, f"Issued Date: {datetime.now().strftime('%d %b %Y')}", align='L')
     pdf.set_xy(26, 160)
@@ -7544,7 +7544,7 @@ def generate_certificate_pdf_bytes(event: dict, reg_info) -> bytes:
     pdf.set_xy(15, 196)
     pdf.set_font("Helvetica", '', 7.5)
     pdf.set_text_color(100, 116, 139)
-    pdf.cell(267, 4, f"Security Hash: {cert_code} | Issued via EVENTS Gate Verification Engine | Contact: venu.rachakondaa@gmail.com", align='C')
+    pdf.cell(267, 4, f"Security Hash: {cert_code} | Issued via Events Booking Gate Verification Engine | Contact: venu.rachakondaa@gmail.com", align='C')
 
     try:
         return bytes(pdf.output())
@@ -7561,7 +7561,7 @@ def send_registration_confirmation_email(recipient_email: str, recipient_name: s
         return
 
     smtp_email, smtp_password, smtp_server, smtp_port, sender_name = _get_smtp_config()
-    sender_name = (os.environ.get('SMTP_SENDER_NAME') or 'EVENTS Registration').strip()
+    sender_name = (os.environ.get('SMTP_SENDER_NAME') or 'Events Booking Registration').strip()
 
     if isinstance(reg_info, dict):
         reg_id = reg_info.get('id', 1)
@@ -7628,7 +7628,7 @@ def send_registration_confirmation_email(recipient_email: str, recipient_name: s
         </head>
         <body>
             <div class="container">
-                <div class="logo">EV<span>ENTS</span></div>
+                <div class="logo">Events <span>Booking</span></div>
                 <div style="text-align: center; margin-bottom: 20px;">
                     <span class="badge">✓ Registration Confirmed</span>
                 </div>
@@ -7679,7 +7679,7 @@ def send_registration_confirmation_email(recipient_email: str, recipient_name: s
                 </div>
                 
                 <div class="footer">
-                    &copy; 2026 EVENTS Management System. All rights reserved.<br>
+                    &copy; 2026 Events Booking. All rights reserved.<br>
                     Need assistance? Reach out to <a href="mailto:{smtp_email}" style="color: #00f2fe; text-decoration: none;">{smtp_email}</a>.
                 </div>
             </div>
@@ -7728,7 +7728,7 @@ def send_unregistration_confirmation_email(recipient_email: str, recipient_name:
         return
 
     smtp_email, smtp_password, smtp_server, smtp_port, sender_name = _get_smtp_config()
-    sender_name = (os.environ.get('SMTP_SENDER_NAME') or 'EVENTS Team').strip()
+    sender_name = (os.environ.get('SMTP_SENDER_NAME') or 'Events Booking Team').strip()
 
     if isinstance(reg_info, dict):
         reg_id = reg_info.get('id', 1)
@@ -7787,7 +7787,7 @@ def send_unregistration_confirmation_email(recipient_email: str, recipient_name:
         </head>
         <body>
             <div class="container">
-                <div class="logo">EV<span>ENTS</span></div>
+                <div class="logo">Events <span>Booking</span></div>
                 <div style="text-align: center; margin-bottom: 20px;">
                     <span class="badge">✕ Registration Cancelled</span>
                 </div>
@@ -7830,7 +7830,7 @@ def send_unregistration_confirmation_email(recipient_email: str, recipient_name:
                 </div>
                 
                 <div class="footer">
-                    &copy; 2026 EVENTS Management System. All rights reserved.<br>
+                    &copy; 2026 Events Booking. All rights reserved.<br>
                     Need assistance? Contact our helpdesk at <a href="mailto:{smtp_email}" style="color: #00f2fe; text-decoration: none;">{smtp_email}</a>.
                 </div>
             </div>
@@ -7907,14 +7907,14 @@ def send_account_welcome_email(recipient_email: str, recipient_name: str, userna
         </head>
         <body>
             <div class="container">
-                <div class="logo">EV<span>ENTS</span></div>
+                <div class="logo">Events <span>Booking</span></div>
                 <div style="text-align: center; margin-bottom: 20px;">
                     <span class="badge">✨ Welcome to the Community</span>
                 </div>
                 
                 <p style="font-size: 16px; color: #f8fafc; margin-bottom: 6px;">Hello <strong>{recipient_name or username}</strong>,</p>
                 <p style="color: #cbd5e1; font-size: 14px; line-height: 1.6; margin-top: 0;">
-                    Your account on <strong>EVENTS Management System</strong> has been created successfully! You can now explore tech hackathons, workshops, and exclusive conferences.
+                    Your account on <strong>Events Booking</strong> has been created successfully! You can now explore tech hackathons, workshops, and exclusive conferences.
                 </p>
 
                 <p style="color: #94a3b8; font-size: 13px; margin-bottom: 4px; text-align: center;">Your official 4-digit User ID for login:</p>
@@ -7940,7 +7940,7 @@ def send_account_welcome_email(recipient_email: str, recipient_name: str, userna
                 </div>
                 
                 <div class="footer">
-                    &copy; 2026 EVENTS Management System. All rights reserved.<br>
+                    &copy; 2026 Events Booking. All rights reserved.<br>
                     Automated welcome notification — do not reply to this email.
                 </div>
             </div>
@@ -7948,7 +7948,7 @@ def send_account_welcome_email(recipient_email: str, recipient_name: str, userna
         </html>
         """
 
-        text_body = f"""Welcome to EVENTS!
+        text_body = f"""Welcome to Events Booking!
 Hello {recipient_name or username},
 
 Your account has been created successfully.
@@ -7961,7 +7961,7 @@ You can log in using either your User ID ({user_id}) or your registered email ad
 
         ok, msg, is_real = _dispatch_html_email(
             recipient_email,
-            f"🚀 Welcome to EVENTS — Your User ID is {user_id}",
+            f"🚀 Welcome to Events Booking — Your User ID is {user_id}",
             html_body,
             text_body
         )
@@ -9325,11 +9325,11 @@ def event_ical(event_id):
         
     ical_content = f"""BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//EVENTS//Event Management System//EN
+PRODID:-//Events Booking//Events Booking//EN
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
 BEGIN:VEVENT
-UID:event-{event['id']}@eventsystem.com
+UID:event-{event['id']}@eventsbooking.com
 DTSTAMP:{datetime.now().strftime("%Y%m%dT%H%M%SZ")}
 DTSTART;TZID=Asia/Kolkata:{dt_start}
 DTEND;TZID=Asia/Kolkata:{dt_end}
@@ -9660,7 +9660,7 @@ def generate_gemini_reply(user_message: str, history: list, events: list, userna
 
     try:
         ev_summary = "\n".join([f"- {e['title']} | Date: {e.get('date')} | Price: {e.get('price')} | Category: {get_category(e.get('title',''))}" for e in events[:15]])
-        system_text = f"""You are EVENTS Assistant, an intelligent AI for the EVENTS platform — a premium student event management portal for hackathons, workshops, and seminars.
+        system_text = f"""You are Events Booking Assistant, an intelligent AI for the Events Booking platform — a premium student event booking portal for hackathons, workshops, and seminars.
 Here are the live events currently scheduled on the platform:
 {ev_summary}
 
@@ -9744,7 +9744,7 @@ def api_chat():
     if client:
         try:
             ev_summary = "\n".join([f"- {e['title']} | Date: {e.get('date')} | Price: {e.get('price')} | Category: {get_category(e.get('title',''))}" for e in events[:15]])
-            system_prompt = f'''You are EVENTS Assistant, an intelligent AI for the EVENTS platform — a premium student event management portal for hackathons, workshops, and seminars.
+            system_prompt = f'''You are Events Booking Assistant, an intelligent AI for the Events Booking platform — a premium student event booking portal for hackathons, workshops, and seminars.
 Here are the live events currently scheduled on the platform:
 {ev_summary}
 

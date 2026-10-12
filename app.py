@@ -1,5 +1,5 @@
 """
-Event Management System - Server Launcher
+Events Booking - Server Launcher
 Allows running `python app.py` directly from the workspace root directory.
 """
 import sys
@@ -24,7 +24,7 @@ if __name__ == '__main__':
     is_dev = '--dev' in sys.argv or os.environ.get('FLASK_ENV') == 'development' or os.environ.get('DEBUG') == '1'
 
     print("\n" + "=" * 75)
-    print("  EVENTS MANAGEMENT SYSTEM - FASTAPI + FLASK HYBRID SERVER")
+    print("  EVENTS BOOKING - FASTAPI + FLASK HYBRID SERVER")
     print("=" * 75)
     print("  Local Access URL:    http://127.0.0.1:5000")
     print("  Interactive Swagger: http://127.0.0.1:5000/docs")
@@ -47,7 +47,7 @@ if __name__ == '__main__':
 
     if is_port_in_use(5000):
         print("\n" + "=" * 75)
-        print("  NOTICE: EVENTS Management System is ALREADY RUNNING on Port 5000!")
+        print("  NOTICE: Events Booking is ALREADY RUNNING on Port 5000!")
         print("=" * 75)
         print("  Local Access URL:    http://127.0.0.1:5000")
         print("  Interactive Swagger: http://127.0.0.1:5000/docs")

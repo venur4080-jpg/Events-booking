@@ -107,9 +107,9 @@
     banner.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;">
         <div style="display:flex;align-items:center;gap:10px;">
-          <img src="/static/logo.png" alt="EVENTS Logo" style="width:32px;height:32px;border-radius:8px;object-fit:cover;">
+          <img src="/static/logo.png" alt="Events Booking Logo" style="width:32px;height:32px;border-radius:8px;object-fit:cover;">
           <div>
-            <div style="font-weight:800;color:#ffffff;font-size:0.95rem;">Install EVENTS App</div>
+            <div style="font-weight:800;color:#ffffff;font-size:0.95rem;">Install Events Booking App</div>
             <div style="color:#94a3b8;font-size:0.75rem;">Fast access & offline ticket wallet</div>
           </div>
         </div>

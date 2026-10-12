@@ -1,7 +1,7 @@
 /**
  * animations.js – High-Performance Helical Screw Thread & Motion Suite
  * Powered by Motion (motion.dev / Framer Motion Engine)
- * Event Management System
+ * Events Booking
  */
 
 (function () {

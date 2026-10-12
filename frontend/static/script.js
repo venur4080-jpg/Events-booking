@@ -1,5 +1,5 @@
 /* 
- * Event Management System - Client Side Logic & Validation Suite
+ * Events Booking - Client Side Logic & Validation Suite
  */
 
 function registerEvent(eventName) {

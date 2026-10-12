@@ -1,6 +1,6 @@
-# Event Management System - Hosting & Deployment Guide
+# Events Booking - Hosting & Deployment Guide
 
-This guide covers the 3 primary ways to host and deploy the Event Management System.
+This guide covers the 3 primary ways to host and deploy Events Booking.
 
 ---
 
@@ -46,10 +46,10 @@ The project includes a production `Dockerfile` and `.dockerignore`.
 ### Build & Run Docker Container
 ```bash
 # 1. Build Docker image
-docker build -t event-management-system .
+docker build -t events-booking .
 
 # 2. Run container on port 5000
-docker run -d -p 5000:5000 --name ems-app event-management-system
+docker run -d -p 5000:5000 --name events-booking-app events-booking
 ```
 *Access locally at `http://localhost:5000`.*
 

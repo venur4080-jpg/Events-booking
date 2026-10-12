@@ -1,8 +1,8 @@
 @echo off
-title Event Management System - Local Server
+title Events Booking - Local Server
 cls
 echo ===========================================================================
-echo   STARTING EVENT MANAGEMENT SYSTEM
+echo   STARTING EVENTS BOOKING
 echo ===========================================================================
 echo.
 

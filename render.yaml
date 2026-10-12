@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: event-management-system
+    name: events-booking
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: python -m uvicorn app:asgi_app --host 0.0.0.0 --port $PORT --workers 4

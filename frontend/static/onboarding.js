@@ -1,5 +1,5 @@
 /**
- * onboarding.js – First-login walkthrough modal for Event Management System
+ * onboarding.js – First-login walkthrough modal for Events Booking
  */
 
 const ONBOARDING_KEY = 'events_onboarding_done_v1';
@@ -7,8 +7,8 @@ const ONBOARDING_KEY = 'events_onboarding_done_v1';
 const slides = [
   {
     icon: '🏠',
-    title: 'Welcome to EVENTS!',
-    body: 'Your all-in-one platform for discovering hackathons, workshops & seminars. Let us give you a quick tour!'
+    title: 'Welcome to Events Booking!',
+    body: 'Your all-in-one platform for discovering and booking hackathons, workshops & seminars. Let us give you a quick tour!'
   },
   {
     icon: '🔍',

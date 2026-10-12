@@ -1,5 +1,5 @@
 """
-test_system.py - Automated verification test suite for the Event Management System.
+test_system.py - Automated verification test suite for Events Booking.
 Tests authentication, registration, seats tracking, notifications, audit logs,
 admin controls, AI assistant responses, and PDF ticket generation.
 """
@@ -892,7 +892,7 @@ class EventManagementSystemTests(unittest.TestCase):
         # 4. Test Feature 4: PWA Manifest & Service Worker Routes
         resp_manifest = self.client.get('/manifest.json')
         self.assertEqual(resp_manifest.status_code, 200)
-        self.assertIn('EVENTS', resp_manifest.data.decode('utf-8'))
+        self.assertIn('Events Booking', resp_manifest.data.decode('utf-8'))
 
         resp_sw = self.client.get('/sw.js')
         self.assertEqual(resp_sw.status_code, 200)
@@ -1141,7 +1141,7 @@ class FastAPIApiTests(unittest.TestCase):
         resp_openapi = self.client.get('/openapi.json')
         self.assertEqual(resp_openapi.status_code, 200)
         schema = resp_openapi.json()
-        self.assertEqual(schema['info']['title'], "Event Management System API")
+        self.assertEqual(schema['info']['title'], "Events Booking API")
         self.assertIn('/api/v1/events', schema['paths'])
         self.assertIn('/api/v1/auth/login', schema['paths'])
         self.assertIn('/api/v1/health', schema['paths'])

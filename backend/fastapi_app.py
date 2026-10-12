@@ -257,9 +257,9 @@ async def lifespan(app: FastAPI):
     yield
 
 fastapi_app = FastAPI(
-    title="Event Management System API",
+    title="Events Booking API",
     description="""
-## Smart Event & Hackathon Management Platform API
+## Smart Events Booking Platform API
 **Powered by FastAPI (ASGI Engine) + Flask Web Portal (WSGI Engine)**
 
 ### Features:

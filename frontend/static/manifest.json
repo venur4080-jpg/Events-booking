@@ -1,7 +1,7 @@
 {
-  "name": "EVENTS – Event Management System",
-  "short_name": "EVENTS",
-  "description": "Discover and register for hackathons, workshops & seminars",
+  "name": "Events Booking",
+  "short_name": "Events Booking",
+  "description": "Discover and book tickets for hackathons, workshops & seminars",
   "start_url": "/dashboard",
   "display": "standalone",
   "background_color": "#0f172a",

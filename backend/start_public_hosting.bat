@@ -1,8 +1,8 @@
 @echo off
-title Event Management System - Public Live Host
+title Events Booking - Public Live Host
 cls
 echo ===========================================================================
-echo   STARTING EVENT MANAGEMENT SYSTEM & CLOUDFLARE PUBLIC LIVE HOST
+echo   STARTING EVENTS BOOKING & CLOUDFLARE PUBLIC LIVE HOST
 echo ===========================================================================
 echo.
 

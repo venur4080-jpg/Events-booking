@@ -1,6 +1,6 @@
 /**
  * themes.js – Nature Wallpaper, Live Motion & Atmospheric Particle Engine
- * Event Management System
+ * Events Booking
  */
 
 (function () {
