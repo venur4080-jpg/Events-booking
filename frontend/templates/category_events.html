@@ -845,14 +845,55 @@
             </div>
             <button class="close-btn" id="closeSidebar" aria-label="Close sidebar" style="background:none;border:none;cursor:pointer;">&times;</button>
         </div>
+
+        <!-- Sidebar User Mini-Card -->
+        <div class="sidebar-user-card">
+            <div class="sidebar-user-avatar">
+                <div style="width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; font-weight: 800; color: #0f172a; font-size: 0.95rem; box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);">
+                    {{ (session.get('username') or 'U')[:2]|upper }}
+                </div>
+            </div>
+            <div style="overflow: hidden; flex: 1;">
+                <div style="font-weight: 700; font-size: 0.92rem; color: #ffffff; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">
+                    {{ session.get('username') or 'Attendee' }}
+                </div>
+                <div style="font-size: 0.74rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+                    <span>{{ user_id_badge or 'UID-0001' }}</span>
+                    <span>•</span>
+                    {% if is_admin or session.get('username') in ['admin', 'Venu R'] %}
+                    <span style="color: #f59e0b; font-weight: 700;">Host & Admin</span>
+                    {% elif is_host %}
+                    <span style="color: #00f2fe; font-weight: 700;">Host</span>
+                    {% else %}
+                    <span style="color: #34d399; font-weight: 700;">Member</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
         <ul class="sidebar-links" role="list">
             <li><a href="{{ url_for('dashboard') }}">🏠 Dashboard</a></li>
-            <li><a href="{{ url_for('category_events', category_name='all') }}" class="active">🎪 Explore Categories</a></li>
+            <li>
+                <a href="{{ url_for('category_events', category_name='all') }}" class="active">
+                    🎪 Explore Categories
+                    <span class="sidebar-pill-badge pill-count">240 Events</span>
+                </a>
+            </li>
             <li><a href="{{ url_for('profile') }}">👤 My Profile</a></li>
-            <li><a href="{{ url_for('history') }}">📋 My Bookings</a></li>
+            <li>
+                <a href="{{ url_for('history') }}">
+                    📋 My Bookings
+                    <span class="sidebar-pill-badge pill-free">Active</span>
+                </a>
+            </li>
             <li><a href="{{ url_for('settings') }}">⚙️ Settings</a></li>
             {% if is_admin or session.get('username') in ['admin', 'Venu R'] %}
-            <li><a href="{{ url_for('admin_dashboard') }}" style="color:var(--admin-accent,#f59e0b);font-weight:700">⚡ Admin Panel</a></li>
+            <li>
+                <a href="{{ url_for('admin_dashboard') }}" style="color:var(--admin-accent,#f59e0b);font-weight:700">
+                    ⚡ Admin Panel
+                    <span class="sidebar-pill-badge" style="background:rgba(245,158,11,0.2);color:#f59e0b;border:1px solid rgba(245,158,11,0.4)">Host</span>
+                </a>
+            </li>
             {% endif %}
             {% if is_host %}
             <li role="separator"><hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 1rem 0;"></li>
@@ -947,6 +988,18 @@
                     <option value="upcoming">Upcoming & Live ({{ upcoming_events|length }})</option>
                     <option value="past">Concluded / Past ({{ past_events|length }})</option>
                 </select>
+            </div>
+
+            <div class="price-filter-pill-group" role="tablist" aria-label="Price Quick Filter">
+                <button type="button" class="price-pill-btn active" id="catPillAll" onclick="selectCategoryPricePill('all')">
+                    🌐 All
+                </button>
+                <button type="button" class="price-pill-btn pill-free-btn" id="catPillFree" onclick="selectCategoryPricePill('free')">
+                    ✨ Free Only
+                </button>
+                <button type="button" class="price-pill-btn" id="catPillPaid" onclick="selectCategoryPricePill('paid')">
+                    🎟️ Paid Only
+                </button>
             </div>
 
             <div class="select-wrapper">
@@ -1052,9 +1105,15 @@
 
                             <!-- Price Tag -->
                             <div class="event-price-row">
-                                <span class="price-tag">
-                                    {{ event.price }}
+                                {% if event.price.lower() == 'free' %}
+                                <span class="price-tag event-price-tag price-free">
+                                    ✨ Free Pass
                                 </span>
+                                {% else %}
+                                <span class="price-tag event-price-tag price-paid">
+                                    🎟️ {{ event.price }}
+                                </span>
+                                {% endif %}
                             </div>
 
                             <div class="card-footer">
@@ -1159,7 +1218,11 @@
                     <p class="grid-desc-clamped">{{ event.desc }}</p>
                 </div>
                 <div class="grid-card-footer">
-                    <span style="font-size: 1.25rem; font-weight: 800; color: var(--primary);">{{ event.price }}</span>
+                    {% if event.price.lower() == 'free' %}
+                    <span class="event-price-tag price-free" style="font-size: 0.95rem;">✨ Free Pass</span>
+                    {% else %}
+                    <span class="event-price-tag price-paid" style="font-size: 0.95rem;">🎟️ {{ event.price }}</span>
+                    {% endif %}
                     <a href="{{ url_for('event_detail', event_id=event.id) }}" class="btn-primary" style="text-decoration: none; padding: 0.45rem 1rem; font-size: 0.82rem; border-radius: 8px; font-weight: 700; height: 34px; display: inline-flex; align-items: center; justify-content: center; width: auto; margin: 0;">Details & Booking →</a>
                 </div>
             </div>
@@ -1640,6 +1703,16 @@
 
             recalculateCarousel(visibleCount);
             renderCalendar();
+        }
+
+        function selectCategoryPricePill(val) {
+            const sel = document.getElementById('priceFilter');
+            if (sel) sel.value = val;
+            document.querySelectorAll('.price-filter-pill-group .price-pill-btn').forEach(b => b.classList.remove('active'));
+            const pillId = val === 'all' ? 'catPillAll' : (val === 'free' ? 'catPillFree' : 'catPillPaid');
+            const btn = document.getElementById(pillId);
+            if (btn) btn.classList.add('active');
+            filterEvents();
         }
 
         function recalculateCarousel(visibleCount) {

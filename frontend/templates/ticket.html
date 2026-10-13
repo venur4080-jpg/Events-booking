@@ -765,7 +765,13 @@
                 <span>🖨️</span> Print
             </button>
             <a href="{{ url_for('download_ticket', event_id=event.id) }}" class="t-btn t-btn-primary" target="_blank" title="Download Official PDF E-Ticket">
-                <span>📥</span> PDF E-Ticket
+                <span>📥</span> PDF Pass
+            </a>
+            <a href="{{ url_for('download_invoice', event_id=event.id) }}" class="t-btn" target="_blank" style="border-color: rgba(52, 211, 153, 0.4); color: #34d399;" title="Download Official Tax Invoice & Payment Receipt">
+                <span>🧾</span> Tax Invoice
+            </a>
+            <a href="{{ url_for('event_google_calendar', event_id=event.id) }}" class="t-btn" target="_blank" style="border-color: rgba(245, 158, 11, 0.4); color: #fbbf24;" title="Add Event to Google Calendar">
+                <span>📅</span> Add to Calendar
             </a>
             <button onclick="copyShareUrl()" class="t-btn" id="shareBtn" title="Copy Verification Link">
                 <span>🔗</span> Share

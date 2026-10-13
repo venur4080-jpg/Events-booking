@@ -236,7 +236,12 @@
 
         <!-- Detailed Events Table -->
         <div class="events-table-card">
-            <div class="chart-title" style="margin-bottom: 2rem;">All Events & Registration Lists</div>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;">
+                <div class="chart-title" style="margin: 0;">All Events & Registration Lists</div>
+                <a href="{{ url_for('host_export_all_csv') }}" class="csv-btn" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.3)); border-color: #10b981; color: #34d399; font-weight: 700; text-decoration: none; padding: 0.6rem 1.2rem; border-radius: 10px; display: inline-flex; align-items: center; gap: 6px;" title="Export comprehensive CSV list of all attendee registrations across all events">
+                    📊 Export All Attendees Master (CSV)
+                </a>
+            </div>
             <table class="events-table">
                 <thead>
                     <tr>

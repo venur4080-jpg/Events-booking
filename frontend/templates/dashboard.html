@@ -418,16 +418,57 @@
             <button class="close-btn" id="closeSidebar" aria-label="Close sidebar"
                 style="background:none;border:none;cursor:pointer;">&times;</button>
         </div>
+
+        <!-- Sidebar User Mini-Card -->
+        <div class="sidebar-user-card">
+            <div class="sidebar-user-avatar">
+                <div style="width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; font-weight: 800; color: #0f172a; font-size: 0.95rem; box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);">
+                    {{ (session.get('username') or 'U')[:2]|upper }}
+                </div>
+            </div>
+            <div style="overflow: hidden; flex: 1;">
+                <div style="font-weight: 700; font-size: 0.92rem; color: #ffffff; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">
+                    {{ session.get('username') or 'Attendee' }}
+                </div>
+                <div style="font-size: 0.74rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+                    <span>{{ user_id_badge or 'UID-0001' }}</span>
+                    <span>•</span>
+                    {% if is_admin or session.get('username') in ['admin', 'Venu R'] %}
+                    <span style="color: #f59e0b; font-weight: 700;">Host & Admin</span>
+                    {% elif is_host %}
+                    <span style="color: #00f2fe; font-weight: 700;">Host</span>
+                    {% else %}
+                    <span style="color: #34d399; font-weight: 700;">Member</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
         <ul class="sidebar-links" role="list">
             <li><a href="{{ url_for('dashboard') }}" class="active" aria-current="page">🏠 Dashboard</a></li>
-            <li><a href="{{ url_for('category_events', category_name='all') }}">🎪 Browse All Categories</a></li>
+            <li>
+                <a href="{{ url_for('category_events', category_name='all') }}">
+                    🎪 Browse All Categories
+                    <span class="sidebar-pill-badge pill-count">240 Events</span>
+                </a>
+            </li>
             <li><a href="{{ url_for('passport_page') }}">🛂 Event Passport & XP</a></li>
             <li><a href="{{ url_for('teams_page') }}">🤝 AI Team Matcher</a></li>
             <li><a href="{{ url_for('profile') }}">👤 My Profile</a></li>
-            <li><a href="{{ url_for('history') }}">📋 My Bookings</a></li>
+            <li>
+                <a href="{{ url_for('history') }}">
+                    📋 My Bookings
+                    <span class="sidebar-pill-badge pill-free">Active</span>
+                </a>
+            </li>
             <li><a href="{{ url_for('settings') }}">⚙️ Settings</a></li>
             {% if is_admin or is_host or session.get('username') in ['admin', 'Venu R'] %}
-            <li><a href="{{ url_for('admin_dashboard') }}" style="color:var(--admin-accent,#f59e0b);font-weight:700">⚡ Admin Panel</a></li>
+            <li>
+                <a href="{{ url_for('admin_dashboard') }}" style="color:var(--admin-accent,#f59e0b);font-weight:700">
+                    ⚡ Admin Panel
+                    <span class="sidebar-pill-badge" style="background:rgba(245,158,11,0.2);color:#f59e0b;border:1px solid rgba(245,158,11,0.4)">Host</span>
+                </a>
+            </li>
             {% endif %}
             {% if is_host %}
             <li role="separator">
@@ -512,6 +553,57 @@
             </div>
         </div>
     </section>
+
+    <!-- ⏱️ Live Next Event Countdown Banner -->
+    {% set next_event = (upcoming_events[0] if upcoming_events else None) %}
+    {% if next_event %}
+    <div class="event-countdown-banner" id="eventCountdownBanner" data-date="{{ next_event.date }}" data-time="{{ next_event.time }}">
+        <div style="display: flex; align-items: center; gap: 14px;">
+            <div style="font-size: 2.2rem; filter: drop-shadow(0 0 10px rgba(0,242,254,0.5));">⏳</div>
+            <div>
+                <span style="font-size: 0.72rem; font-weight: 800; letter-spacing: 1.2px; color: var(--primary); text-transform: uppercase;">
+                    ⚡ NEXT UPCOMING EVENT COUNTDOWN
+                </span>
+                <h3 style="margin: 3px 0 0; font-size: 1.25rem; font-weight: 800; color: #ffffff;">
+                    {{ next_event.title }}
+                </h3>
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 3px;">
+                    📅 {{ next_event.date }} &bull; ⏰ {{ next_event.time }} &bull; 📍 {{ next_event.venue }}
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+            <div class="countdown-digits" id="liveCountdownTimer">
+                <div class="countdown-segment">
+                    <span class="countdown-number" id="cdDays">00</span>
+                    <span class="countdown-label">Days</span>
+                </div>
+                <div class="countdown-segment">
+                    <span class="countdown-number" id="cdHours">00</span>
+                    <span class="countdown-label">Hours</span>
+                </div>
+                <div class="countdown-segment">
+                    <span class="countdown-number" id="cdMinutes">00</span>
+                    <span class="countdown-label">Mins</span>
+                </div>
+                <div class="countdown-segment">
+                    <span class="countdown-number" id="cdSeconds">00</span>
+                    <span class="countdown-label">Secs</span>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 8px;">
+                <a href="{{ url_for('event_detail', event_id=next_event.id) }}" class="btn-primary" style="padding: 0.65rem 1.2rem; font-size: 0.85rem; font-weight: 700; text-decoration: none; border-radius: 10px;">
+                    View Details ➔
+                </a>
+                <a href="{{ url_for('event_google_calendar', event_id=next_event.id) }}" target="_blank" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 0.65rem 1rem; font-size: 0.85rem; border-radius: 10px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;" title="Add to Google Calendar">
+                    📅 Calendar
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
     <!-- ═══════════════════════════════════════════════════════════ -->
     <!-- 📦 12 Core Event Category Hub Boxes                         -->
@@ -738,21 +830,34 @@
 
     <!-- ⚡ Happening Today & Trending Highlights (Compact Grid Preview) -->
     <section class="highlights-section" aria-label="Trending Highlights">
-        <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px; margin-bottom: 0.5rem;">
             <div>
                 <span style="font-size: 0.8rem; font-weight: 800; letter-spacing: 1.5px; color: var(--primary); text-transform: uppercase;">⚡ ACTIVE HIGHLIGHTS</span>
                 <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 800; margin: 0.2rem 0 0;">Trending & Upcoming <span style="background: linear-gradient(135deg, #00f2fe, #4facfe); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Events</span></h2>
             </div>
-            <div class="calendar-legend" style="margin: 0;">
-                <span style="display: inline-flex; align-items: center; gap: 5px;"><span class="event-status-dot dot-open"></span> Open</span>
-                <span style="display: inline-flex; align-items: center; gap: 5px;"><span class="event-status-dot dot-today"></span> Today</span>
-                <span style="display: inline-flex; align-items: center; gap: 5px;"><span class="event-status-dot dot-closed"></span> Closed</span>
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                <div class="price-filter-pill-group" role="tablist" aria-label="Price Filter">
+                    <button type="button" class="price-pill-btn active" onclick="filterHighlightsPrice('all', this)" id="pillAllBtn">
+                        🌐 All Passes
+                    </button>
+                    <button type="button" class="price-pill-btn pill-free-btn" onclick="filterHighlightsPrice('free', this)" id="pillFreeBtn">
+                        ✨ Free Only
+                    </button>
+                    <button type="button" class="price-pill-btn" onclick="filterHighlightsPrice('paid', this)" id="pillPaidBtn">
+                        🎟️ Paid Passes
+                    </button>
+                </div>
+                <div class="calendar-legend" style="margin: 0;">
+                    <span style="display: inline-flex; align-items: center; gap: 5px;"><span class="event-status-dot dot-open"></span> Open</span>
+                    <span style="display: inline-flex; align-items: center; gap: 5px;"><span class="event-status-dot dot-today"></span> Today</span>
+                    <span style="display: inline-flex; align-items: center; gap: 5px;"><span class="event-status-dot dot-closed"></span> Closed</span>
+                </div>
             </div>
         </div>
 
         <div class="highlights-grid">
             {% for event in upcoming_events[:6] %}
-            <div class="highlight-card" data-id="{{ event.id }}" data-category="{{ event.category }}" data-cutoff-time="{{ event.cutoff_time }}" data-is-today="{{ '1' if event.is_today else '0' }}">
+            <div class="highlight-card" data-id="{{ event.id }}" data-category="{{ event.category }}" data-price="{% if event.price.lower() == 'free' %}free{% else %}paid{% endif %}" data-cutoff-time="{{ event.cutoff_time }}" data-is-today="{{ '1' if event.is_today else '0' }}">
                 <a href="{{ url_for('event_detail', event_id=event.id) }}" style="display: block; position: relative; height: 180px; overflow: hidden; text-decoration: none;">
                     <img src="{{ event.image }}" alt="{{ event.title }}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease;" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070&auto=format&fit=crop';">
                     <a href="{{ url_for('category_events', category_name=event.category) }}" onclick="event.stopPropagation();" style="position: absolute; top: 10px; left: 10px; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(8px); padding: 4px 10px; border-radius: 20px; font-size: 0.74rem; color: var(--primary); font-weight: 700; border: 1px solid rgba(0, 242, 254, 0.35); text-decoration: none; z-index: 5;">
@@ -814,7 +919,11 @@
                     </div>
 
                     <div class="highlight-card-footer">
-                        <span class="event-price-tag">{{ event.price }}</span>
+                        {% if event.price.lower() == 'free' %}
+                        <span class="event-price-tag price-free">✨ Free Entry</span>
+                        {% else %}
+                        <span class="event-price-tag price-paid">🎟️ {{ event.price }}</span>
+                        {% endif %}
                         <div class="card-action-btn-group">
                             {% if event.is_registered %}
                             <a href="{{ url_for('view_ticket_interactive', event_id=event.id) }}" class="card-btn-action" style="background: rgba(0, 242, 254, 0.2); color: var(--primary);" title="Open Holographic Pass">🎟️ Pass</a>
@@ -994,10 +1103,68 @@
             if (formToDelete) formToDelete.submit();
         }
 
+        // 1-Click Highlights Price Filter
+        function filterHighlightsPrice(type, btn) {
+            document.querySelectorAll('.price-filter-pill-group .price-pill-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+
+            const cards = document.querySelectorAll('.highlights-grid .highlight-card');
+            cards.forEach(card => {
+                const cardPrice = (card.getAttribute('data-price') || '').toLowerCase();
+                if (type === 'all' || cardPrice === type) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Live Event Countdown Timer
+        function initCountdownTimer() {
+            const banner = document.getElementById('eventCountdownBanner');
+            if (!banner) return;
+            const dateStr = banner.getAttribute('data-date');
+            const timeStr = banner.getAttribute('data-time') || '10:00 AM';
+            if (!dateStr) return;
+
+            // Target datetime
+            const targetDate = new Date(`${dateStr} ${timeStr}`);
+            if (isNaN(targetDate.getTime())) return;
+
+            function update() {
+                const now = new Date();
+                const diff = targetDate.getTime() - now.getTime();
+                if (diff <= 0) {
+                    document.getElementById('cdDays').textContent = '00';
+                    document.getElementById('cdHours').textContent = '00';
+                    document.getElementById('cdMinutes').textContent = '00';
+                    document.getElementById('cdSeconds').textContent = '00';
+                    return;
+                }
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+                const elD = document.getElementById('cdDays');
+                const elH = document.getElementById('cdHours');
+                const elM = document.getElementById('cdMinutes');
+                const elS = document.getElementById('cdSeconds');
+                if (elD) elD.textContent = String(days).padStart(2, '0');
+                if (elH) elH.textContent = String(hours).padStart(2, '0');
+                if (elM) elM.textContent = String(mins).padStart(2, '0');
+                if (elS) elS.textContent = String(secs).padStart(2, '0');
+            }
+
+            update();
+            setInterval(update, 1000);
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             if (window.loadPersistedTheme) loadPersistedTheme();
             if (window.initOnboarding) initOnboarding();
             loadAIRecommendations();
+            initCountdownTimer();
         });
     </script>
 

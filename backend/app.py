@@ -7602,6 +7602,306 @@ Status: {'REVOKED & VOID' if reg_status == 'cancelled' else 'CONFIRMED'}
         return pdf.output(dest='S')
 
 
+def generate_invoice_pdf_bytes(event: dict, reg_info) -> bytes:
+    """
+    Generates a professional A4 Tax Invoice & Booking Receipt PDF with full breakdown,
+    GST split, attendee credentials, transaction reference, and verification QR code.
+    """
+    if isinstance(reg_info, dict):
+        reg_id = reg_info.get('id', 1)
+        full_name = reg_info.get('full_name') or reg_info.get('username') or 'Valued Attendee'
+        email = reg_info.get('email') or 'N/A'
+        phone = reg_info.get('phone') or 'N/A'
+        college_id = reg_info.get('college_id') or 'N/A'
+        username = reg_info.get('username') or ''
+        payment_method = reg_info.get('payment_method') or 'Direct'
+        upi_id = reg_info.get('upi_id') or 'N/A'
+        reg_time = reg_info.get('reg_time') or datetime.now().strftime('%d %b %Y, %I:%M %p')
+        ticket_code = reg_info.get('ticket_code') or f"TKT-{event.get('id', 1):03d}-{reg_id:05d}"
+        pass_type = reg_info.get('pass_type', 'in_person')
+    else:
+        reg_id = reg_info[0]
+        full_name = reg_info[1] or 'Valued Attendee'
+        email = reg_info[2] or 'N/A'
+        phone = reg_info[3] or 'N/A'
+        college_id = reg_info[4] or 'N/A'
+        payment_method = reg_info[5] or 'Direct'
+        upi_id = reg_info[6] or 'N/A'
+        reg_time = reg_info[7] or datetime.now().strftime('%d %b %Y, %I:%M %p')
+        username = reg_info[10] if len(reg_info) > 10 else ''
+        ticket_code = reg_info[12] if len(reg_info) > 12 and reg_info[12] else f"TKT-{event.get('id', 1):03d}-{reg_id:05d}"
+        pass_type = reg_info[13] if len(reg_info) > 13 and reg_info[13] else 'in_person'
+    
+    price_str = str(event.get('price', 'Free')).strip()
+    is_free = price_str.lower() == 'free' or price_str in ('0', '₹0', '0.0', '')
+    
+    clean_digits = re.sub(r'[^\d.]', '', price_str)
+    try:
+        total_amount = float(clean_digits) if clean_digits else 0.0
+    except ValueError:
+        total_amount = 0.0
+
+    if is_free or total_amount == 0.0:
+        base_amount = 0.0
+        cgst = 0.0
+        sgst = 0.0
+        total_display = "Free (INR 0.00)"
+        pay_status = "CONFIRMED - COMPLIMENTARY PASS"
+    else:
+        base_amount = round(total_amount / 1.18, 2)
+        tax_total = round(total_amount - base_amount, 2)
+        cgst = round(tax_total / 2, 2)
+        sgst = round(tax_total - cgst, 2)
+        total_display = f"INR {total_amount:.2f}"
+        pay_status = "PAID & VERIFIED"
+
+    pdf = FPDF(orientation='P', unit='mm', format='A4')
+    pdf.set_auto_page_break(auto=False)
+    pdf.add_page()
+
+    # Dark Top Header Banner (#0f172a)
+    pdf.set_fill_color(15, 23, 42)
+    pdf.rect(0, 0, 210, 48, 'F')
+
+    # Top Cyan Line Accent (#00f2fe)
+    pdf.set_fill_color(0, 242, 254)
+    pdf.rect(0, 0, 210, 3, 'F')
+
+    # Platform Title & Invoice Type
+    pdf.set_text_color(255, 255, 255)
+    pdf.set_font('Helvetica', 'B', 20)
+    pdf.set_xy(14, 12)
+    pdf.cell(100, 10, "EVENTS BOOKING", align='L')
+
+    pdf.set_font('Helvetica', 'B', 13)
+    pdf.set_text_color(0, 242, 254)
+    pdf.set_xy(110, 12)
+    pdf.cell(86, 10, "TAX INVOICE / RECEIPT", align='R')
+
+    pdf.set_font('Helvetica', '', 8.5)
+    pdf.set_text_color(148, 163, 184)
+    pdf.set_xy(14, 23)
+    pdf.cell(100, 5, "Official Smart Event Booking & Accreditation Platform", align='L')
+    pdf.set_xy(14, 28)
+    pdf.cell(100, 5, "GSTIN: 29AAACE9999P1Z8 | Contact: support@eventsbooking.internal", align='L')
+    pdf.set_xy(14, 33)
+    pdf.cell(100, 5, "Bengaluru, Karnataka, India - 560001", align='L')
+
+    # Invoice Metadata Box
+    pdf.set_xy(110, 23)
+    pdf.set_text_color(255, 255, 255)
+    pdf.set_font('Helvetica', 'B', 8.5)
+    pdf.cell(46, 5, "Invoice Number:", align='R')
+    pdf.set_font('Helvetica', '', 8.5)
+    pdf.set_text_color(0, 242, 254)
+    pdf.cell(40, 5, f"INV-2026-{reg_id:05d}", align='R')
+
+    pdf.set_xy(110, 28)
+    pdf.set_text_color(255, 255, 255)
+    pdf.set_font('Helvetica', 'B', 8.5)
+    pdf.cell(46, 5, "Invoice Date:", align='R')
+    pdf.set_font('Helvetica', '', 8.5)
+    pdf.set_text_color(203, 213, 225)
+    pdf.cell(40, 5, str(reg_time)[:16], align='R')
+
+    pdf.set_xy(110, 33)
+    pdf.set_text_color(255, 255, 255)
+    pdf.set_font('Helvetica', 'B', 8.5)
+    pdf.cell(46, 5, "Ticket Code:", align='R')
+    pdf.set_font('Helvetica', '', 8.5)
+    pdf.set_text_color(203, 213, 225)
+    pdf.cell(40, 5, str(ticket_code), align='R')
+
+    # Horizontal Divider Line
+    pdf.set_fill_color(226, 232, 240)
+    pdf.rect(14, 52, 182, 0.8, 'F')
+
+    # Two Column Layout: Billed To vs Event Information
+    pdf.set_xy(14, 58)
+    pdf.set_font('Helvetica', 'B', 10)
+    pdf.set_text_color(15, 23, 42)
+    pdf.cell(90, 5, "BILLED TO (ATTENDEE):")
+
+    pdf.set_xy(14, 64)
+    pdf.set_font('Helvetica', 'B', 9.5)
+    pdf.set_text_color(30, 41, 59)
+    pdf.cell(90, 5, full_name[:40])
+
+    pdf.set_font('Helvetica', '', 8.5)
+    pdf.set_text_color(71, 85, 105)
+    pdf.set_xy(14, 69)
+    pdf.cell(90, 4.5, f"Username: {username}")
+    pdf.set_xy(14, 73.5)
+    pdf.cell(90, 4.5, f"Email: {email[:38]}")
+    pdf.set_xy(14, 78)
+    pdf.cell(90, 4.5, f"Phone: {phone}")
+    pdf.set_xy(14, 82.5)
+    pdf.cell(90, 4.5, f"Student / College ID: {college_id}")
+
+    # Column 2: Event Details
+    pdf.set_xy(106, 58)
+    pdf.set_font('Helvetica', 'B', 10)
+    pdf.set_text_color(15, 23, 42)
+    pdf.cell(90, 5, "EVENT & VENUE DETAILS:")
+
+    pdf.set_xy(106, 64)
+    pdf.set_font('Helvetica', 'B', 9.5)
+    pdf.set_text_color(30, 41, 59)
+    title_short = (event.get('title') or 'Event')[:40]
+    pdf.cell(90, 5, title_short)
+
+    pdf.set_xy(106, 69)
+    pdf.set_font('Helvetica', '', 8.5)
+    pdf.set_text_color(71, 85, 105)
+    pdf.cell(90, 4.5, f"Category: {event.get('category', 'General')}")
+    pdf.set_xy(106, 73.5)
+    pdf.cell(90, 4.5, f"Date: {event.get('date', '')} | Time: {event.get('time', '10:00 AM')}")
+    pdf.set_xy(106, 78)
+    venue_str = (event.get('venue') or 'Campus Auditorium')[:38]
+    pdf.cell(90, 4.5, f"Venue: {venue_str}")
+    pdf.set_xy(106, 82.5)
+    pass_type_label = "Official Live Stream Pass" if pass_type == 'live_stream' else "In-Person Solo Entry Pass"
+    pdf.cell(90, 4.5, f"Pass Type: {pass_type_label}")
+
+    # Itemized Table Header
+    pdf.set_xy(14, 94)
+    pdf.set_fill_color(241, 245, 249)
+    pdf.rect(14, 94, 182, 8.5, 'F')
+    pdf.set_font('Helvetica', 'B', 8.5)
+    pdf.set_text_color(15, 23, 42)
+    pdf.cell(10, 8.5, "#", align='C')
+    pdf.cell(92, 8.5, "Description & Service Scope", align='L')
+    pdf.cell(26, 8.5, "SAC / HSN", align='C')
+    pdf.cell(26, 8.5, "Tax Rate", align='C')
+    pdf.cell(28, 8.5, "Amount", align='R')
+
+    # Itemized Table Row
+    pdf.set_xy(14, 103)
+    pdf.set_font('Helvetica', '', 8.5)
+    pdf.set_text_color(51, 65, 85)
+    pdf.cell(10, 8, "1", align='C')
+    desc_label = f"Pass: {event.get('title', '')[:32]}"
+    pdf.cell(92, 8, desc_label, align='L')
+    pdf.cell(26, 8, "998319", align='C')
+    pdf.cell(26, 8, "18% GST" if not is_free else "0%", align='C')
+    pdf.cell(28, 8, f"INR {base_amount:.2f}", align='R')
+
+    # Row Separator
+    pdf.set_fill_color(241, 245, 249)
+    pdf.rect(14, 112, 182, 0.5, 'F')
+
+    # Subtotals Section
+    y = 117
+    pdf.set_font('Helvetica', '', 8.5)
+    pdf.set_text_color(71, 85, 105)
+
+    pdf.set_xy(110, y)
+    pdf.cell(50, 4.5, "Subtotal (Taxable Value):", align='R')
+    pdf.cell(36, 4.5, f"INR {base_amount:.2f}", align='R')
+
+    y += 4.5
+    pdf.set_xy(110, y)
+    pdf.cell(50, 4.5, "Central GST (CGST @ 9%):", align='R')
+    pdf.cell(36, 4.5, f"INR {cgst:.2f}", align='R')
+
+    y += 4.5
+    pdf.set_xy(110, y)
+    pdf.cell(50, 4.5, "State GST (SGST @ 9%):", align='R')
+    pdf.cell(36, 4.5, f"INR {sgst:.2f}", align='R')
+
+    y += 6
+    # Total Highlight Box
+    pdf.set_fill_color(248, 250, 252)
+    pdf.rect(110, y, 86, 9.5, 'F')
+    pdf.set_fill_color(0, 242, 254)
+    pdf.rect(110, y, 2.5, 9.5, 'F')
+
+    pdf.set_xy(114, y + 2)
+    pdf.set_font('Helvetica', 'B', 10)
+    pdf.set_text_color(15, 23, 42)
+    pdf.cell(46, 5.5, "Total Amount Paid:", align='L')
+    pdf.set_text_color(2, 132, 199)
+    pdf.cell(32, 5.5, total_display, align='R')
+
+    # Payment Status Box (Left Side)
+    pdf.set_fill_color(240, 253, 244)
+    pdf.rect(14, 117, 90, 26, 'F')
+    pdf.set_fill_color(16, 185, 129)
+    pdf.rect(14, 117, 2.5, 26, 'F')
+
+    pdf.set_xy(19, 119)
+    pdf.set_font('Helvetica', 'B', 8.5)
+    pdf.set_text_color(22, 101, 52)
+    pdf.cell(82, 4.5, f"STATUS: {pay_status}")
+
+    pdf.set_xy(19, 124)
+    pdf.set_font('Helvetica', '', 8)
+    pdf.set_text_color(51, 65, 85)
+    pdf.cell(82, 4, f"Mode: {payment_method.upper()}")
+    pdf.set_xy(19, 128.5)
+    pdf.cell(82, 4, f"UPI / Transaction Ref: {upi_id}")
+    pdf.set_xy(19, 133)
+    pdf.cell(82, 4, "Settlement: Automated Platform Clearing")
+
+    # QR Code for Invoice Verification
+    try:
+        qr = qrcode.QRCode(version=1, box_size=3, border=1)
+        qr_data = f"INVOICE:INV-2026-{reg_id:05d}\nEVENT:{event.get('title')}\nATTENDEE:{full_name}\nAMOUNT:{total_display}\nSTATUS:{pay_status}"
+        qr.add_data(qr_data)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="black", back_color="white")
+        qr_buffer = io.BytesIO()
+        img.save(qr_buffer, format="PNG")
+        qr_buffer.seek(0)
+        pdf.image(qr_buffer, x=15, y=156, w=30, h=30)
+    except Exception:
+        pass
+
+    pdf.set_xy(48, 158)
+    pdf.set_font('Helvetica', 'B', 8.5)
+    pdf.set_text_color(15, 23, 42)
+    pdf.cell(145, 4.5, "Digital Security & Authenticity Verification")
+
+    pdf.set_xy(48, 163.5)
+    pdf.set_font('Helvetica', '', 7.5)
+    pdf.set_text_color(100, 116, 139)
+    pdf.multi_cell(145, 3.8, "This tax invoice has been cryptographically generated by Events Booking. Scan the QR code to verify validity at any physical gate checkpoint or security desk. Keep this receipt for tax, academic reimbursement, and attendance verification purposes.")
+
+    # Authorized Signatory Seal
+    pdf.set_xy(125, 205)
+    pdf.set_font('Helvetica', 'B', 8.5)
+    pdf.set_text_color(15, 23, 42)
+    pdf.cell(65, 4.5, "For EVENTS BOOKING PLATFORM", align='C')
+
+    pdf.set_xy(125, 218)
+    pdf.set_font('Helvetica', 'I', 7.5)
+    pdf.set_text_color(100, 116, 139)
+    pdf.cell(65, 3.5, "Authorised Signatory", align='C')
+    pdf.set_xy(125, 222)
+    pdf.cell(65, 3.5, "(Digitally Generated Document)", align='C')
+
+    # Bottom Footer
+    pdf.set_fill_color(15, 23, 42)
+    pdf.rect(0, 275, 210, 22, 'F')
+    pdf.set_fill_color(0, 242, 254)
+    pdf.rect(0, 275, 210, 1.5, 'F')
+
+    pdf.set_xy(14, 280)
+    pdf.set_text_color(255, 255, 255)
+    pdf.set_font('Helvetica', 'B', 8)
+    pdf.cell(182, 4, "EVENTS BOOKING - SECURE SMART EVENT PLATFORM", align='C')
+
+    pdf.set_xy(14, 285)
+    pdf.set_text_color(148, 163, 184)
+    pdf.set_font('Helvetica', '', 7)
+    pdf.cell(182, 4, "Terms of Admission apply. All bookings are non-transferable without host approval. Powered by Events Booking Engine.", align='C')
+
+    try:
+        return bytes(pdf.output())
+    except TypeError:
+        return pdf.output(dest='S')
+
+
 def generate_certificate_pdf_bytes(event: dict, reg_info) -> bytes:
     """
     Generates an official Certificate of Participation PDF (Landscape A4: 297mm x 210mm)
@@ -8897,6 +9197,191 @@ def download_certificate(event_id):
         mimetype="application/pdf"
     )
 
+@app.route('/download_invoice/<int:event_id>', endpoint='download_invoice')
+def download_invoice(event_id):
+    if not session.get('loggedin'):
+        return redirect(url_for('login'))
+    username = session.get('username')
+    event = get_event(event_id)
+    if not event:
+        flash("Event not found.", "error")
+        return redirect(url_for('dashboard'))
+
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""SELECT id, full_name, email, phone, college_id, payment_method, upi_id, timestamp, team_name, team_members, status, cancelled_at, ticket_code, pass_type, amount_paid 
+                 FROM registrations 
+                 WHERE username = ? AND event_id = ? 
+                 ORDER BY id DESC LIMIT 1""", (username, event_id))
+    registration = c.fetchone()
+    conn.close()
+
+    if not registration:
+        flash("Registration not found. Please register first.", "error")
+        return redirect(url_for('event_detail', event_id=event_id))
+
+    reg_id, full_name, email, phone, college_id, payment_method, upi_id, reg_time, team_name, team_members_raw, reg_status, cancelled_at, ticket_code, pass_type, amount_paid = registration
+    reg_dict = {
+        'id': reg_id,
+        'full_name': full_name or username,
+        'email': email,
+        'phone': phone,
+        'college_id': college_id,
+        'payment_method': payment_method,
+        'upi_id': upi_id,
+        'reg_time': reg_time,
+        'username': username,
+        'ticket_code': ticket_code or f"TKT-{event_id:03d}-{reg_id:05d}",
+        'pass_type': pass_type or 'in_person',
+        'amount_paid': amount_paid or 0.0
+    }
+
+    pdf_bytes = generate_invoice_pdf_bytes(event, reg_dict)
+    buffer = io.BytesIO(pdf_bytes)
+    buffer.seek(0)
+    safe_title = re.sub(r'[^a-zA-Z0-9_-]', '_', event['title'])
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name=f"Invoice_{safe_title}.pdf",
+        mimetype="application/pdf"
+    )
+
+@app.route('/download_invoice_by_reg/<int:reg_id>', endpoint='download_invoice_by_reg')
+def download_invoice_by_reg(reg_id):
+    if not session.get('loggedin'):
+        return redirect(url_for('login'))
+    username = session.get('username')
+
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""SELECT id, event_id, full_name, email, phone, college_id, payment_method, upi_id, timestamp, team_name, team_members, status, cancelled_at, ticket_code, pass_type, amount_paid, username 
+                 FROM registrations 
+                 WHERE id = ?""", (reg_id,))
+    registration = c.fetchone()
+    conn.close()
+
+    if not registration:
+        flash("Registration record not found.", "error")
+        return redirect(url_for('dashboard'))
+
+    # Security check: owner, admin, or host
+    if registration[16] != username and not (is_admin() or is_host()):
+        flash("Unauthorized access to invoice.", "error")
+        return redirect(url_for('dashboard'))
+
+    event = get_event(registration[1]) or {'id': registration[1], 'title': 'Event Pass', 'price': 'Free', 'category': 'General'}
+    reg_dict = {
+        'id': registration[0],
+        'full_name': registration[2] or registration[16],
+        'email': registration[3],
+        'phone': registration[4],
+        'college_id': registration[5],
+        'payment_method': registration[6],
+        'upi_id': registration[7],
+        'reg_time': registration[8],
+        'username': registration[16],
+        'ticket_code': registration[13] or f"TKT-{registration[1]:03d}-{registration[0]:05d}",
+        'pass_type': registration[14] or 'in_person',
+        'amount_paid': registration[15] or 0.0
+    }
+
+    pdf_bytes = generate_invoice_pdf_bytes(event, reg_dict)
+    buffer = io.BytesIO(pdf_bytes)
+    buffer.seek(0)
+    safe_title = re.sub(r'[^a-zA-Z0-9_-]', '_', event.get('title', 'Event'))
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name=f"Invoice_{safe_title}_{reg_id}.pdf",
+        mimetype="application/pdf"
+    )
+
+@app.route('/event/<int:event_id>/google_calendar', endpoint='event_google_calendar')
+def event_google_calendar(event_id):
+    event = get_event(event_id)
+    if not event:
+        flash("Event not found.", "error")
+        return redirect(url_for('dashboard'))
+    status_info = get_event_status_info(event)
+    try:
+        start_dt = status_info.get('start_dt') or datetime.strptime(event['date'], "%b %d, %Y")
+        end_dt = status_info.get('end_dt') or (start_dt + timedelta(hours=7))
+        start_str = start_dt.strftime("%Y%m%dT%H%M00")
+        end_str = end_dt.strftime("%Y%m%dT%H%M00")
+        dates_param = f"{start_str}/{end_str}"
+        title_esc = urllib.parse.quote(event['title'])
+        desc_esc = urllib.parse.quote(f"{event.get('desc', '')}\nVenue: {event.get('venue', '')}\nAddress: {event.get('venue_address', '')}")
+        loc_combined = f"{event.get('venue', '')}, {event.get('venue_address', '')}".strip(', ')
+        loc_esc = urllib.parse.quote(loc_combined or 'Bengaluru, Karnataka, India')
+        google_cal_url = f"https://calendar.google.com/calendar/render?action=TEMPLATE&text={title_esc}&dates={dates_param}&details={desc_esc}&location={loc_esc}&sf=true&output=xml"
+        return redirect(google_cal_url)
+    except Exception:
+        return redirect(url_for('event_detail', event_id=event_id))
+
+
+
+@app.route('/host/export_all_csv', endpoint='host_export_all_csv')
+def host_export_all_csv():
+    if not session.get('loggedin'):
+        return redirect(url_for('login'))
+    if not (is_host() or is_admin()):
+        flash("Host or Admin access required to export all attendee records.", "error")
+        return redirect(url_for('dashboard'))
+
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""SELECT r.id, r.event_id, r.ticket_code, r.full_name, r.username, r.email, r.phone, 
+                        r.college_id, r.pass_type, r.amount_paid, r.payment_method, r.checked_in, 
+                        r.checkin_time, r.timestamp, r.team_name, r.status, e.title, e.category
+                 FROM registrations r
+                 LEFT JOIN events e ON r.event_id = e.id
+                 ORDER BY r.id DESC""")
+    rows = c.fetchall()
+    conn.close()
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow([
+        "Reg ID", "Event ID", "Event Title", "Category", "Ticket Code", "Full Name",
+        "Username", "Email", "Phone", "College ID", "Pass Type", "Fee Amount",
+        "Payment Mode", "Checked In", "Check-in Timestamp", "Registered Timestamp",
+        "Team Name", "Status"
+    ])
+
+    for r in rows:
+        reg_id = r[0]
+        ev_id = r[1]
+        ev_title = r[16] or f"Event #{ev_id}"
+        code = r[2] or f"TKT-{ev_id:03d}-{reg_id:05d}"
+        fee_disp = f"INR {r[9]:.2f}" if (r[9] and r[9] > 0) else "Free"
+        writer.writerow([
+            f"REG-{reg_id:05d}",
+            ev_id,
+            ev_title,
+            r[17] or 'General',
+            code,
+            r[3] or r[4],
+            r[4],
+            r[5] or 'N/A',
+            r[6] or 'N/A',
+            r[7] or 'N/A',
+            (r[8] or 'in_person').replace('_', ' ').title(),
+            fee_disp,
+            (r[10] or 'direct').upper(),
+            "YES" if r[11] else "NO",
+            r[12] or 'Pending',
+            r[13] or 'N/A',
+            r[14] or 'Solo',
+            (r[15] or 'active').upper()
+        ])
+
+    csv_data = output.getvalue()
+    response = make_response(csv_data)
+    response.headers["Content-Disposition"] = "attachment; filename=All_Platform_Attendees_Master.csv"
+    response.headers["Content-Type"] = "text/csv; charset=utf-8"
+    return response
+
 @app.route('/verify_certificate/<cert_id>')
 def verify_certificate(cert_id):
     cert_clean = cert_id.strip().upper()
@@ -9665,6 +10150,7 @@ def host_analytics():
                            cat_data=cat_data)
 
 @app.route('/host/export/<int:event_id>')
+@app.route('/host/export_csv/<int:event_id>')
 @app.route('/host_export_csv/<int:event_id>')
 def host_export_csv(event_id):
     return export_attendees(event_id)
