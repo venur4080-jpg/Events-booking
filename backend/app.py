@@ -117,23 +117,24 @@ EVENTS = [
         "image": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Rapid prototyping and algorithmic problem solving.",
         "full_details": "A 24-hour marathon where student teams build scalable solutions for real-world civic and enterprise challenges. Includes 1-on-1 mentorship from top engineering leads.",
-        "outcome": "Win cash prizes up to \u20b91,00,000, gain deep technical experience, and network with tech recruiters.",
+        "outcome": "Win cash prizes up to ₹1,00,000, gain deep technical experience, and network with tech recruiters.",
         "seats_total": 100,
-        "seats_filled": 0,
+        "seats_filled": 23,
         "is_draft": 0,
         "featured": 0,
         "venue": "Bangalore International Exhibition Centre (BIEC)",
         "venue_address": "10th Mile, Tumkur Road, Madavara Post, Dasanapura Hobli, Bengaluru, Karnataka 560073",
         "time": "10:00 AM",
         "end_time": "05:00 PM",
-        "category": "Education"
+        "category": "Education",
+        "stream_price": "₹199"
     },
     {
         "id": 2,
         "title": "AI & ML Summit 2026",
         "date": "Nov 18, 2026",
         "desc": "Explore modern Generative AI, LLM architectures, and agentic workflows.",
-        "price": "\u20b9800",
+        "price": "₹800",
         "color": "#00f2fe",
         "image": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Deep dive into state-of-the-art AI advancements.",
@@ -147,14 +148,15 @@ EVENTS = [
         "venue_address": "Plot No 1/C, Sy No 83/1, Raidurgam, Knowledge City, Serilingampally, Hyderabad, Telangana 500081",
         "time": "09:30 AM",
         "end_time": "04:30 PM",
-        "category": "Education"
+        "category": "Education",
+        "stream_price": "₹199"
     },
     {
         "id": 3,
         "title": "Cyber Shield Ethical Hacking Workshop",
         "date": "Nov 25, 2026",
         "desc": "Hands-on penetration testing, exploit analysis, and defense strategies.",
-        "price": "\u20b91200",
+        "price": "₹1200",
         "color": "#ff0055",
         "image": "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Strengthening cybersecurity defense and vulnerability assessment capabilities.",
@@ -168,7 +170,8 @@ EVENTS = [
         "venue_address": "Main Gate Rd, IIT Area, Powai, Mumbai, Maharashtra 400076",
         "time": "10:00 AM",
         "end_time": "05:00 PM",
-        "category": "Education"
+        "category": "Education",
+        "stream_price": "₹199"
     },
     {
         "id": 4,
@@ -189,14 +192,15 @@ EVENTS = [
         "venue_address": "S No. 231/4A, Viman Nagar, Pune, Maharashtra 411014",
         "time": "11:00 AM",
         "end_time": "06:00 PM",
-        "category": "Education"
+        "category": "Education",
+        "stream_price": "₹199"
     },
     {
         "id": 5,
         "title": "CloudCom Azure Infrastructure",
         "date": "Dec 08, 2026",
         "desc": "Architect scalable cloud microservices, virtual networks, and databases.",
-        "price": "\u20b9400",
+        "price": "₹400",
         "color": "#a18cd1",
         "image": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Equip students with enterprise cloud architecture skills.",
@@ -210,14 +214,15 @@ EVENTS = [
         "venue_address": "No.4, Rajiv Gandhi Salai, Taramani, Chennai, Tamil Nadu 600113",
         "time": "10:00 AM",
         "end_time": "05:00 PM",
-        "category": "Education"
+        "category": "Education",
+        "stream_price": "₹199"
     },
     {
         "id": 6,
         "title": "Data Science Analytics Dive",
         "date": "Dec 15, 2026",
         "desc": "Big Data processing, statistical modeling, and interactive dashboards.",
-        "price": "\u20b91500",
+        "price": "₹1500",
         "color": "#fbc2eb",
         "image": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Extract actionable intelligence from complex enterprise datasets.",
@@ -231,14 +236,15 @@ EVENTS = [
         "venue_address": "Action Area I, Major Arterial Road, New Town, Kolkata, West Bengal 700156",
         "time": "09:00 AM",
         "end_time": "04:00 PM",
-        "category": "Education"
+        "category": "Education",
+        "stream_price": "₹199"
     },
     {
         "id": 7,
         "title": "AppVentures Mobile Flutter Fest",
         "date": "Dec 20, 2026",
         "desc": "Cross-platform iOS and Android mobile app development.",
-        "price": "\u20b9800",
+        "price": "₹800",
         "color": "#84fab0",
         "image": "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Build sleek mobile experiences with single-codebase Flutter.",
@@ -252,7 +258,8 @@ EVENTS = [
         "venue_address": "DLF Cyber City, Phase 2, Sector 24, Gurugram, Haryana 122002",
         "time": "10:30 AM",
         "end_time": "05:30 PM",
-        "category": "Education"
+        "category": "Education",
+        "stream_price": "₹199"
     },
     {
         "id": 8,
@@ -273,14 +280,15 @@ EVENTS = [
         "venue_address": "ITPL Main Rd, Pattandur Agrahara, Whitefield, Bengaluru, Karnataka 560066",
         "time": "10:00 AM",
         "end_time": "05:00 PM",
-        "category": "Education"
+        "category": "Education",
+        "stream_price": "₹199"
     },
     {
         "id": 9,
         "title": "RoboRumble Autonomous Robotics",
         "date": "Jan 16, 2027",
         "desc": "Robotic navigation, PID controllers, and autonomous maze solving.",
-        "price": "\u20b91200",
+        "price": "₹1200",
         "color": "#fee140",
         "image": "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Master algorithmic robotics and sensor feedback loops.",
@@ -294,14 +302,15 @@ EVENTS = [
         "venue_address": "Plot No. 23 -25, Knowledge Park II, Greater Noida, Uttar Pradesh 201306",
         "time": "09:00 AM",
         "end_time": "05:00 PM",
-        "category": "Education"
+        "category": "Education",
+        "stream_price": "₹199"
     },
     {
         "id": 10,
         "title": "Blockchain & Web3 Developer Summit",
         "date": "Jan 24, 2027",
         "desc": "Smart contracts, decentralized finance protocols, and cryptography.",
-        "price": "\u20b9800",
+        "price": "₹800",
         "color": "#667eea",
         "image": "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Demystify decentralized applications and consensus mechanisms.",
@@ -315,7 +324,8 @@ EVENTS = [
         "venue_address": "G Block BKC, Bandra Kurla Complex, Bandra East, Mumbai, Maharashtra 400098",
         "time": "10:00 AM",
         "end_time": "04:30 PM",
-        "category": "Education"
+        "category": "Education",
+        "stream_price": "₹199"
     },
     {
         "id": 11,
@@ -336,14 +346,15 @@ EVENTS = [
         "venue_address": "Palace Rd, Gandhi Nagar, Bengaluru, Karnataka 560009",
         "time": "02:00 PM",
         "end_time": "06:00 PM",
-        "category": "Education"
+        "category": "Education",
+        "stream_price": "₹199"
     },
     {
         "id": 12,
         "title": "Full Stack MERN Masterclass",
         "date": "Feb 10, 2027",
         "desc": "End-to-end full stack web architecture with MongoDB, Express, React, and Node.",
-        "price": "\u20b92500",
+        "price": "₹2500",
         "color": "#f6d365",
         "image": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Build scalable, production-ready full stack web applications.",
@@ -357,14 +368,15 @@ EVENTS = [
         "venue_address": "Survey No. 124, Paud Rd, Kothrud, Pune, Maharashtra 411038",
         "time": "09:30 AM",
         "end_time": "05:30 PM",
-        "category": "Education"
+        "category": "Education",
+        "stream_price": "₹199"
     },
     {
         "id": 13,
         "title": "Quantum Computing Fundamentals",
         "date": "Feb 18, 2027",
         "desc": "Qubits, quantum superposition, entanglement, and Qiskit circuits.",
-        "price": "\u20b9600",
+        "price": "₹600",
         "color": "#3f51b5",
         "image": "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Equip students with the fundamentals of quantum hardware and algorithms.",
@@ -378,14 +390,15 @@ EVENTS = [
         "venue_address": "CV Raman Rd, Mathikere, Bengaluru, Karnataka 560012",
         "time": "10:00 AM",
         "end_time": "04:30 PM",
-        "category": "Education"
+        "category": "Education",
+        "stream_price": "₹199"
     },
     {
         "id": 14,
         "title": "DevOps, Docker & CI/CD Masterclass",
         "date": "Feb 26, 2027",
         "desc": "Containerization, automated GitHub Actions pipelines, and Kubernetes.",
-        "price": "\u20b9900",
+        "price": "₹900",
         "color": "#9c27b0",
         "image": "https://images.unsplash.com/photo-1607799279861-4dd421887fb3?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Automate modern software testing, containerization, and deployments.",
@@ -399,28 +412,30 @@ EVENTS = [
         "venue_address": "Sector 142, Noida-Greater Noida Expy, Noida, Uttar Pradesh 201305",
         "time": "10:00 AM",
         "end_time": "05:00 PM",
-        "category": "Education"
+        "category": "Education",
+        "stream_price": "₹199"
     },
     {
         "id": 15,
         "title": "Automated Penetration Testing with AI",
         "date": "Feb 05, 2027",
         "desc": "Leverage AI to discover security vulnerabilities and generate exploit payloads.",
-        "price": "\u20b91200",
+        "price": "₹1200",
         "color": "#00f2fe",
         "image": "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Applying machine learning to modern vulnerability discovery.",
         "full_details": "Hands-on workshop demonstrating LLM-guided fuzzing, automated AST vulnerability scanning, and red-team automated evasion.",
         "outcome": "AI Security Auditor credentials and custom fuzzing toolkit scripts.",
         "seats_total": 100,
-        "seats_filled": 4,
+        "seats_filled": 37,
         "is_draft": 0,
         "featured": 0,
         "venue": "IIT Delhi Bharti School of Telecommunication",
         "venue_address": "Hauz Khas, New Delhi, Delhi 110016",
         "time": "10:00 AM",
         "end_time": "05:30 PM",
-        "category": "Education"
+        "category": "Education",
+        "stream_price": "₹199"
     },
     {
         "id": 16,
@@ -441,7 +456,8 @@ EVENTS = [
         "venue_address": "10th Mile, Tumkur Road, Bengaluru, Karnataka 560073",
         "time": "10:00 AM",
         "end_time": "05:00 PM",
-        "category": "Education"
+        "category": "Education",
+        "stream_price": "₹199"
     },
     {
         "id": 17,
@@ -462,14 +478,15 @@ EVENTS = [
         "venue_address": "Central College Campus, Palace Rd, Bengaluru, Karnataka 560009",
         "time": "10:00 AM",
         "end_time": "05:00 PM",
-        "category": "Education"
+        "category": "Education",
+        "stream_price": "₹199"
     },
     {
         "id": 18,
         "title": "CyberDefense Conclave 2025",
         "date": "Dec 10, 2025",
         "desc": "Concluded national security symposium on cloud threat detection.",
-        "price": "\u20b91000",
+        "price": "₹1000",
         "color": "#ef4444",
         "image": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1200&q=80",
         "purpose": "National forum on critical infrastructure protection.",
@@ -483,19 +500,20 @@ EVENTS = [
         "venue_address": "Western Express Hwy, Goregaon, Mumbai, Maharashtra 400063",
         "time": "09:30 AM",
         "end_time": "04:30 PM",
-        "category": "Education"
+        "category": "Education",
+        "stream_price": "₹199"
     },
     {
         "id": 19,
         "title": "Inter-College Premier Cricket League 2026",
         "date": "Nov 13, 2026",
         "desc": "High-octane T20 cricket tournament between top university squads under floodlights.",
-        "price": "\u20b9500",
+        "price": "₹500",
         "color": "#10b981",
         "image": "https://images.unsplash.com/photo-1531415074868-036b1c5f53ec?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Foster collegiate athletic excellence and sporting camaraderie.",
         "full_details": "16 collegiate teams compete in knockout stages with professional DRS, live commentary, and scouting from state cricket selectors.",
-        "outcome": "Champion Trophy, \u20b91,50,000 team prize, Man of the Tournament medals, and scout selection.",
+        "outcome": "Champion Trophy, ₹1,50,000 team prize, Man of the Tournament medals, and scout selection.",
         "seats_total": 100,
         "seats_filled": 0,
         "is_draft": 0,
@@ -504,14 +522,15 @@ EVENTS = [
         "venue_address": "MG Road, Near Cubbon Park, Shivaji Nagar, Bengaluru, Karnataka 560001",
         "time": "09:00 AM",
         "end_time": "07:00 PM",
-        "category": "Sports"
+        "category": "Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 20,
         "title": "National Collegiate Football Cup 2026",
         "date": "Nov 19, 2026",
         "desc": "11v11 championship football knockout tournament on international-standard turf.",
-        "price": "\u20b9400",
+        "price": "₹400",
         "color": "#059669",
         "image": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Promote university football talent and strategic team athletic competition.",
@@ -525,14 +544,15 @@ EVENTS = [
         "venue_address": "JB Block, Sector III, Bidhannagar, Kolkata, West Bengal 700106",
         "time": "08:30 AM",
         "end_time": "06:00 PM",
-        "category": "Sports"
+        "category": "Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 21,
         "title": "Bangalore Midnight 10K & Half Marathon",
         "date": "Nov 26, 2026",
         "desc": "Scenic night run across illuminated city avenues with timing chips and medals.",
-        "price": "\u20b9800",
+        "price": "₹800",
         "color": "#f59e0b",
         "image": "https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Promote cardiovascular fitness, community endurance, and civic charity.",
@@ -546,14 +566,15 @@ EVENTS = [
         "venue_address": "Kasturba Rd, Sampangi Rama Nagar, Bengaluru, Karnataka 560001",
         "time": "08:00 PM",
         "end_time": "11:30 PM",
-        "category": "Sports"
+        "category": "Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 22,
         "title": "All-India Badminton Open Championship",
         "date": "Dec 03, 2026",
         "desc": "Singles and doubles national badminton showdown on synthetic Olympic courts.",
-        "price": "\u20b9600",
+        "price": "₹600",
         "color": "#3b82f6",
         "image": "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Showcase fast-paced badminton agility, stamina, and racket technique.",
@@ -567,19 +588,20 @@ EVENTS = [
         "venue_address": "Survey No 336, Bettahalasur, Jala Hobli, Yelahanka, Bengaluru, Karnataka 562157",
         "time": "09:00 AM",
         "end_time": "06:00 PM",
-        "category": "Sports"
+        "category": "Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 23,
         "title": "Valorant & CS2 Esports National Arena",
         "date": "Dec 09, 2026",
         "desc": "5v5 competitive tactical shooter battle on LAN with high-refresh monitors.",
-        "price": "\u20b9500",
+        "price": "₹500",
         "color": "#ef4444",
         "image": "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Celebrate professional collegiate esports and tactical multiplayer coordination.",
         "full_details": "Double-elimination bracket with live shoutcasting, custom player booths, and 240Hz mechanical battle-stations.",
-        "outcome": "\u20b92,00,000 esports prize pool, mechanical gaming peripherals, and pro roster contracts.",
+        "outcome": "₹2,00,000 esports prize pool, mechanical gaming peripherals, and pro roster contracts.",
         "seats_total": 100,
         "seats_filled": 0,
         "is_draft": 0,
@@ -588,14 +610,15 @@ EVENTS = [
         "venue_address": "Cyber Towers, Hitec City, Madhapur, Hyderabad, Telangana 500081",
         "time": "11:00 AM",
         "end_time": "09:00 PM",
-        "category": "Sports"
+        "category": "Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 24,
         "title": "Grandmaster Blitz Chess Open 2026",
         "date": "Dec 16, 2026",
         "desc": "FIDE rated 5+3 Blitz chess tournament featuring titled masters and college prodigies.",
-        "price": "\u20b9350",
+        "price": "₹350",
         "color": "#8b5cf6",
         "image": "https://images.unsplash.com/photo-1529699211952-734e80c4d42b?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Sharpen deep tactical calculation, opening repertoire, and endgame mastery.",
@@ -609,14 +632,15 @@ EVENTS = [
         "venue_address": "223, Netaji Subhash Chandra Bose Rd, George Town, Chennai, Tamil Nadu 600001",
         "time": "10:00 AM",
         "end_time": "05:30 PM",
-        "category": "Sports"
+        "category": "Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 25,
         "title": "Pro Table Tennis Collegiate Smash",
         "date": "Dec 21, 2026",
         "desc": "High-spin table tennis singles and team duels on international Stag tables.",
-        "price": "\u20b9300",
+        "price": "Free",
         "color": "#ec4899",
         "image": "https://images.unsplash.com/photo-1609710228159-0fa9bd7c0827?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Develop lightning reflexes, topspin loops, and competitive match temperament.",
@@ -630,14 +654,15 @@ EVENTS = [
         "venue_address": "INA Colony, Laxmi Bai Nagar, New Delhi, Delhi 110023",
         "time": "09:30 AM",
         "end_time": "05:00 PM",
-        "category": "Sports"
+        "category": "Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 26,
         "title": "3x3 Street Basketball Showdown",
         "date": "Jan 09, 2027",
         "desc": "FIBA 3x3 half-court basketball with DJ beats, slam dunk contests, and street food.",
-        "price": "\u20b9450",
+        "price": "Free",
         "color": "#f97316",
         "image": "https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Fast-paced streetball competition promoting quick transitions and shooting accuracy.",
@@ -651,14 +676,15 @@ EVENTS = [
         "venue_address": "Survey No 78/10, Bellary Rd, Chikkajala, Bengaluru, Karnataka 562157",
         "time": "02:00 PM",
         "end_time": "08:30 PM",
-        "category": "Sports"
+        "category": "Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 27,
         "title": "National Aquatic Swimming Championship",
         "date": "Jan 17, 2027",
         "desc": "Freestyle, Butterfly, and Medley relay events in an Olympic 50m temperature-controlled pool.",
-        "price": "\u20b9600",
+        "price": "₹600",
         "color": "#06b6d4",
         "image": "https://images.unsplash.com/photo-1519315901367-f34ff9154487?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Promote aquatic sports and evaluate national collegiate swimming times.",
@@ -672,7 +698,8 @@ EVENTS = [
         "venue_address": "Talkatora Garden, President's Estate, New Delhi, Delhi 110004",
         "time": "08:00 AM",
         "end_time": "04:30 PM",
-        "category": "Sports"
+        "category": "Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 28,
@@ -693,14 +720,15 @@ EVENTS = [
         "venue_address": "Safdarjung Rd, New Delhi, Delhi 110011",
         "time": "07:30 AM",
         "end_time": "02:00 PM",
-        "category": "Sports"
+        "category": "Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 29,
         "title": "Inter-State Volleyball Super League",
         "date": "Feb 03, 2027",
         "desc": "Spike, block, and set in high-energy indoor court volleyball battles.",
-        "price": "\u20b9350",
+        "price": "₹350",
         "color": "#eab308",
         "image": "https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Elevate volleyball coordination, vertical jumps, and defense coverage.",
@@ -714,19 +742,20 @@ EVENTS = [
         "venue_address": "Old Mumbai Hwy, Gachibowli, Hyderabad, Telangana 500032",
         "time": "10:00 AM",
         "end_time": "06:00 PM",
-        "category": "Sports"
+        "category": "Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 30,
         "title": "Pro Kabaddi Collegiate Knockout",
         "date": "Feb 11, 2027",
         "desc": "Raids, tackles, and super-catches on professional synthetic kabaddi mats.",
-        "price": "\u20b9400",
+        "price": "₹400",
         "color": "#dc2626",
         "image": "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Celebrate India's indigenous high-intensity contact sport.",
         "full_details": "40-minute matches with 30-second raid timers, bonus lines, and PKL coaching scouts.",
-        "outcome": "Best Raider trophy, \u20b975,000 champion purse, and PKL development camp invitations.",
+        "outcome": "Best Raider trophy, ₹75,000 champion purse, and PKL development camp invitations.",
         "seats_total": 100,
         "seats_filled": 0,
         "is_draft": 0,
@@ -735,14 +764,15 @@ EVENTS = [
         "venue_address": "National Games Park, Mahalunge, Pune, Maharashtra 411045",
         "time": "03:00 PM",
         "end_time": "08:30 PM",
-        "category": "Sports"
+        "category": "Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 31,
         "title": "Formula Student Electric Go-Kart GP",
         "date": "Feb 19, 2027",
         "desc": "High-torque electric kart racing and vehicle dynamics collegiate competition.",
-        "price": "\u20b91200",
+        "price": "₹1200",
         "color": "#6366f1",
         "image": "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Combine automotive engineering and high-speed circuit racing.",
@@ -756,7 +786,8 @@ EVENTS = [
         "venue_address": "Hennur-Bagalur Road, Mitganahalli, Chagalahatti, Bengaluru, Karnataka 562149",
         "time": "09:00 AM",
         "end_time": "05:00 PM",
-        "category": "Sports"
+        "category": "Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 32,
@@ -777,14 +808,15 @@ EVENTS = [
         "venue_address": "Pragati Vihar, New Delhi, Delhi 110003",
         "time": "07:00 AM",
         "end_time": "04:00 PM",
-        "category": "Sports"
+        "category": "Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 33,
         "title": "Taekwondo & Martial Arts Open Cup",
         "date": "Mar 07, 2027",
         "desc": "Sparring (Kyorugi) and Forms (Poomsae) martial arts clash with electronic scoring sensors.",
-        "price": "\u20b9500",
+        "price": "₹500",
         "color": "#a855f7",
         "image": "https://images.unsplash.com/photo-1555597673-b21d5c935865?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Showcase discipline, agility, and precision kicks in Olympic Taekwondo.",
@@ -798,7 +830,8 @@ EVENTS = [
         "venue_address": "80 Feet Rd, 6th Block, Koramangala, Bengaluru, Karnataka 560095",
         "time": "09:00 AM",
         "end_time": "05:30 PM",
-        "category": "Sports"
+        "category": "Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 34,
@@ -810,7 +843,7 @@ EVENTS = [
         "image": "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Crown the top tactical battle royale squad across the nation.",
         "full_details": "6 custom match rounds with point multipliers for eliminations and survival placement.",
-        "outcome": "\u20b91,50,000 cash pool, gaming jerseys, and streaming sponsorships.",
+        "outcome": "₹1,50,000 cash pool, gaming jerseys, and streaming sponsorships.",
         "seats_total": 100,
         "seats_filled": 144,
         "is_draft": 0,
@@ -819,14 +852,15 @@ EVENTS = [
         "venue_address": "Western Express Hwy, Goregaon, Mumbai, Maharashtra 400063",
         "time": "12:00 PM",
         "end_time": "08:00 PM",
-        "category": "Sports"
+        "category": "Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 35,
         "title": "Winter Cricket Trophy 2025",
         "date": "Dec 18, 2025",
         "desc": "Concluded winter inter-college cricket championship.",
-        "price": "\u20b9400",
+        "price": "₹400",
         "color": "#15803d",
         "image": "https://images.unsplash.com/photo-1531415074868-036b1c5f53ec?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Historic winter sports championship.",
@@ -840,14 +874,15 @@ EVENTS = [
         "venue_address": "Veer Nariman Rd, Churchgate, Mumbai, Maharashtra 400020",
         "time": "09:00 AM",
         "end_time": "05:00 PM",
-        "category": "Sports"
+        "category": "Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 36,
         "title": "Autumn Football Derby 2025",
         "date": "Nov 28, 2025",
         "desc": "Concluded city derby football cup with 16 competing varsity clubs.",
-        "price": "\u20b9350",
+        "price": "Free",
         "color": "#047857",
         "image": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Collegiate football derby tradition.",
@@ -861,14 +896,15 @@ EVENTS = [
         "venue_address": "Maharshi Karve Rd, Nariman Point, Mumbai, Maharashtra 400021",
         "time": "02:00 PM",
         "end_time": "07:00 PM",
-        "category": "Sports"
+        "category": "Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 37,
         "title": "Sunburn Arena Live EDM Explosion 2026",
         "date": "Nov 14, 2026",
         "desc": "Massive outdoor electronic dance music festival with international headliner DJs and laser show.",
-        "price": "\u20b91500",
+        "price": "₹1500",
         "color": "#f43f5e",
         "image": "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Deliver an unforgettable live audio-visual electronic music experience.",
@@ -882,14 +918,15 @@ EVENTS = [
         "venue_address": "No. 91/4, Veeranna Palya, Outer Ring Road, Nagavara, Bengaluru, Karnataka 560045",
         "time": "05:00 PM",
         "end_time": "11:30 PM",
-        "category": "Music Concerts"
+        "category": "Music Concerts",
+        "stream_price": "₹199"
     },
     {
         "id": 38,
         "title": "Bollywood Symphony Grand Orchestra",
         "date": "Nov 20, 2026",
         "desc": "A 60-piece acoustic orchestra performing timeless Bollywood classics and modern anthems.",
-        "price": "\u20b91200",
+        "price": "₹1200",
         "color": "#fbbf24",
         "image": "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Celebrate cinema music heritage through grand acoustic orchestration.",
@@ -903,14 +940,15 @@ EVENTS = [
         "venue_address": "Comrade Harbanslal Marg, Sion East, Mumbai, Maharashtra 400022",
         "time": "06:30 PM",
         "end_time": "10:00 PM",
-        "category": "Music Concerts"
+        "category": "Music Concerts",
+        "stream_price": "₹199"
     },
     {
         "id": 39,
         "title": "Indie Rock & Fusion Music Fest",
         "date": "Nov 27, 2026",
         "desc": "Top Indian indie bands, electrifying guitar solos, and bilingual fusion jams.",
-        "price": "\u20b9800",
+        "price": "Free",
         "color": "#8b5cf6",
         "image": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Promote independent musicians and vibrant original live songwriting.",
@@ -924,14 +962,15 @@ EVENTS = [
         "venue_address": "Whitefield Main Rd, Devasandra Industrial Estate, Mahadevapura, Bengaluru, Karnataka 560048",
         "time": "04:30 PM",
         "end_time": "10:30 PM",
-        "category": "Music Concerts"
+        "category": "Music Concerts",
+        "stream_price": "₹199"
     },
     {
         "id": 40,
         "title": "Sufi & Qawwali Soulful Evening",
         "date": "Dec 04, 2026",
         "desc": "Mystical Sufi poetry and transcendent Qawwali chants by legendary maestros.",
-        "price": "\u20b9750",
+        "price": "₹750",
         "color": "#d97706",
         "image": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Immerse listeners in rich spiritual Sufi acoustic traditions.",
@@ -945,14 +984,15 @@ EVENTS = [
         "venue_address": "1, Copernicus Marg, Mandi House, New Delhi, Delhi 110001",
         "time": "07:00 PM",
         "end_time": "10:30 PM",
-        "category": "Music Concerts"
+        "category": "Music Concerts",
+        "stream_price": "₹199"
     },
     {
         "id": 41,
         "title": "Electronic Pulse DJ Mega Night",
         "date": "Dec 10, 2026",
         "desc": "Deep house, techno, and progressive trance beats powered by VOID Acoustics.",
-        "price": "\u20b91100",
+        "price": "₹1100",
         "color": "#06b6d4",
         "image": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Celebrate cutting-edge underground techno and melodic house production.",
@@ -966,14 +1006,15 @@ EVENTS = [
         "venue_address": "Trade Fair Office Building, Izzathnagar, Hyderabad, Telangana 500084",
         "time": "06:00 PM",
         "end_time": "11:59 PM",
-        "category": "Music Concerts"
+        "category": "Music Concerts",
+        "stream_price": "₹199"
     },
     {
         "id": 42,
         "title": "Acoustic Unplugged Under the Stars",
         "date": "Dec 17, 2026",
         "desc": "Intimate candlelit acoustic session with singer-songwriters, guitar, and cello.",
-        "price": "\u20b9600",
+        "price": "Free",
         "color": "#ec4899",
         "image": "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Experience raw vocal melodies and intimate acoustic storytelling.",
@@ -987,14 +1028,15 @@ EVENTS = [
         "venue_address": "36/2, 8th Cross Rd, R K Colony, 2nd Phase, J. P. Nagar, Bengaluru, Karnataka 560078",
         "time": "06:30 PM",
         "end_time": "09:30 PM",
-        "category": "Music Concerts"
+        "category": "Music Concerts",
+        "stream_price": "₹199"
     },
     {
         "id": 43,
         "title": "Global Jazz & Blues Festival 2026",
         "date": "Dec 22, 2026",
         "desc": "Saxophone improvisation, brass ensembles, and sultry blues rhythms from international artists.",
-        "price": "\u20b91400",
+        "price": "₹1400",
         "color": "#3b82f6",
         "image": "https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Celebrate jazz improvisation and vintage blues heritage.",
@@ -1008,14 +1050,15 @@ EVENTS = [
         "venue_address": "NCPA Marg, Nariman Point, Mumbai, Maharashtra 400021",
         "time": "07:00 PM",
         "end_time": "10:30 PM",
-        "category": "Music Concerts"
+        "category": "Music Concerts",
+        "stream_price": "₹199"
     },
     {
         "id": 44,
         "title": "Hip-Hop Cypher & Rap Battleground",
         "date": "Jan 10, 2027",
         "desc": "Live beatboxing, lyrical rap battles, b-boy breaking, and street cyphers.",
-        "price": "\u20b9400",
+        "price": "Free",
         "color": "#f97316",
         "image": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Empower underground street hip-hop culture, rap lyricism, and urban dance.",
@@ -1029,7 +1072,8 @@ EVENTS = [
         "venue_address": "949, 12th Main Rd, Doopanahalli, Indiranagar, Bengaluru, Karnataka 560008",
         "time": "04:00 PM",
         "end_time": "09:30 PM",
-        "category": "Music Concerts"
+        "category": "Music Concerts",
+        "stream_price": "₹199"
     },
     {
         "id": 45,
@@ -1050,14 +1094,15 @@ EVENTS = [
         "venue_address": "New No. 168, TT Krishnamachari Rd, Royapettah, Chennai, Tamil Nadu 600014",
         "time": "06:00 PM",
         "end_time": "09:30 PM",
-        "category": "Music Concerts"
+        "category": "Music Concerts",
+        "stream_price": "₹199"
     },
     {
         "id": 46,
         "title": "Retro 90s Pop & Disco Night",
         "date": "Jan 26, 2027",
         "desc": "Dance to non-stop golden era pop hits, disco lights, and vinyl DJ sets.",
-        "price": "\u20b9900",
+        "price": "₹900",
         "color": "#ec4899",
         "image": "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Relive the high-energy nostalgic 90s pop and synth-wave era.",
@@ -1071,14 +1116,15 @@ EVENTS = [
         "venue_address": "East Main Rd, Koregaon Park, Pune, Maharashtra 411001",
         "time": "07:30 PM",
         "end_time": "11:30 PM",
-        "category": "Music Concerts"
+        "category": "Music Concerts",
+        "stream_price": "₹199"
     },
     {
         "id": 47,
         "title": "Monsoon Beats Music Carnival 2026",
         "date": "Feb 04, 2027",
         "desc": "Multi-genre rain dance music festival with alternative rock, reggae, and electronic stages.",
-        "price": "\u20b91000",
+        "price": "₹1000",
         "color": "#0ea5e9",
         "image": "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Celebrate music through outdoor stages and carnival community spirit.",
@@ -1092,14 +1138,15 @@ EVENTS = [
         "venue_address": "HM Block, Sector IV, Bidhannagar, Kolkata, West Bengal 700106",
         "time": "03:00 PM",
         "end_time": "10:00 PM",
-        "category": "Music Concerts"
+        "category": "Music Concerts",
+        "stream_price": "₹199"
     },
     {
         "id": 48,
         "title": "Psychedelic Trance & Visual Art Festival",
         "date": "Feb 12, 2027",
         "desc": "All-night psychedelic trance audio-visual journey with UV decor and projection mapping.",
-        "price": "\u20b91800",
+        "price": "₹1800",
         "color": "#a855f7",
         "image": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Deliver immersive high-BPM psychedelic music and visionary art installations.",
@@ -1113,14 +1160,15 @@ EVENTS = [
         "venue_address": "Small Vagator, Anjuna, Bardez, Goa 403509",
         "time": "06:00 PM",
         "end_time": "06:00 AM",
-        "category": "Music Concerts"
+        "category": "Music Concerts",
+        "stream_price": "₹199"
     },
     {
         "id": 49,
         "title": "Candlelight Piano & Cello Concert",
         "date": "Feb 20, 2027",
         "desc": "Illuminated by 2,000 candles, classical musicians perform movie soundtracks and baroque sonatas.",
-        "price": "\u20b91300",
+        "price": "₹1300",
         "color": "#f59e0b",
         "image": "https://images.unsplash.com/photo-1520523839898-50712140d868?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Create a peaceful, candlelit acoustic sanctuary in an architectural landmark.",
@@ -1134,7 +1182,8 @@ EVENTS = [
         "venue_address": "Mathew Rd, Charni Road East, Opera House, Girgaon, Mumbai, Maharashtra 400004",
         "time": "07:00 PM",
         "end_time": "09:15 PM",
-        "category": "Music Concerts"
+        "category": "Music Concerts",
+        "stream_price": "₹199"
     },
     {
         "id": 50,
@@ -1146,7 +1195,7 @@ EVENTS = [
         "image": "https://images.unsplash.com/photo-1464375117522-1311d6a5b81f?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Discover emerging student band talent and raw musical songwriting.",
         "full_details": "Bands judged on original composition, stage presence, and technical skill by celebrity musicians.",
-        "outcome": "Winning band receives studio recording contract and \u20b91,00,000 in musical gear.",
+        "outcome": "Winning band receives studio recording contract and ₹1,00,000 in musical gear.",
         "seats_total": 100,
         "seats_filled": 0,
         "is_draft": 0,
@@ -1155,14 +1204,15 @@ EVENTS = [
         "venue_address": "36, Lalbagh Rd, Shanti Nagar, Bengaluru, Karnataka 560027",
         "time": "02:00 PM",
         "end_time": "08:30 PM",
-        "category": "Music Concerts"
+        "category": "Music Concerts",
+        "stream_price": "₹199"
     },
     {
         "id": 51,
         "title": "EDM Neon Bass Music Extravaganza",
         "date": "Mar 08, 2027",
         "desc": "Bass-heavy trap, dubstep, and future bass beats with LED wristband synchronization.",
-        "price": "\u20b91600",
+        "price": "₹1600",
         "color": "#00f2fe",
         "image": "https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Deliver high-energy bass music festival production with interactive lighting.",
@@ -1176,14 +1226,15 @@ EVENTS = [
         "venue_address": "E Block BKC, Bandra Kurla Complex, Bandra East, Mumbai, Maharashtra 400051",
         "time": "05:00 PM",
         "end_time": "11:00 PM",
-        "category": "Music Concerts"
+        "category": "Music Concerts",
+        "stream_price": "₹199"
     },
     {
         "id": 52,
         "title": "Coke Studio Live Regional Concert",
         "date": "Mar 17, 2027",
         "desc": "Folk legends and contemporary pop icons collaborating in a grand live music spectacle.",
-        "price": "\u20b91200",
+        "price": "₹1200",
         "color": "#dc2626",
         "image": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Celebrate regional cultural music diversity on a massive live production stage.",
@@ -1197,14 +1248,15 @@ EVENTS = [
         "venue_address": "Old Mumbai Hwy, Gachibowli, Hyderabad, Telangana 500032",
         "time": "06:00 PM",
         "end_time": "10:30 PM",
-        "category": "Music Concerts"
+        "category": "Music Concerts",
+        "stream_price": "₹199"
     },
     {
         "id": 53,
         "title": "New Year Neon Music Festival 2025",
         "date": "Dec 31, 2025",
         "desc": "Concluded mega New Year countdown music celebration with fireworks and top artists.",
-        "price": "\u20b92000",
+        "price": "₹2000",
         "color": "#ec4899",
         "image": "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Historic New Year music celebration.",
@@ -1218,14 +1270,15 @@ EVENTS = [
         "venue_address": "Bellary Rd, Jayamahal, Bengaluru, Karnataka 560006",
         "time": "07:00 PM",
         "end_time": "01:00 AM",
-        "category": "Music Concerts"
+        "category": "Music Concerts",
+        "stream_price": "₹199"
     },
     {
         "id": 54,
         "title": "Autumn Acoustic Sunset Jam 2025",
         "date": "Oct 25, 2025",
         "desc": "Concluded open-air sunset acoustic music evening.",
-        "price": "\u20b9500",
+        "price": "Free",
         "color": "#f59e0b",
         "image": "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Historical acoustic gathering in botanical gardens.",
@@ -1239,14 +1292,15 @@ EVENTS = [
         "venue_address": "Kasturba Rd, Sampangi Rama Nagar, Bengaluru, Karnataka 560001",
         "time": "05:00 PM",
         "end_time": "08:30 PM",
-        "category": "Music Concerts"
+        "category": "Music Concerts",
+        "stream_price": "₹199"
     },
     {
         "id": 55,
         "title": "Pan-India Mega Action Film Audio Launch",
         "date": "Nov 15, 2026",
         "desc": "Star-studded live audio launch with music directors, lead actors, and exclusive trailer showcase.",
-        "price": "\u20b9500",
+        "price": "₹500",
         "color": "#f43f5e",
         "image": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Launch music album and theatrical trailer with lead cast interactions.",
@@ -1260,7 +1314,8 @@ EVENTS = [
         "venue_address": "Sydenhams Rd, Periamet, Chennai, Tamil Nadu 600003",
         "time": "05:30 PM",
         "end_time": "10:00 PM",
-        "category": "Movie Promotions"
+        "category": "Movie Promotions",
+        "stream_price": "₹199"
     },
     {
         "id": 56,
@@ -1281,14 +1336,15 @@ EVENTS = [
         "venue_address": "Mall of India, Sector 18, Noida, Uttar Pradesh 201301",
         "time": "03:00 PM",
         "end_time": "06:30 PM",
-        "category": "Movie Promotions"
+        "category": "Movie Promotions",
+        "stream_price": "₹199"
     },
     {
         "id": 57,
         "title": "National Cinema & Comic Con 2026",
         "date": "Nov 28, 2026",
         "desc": "Celebrate cinema, movie prop exhibitions, upcoming blockbuster panels, and cosplay contests.",
-        "price": "\u20b9850",
+        "price": "₹850",
         "color": "#fbbf24",
         "image": "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Celebrate film culture, upcoming film lineups, and comic adaptations.",
@@ -1302,14 +1358,15 @@ EVENTS = [
         "venue_address": "NESCO, Western Express Hwy, Goregaon East, Mumbai, Maharashtra 400063",
         "time": "10:00 AM",
         "end_time": "07:00 PM",
-        "category": "Movie Promotions"
+        "category": "Movie Promotions",
+        "stream_price": "₹199"
     },
     {
         "id": 58,
         "title": "VFX & CGI Behind-the-Scenes Movie Preview",
         "date": "Dec 05, 2026",
         "desc": "Exclusive breakdown of Hollywood-grade VFX shots, motion capture, and green screen secrets.",
-        "price": "\u20b9400",
+        "price": "Free",
         "color": "#8b5cf6",
         "image": "https://images.unsplash.com/photo-1478720568477-152d9b164e26?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Inspire student filmmakers and animators with state-of-the-art visual effects pipelines.",
@@ -1323,14 +1380,15 @@ EVENTS = [
         "venue_address": "NTR Gardens, Khairatabad, Hyderabad, Telangana 500063",
         "time": "02:00 PM",
         "end_time": "06:00 PM",
-        "category": "Movie Promotions"
+        "category": "Movie Promotions",
+        "stream_price": "₹199"
     },
     {
         "id": 59,
         "title": "Director's Cut & Cast Live Q&A Conclave",
         "date": "Dec 11, 2026",
         "desc": "Intimate cinema panel discussing screenwriting, direction, and character nuances with lead actors.",
-        "price": "\u20b9600",
+        "price": "₹600",
         "color": "#10b981",
         "image": "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Deep dive into cinematic craft, screenplay analysis, and directorial storytelling.",
@@ -1344,14 +1402,15 @@ EVENTS = [
         "venue_address": "August Kranti Marg, Siri Fort Institutional Area, New Delhi, Delhi 110049",
         "time": "05:00 PM",
         "end_time": "08:30 PM",
-        "category": "Movie Promotions"
+        "category": "Movie Promotions",
+        "stream_price": "₹199"
     },
     {
         "id": 60,
         "title": "Indie Film Premiere & Star Interaction",
         "date": "Dec 18, 2026",
         "desc": "Red carpet premiere of an acclaimed festival film followed by cast and crew interaction.",
-        "price": "\u20b9750",
+        "price": "₹750",
         "color": "#ec4899",
         "image": "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Support independent Indian cinema and artistic storytelling.",
@@ -1365,7 +1424,8 @@ EVENTS = [
         "venue_address": "Forum Mall, Hosur Rd, Koramangala, Bengaluru, Karnataka 560095",
         "time": "06:00 PM",
         "end_time": "09:30 PM",
-        "category": "Movie Promotions"
+        "category": "Movie Promotions",
+        "stream_price": "₹199"
     },
     {
         "id": 61,
@@ -1386,14 +1446,15 @@ EVENTS = [
         "venue_address": "Trade Fair Office Building, Izzathnagar, Hyderabad, Telangana 500084",
         "time": "04:00 PM",
         "end_time": "07:30 PM",
-        "category": "Movie Promotions"
+        "category": "Movie Promotions",
+        "stream_price": "₹199"
     },
     {
         "id": 62,
         "title": "Bollywood Star Cast Press Meet & Preview",
         "date": "Jan 11, 2027",
         "desc": "Exclusive media and fan press conference featuring A-list actors and producers.",
-        "price": "\u20b91000",
+        "price": "₹1000",
         "color": "#e11d48",
         "image": "https://images.unsplash.com/photo-1524712245354-2c4e5e7121c0?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Media and fan engagement ahead of worldwide theatrical release.",
@@ -1407,14 +1468,15 @@ EVENTS = [
         "venue_address": "Juhu Tara Rd, Juhu, Mumbai, Maharashtra 400049",
         "time": "11:30 AM",
         "end_time": "03:30 PM",
-        "category": "Movie Promotions"
+        "category": "Movie Promotions",
+        "stream_price": "₹199"
     },
     {
         "id": 63,
         "title": "Horror-Thriller Midnight Screening & Cast Q&A",
         "date": "Jan 19, 2027",
         "desc": "Spine-chilling midnight advance screening with sound effects and haunted corridor decor.",
-        "price": "\u20b9450",
+        "price": "₹450",
         "color": "#475569",
         "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Deliver an atmospheric horror movie experience for true genre buffs.",
@@ -1428,7 +1490,8 @@ EVENTS = [
         "venue_address": "Inorbit Mall, Link Rd, Malad West, Mumbai, Maharashtra 400064",
         "time": "11:00 PM",
         "end_time": "02:30 AM",
-        "category": "Movie Promotions"
+        "category": "Movie Promotions",
+        "stream_price": "₹199"
     },
     {
         "id": 64,
@@ -1449,19 +1512,20 @@ EVENTS = [
         "venue_address": "Bellary Rd, Jayamahal, Bengaluru, Karnataka 560006",
         "time": "05:00 PM",
         "end_time": "09:00 PM",
-        "category": "Movie Promotions"
+        "category": "Movie Promotions",
+        "stream_price": "₹199"
     },
     {
         "id": 65,
         "title": "National Short Film Festival & Awards Gala",
         "date": "Feb 05, 2027",
         "desc": "Screening of 30 curated short films from university creators followed by jury award ceremony.",
-        "price": "\u20b9500",
+        "price": "₹500",
         "color": "#0284c7",
         "image": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Discover emerging indie directors, cinematographers, and screenwriters.",
         "full_details": "Category screenings across Fiction, Documentary, and Animation with feedback from veteran film jury.",
-        "outcome": "Best Short Film Trophy with \u20b950,000 cash grant and distribution contract.",
+        "outcome": "Best Short Film Trophy with ₹50,000 cash grant and distribution contract.",
         "seats_total": 100,
         "seats_filled": 0,
         "is_draft": 0,
@@ -1470,14 +1534,15 @@ EVENTS = [
         "venue_address": "1/1, AJC Bose Rd, Elgin, Kolkata, West Bengal 700020",
         "time": "10:00 AM",
         "end_time": "07:00 PM",
-        "category": "Movie Promotions"
+        "category": "Movie Promotions",
+        "stream_price": "₹199"
     },
     {
         "id": 66,
         "title": "Superhero Cinematic Universe Fan Con",
         "date": "Feb 13, 2027",
         "desc": "Immersive comic book movie activation with life-sized superhero statues and trailer exclusive drops.",
-        "price": "\u20b9700",
+        "price": "₹700",
         "color": "#2563eb",
         "image": "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Bring the superhero cinematic multiverse to life for passionate fans.",
@@ -1491,14 +1556,15 @@ EVENTS = [
         "venue_address": "DLF Cyber City, Phase 2, Sector 24, Gurugram, Haryana 122002",
         "time": "11:00 AM",
         "end_time": "06:30 PM",
-        "category": "Movie Promotions"
+        "category": "Movie Promotions",
+        "stream_price": "₹199"
     },
     {
         "id": 67,
         "title": "Costume & Prop Design Cinema Expo",
         "date": "Feb 21, 2027",
         "desc": "Exhibition of legendary movie armor, royal period attire, and signature weapon props.",
-        "price": "\u20b9350",
+        "price": "Free",
         "color": "#c026d3",
         "image": "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Highlight the craftsmanship of costume designers, armorers, and production designers.",
@@ -1512,14 +1578,15 @@ EVENTS = [
         "venue_address": "Film City Complex, Goregaon East, Mumbai, Maharashtra 400065",
         "time": "10:00 AM",
         "end_time": "05:00 PM",
-        "category": "Movie Promotions"
+        "category": "Movie Promotions",
+        "stream_price": "₹199"
     },
     {
         "id": 68,
         "title": "Celebrity Choreographers Dance Workshop & Film Promo",
         "date": "Mar 01, 2027",
         "desc": "Learn viral signature hook steps directly from Bollywood's top choreographers.",
-        "price": "\u20b9800",
+        "price": "₹800",
         "color": "#f43f5e",
         "image": "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Promote dance-musical film with direct fan participation in signature choreography.",
@@ -1533,14 +1600,15 @@ EVENTS = [
         "venue_address": "Bandra West, Mumbai, Maharashtra 400050",
         "time": "02:00 PM",
         "end_time": "06:00 PM",
-        "category": "Movie Promotions"
+        "category": "Movie Promotions",
+        "stream_price": "₹199"
     },
     {
         "id": 69,
         "title": "Mythological Mega-Budget Movie Showcase",
         "date": "Mar 09, 2027",
         "desc": "Grand reveal of concept art, creature design, and musical score for upcoming mythological epic.",
-        "price": "\u20b9900",
+        "price": "₹900",
         "color": "#d97706",
         "image": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Unveil historical Indian mythology brought to life with world-class production values.",
@@ -1554,14 +1622,15 @@ EVENTS = [
         "venue_address": "Hitec City Main Rd, Madhapur, Hyderabad, Telangana 500081",
         "time": "05:00 PM",
         "end_time": "09:00 PM",
-        "category": "Movie Promotions"
+        "category": "Movie Promotions",
+        "stream_price": "₹199"
     },
     {
         "id": 70,
         "title": "International Film Festival Star Screening",
         "date": "Mar 18, 2027",
         "desc": "Red-carpet opening gala of the International Film Festival of India with world cinema icons.",
-        "price": "\u20b91200",
+        "price": "₹1200",
         "color": "#4f46e5",
         "image": "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Celebrate global cinematic masterpieces and cultural diplomacy.",
@@ -1575,7 +1644,8 @@ EVENTS = [
         "venue_address": "Dayanand Bandodkar Marg, Campal, Panaji, Goa 403001",
         "time": "06:00 PM",
         "end_time": "10:00 PM",
-        "category": "Movie Promotions"
+        "category": "Movie Promotions",
+        "stream_price": "₹199"
     },
     {
         "id": 71,
@@ -1596,14 +1666,15 @@ EVENTS = [
         "venue_address": "NTR Gardens, Khairatabad, Hyderabad, Telangana 500063",
         "time": "05:00 PM",
         "end_time": "08:30 PM",
-        "category": "Movie Promotions"
+        "category": "Movie Promotions",
+        "stream_price": "₹199"
     },
     {
         "id": 72,
         "title": "Fantasy Film Cast Press Meet 2025",
         "date": "Dec 20, 2025",
         "desc": "Concluded fantasy cinema press conference with lead actor discussions.",
-        "price": "\u20b9500",
+        "price": "₹500",
         "color": "#9333ea",
         "image": "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Concluded movie promotion panel.",
@@ -1617,14 +1688,15 @@ EVENTS = [
         "venue_address": "Ambience Mall, Vasant Kunj, New Delhi, Delhi 110070",
         "time": "02:00 PM",
         "end_time": "05:00 PM",
-        "category": "Movie Promotions"
+        "category": "Movie Promotions",
+        "stream_price": "₹199"
     },
     {
         "id": 73,
         "title": "Global Creator & Influencer Conclave 2026",
         "date": "Nov 16, 2026",
         "desc": "Meet top YouTube creators, podcast hosts, and digital storytellers in live keynotes and creator lounges.",
-        "price": "\u20b91200",
+        "price": "₹1200",
         "color": "#8b5cf6",
         "image": "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Connect passionate aspiring creators with the world's most successful digital influencers.",
@@ -1638,14 +1710,15 @@ EVENTS = [
         "venue_address": "G Block BKC, Bandra Kurla Complex, Bandra East, Mumbai, Maharashtra 400098",
         "time": "10:00 AM",
         "end_time": "06:00 PM",
-        "category": "Celebrity Meet-ups"
+        "category": "Celebrity Meet-ups",
+        "stream_price": "₹199"
     },
     {
         "id": 74,
         "title": "Tech Titan Fireside Keynote with Silicon Leaders",
         "date": "Nov 22, 2026",
         "desc": "Intimate fireside chat with billionaire tech founders and silicon innovators followed by dinner.",
-        "price": "\u20b91500",
+        "price": "₹1500",
         "color": "#0ea5e9",
         "image": "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Gain rare insights into high-scale engineering, AI disruption, and venture leadership.",
@@ -1659,14 +1732,15 @@ EVENTS = [
         "venue_address": "23, HAL Old Airport Rd, HAL 2nd Stage, Kodihalli, Bengaluru, Karnataka 560008",
         "time": "05:00 PM",
         "end_time": "09:00 PM",
-        "category": "Celebrity Meet-ups"
+        "category": "Celebrity Meet-ups",
+        "stream_price": "₹199"
     },
     {
         "id": 75,
         "title": "International Authors & Thought Leaders Conclave",
         "date": "Nov 29, 2026",
         "desc": "Book signing, live reading, and philosophical dialogues with international best-selling authors.",
-        "price": "\u20b9600",
+        "price": "Free",
         "color": "#d97706",
         "image": "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Celebrate literature, philosophy, and intellectual discourse.",
@@ -1680,14 +1754,15 @@ EVENTS = [
         "venue_address": "Lodhi Rd, Near Airforce Bal Bharati School, New Delhi, Delhi 110003",
         "time": "11:00 AM",
         "end_time": "05:30 PM",
-        "category": "Celebrity Meet-ups"
+        "category": "Celebrity Meet-ups",
+        "stream_price": "₹199"
     },
     {
         "id": 76,
         "title": "Youth Icons & Startup Unicorn Founders Gala",
         "date": "Dec 06, 2026",
         "desc": "Black-tie networking dinner with Forbes 30 Under 30 founders and angel investors.",
-        "price": "\u20b92500",
+        "price": "₹2500",
         "color": "#ec4899",
         "image": "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Accelerate high-level youth entrepreneurship and startup investments.",
@@ -1701,14 +1776,15 @@ EVENTS = [
         "venue_address": "Chhatrapati Shivaji Maharaj International Airport, Mumbai, Maharashtra 400099",
         "time": "06:30 PM",
         "end_time": "10:30 PM",
-        "category": "Celebrity Meet-ups"
+        "category": "Celebrity Meet-ups",
+        "stream_price": "₹199"
     },
     {
         "id": 77,
         "title": "Bollywood Superstar Fan Fest & Autographs",
         "date": "Dec 12, 2026",
         "desc": "Exclusive fan interaction, stage games, photo-ops, and direct autograph signing.",
-        "price": "\u20b92000",
+        "price": "₹2000",
         "color": "#f43f5e",
         "image": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Connect devoted cinema fans with their beloved superstar idol in an intimate setting.",
@@ -1722,14 +1798,15 @@ EVENTS = [
         "venue_address": "Bellary Rd, Byatarayanapura, Yelahanka, Bengaluru, Karnataka 560092",
         "time": "03:00 PM",
         "end_time": "07:00 PM",
-        "category": "Celebrity Meet-ups"
+        "category": "Celebrity Meet-ups",
+        "stream_price": "₹199"
     },
     {
         "id": 78,
         "title": "Comedy Superstars Live Roast & Meetup",
         "date": "Dec 19, 2026",
         "desc": "Unfiltered stand-up comedy, crowd work, and back-stage green room hangout.",
-        "price": "\u20b91100",
+        "price": "₹1100",
         "color": "#eab308",
         "image": "https://images.unsplash.com/photo-1585699324551-f6c309eedeca?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Unwind with India's most celebrated stand-up comedians and humorists.",
@@ -1743,14 +1820,15 @@ EVENTS = [
         "venue_address": "Museum Rd, Opp. St. Joseph's Boys' High School, Bengaluru, Karnataka 560025",
         "time": "07:00 PM",
         "end_time": "10:00 PM",
-        "category": "Celebrity Meet-ups"
+        "category": "Celebrity Meet-ups",
+        "stream_price": "₹199"
     },
     {
         "id": 79,
         "title": "Fitness Icons & Olympian Athlete Masterclass",
         "date": "Dec 24, 2026",
         "desc": "Workout session, nutrition philosophy, and mental resilience keynote by Olympic medalists.",
-        "price": "\u20b9950",
+        "price": "₹950",
         "color": "#10b981",
         "image": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Learn championship athletic mindset, functional fitness, and recovery science.",
@@ -1764,14 +1842,15 @@ EVENTS = [
         "venue_address": "National Games Park, Mahalunge, Pune, Maharashtra 411045",
         "time": "08:00 AM",
         "end_time": "01:30 PM",
-        "category": "Celebrity Meet-ups"
+        "category": "Celebrity Meet-ups",
+        "stream_price": "₹199"
     },
     {
         "id": 80,
         "title": "Gaming & Live Streamer Superstars Conclave",
         "date": "Jan 12, 2027",
         "desc": "Play alongside India's top gaming YouTubers and Twitch streamers in live exhibition matches.",
-        "price": "\u20b9600",
+        "price": "Free",
         "color": "#6366f1",
         "image": "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Celebrate gaming creators and give community fans a chance to squad up live.",
@@ -1785,14 +1864,15 @@ EVENTS = [
         "venue_address": "Golf Course Rd, Sector 43, Gurugram, Haryana 122002",
         "time": "01:00 PM",
         "end_time": "07:00 PM",
-        "category": "Celebrity Meet-ups"
+        "category": "Celebrity Meet-ups",
+        "stream_price": "₹199"
     },
     {
         "id": 81,
         "title": "TEDx VIP Speakers Reception & Networking",
         "date": "Jan 20, 2027",
         "desc": "Ideas worth spreading: interact with scientists, explorers, philosophers, and humanitarians.",
-        "price": "\u20b91800",
+        "price": "₹1800",
         "color": "#ef4444",
         "image": "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Spark intellectual curiosity and transformative world-changing ideas.",
@@ -1806,14 +1886,15 @@ EVENTS = [
         "venue_address": "16th Cross, Gayatri Devi Park Extension, Vyalikaval, Bengaluru, Karnataka 560003",
         "time": "04:30 PM",
         "end_time": "09:30 PM",
-        "category": "Celebrity Meet-ups"
+        "category": "Celebrity Meet-ups",
+        "stream_price": "₹199"
     },
     {
         "id": 82,
         "title": "World Explorers & Mountaineers Conclave",
         "date": "Jan 28, 2027",
         "desc": "Everest summiters and deep-sea divers sharing gripping survival stories and photography.",
-        "price": "\u20b9700",
+        "price": "Free",
         "color": "#0ea5e9",
         "image": "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Inspire outdoor courage, geographical exploration, and mountaineering discipline.",
@@ -1827,14 +1908,15 @@ EVENTS = [
         "venue_address": "Cathedral Rd, Maidan, Kolkata, West Bengal 700071",
         "time": "03:00 PM",
         "end_time": "07:30 PM",
-        "category": "Celebrity Meet-ups"
+        "category": "Celebrity Meet-ups",
+        "stream_price": "₹199"
     },
     {
         "id": 83,
         "title": "Couture Fashion Designers & Supermodels VIP Gala",
         "date": "Feb 06, 2027",
         "desc": "Red carpet luxury fashion showcase with top designers, stylists, and runway models.",
-        "price": "\u20b93000",
+        "price": "₹3000",
         "color": "#d946ef",
         "image": "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Celebrate haute couture innovation and meet industry leading stylists and fashion moguls.",
@@ -1848,7 +1930,8 @@ EVENTS = [
         "venue_address": "Dr Zakir Hussain Marg, Golf Links, New Delhi, Delhi 110003",
         "time": "07:00 PM",
         "end_time": "11:00 PM",
-        "category": "Celebrity Meet-ups"
+        "category": "Celebrity Meet-ups",
+        "stream_price": "₹199"
     },
     {
         "id": 84,
@@ -1869,14 +1952,15 @@ EVENTS = [
         "venue_address": "Outer Ring Rd, Peenya 1st Stage, Bengaluru, Karnataka 560058",
         "time": "02:00 PM",
         "end_time": "06:00 PM",
-        "category": "Celebrity Meet-ups"
+        "category": "Celebrity Meet-ups",
+        "stream_price": "₹199"
     },
     {
         "id": 85,
         "title": "Masterchef & Culinary Icons Tasting Gala",
         "date": "Feb 22, 2027",
         "desc": "Live culinary demonstrations, signature dish tastings, and meet & greet with Michelin star chefs.",
-        "price": "\u20b92200",
+        "price": "₹2200",
         "color": "#f97316",
         "image": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Experience high gastronomy, molecular cooking, and meet celebrated culinary visionaries.",
@@ -1890,7 +1974,8 @@ EVENTS = [
         "venue_address": "1, Residency Rd, Ashok Nagar, Bengaluru, Karnataka 560025",
         "time": "06:00 PM",
         "end_time": "10:00 PM",
-        "category": "Celebrity Meet-ups"
+        "category": "Celebrity Meet-ups",
+        "stream_price": "₹199"
     },
     {
         "id": 86,
@@ -1911,14 +1996,15 @@ EVENTS = [
         "venue_address": "India Gate, New Delhi, Delhi 110001",
         "time": "10:00 AM",
         "end_time": "03:30 PM",
-        "category": "Celebrity Meet-ups"
+        "category": "Celebrity Meet-ups",
+        "stream_price": "₹199"
     },
     {
         "id": 87,
         "title": "Music Prodigies & Virtuosos Fan Meet",
         "date": "Mar 10, 2027",
         "desc": "Intimate musical masterclass and jam session with internationally acclaimed instrumentalists.",
-        "price": "\u20b91000",
+        "price": "₹1000",
         "color": "#a855f7",
         "image": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Foster deep musical mastery and student mentorship with virtuosic performers.",
@@ -1932,14 +2018,15 @@ EVENTS = [
         "venue_address": "NCPA Marg, Nariman Point, Mumbai, Maharashtra 400021",
         "time": "05:00 PM",
         "end_time": "08:30 PM",
-        "category": "Celebrity Meet-ups"
+        "category": "Celebrity Meet-ups",
+        "stream_price": "₹199"
     },
     {
         "id": 88,
         "title": "FinTech Visionaries & Angel Investors Meetup",
         "date": "Mar 19, 2027",
         "desc": "Network with visionary angel investors, venture partners, and leading banking executives.",
-        "price": "\u20b92000",
+        "price": "₹2000",
         "color": "#10b981",
         "image": "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Bridge promising fintech startups with institutional capital and guidance.",
@@ -1953,14 +2040,15 @@ EVENTS = [
         "venue_address": "1/136, Dr E Moses Rd, Gandhi Nagar, Upper Worli, Mumbai, Maharashtra 400018",
         "time": "06:00 PM",
         "end_time": "09:30 PM",
-        "category": "Celebrity Meet-ups"
+        "category": "Celebrity Meet-ups",
+        "stream_price": "₹199"
     },
     {
         "id": 89,
         "title": "National Creators Summit 2025",
         "date": "Oct 15, 2025",
         "desc": "Concluded mega creator conclave celebrating digital storytelling.",
-        "price": "\u20b91000",
+        "price": "Free",
         "color": "#6366f1",
         "image": "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Historic national creators event.",
@@ -1974,14 +2062,15 @@ EVENTS = [
         "venue_address": "Pragati Maidan, New Delhi, Delhi 110001",
         "time": "10:00 AM",
         "end_time": "06:00 PM",
-        "category": "Celebrity Meet-ups"
+        "category": "Celebrity Meet-ups",
+        "stream_price": "₹199"
     },
     {
         "id": 90,
         "title": "Global Leadership Roundtable 2025",
         "date": "Dec 05, 2025",
         "desc": "Concluded executive dinner and leadership discussion.",
-        "price": "\u20b91500",
+        "price": "₹1500",
         "color": "#0ea5e9",
         "image": "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Concluded leadership summit.",
@@ -1995,7 +2084,8 @@ EVENTS = [
         "venue_address": "Sahar Airport Rd, Andheri East, Mumbai, Maharashtra 400099",
         "time": "06:00 PM",
         "end_time": "10:00 PM",
-        "category": "Celebrity Meet-ups"
+        "category": "Celebrity Meet-ups",
+        "stream_price": "₹199"
     },
     {
         "id": 91,
@@ -2016,14 +2106,15 @@ EVENTS = [
         "venue_address": "Bellary Rd, Gandhi Krishi Vigyana Kendra, Bengaluru, Karnataka 560065",
         "time": "09:00 AM",
         "end_time": "05:00 PM",
-        "category": "Agriculture"
+        "category": "Agriculture",
+        "stream_price": "₹199"
     },
     {
         "id": 92,
         "title": "Organic Farming & Sustainable Produce Fair",
         "date": "Nov 23, 2026",
         "desc": "Farm-fresh organic exhibition, zero-budget natural farming techniques, and seed exchange.",
-        "price": "\u20b9200",
+        "price": "₹200",
         "color": "#84cc16",
         "image": "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Promote chemical-free organic farming, soil biology, and direct farmer-consumer sales.",
@@ -2037,14 +2128,15 @@ EVENTS = [
         "venue_address": "Mavalli, Bengaluru, Karnataka 560004",
         "time": "08:30 AM",
         "end_time": "06:00 PM",
-        "category": "Agriculture"
+        "category": "Agriculture",
+        "stream_price": "₹199"
     },
     {
         "id": 93,
         "title": "Hydroponics & Vertical Farming Workshop",
         "date": "Nov 30, 2026",
         "desc": "Soil-less farming, NFT nutrient film channels, and climate-controlled LED greenhouses.",
-        "price": "\u20b9750",
+        "price": "₹750",
         "color": "#06b6d4",
         "image": "https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Teach modern urban rooftop farming and high-yield commercial hydroponics.",
@@ -2058,14 +2150,15 @@ EVENTS = [
         "venue_address": "Hessarghatta Lake Post, Bengaluru, Karnataka 560089",
         "time": "10:00 AM",
         "end_time": "04:30 PM",
-        "category": "Agriculture"
+        "category": "Agriculture",
+        "stream_price": "₹199"
     },
     {
         "id": 94,
         "title": "Soil Health & Precision Irrigation Congress",
         "date": "Dec 07, 2026",
         "desc": "Drip automation, soil micro-biome restoration, and water conservation technologies.",
-        "price": "\u20b9400",
+        "price": "₹400",
         "color": "#a16207",
         "image": "https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Conserve groundwater and rebuild topsoil organic carbon levels.",
@@ -2079,7 +2172,8 @@ EVENTS = [
         "venue_address": "Ferozepur Rd, PAU Campus, Ludhiana, Punjab 141004",
         "time": "09:30 AM",
         "end_time": "04:30 PM",
-        "category": "Agriculture"
+        "category": "Agriculture",
+        "stream_price": "₹199"
     },
     {
         "id": 95,
@@ -2100,14 +2194,15 @@ EVENTS = [
         "venue_address": "Pusa Rd, Pusa, New Delhi, Delhi 110012",
         "time": "10:00 AM",
         "end_time": "05:00 PM",
-        "category": "Agriculture"
+        "category": "Agriculture",
+        "stream_price": "₹199"
     },
     {
         "id": 96,
         "title": "Agri-Startup Pitch & Venture Fair 2026",
         "date": "Dec 20, 2026",
         "desc": "30 innovative agritech startups pitching to venture capitalists and agricultural ministry funds.",
-        "price": "\u20b9500",
+        "price": "₹500",
         "color": "#ca8a04",
         "image": "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Catalyze venture investment and commercialization of agricultural innovations.",
@@ -2121,7 +2216,8 @@ EVENTS = [
         "venue_address": "Rajendranagar, Hyderabad, Telangana 500030",
         "time": "09:30 AM",
         "end_time": "06:00 PM",
-        "category": "Agriculture"
+        "category": "Agriculture",
+        "stream_price": "₹199"
     },
     {
         "id": 97,
@@ -2142,14 +2238,15 @@ EVENTS = [
         "venue_address": "132 Feet Ring Rd, Near Helmet Cross Road, Ahmedabad, Gujarat 380052",
         "time": "10:00 AM",
         "end_time": "05:30 PM",
-        "category": "Agriculture"
+        "category": "Agriculture",
+        "stream_price": "₹199"
     },
     {
         "id": 98,
         "title": "Dairy Farming Tech & Automated Milking Expo",
         "date": "Jan 13, 2027",
         "desc": "IoT cattle health monitoring collars, robotic milking parlors, and fodder silage management.",
-        "price": "\u20b9300",
+        "price": "₹300",
         "color": "#0284c7",
         "image": "https://images.unsplash.com/photo-1527153857715-3908f2ae5e81?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Modernize dairy cattle management, milk hygiene, and disease prevention.",
@@ -2163,14 +2260,15 @@ EVENTS = [
         "venue_address": "GT Rd, Karnal, Haryana 132001",
         "time": "09:00 AM",
         "end_time": "05:00 PM",
-        "category": "Agriculture"
+        "category": "Agriculture",
+        "stream_price": "₹199"
     },
     {
         "id": 99,
         "title": "Aquaponics & Urban Rooftop Farming Bootcamp",
         "date": "Jan 21, 2027",
         "desc": "Symbiotic fish and vegetable production systems for urban homes and commercial greenhouses.",
-        "price": "\u20b9850",
+        "price": "₹850",
         "color": "#0ea5e9",
         "image": "https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Train urban growers in closed-loop aquaponics combining aquaculture with horticulture.",
@@ -2184,14 +2282,15 @@ EVENTS = [
         "venue_address": "Krishinagar, Dharwad, Karnataka 580005",
         "time": "10:00 AM",
         "end_time": "04:30 PM",
-        "category": "Agriculture"
+        "category": "Agriculture",
+        "stream_price": "₹199"
     },
     {
         "id": 100,
         "title": "Farm-to-Table Supply Chain Logistics Summit",
         "date": "Jan 29, 2027",
         "desc": "Cold-chain reefer transport, automated sorting, and direct farmer-to-retailer digital mandis.",
-        "price": "\u20b9600",
+        "price": "₹600",
         "color": "#10b981",
         "image": "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Eliminate post-harvest food waste through real-time telemetry and cold chains.",
@@ -2205,7 +2304,8 @@ EVENTS = [
         "venue_address": "Trade Fair Office Building, Izzathnagar, Hyderabad, Telangana 500084",
         "time": "09:30 AM",
         "end_time": "05:00 PM",
-        "category": "Agriculture"
+        "category": "Agriculture",
+        "stream_price": "₹199"
     },
     {
         "id": 101,
@@ -2226,14 +2326,15 @@ EVENTS = [
         "venue_address": "Shivajinagar, Pune, Maharashtra 411005",
         "time": "10:00 AM",
         "end_time": "05:30 PM",
-        "category": "Agriculture"
+        "category": "Agriculture",
+        "stream_price": "₹199"
     },
     {
         "id": 102,
         "title": "Bio-Fertilizers & Natural Pest Control Workshop",
         "date": "Feb 15, 2027",
         "desc": "Trichoderma, mycorrhiza fungi cultures, and botanical neem-based insect repellent formulas.",
-        "price": "\u20b9250",
+        "price": "₹250",
         "color": "#84cc16",
         "image": "https://images.unsplash.com/photo-1628352081506-83c43123ed6d?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Replace toxic synthetic chemical pesticides with regenerative biological pest controls.",
@@ -2247,14 +2348,15 @@ EVENTS = [
         "venue_address": "Marudhamalai Rd, Navavoor, Coimbatore, Tamil Nadu 641003",
         "time": "09:30 AM",
         "end_time": "04:00 PM",
-        "category": "Agriculture"
+        "category": "Agriculture",
+        "stream_price": "₹199"
     },
     {
         "id": 103,
         "title": "IoT Smart Sensors for Precision Agriculture",
         "date": "Feb 23, 2027",
         "desc": "LoRaWAN sensor nodes measuring NPK soil nutrients, leaf wetness, and ambient weather.",
-        "price": "\u20b9900",
+        "price": "₹900",
         "color": "#0ea5e9",
         "image": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Teach developers and agronomists to build long-range wireless farm monitoring networks.",
@@ -2268,14 +2370,15 @@ EVENTS = [
         "venue_address": "Kharagpur Technology Park, Kharagpur, West Bengal 721302",
         "time": "10:00 AM",
         "end_time": "05:00 PM",
-        "category": "Agriculture"
+        "category": "Agriculture",
+        "stream_price": "₹199"
     },
     {
         "id": 104,
         "title": "Cold Chain & Grain Silo Storage Conclave",
         "date": "Mar 03, 2027",
         "desc": "Scientific hermetic grain bags, steel silo aeration, and automated moisture sensors.",
-        "price": "\u20b9500",
+        "price": "₹500",
         "color": "#d97706",
         "image": "https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Prevent fungal and weevil damage in stored food grains and pulses.",
@@ -2289,7 +2392,8 @@ EVENTS = [
         "venue_address": "Rajendranagar, Hyderabad, Telangana 500030",
         "time": "09:30 AM",
         "end_time": "04:30 PM",
-        "category": "Agriculture"
+        "category": "Agriculture",
+        "stream_price": "₹199"
     },
     {
         "id": 105,
@@ -2310,14 +2414,15 @@ EVENTS = [
         "venue_address": "Patancheru, Hyderabad, Telangana 502324",
         "time": "10:00 AM",
         "end_time": "05:00 PM",
-        "category": "Agriculture"
+        "category": "Agriculture",
+        "stream_price": "₹199"
     },
     {
         "id": 106,
         "title": "Agri-Drone Pilot Certification & Flying Camp",
         "date": "Mar 20, 2027",
         "desc": "DGCA accredited flight simulator training and live agricultural payload flight maneuvers.",
-        "price": "\u20b91500",
+        "price": "₹1500",
         "color": "#6366f1",
         "image": "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Train certified rural drone pilots for commercial aerial spraying enterprises.",
@@ -2331,7 +2436,8 @@ EVENTS = [
         "venue_address": "Bellary Rd, Jakkuru, Bengaluru, Karnataka 560064",
         "time": "08:30 AM",
         "end_time": "04:30 PM",
-        "category": "Agriculture"
+        "category": "Agriculture",
+        "stream_price": "₹199"
     },
     {
         "id": 107,
@@ -2352,14 +2458,15 @@ EVENTS = [
         "venue_address": "Pune-Nashik Highway, Moshi, Pune, Maharashtra 412105",
         "time": "09:00 AM",
         "end_time": "06:00 PM",
-        "category": "Agriculture"
+        "category": "Agriculture",
+        "stream_price": "₹199"
     },
     {
         "id": 108,
         "title": "Organic Agro Fest 2025",
         "date": "Nov 20, 2025",
         "desc": "Concluded state-level organic farmers conference.",
-        "price": "\u20b9150",
+        "price": "₹150",
         "color": "#84cc16",
         "image": "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Historic organic farming conference.",
@@ -2373,7 +2480,8 @@ EVENTS = [
         "venue_address": "GKVK Campus, Bellary Rd, Bengaluru, Karnataka 560065",
         "time": "09:00 AM",
         "end_time": "05:00 PM",
-        "category": "Agriculture"
+        "category": "Agriculture",
+        "stream_price": "₹199"
     },
     {
         "id": 109,
@@ -2394,14 +2502,15 @@ EVENTS = [
         "venue_address": "Maulana Azad Rd, Rajpath Area, Central Secretariat, New Delhi, Delhi 110011",
         "time": "10:00 AM",
         "end_time": "05:00 PM",
-        "category": "Government"
+        "category": "Government",
+        "stream_price": "₹199"
     },
     {
         "id": 110,
         "title": "Smart City Governance & Urban Policy Townhall",
         "date": "Nov 24, 2026",
         "desc": "Open public townhall with municipal commissioners on traffic decongestion, waste management, and parks.",
-        "price": "Free",
+        "price": "₹499",
         "color": "#0ea5e9",
         "image": "https://images.unsplash.com/photo-1477959858617-67f30bc75b82?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Direct democratic citizen dialogue with city administrators and urban planners.",
@@ -2415,14 +2524,15 @@ EVENTS = [
         "venue_address": "JC Rd, Sampangi Rama Nagar, Bengaluru, Karnataka 560002",
         "time": "10:30 AM",
         "end_time": "04:30 PM",
-        "category": "Government"
+        "category": "Government",
+        "stream_price": "₹199"
     },
     {
         "id": 111,
         "title": "National Youth Leadership & Democracy Conclave",
         "date": "Dec 01, 2026",
         "desc": "Mock youth parliament, public policy debate, and constitutional rights forum.",
-        "price": "Free",
+        "price": "₹350",
         "color": "#f97316",
         "image": "https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Inspire young collegiate minds toward ethical public administration and democratic debate.",
@@ -2436,7 +2546,8 @@ EVENTS = [
         "venue_address": "Rafi Marg, Sansad Marg Area, New Delhi, Delhi 110001",
         "time": "09:30 AM",
         "end_time": "05:30 PM",
-        "category": "Government"
+        "category": "Government",
+        "stream_price": "₹199"
     },
     {
         "id": 112,
@@ -2457,14 +2568,15 @@ EVENTS = [
         "venue_address": "Ansari Nagar East, Gautam Nagar, New Delhi, Delhi 110029",
         "time": "09:00 AM",
         "end_time": "04:00 PM",
-        "category": "Government"
+        "category": "Government",
+        "stream_price": "₹199"
     },
     {
         "id": 113,
         "title": "Renewable Clean Energy & Green City Civic Forum",
         "date": "Dec 14, 2026",
         "desc": "Subsidies for rooftop solar, EV charging infrastructure, and municipal rainwater harvesting.",
-        "price": "Free",
+        "price": "₹400",
         "color": "#84cc16",
         "image": "https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Accelerate citizen adoption of solar panels, electric vehicles, and green architecture.",
@@ -2478,19 +2590,20 @@ EVENTS = [
         "venue_address": "Sector 13C, Gandhinagar, Gujarat 382016",
         "time": "10:00 AM",
         "end_time": "05:00 PM",
-        "category": "Government"
+        "category": "Government",
+        "stream_price": "₹199"
     },
     {
         "id": 114,
         "title": "Civic Innovation & Smart Public Transport Hackathon",
         "date": "Dec 21, 2026",
         "desc": "Build open-data apps for bus tracking, metro transit integration, and pedestrian safety.",
-        "price": "Free",
+        "price": "₹299",
         "color": "#06b6d4",
         "image": "https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Harness open civic transit data to solve real commuter pain points.",
         "full_details": "Teams develop solutions using real-time GTFS feeds for live bus arrival predictions and seamless multi-modal ticketing.",
-        "outcome": "\u20b91,00,000 in transit innovation grants and pilot deployment on state transport portals.",
+        "outcome": "₹1,00,000 in transit innovation grants and pilot deployment on state transport portals.",
         "seats_total": 100,
         "seats_filled": 0,
         "is_draft": 0,
@@ -2499,14 +2612,15 @@ EVENTS = [
         "venue_address": "Shanthinagar Bus Station Complex, K.H. Road, Bengaluru, Karnataka 560027",
         "time": "09:00 AM",
         "end_time": "06:00 PM",
-        "category": "Government"
+        "category": "Government",
+        "stream_price": "₹199"
     },
     {
         "id": 115,
         "title": "Cyber Security for Public Infrastructure & Citizens",
         "date": "Dec 26, 2026",
         "desc": "Protecting citizens against online financial fraud, identity theft, and deepfake scams.",
-        "price": "Free",
+        "price": "₹499",
         "color": "#ef4444",
         "image": "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Shield the public from cyber financial fraud and deceptive digital scams.",
@@ -2520,14 +2634,15 @@ EVENTS = [
         "venue_address": "Electronics Niketan, 6 CGO Complex, Lodhi Road, New Delhi, Delhi 110003",
         "time": "10:00 AM",
         "end_time": "04:30 PM",
-        "category": "Government"
+        "category": "Government",
+        "stream_price": "₹199"
     },
     {
         "id": 116,
         "title": "National Skill Development & PMKVY Job Conclave",
         "date": "Jan 14, 2027",
         "desc": "Free vocational skill certifications, apprenticeships, and on-spot recruitment by 50+ employers.",
-        "price": "Free",
+        "price": "₹299",
         "color": "#f59e0b",
         "image": "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Bridge vocational students with verified job placements and national skill certifications.",
@@ -2541,7 +2656,8 @@ EVENTS = [
         "venue_address": "BKC Exhibition Grounds, Bandra East, Mumbai, Maharashtra 400051",
         "time": "09:30 AM",
         "end_time": "05:30 PM",
-        "category": "Government"
+        "category": "Government",
+        "stream_price": "₹199"
     },
     {
         "id": 117,
@@ -2562,7 +2678,8 @@ EVENTS = [
         "venue_address": "Plot No. 5, Scheme No. 78, Part II, Vijay Nagar, Indore, Madhya Pradesh 452010",
         "time": "10:00 AM",
         "end_time": "04:30 PM",
-        "category": "Government"
+        "category": "Government",
+        "stream_price": "₹199"
     },
     {
         "id": 118,
@@ -2583,7 +2700,8 @@ EVENTS = [
         "venue_address": "NDMA Bhawan, A-1, Safdarjung Enclave, New Delhi, Delhi 110029",
         "time": "09:00 AM",
         "end_time": "05:00 PM",
-        "category": "Government"
+        "category": "Government",
+        "stream_price": "₹199"
     },
     {
         "id": 119,
@@ -2604,14 +2722,15 @@ EVENTS = [
         "venue_address": "Dr. Ambedkar Veedhi, Sampangi Rama Nagar, Bengaluru, Karnataka 560001",
         "time": "10:30 AM",
         "end_time": "04:30 PM",
-        "category": "Government"
+        "category": "Government",
+        "stream_price": "₹199"
     },
     {
         "id": 120,
         "title": "Start-up India Seed Fund & Grant Distribution Expo",
         "date": "Feb 16, 2027",
         "desc": "Direct access to DPIIT startup recognition, tax exemptions, and government procurement tenders.",
-        "price": "Free",
+        "price": "₹599",
         "color": "#4f46e5",
         "image": "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Empower early-stage founders to leverage government grants and GeM public procurement.",
@@ -2625,14 +2744,15 @@ EVENTS = [
         "venue_address": "Pragati Maidan, Mathura Rd, New Delhi, Delhi 110001",
         "time": "09:30 AM",
         "end_time": "05:30 PM",
-        "category": "Government"
+        "category": "Government",
+        "stream_price": "₹199"
     },
     {
         "id": 121,
         "title": "Rural Broadband & Digital Panchayat Conference",
         "date": "Feb 24, 2027",
         "desc": "BharatNet optical fiber expansion, rural telemedicine, and digital village governance.",
-        "price": "Free",
+        "price": "₹349",
         "color": "#0284c7",
         "image": "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Expand internet connectivity and e-governance to India's 2,50,000 gram panchayats.",
@@ -2646,14 +2766,15 @@ EVENTS = [
         "venue_address": "Rajendranagar, Hyderabad, Telangana 500030",
         "time": "10:00 AM",
         "end_time": "04:30 PM",
-        "category": "Government"
+        "category": "Government",
+        "stream_price": "₹199"
     },
     {
         "id": 122,
         "title": "Clean Air & Water Conservation Public Forum",
         "date": "Mar 04, 2027",
         "desc": "Air quality index monitoring, lake rejuvenation projects, and industrial effluent regulations.",
-        "price": "Free",
+        "price": "₹249",
         "color": "#0d9488",
         "image": "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Safeguard urban water bodies and improve air quality through scientific citizen monitoring.",
@@ -2667,14 +2788,15 @@ EVENTS = [
         "venue_address": "Parivesh Bhawan, East Arjun Nagar, Delhi 110032",
         "time": "10:00 AM",
         "end_time": "04:30 PM",
-        "category": "Government"
+        "category": "Government",
+        "stream_price": "₹199"
     },
     {
         "id": 123,
         "title": "Road Safety & Automated Traffic Enforcement Summit",
         "date": "Mar 12, 2027",
         "desc": "AI camera speed enforcement, zero-fatality corridor designs, and defensive driving education.",
-        "price": "Free",
+        "price": "₹299",
         "color": "#eab308",
         "image": "https://images.unsplash.com/photo-1508962914676-134849a727f0?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Reduce road fatalities to zero through strict enforcement, road engineering, and public awareness.",
@@ -2688,7 +2810,8 @@ EVENTS = [
         "venue_address": "Infantry Rd, Tasker Town, Shivaji Nagar, Bengaluru, Karnataka 560001",
         "time": "10:00 AM",
         "end_time": "04:00 PM",
-        "category": "Government"
+        "category": "Government",
+        "stream_price": "₹199"
     },
     {
         "id": 124,
@@ -2709,14 +2832,15 @@ EVENTS = [
         "venue_address": "Bhagwan Das Rd, Opposite Supreme Court, New Delhi, Delhi 110001",
         "time": "10:30 AM",
         "end_time": "04:30 PM",
-        "category": "Government"
+        "category": "Government",
+        "stream_price": "₹199"
     },
     {
         "id": 125,
         "title": "Public E-Governance Summit 2025",
         "date": "Nov 10, 2025",
         "desc": "Concluded national summit on cloud-first e-governance and direct benefit transfers.",
-        "price": "Free",
+        "price": "₹450",
         "color": "#1e40af",
         "image": "https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Historic national e-governance convention.",
@@ -2730,14 +2854,15 @@ EVENTS = [
         "venue_address": "Maulana Azad Rd, Rajpath Area, New Delhi, Delhi 110011",
         "time": "10:00 AM",
         "end_time": "05:00 PM",
-        "category": "Government"
+        "category": "Government",
+        "stream_price": "₹199"
     },
     {
         "id": 126,
         "title": "National Clean City Conclave 2025",
         "date": "Dec 08, 2025",
         "desc": "Concluded annual Swachh Survekshan rankings and municipal awards.",
-        "price": "Free",
+        "price": "₹350",
         "color": "#15803d",
         "image": "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Concluded municipal sanitation awards.",
@@ -2751,14 +2876,15 @@ EVENTS = [
         "venue_address": "Plot No. 5, Scheme No. 78, Part II, Vijay Nagar, Indore, Madhya Pradesh 452010",
         "time": "09:30 AM",
         "end_time": "04:30 PM",
-        "category": "Government"
+        "category": "Government",
+        "stream_price": "₹199"
     },
     {
         "id": 127,
         "title": "Apex Legends LAN Showdown 2026",
         "date": "Nov 12, 2026",
         "desc": "Battle royale championship with 20 squad lobbies and 4K spectator screens.",
-        "price": "\u20b9500",
+        "price": "₹500",
         "color": "#8b5cf6",
         "image": "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
@@ -2772,7 +2898,8 @@ EVENTS = [
         "venue_address": "Phoenix Marketcity, Whitefield, Bangalore",
         "time": "10:00 AM",
         "end_time": "06:00 PM",
-        "category": "Gaming & E-Sports"
+        "category": "Gaming & E-Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 128,
@@ -2793,14 +2920,15 @@ EVENTS = [
         "venue_address": "Koramangala 5th Block, Bangalore",
         "time": "11:00 AM",
         "end_time": "07:00 PM",
-        "category": "Gaming & E-Sports"
+        "category": "Gaming & E-Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 129,
         "title": "BGMI India Masters Championship",
         "date": "Nov 25, 2026",
-        "desc": "National mobile esports showdown with \u20b95,00,000 prize pool.",
-        "price": "\u20b9600",
+        "desc": "National mobile esports showdown with ₹5,00,000 prize pool.",
+        "price": "₹600",
         "color": "#8b5cf6",
         "image": "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
@@ -2814,14 +2942,15 @@ EVENTS = [
         "venue_address": "Cuttack, Odisha",
         "time": "01:00 PM",
         "end_time": "09:00 PM",
-        "category": "Gaming & E-Sports"
+        "category": "Gaming & E-Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 130,
         "title": "FIFA 26 NextGen Cup",
         "date": "Dec 02, 2026",
         "desc": "PlayStation 5 knockout tournament with live commentary and leaderboards.",
-        "price": "\u20b9300",
+        "price": "₹300",
         "color": "#8b5cf6",
         "image": "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
@@ -2835,7 +2964,8 @@ EVENTS = [
         "venue_address": "Palladium Mall, Lower Parel, Mumbai",
         "time": "12:00 PM",
         "end_time": "08:00 PM",
-        "category": "Gaming & E-Sports"
+        "category": "Gaming & E-Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 131,
@@ -2856,14 +2986,15 @@ EVENTS = [
         "venue_address": "Kanagam Rd, Taramani, Chennai",
         "time": "09:00 AM",
         "end_time": "06:00 PM",
-        "category": "Gaming & E-Sports"
+        "category": "Gaming & E-Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 132,
         "title": "Counter-Strike 2 Major Qualifier",
         "date": "Dec 15, 2026",
         "desc": "High-octane CS2 double-elimination tournament with 128-tick servers.",
-        "price": "\u20b9800",
+        "price": "₹800",
         "color": "#8b5cf6",
         "image": "https://images.unsplash.com/photo-1560253023-3ec5d502959f?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
@@ -2877,14 +3008,15 @@ EVENTS = [
         "venue_address": "Indiranagar, Bangalore",
         "time": "10:00 AM",
         "end_time": "06:00 PM",
-        "category": "Gaming & E-Sports"
+        "category": "Gaming & E-Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 133,
         "title": "Cosplay & Anime Gaming Con 2026",
         "date": "Dec 20, 2026",
         "desc": "Grand cosplay showcase, voice actor panels, retro arcade machines, and indie booths.",
-        "price": "\u20b9450",
+        "price": "₹450",
         "color": "#8b5cf6",
         "image": "https://images.unsplash.com/photo-1566492031773-4f4e44671857?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
@@ -2898,14 +3030,15 @@ EVENTS = [
         "venue_address": "Izzat Nagar, Hyderabad",
         "time": "10:30 AM",
         "end_time": "08:00 PM",
-        "category": "Gaming & E-Sports"
+        "category": "Gaming & E-Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 134,
         "title": "VR & Spatial Gaming Arena Expo",
         "date": "Jan 08, 2027",
         "desc": "Experience next-gen VR headsets, haptic vests, and mixed-reality gaming rig demos.",
-        "price": "\u20b9700",
+        "price": "₹700",
         "color": "#8b5cf6",
         "image": "https://images.unsplash.com/photo-1593508512255-86ab42a8e620?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
@@ -2919,14 +3052,15 @@ EVENTS = [
         "venue_address": "Mathura Rd, New Delhi",
         "time": "11:00 AM",
         "end_time": "07:00 PM",
-        "category": "Gaming & E-Sports"
+        "category": "Gaming & E-Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 135,
         "title": "Street Fighter 6 & Tekken 8 FGC Showdown",
         "date": "Jan 16, 2027",
         "desc": "Fighting Game Community (FGC) arcade stick tournament and casual friendlies.",
-        "price": "\u20b9350",
+        "price": "₹350",
         "color": "#8b5cf6",
         "image": "https://images.unsplash.com/photo-1551103782-8ab07afd45c1?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
@@ -2940,7 +3074,8 @@ EVENTS = [
         "venue_address": "DLF Phase 2, Gurugram",
         "time": "01:00 PM",
         "end_time": "08:00 PM",
-        "category": "Gaming & E-Sports"
+        "category": "Gaming & E-Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 136,
@@ -2961,14 +3096,15 @@ EVENTS = [
         "venue_address": "Gandhinagar, Gujarat",
         "time": "10:00 AM",
         "end_time": "05:00 PM",
-        "category": "Gaming & E-Sports"
+        "category": "Gaming & E-Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 137,
         "title": "Mobile Legends Bang Bang Tournament",
         "date": "Feb 02, 2027",
         "desc": "Fast-paced 5v5 MOBA championship with custom team merchandise.",
-        "price": "\u20b9400",
+        "price": "₹400",
         "color": "#8b5cf6",
         "image": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
@@ -2982,14 +3118,15 @@ EVENTS = [
         "venue_address": "DC Block, Sector 1, Kolkata",
         "time": "02:00 PM",
         "end_time": "09:00 PM",
-        "category": "Gaming & E-Sports"
+        "category": "Gaming & E-Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 138,
         "title": "Sim Racing & Formula 1 Esports Cup",
         "date": "Feb 10, 2027",
         "desc": "Full-motion racing simulator tournament on Monza and Silverstone tracks.",
-        "price": "\u20b9900",
+        "price": "₹900",
         "color": "#8b5cf6",
         "image": "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
@@ -3003,7 +3140,8 @@ EVENTS = [
         "venue_address": "Greater Noida, UP",
         "time": "11:00 AM",
         "end_time": "06:00 PM",
-        "category": "Gaming & E-Sports"
+        "category": "Gaming & E-Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 139,
@@ -3024,14 +3162,15 @@ EVENTS = [
         "venue_address": "MG Road, Bengaluru",
         "time": "10:00 AM",
         "end_time": "06:00 PM",
-        "category": "Gaming & E-Sports"
+        "category": "Gaming & E-Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 140,
         "title": "Gaming Content Creators Summit 2027",
         "date": "Feb 26, 2027",
         "desc": "Keynotes on streaming gear, YouTube algorithms, and brand sponsorships.",
-        "price": "\u20b91200",
+        "price": "₹1200",
         "color": "#8b5cf6",
         "image": "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
@@ -3045,7 +3184,8 @@ EVENTS = [
         "venue_address": "Nagavara, Bangalore",
         "time": "10:00 AM",
         "end_time": "05:00 PM",
-        "category": "Gaming & E-Sports"
+        "category": "Gaming & E-Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 141,
@@ -3066,14 +3206,15 @@ EVENTS = [
         "venue_address": "Gachibowli, Hyderabad",
         "time": "12:00 PM",
         "end_time": "08:00 PM",
-        "category": "Gaming & E-Sports"
+        "category": "Gaming & E-Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 142,
         "title": "National College Esports Championship",
         "date": "Mar 15, 2027",
         "desc": "The ultimate university esports showdown across BGMI, Valorant, and Rocket League.",
-        "price": "\u20b9500",
+        "price": "₹500",
         "color": "#8b5cf6",
         "image": "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
@@ -3087,14 +3228,15 @@ EVENTS = [
         "venue_address": "BBD Bagh, Kolkata",
         "time": "09:00 AM",
         "end_time": "07:00 PM",
-        "category": "Gaming & E-Sports"
+        "category": "Gaming & E-Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 143,
         "title": "Summer LAN Battle Royale 2026",
         "date": "Jun 18, 2026",
         "desc": "High-energy 100-player LAN battle royale with live stream audience.",
-        "price": "\u20b9500",
+        "price": "₹500",
         "color": "#8b5cf6",
         "image": "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Concluded gaming & e-sports landmark event.",
@@ -3108,7 +3250,8 @@ EVENTS = [
         "venue_address": "Koramangala, Bangalore",
         "time": "10:00 AM",
         "end_time": "07:00 PM",
-        "category": "Gaming & E-Sports"
+        "category": "Gaming & E-Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 144,
@@ -3129,14 +3272,15 @@ EVENTS = [
         "venue_address": "Hauz Khas, New Delhi",
         "time": "09:00 AM",
         "end_time": "06:00 PM",
-        "category": "Gaming & E-Sports"
+        "category": "Gaming & E-Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 145,
         "title": "National Angel Investor & Pitch Fest 2026",
         "date": "Nov 14, 2026",
         "desc": "50 curated early-stage startups pitch live to 30+ prominent Angel & VC funds.",
-        "price": "\u20b91200",
+        "price": "₹1200",
         "color": "#3b82f6",
         "image": "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
@@ -3150,14 +3294,15 @@ EVENTS = [
         "venue_address": "Knowledge City, Hyderabad",
         "time": "09:30 AM",
         "end_time": "05:30 PM",
-        "category": "Business & Startup"
+        "category": "Business & Startup",
+        "stream_price": "₹199"
     },
     {
         "id": 146,
         "title": "Fintech Disruption Summit 2026",
         "date": "Nov 22, 2026",
         "desc": "UPI 3.0, Neo-banking, AI credit scoring, and RBI regulatory sandbox updates.",
-        "price": "\u20b91500",
+        "price": "₹1500",
         "color": "#3b82f6",
         "image": "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
@@ -3171,7 +3316,8 @@ EVENTS = [
         "venue_address": "BKC, Bandra East, Mumbai",
         "time": "10:00 AM",
         "end_time": "05:00 PM",
-        "category": "Business & Startup"
+        "category": "Business & Startup",
+        "stream_price": "₹199"
     },
     {
         "id": 147,
@@ -3192,14 +3338,15 @@ EVENTS = [
         "venue_address": "Bannerghatta Road, Bengaluru",
         "time": "09:00 AM",
         "end_time": "04:30 PM",
-        "category": "Business & Startup"
+        "category": "Business & Startup",
+        "stream_price": "₹199"
     },
     {
         "id": 148,
         "title": "AI & SaaS Founder Conclave",
         "date": "Dec 06, 2026",
         "desc": "Growth playbooks, scaling to $10M ARR, PLG engines, and enterprise sales strategies.",
-        "price": "\u20b91800",
+        "price": "₹1800",
         "color": "#3b82f6",
         "image": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
@@ -3213,7 +3360,8 @@ EVENTS = [
         "venue_address": "Old Airport Road, Bangalore",
         "time": "10:00 AM",
         "end_time": "06:00 PM",
-        "category": "Business & Startup"
+        "category": "Business & Startup",
+        "stream_price": "₹199"
     },
     {
         "id": 149,
@@ -3234,14 +3382,15 @@ EVENTS = [
         "venue_address": "Lodhi Road, New Delhi",
         "time": "10:00 AM",
         "end_time": "04:30 PM",
-        "category": "Business & Startup"
+        "category": "Business & Startup",
+        "stream_price": "₹199"
     },
     {
         "id": 150,
         "title": "D2C & E-Commerce Brands Masterclass",
         "date": "Dec 22, 2026",
         "desc": "Omnichannel scaling, supply chain optimization, and viral performance marketing.",
-        "price": "\u20b9900",
+        "price": "₹900",
         "color": "#3b82f6",
         "image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
@@ -3255,14 +3404,15 @@ EVENTS = [
         "venue_address": "Residency Road, Shanthala Nagar, Bangalore",
         "time": "10:30 AM",
         "end_time": "05:30 PM",
-        "category": "Business & Startup"
+        "category": "Business & Startup",
+        "stream_price": "₹199"
     },
     {
         "id": 151,
         "title": "Venture Capital Networking Night",
         "date": "Jan 09, 2027",
         "desc": "Exclusive high-level networking mixer for Seed to Series B startup founders and partners.",
-        "price": "\u20b92500",
+        "price": "₹2500",
         "color": "#3b82f6",
         "image": "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
@@ -3276,14 +3426,15 @@ EVENTS = [
         "venue_address": "Race Course Rd, Bengaluru",
         "time": "06:00 PM",
         "end_time": "10:00 PM",
-        "category": "Business & Startup"
+        "category": "Business & Startup",
+        "stream_price": "₹199"
     },
     {
         "id": 152,
         "title": "Global Export & Supply Chain Expo",
         "date": "Jan 18, 2027",
         "desc": "Cross-border e-commerce, export compliance, customs digitization, and logistics.",
-        "price": "\u20b9600",
+        "price": "₹600",
         "color": "#3b82f6",
         "image": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
@@ -3297,14 +3448,15 @@ EVENTS = [
         "venue_address": "Nandambakkam, Chennai",
         "time": "09:30 AM",
         "end_time": "05:00 PM",
-        "category": "Business & Startup"
+        "category": "Business & Startup",
+        "stream_price": "₹199"
     },
     {
         "id": 153,
         "title": "Healthcare & BioTech Innovators Forum",
         "date": "Jan 27, 2027",
         "desc": "Medical devices, digital health records, genomics, and telemedicine commercialization.",
-        "price": "\u20b91100",
+        "price": "₹1100",
         "color": "#3b82f6",
         "image": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
@@ -3318,7 +3470,8 @@ EVENTS = [
         "venue_address": "Bangalore",
         "time": "10:00 AM",
         "end_time": "05:00 PM",
-        "category": "Business & Startup"
+        "category": "Business & Startup",
+        "stream_price": "₹199"
     },
     {
         "id": 154,
@@ -3339,14 +3492,15 @@ EVENTS = [
         "venue_address": "Gandhinagar, Gujarat",
         "time": "10:00 AM",
         "end_time": "04:30 PM",
-        "category": "Business & Startup"
+        "category": "Business & Startup",
+        "stream_price": "₹199"
     },
     {
         "id": 155,
         "title": "Legal & IP Strategy for Fast-Growing Startups",
         "date": "Feb 14, 2027",
         "desc": "Term sheets, founder vesting, patent filings, and ESOP pool management.",
-        "price": "\u20b9400",
+        "price": "₹400",
         "color": "#3b82f6",
         "image": "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
@@ -3360,7 +3514,8 @@ EVENTS = [
         "venue_address": "Nagarbhavi, Bangalore",
         "time": "02:00 PM",
         "end_time": "06:00 PM",
-        "category": "Business & Startup"
+        "category": "Business & Startup",
+        "stream_price": "₹199"
     },
     {
         "id": 156,
@@ -3381,14 +3536,15 @@ EVENTS = [
         "venue_address": "New Delhi",
         "time": "10:00 AM",
         "end_time": "06:00 PM",
-        "category": "Business & Startup"
+        "category": "Business & Startup",
+        "stream_price": "₹199"
     },
     {
         "id": 157,
         "title": "EdTech & Future of Work Conclave",
         "date": "Mar 02, 2027",
         "desc": "Adaptive AI learning, upskilling bootcamps, and hybrid workplace platforms.",
-        "price": "\u20b9800",
+        "price": "₹800",
         "color": "#3b82f6",
         "image": "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
@@ -3402,14 +3558,15 @@ EVENTS = [
         "venue_address": "Infopark, Kakkanad, Kerala",
         "time": "10:00 AM",
         "end_time": "05:00 PM",
-        "category": "Business & Startup"
+        "category": "Business & Startup",
+        "stream_price": "₹199"
     },
     {
         "id": 158,
         "title": "Real Estate PropTech & Smart Cities Summit",
         "date": "Mar 11, 2027",
         "desc": "Fractional real estate tokenization, BIM modelling, and smart IoT buildings.",
-        "price": "\u20b91400",
+        "price": "₹1400",
         "color": "#3b82f6",
         "image": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
@@ -3423,14 +3580,15 @@ EVENTS = [
         "venue_address": "Guindy, Chennai",
         "time": "09:30 AM",
         "end_time": "05:00 PM",
-        "category": "Business & Startup"
+        "category": "Business & Startup",
+        "stream_price": "₹199"
     },
     {
         "id": 159,
         "title": "Micro-SaaS Zero-to-$100k Workshop",
         "date": "Mar 19, 2027",
         "desc": "Solo founder guide to building, validating, and marketing profitable B2B SaaS.",
-        "price": "\u20b9750",
+        "price": "₹750",
         "color": "#3b82f6",
         "image": "https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
@@ -3444,7 +3602,8 @@ EVENTS = [
         "venue_address": "Ulsoor, Bengaluru",
         "time": "11:00 AM",
         "end_time": "04:00 PM",
-        "category": "Business & Startup"
+        "category": "Business & Startup",
+        "stream_price": "₹199"
     },
     {
         "id": 160,
@@ -3465,14 +3624,15 @@ EVENTS = [
         "venue_address": "Maulana Azad Rd, New Delhi",
         "time": "09:00 AM",
         "end_time": "06:00 PM",
-        "category": "Business & Startup"
+        "category": "Business & Startup",
+        "stream_price": "₹199"
     },
     {
         "id": 161,
         "title": "Bangalore Seed Pitch Day 2026",
         "date": "May 10, 2026",
-        "desc": "25 startups raised over \u20b912 Cr in angel commitments on demo day.",
-        "price": "\u20b91000",
+        "desc": "25 startups raised over ₹12 Cr in angel commitments on demo day.",
+        "price": "₹1000",
         "color": "#3b82f6",
         "image": "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Concluded business & startup landmark event.",
@@ -3486,14 +3646,15 @@ EVENTS = [
         "venue_address": "Indiranagar, Bangalore",
         "time": "10:00 AM",
         "end_time": "05:00 PM",
-        "category": "Business & Startup"
+        "category": "Business & Startup",
+        "stream_price": "₹199"
     },
     {
         "id": 162,
         "title": "SaaS Growth Summit Autumn 2025",
         "date": "Oct 15, 2025",
         "desc": "Over 600 SaaS founders attended keynote sessions by industry unicorns.",
-        "price": "\u20b91500",
+        "price": "₹1500",
         "color": "#3b82f6",
         "image": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Concluded business & startup landmark event.",
@@ -3507,14 +3668,15 @@ EVENTS = [
         "venue_address": "Vittal Mallya Rd, Bengaluru",
         "time": "09:30 AM",
         "end_time": "05:30 PM",
-        "category": "Business & Startup"
+        "category": "Business & Startup",
+        "stream_price": "₹199"
     },
     {
         "id": 163,
         "title": "Grand Standup Comedy Showcase 2026",
         "date": "Nov 15, 2026",
         "desc": "Starring India's top standup comedians performing non-stop hilarious sets.",
-        "price": "\u20b9699",
+        "price": "₹699",
         "color": "#ec4899",
         "image": "https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
@@ -3528,14 +3690,15 @@ EVENTS = [
         "venue_address": "Museum Rd, Shanthala Nagar, Bangalore",
         "time": "07:30 PM",
         "end_time": "10:00 PM",
-        "category": "Art, Culture & Theater"
+        "category": "Art, Culture & Theater",
+        "stream_price": "₹199"
     },
     {
         "id": 164,
         "title": "National Classical Drama & Theater Fest",
         "date": "Nov 21, 2026",
         "desc": "Acclaimed multilingual theater productions, Shakespearean adaptations, and live musical drama.",
-        "price": "\u20b9400",
+        "price": "₹400",
         "color": "#ec4899",
         "image": "https://images.unsplash.com/photo-1469488865564-c2de10f69f96?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
@@ -3549,7 +3712,8 @@ EVENTS = [
         "venue_address": "JP Nagar 2nd Phase, Bengaluru",
         "time": "06:30 PM",
         "end_time": "09:30 PM",
-        "category": "Art, Culture & Theater"
+        "category": "Art, Culture & Theater",
+        "stream_price": "₹199"
     },
     {
         "id": 165,
@@ -3570,14 +3734,15 @@ EVENTS = [
         "venue_address": "Palace Road, Bengaluru",
         "time": "10:00 AM",
         "end_time": "07:00 PM",
-        "category": "Art, Culture & Theater"
+        "category": "Art, Culture & Theater",
+        "stream_price": "₹199"
     },
     {
         "id": 166,
         "title": "Sufi & Qawwali Mystical Night",
         "date": "Dec 05, 2026",
         "desc": "Soulful Sufi music ensemble and Qawwali recitals by heritage masters under the stars.",
-        "price": "\u20b9850",
+        "price": "₹850",
         "color": "#ec4899",
         "image": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
@@ -3591,14 +3756,15 @@ EVENTS = [
         "venue_address": "Mathura Rd, New Delhi",
         "time": "07:00 PM",
         "end_time": "11:00 PM",
-        "category": "Art, Culture & Theater"
+        "category": "Art, Culture & Theater",
+        "stream_price": "₹199"
     },
     {
         "id": 167,
         "title": "Handmade Pottery & Clay Sculpting Workshop",
         "date": "Dec 12, 2026",
         "desc": "Hands-on wheel throwing, glazing techniques, and ceramic sculpture creation.",
-        "price": "\u20b91200",
+        "price": "₹1200",
         "color": "#ec4899",
         "image": "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
@@ -3612,14 +3778,15 @@ EVENTS = [
         "venue_address": "HSR Layout, Sector 1, Bangalore",
         "time": "11:00 AM",
         "end_time": "04:00 PM",
-        "category": "Art, Culture & Theater"
+        "category": "Art, Culture & Theater",
+        "stream_price": "₹199"
     },
     {
         "id": 168,
         "title": "Slam Poetry & Spoken Word Open Mic",
         "date": "Dec 19, 2026",
         "desc": "Expressive poetry performances, storytelling rounds, and acoustic interludes.",
-        "price": "\u20b9200",
+        "price": "₹200",
         "color": "#ec4899",
         "image": "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
@@ -3633,14 +3800,15 @@ EVENTS = [
         "venue_address": "Indiranagar, Bangalore",
         "time": "05:00 PM",
         "end_time": "08:30 PM",
-        "category": "Art, Culture & Theater"
+        "category": "Art, Culture & Theater",
+        "stream_price": "₹199"
     },
     {
         "id": 169,
         "title": "Broadway Musical Night: The Legends",
         "date": "Dec 27, 2026",
         "desc": "Magnificent musical orchestra, high-energy Broadway choreography, and vocalists.",
-        "price": "\u20b91500",
+        "price": "₹1500",
         "color": "#ec4899",
         "image": "https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
@@ -3654,7 +3822,8 @@ EVENTS = [
         "venue_address": "Nariman Point, Mumbai",
         "time": "06:30 PM",
         "end_time": "09:30 PM",
-        "category": "Art, Culture & Theater"
+        "category": "Art, Culture & Theater",
+        "stream_price": "₹199"
     },
     {
         "id": 170,
@@ -3675,14 +3844,15 @@ EVENTS = [
         "venue_address": "JC Road, Sampangi Rama Nagar, Bengaluru",
         "time": "05:30 PM",
         "end_time": "09:00 PM",
-        "category": "Art, Culture & Theater"
+        "category": "Art, Culture & Theater",
+        "stream_price": "₹199"
     },
     {
         "id": 171,
-        "title": "Canvas Painting & Wine Soir\u00e9e",
+        "title": "Canvas Painting & Wine Soirée",
         "date": "Jan 19, 2027",
         "desc": "Guided acrylic canvas painting session with free art kit, beverages, and music.",
-        "price": "\u20b9999",
+        "price": "₹999",
         "color": "#ec4899",
         "image": "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
@@ -3696,7 +3866,8 @@ EVENTS = [
         "venue_address": "Indiranagar 100 Feet Rd, Bangalore",
         "time": "03:00 PM",
         "end_time": "07:00 PM",
-        "category": "Art, Culture & Theater"
+        "category": "Art, Culture & Theater",
+        "stream_price": "₹199"
     },
     {
         "id": 172,
@@ -3717,14 +3888,15 @@ EVENTS = [
         "venue_address": "Fort, Mumbai",
         "time": "10:00 AM",
         "end_time": "06:00 PM",
-        "category": "Art, Culture & Theater"
+        "category": "Art, Culture & Theater",
+        "stream_price": "₹199"
     },
     {
         "id": 173,
         "title": "Standup Comedy Open Mic Nights",
         "date": "Feb 06, 2027",
         "desc": "Catch budding comedians testing out fresh jokes alongside secret celebrity drop-ins.",
-        "price": "\u20b9150",
+        "price": "₹150",
         "color": "#ec4899",
         "image": "https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
@@ -3738,14 +3910,15 @@ EVENTS = [
         "venue_address": "Khar West, Mumbai",
         "time": "07:00 PM",
         "end_time": "09:30 PM",
-        "category": "Art, Culture & Theater"
+        "category": "Art, Culture & Theater",
+        "stream_price": "₹199"
     },
     {
         "id": 174,
         "title": "Traditional Calligraphy & Typography Workshop",
         "date": "Feb 15, 2027",
         "desc": "Learn Devanagari and Gothic brush calligraphy lettering with ink pens and handmade parchment.",
-        "price": "\u20b9650",
+        "price": "₹650",
         "color": "#ec4899",
         "image": "https://images.unsplash.com/photo-1516962215378-7fa2e137ae93?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
@@ -3759,14 +3932,15 @@ EVENTS = [
         "venue_address": "Banashankari 2nd Stage, Bangalore",
         "time": "11:00 AM",
         "end_time": "03:30 PM",
-        "category": "Art, Culture & Theater"
+        "category": "Art, Culture & Theater",
+        "stream_price": "₹199"
     },
     {
         "id": 175,
         "title": "Experimental Improv Comedy & Sketch Night",
         "date": "Feb 23, 2027",
         "desc": "100% unscripted on-the-spot improvised comedic games driven by audience prompts.",
-        "price": "\u20b9350",
+        "price": "₹350",
         "color": "#ec4899",
         "image": "https://images.unsplash.com/photo-1526478806334-5fd488fcaabc?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
@@ -3780,14 +3954,15 @@ EVENTS = [
         "venue_address": "Koramangala 4th Block, Bangalore",
         "time": "06:30 PM",
         "end_time": "09:00 PM",
-        "category": "Art, Culture & Theater"
+        "category": "Art, Culture & Theater",
+        "stream_price": "₹199"
     },
     {
         "id": 176,
         "title": "Sitar & Hindustani Classical Recital",
         "date": "Mar 03, 2027",
         "desc": "Maestro Sitar performances accompanied by Tabla virtuosos celebrating Indian ragas.",
-        "price": "\u20b9500",
+        "price": "₹500",
         "color": "#ec4899",
         "image": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
@@ -3801,7 +3976,8 @@ EVENTS = [
         "venue_address": "Vyalikaval, Malleshwaram, Bengaluru",
         "time": "06:00 PM",
         "end_time": "09:30 PM",
-        "category": "Art, Culture & Theater"
+        "category": "Art, Culture & Theater",
+        "stream_price": "₹199"
     },
     {
         "id": 177,
@@ -3822,14 +3998,15 @@ EVENTS = [
         "venue_address": "Kumara Krupa Rd, Bengaluru",
         "time": "10:00 AM",
         "end_time": "07:00 PM",
-        "category": "Art, Culture & Theater"
+        "category": "Art, Culture & Theater",
+        "stream_price": "₹199"
     },
     {
         "id": 178,
         "title": "Young Playwrights Festival 2027",
         "date": "Mar 21, 2027",
         "desc": "Original contemporary theatrical short plays written and performed by college theater societies.",
-        "price": "\u20b9300",
+        "price": "₹300",
         "color": "#ec4899",
         "image": "https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
@@ -3843,7 +4020,8 @@ EVENTS = [
         "venue_address": "Copernicus Marg, New Delhi",
         "time": "05:00 PM",
         "end_time": "09:30 PM",
-        "category": "Art, Culture & Theater"
+        "category": "Art, Culture & Theater",
+        "stream_price": "₹199"
     },
     {
         "id": 179,
@@ -3864,14 +4042,15 @@ EVENTS = [
         "venue_address": "Mumbai",
         "time": "05:00 PM",
         "end_time": "10:00 PM",
-        "category": "Art, Culture & Theater"
+        "category": "Art, Culture & Theater",
+        "stream_price": "₹199"
     },
     {
         "id": 180,
         "title": "Monsoon Standup Comedy Gala 2025",
         "date": "Jul 20, 2025",
         "desc": "Housefull comedy special with 5 headline comedians and non-stop laughter.",
-        "price": "\u20b9799",
+        "price": "₹799",
         "color": "#ec4899",
         "image": "https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Concluded art, culture & theater landmark event.",
@@ -3885,14 +4064,15 @@ EVENTS = [
         "venue_address": "Whitefield, Bangalore",
         "time": "07:00 PM",
         "end_time": "09:30 PM",
-        "category": "Art, Culture & Theater"
+        "category": "Art, Culture & Theater",
+        "stream_price": "₹199"
     },
     {
         "id": 181,
         "title": "Bangalore Midnight Marathon 2026",
         "date": "Nov 16, 2026",
         "desc": "Iconic nighttime charity marathon with 5K, 10K, and Half Marathon timed chip runs.",
-        "price": "\u20b9950",
+        "price": "₹950",
         "color": "#10b981",
         "image": "https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
@@ -3906,7 +4086,8 @@ EVENTS = [
         "venue_address": "Whitefield, Bengaluru",
         "time": "10:00 PM",
         "end_time": "04:00 AM",
-        "category": "Health, Fitness & Yoga"
+        "category": "Health, Fitness & Yoga",
+        "stream_price": "₹199"
     },
     {
         "id": 182,
@@ -3927,14 +4108,15 @@ EVENTS = [
         "venue_address": "Sampangi Rama Nagara, Bengaluru",
         "time": "06:00 AM",
         "end_time": "10:00 AM",
-        "category": "Health, Fitness & Yoga"
+        "category": "Health, Fitness & Yoga",
+        "stream_price": "₹199"
     },
     {
         "id": 183,
         "title": "CrossFit Arena Open Challenge 2026",
         "date": "Nov 30, 2026",
         "desc": "Deadlifts, box jumps, kettlebell sprints, and obstacle courses for all fitness tiers.",
-        "price": "\u20b9600",
+        "price": "₹600",
         "color": "#10b981",
         "image": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
@@ -3948,14 +4130,15 @@ EVENTS = [
         "venue_address": "Sarjapur Road, Bangalore",
         "time": "08:00 AM",
         "end_time": "04:00 PM",
-        "category": "Health, Fitness & Yoga"
+        "category": "Health, Fitness & Yoga",
+        "stream_price": "₹199"
     },
     {
         "id": 184,
         "title": "Holistic Nutrition & Gut Health Masterclass",
         "date": "Dec 07, 2026",
         "desc": "Evidence-based meal planning, metabolic health, gut microbiome, and athletic diets.",
-        "price": "\u20b9450",
+        "price": "₹450",
         "color": "#10b981",
         "image": "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
@@ -3969,14 +4152,15 @@ EVENTS = [
         "venue_address": "Bangalore",
         "time": "11:00 AM",
         "end_time": "03:00 PM",
-        "category": "Health, Fitness & Yoga"
+        "category": "Health, Fitness & Yoga",
+        "stream_price": "₹199"
     },
     {
         "id": 185,
         "title": "Zumba & Dance Cardio Carnival",
         "date": "Dec 16, 2026",
         "desc": "High-energy Latin beats, licensed Zumba choreographers, and glowing neon wristbands.",
-        "price": "\u20b9300",
+        "price": "₹300",
         "color": "#10b981",
         "image": "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
@@ -3990,7 +4174,8 @@ EVENTS = [
         "venue_address": "Kurla, Mumbai",
         "time": "06:00 PM",
         "end_time": "09:00 PM",
-        "category": "Health, Fitness & Yoga"
+        "category": "Health, Fitness & Yoga",
+        "stream_price": "₹199"
     },
     {
         "id": 186,
@@ -4011,14 +4196,15 @@ EVENTS = [
         "venue_address": "Hosur Rd, Lakkasandra, Bengaluru",
         "time": "10:00 AM",
         "end_time": "02:00 PM",
-        "category": "Health, Fitness & Yoga"
+        "category": "Health, Fitness & Yoga",
+        "stream_price": "₹199"
     },
     {
         "id": 187,
         "title": "Pilates & Core Strength Intensive Workshop",
         "date": "Jan 11, 2027",
         "desc": "Mat and reformer pilates techniques to enhance core stability and posture alignment.",
-        "price": "\u20b9800",
+        "price": "₹800",
         "color": "#10b981",
         "image": "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
@@ -4032,14 +4218,15 @@ EVENTS = [
         "venue_address": "Indiranagar, Bangalore",
         "time": "07:30 AM",
         "end_time": "11:00 AM",
-        "category": "Health, Fitness & Yoga"
+        "category": "Health, Fitness & Yoga",
+        "stream_price": "₹199"
     },
     {
         "id": 188,
         "title": "Western Ghats Nature Trek & Wellness Walk",
         "date": "Jan 20, 2027",
         "desc": "Guided sunrise mountain trek, forest bathing, trail breakfast, and stretching routines.",
-        "price": "\u20b91400",
+        "price": "₹1400",
         "color": "#10b981",
         "image": "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
@@ -4053,14 +4240,15 @@ EVENTS = [
         "venue_address": "Chikkaballapur, Karnataka",
         "time": "05:30 AM",
         "end_time": "03:00 PM",
-        "category": "Health, Fitness & Yoga"
+        "category": "Health, Fitness & Yoga",
+        "stream_price": "₹199"
     },
     {
         "id": 189,
         "title": "Strongman & Powerlifting Championship",
         "date": "Jan 29, 2027",
         "desc": "Squat, bench press, and deadlift official weight class powerlifting meets.",
-        "price": "\u20b9700",
+        "price": "₹700",
         "color": "#10b981",
         "image": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
@@ -4074,14 +4262,15 @@ EVENTS = [
         "venue_address": "INA Colony, New Delhi",
         "time": "09:00 AM",
         "end_time": "06:00 PM",
-        "category": "Health, Fitness & Yoga"
+        "category": "Health, Fitness & Yoga",
+        "stream_price": "₹199"
     },
     {
         "id": 190,
         "title": "AcroYoga & Partner Movement Jam",
         "date": "Feb 07, 2027",
         "desc": "Learn balance, therapeutic partner flying, and acro poses under lush green banyan trees.",
-        "price": "\u20b9500",
+        "price": "₹500",
         "color": "#10b981",
         "image": "https://images.unsplash.com/photo-1545205597-3d9d02c29597?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
@@ -4095,7 +4284,8 @@ EVENTS = [
         "venue_address": "Mavalli, Bengaluru",
         "time": "08:00 AM",
         "end_time": "12:00 PM",
-        "category": "Health, Fitness & Yoga"
+        "category": "Health, Fitness & Yoga",
+        "stream_price": "₹199"
     },
     {
         "id": 191,
@@ -4116,14 +4306,15 @@ EVENTS = [
         "venue_address": "Bengaluru",
         "time": "06:00 AM",
         "end_time": "10:00 AM",
-        "category": "Health, Fitness & Yoga"
+        "category": "Health, Fitness & Yoga",
+        "stream_price": "₹199"
     },
     {
         "id": 192,
         "title": "Calisthenics & Bodyweight Acrobatics Workshop",
         "date": "Feb 24, 2027",
         "desc": "Master muscle-ups, handstands, human flags, and planche progressions safely.",
-        "price": "\u20b9550",
+        "price": "₹550",
         "color": "#10b981",
         "image": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
@@ -4137,7 +4328,8 @@ EVENTS = [
         "venue_address": "Juhu Beach, Mumbai",
         "time": "09:00 AM",
         "end_time": "01:00 PM",
-        "category": "Health, Fitness & Yoga"
+        "category": "Health, Fitness & Yoga",
+        "stream_price": "₹199"
     },
     {
         "id": 193,
@@ -4158,14 +4350,15 @@ EVENTS = [
         "venue_address": "Museum Rd, Bangalore",
         "time": "10:00 AM",
         "end_time": "02:00 PM",
-        "category": "Health, Fitness & Yoga"
+        "category": "Health, Fitness & Yoga",
+        "stream_price": "₹199"
     },
     {
         "id": 194,
         "title": "Sound Bowl Healing & Deep Meditation",
         "date": "Mar 13, 2027",
         "desc": "Tibetan singing bowl frequencies to soothe the nervous system and induce restful sleep.",
-        "price": "\u20b9750",
+        "price": "₹750",
         "color": "#10b981",
         "image": "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
@@ -4179,14 +4372,15 @@ EVENTS = [
         "venue_address": "Defence Colony, Indiranagar, Bangalore",
         "time": "06:00 PM",
         "end_time": "08:30 PM",
-        "category": "Health, Fitness & Yoga"
+        "category": "Health, Fitness & Yoga",
+        "stream_price": "₹199"
     },
     {
         "id": 195,
         "title": "Trail Running & Forest 10K Sprint",
         "date": "Mar 22, 2027",
         "desc": "Off-road dirt trail run through scenic eucalyptus groves with hydration stations.",
-        "price": "\u20b9650",
+        "price": "₹650",
         "color": "#10b981",
         "image": "https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
@@ -4200,14 +4394,15 @@ EVENTS = [
         "venue_address": "Banashankari 6th Stage, Bengaluru",
         "time": "06:00 AM",
         "end_time": "10:00 AM",
-        "category": "Health, Fitness & Yoga"
+        "category": "Health, Fitness & Yoga",
+        "stream_price": "₹199"
     },
     {
         "id": 196,
         "title": "National Fitness Expo & Bodybuilding Grand Prix",
         "date": "Mar 29, 2027",
         "desc": "Supplement expos, athlete meet-and-greets, and competitive physique categories.",
-        "price": "\u20b9800",
+        "price": "₹800",
         "color": "#10b981",
         "image": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
@@ -4221,14 +4416,15 @@ EVENTS = [
         "venue_address": "Goregaon East, Mumbai",
         "time": "09:00 AM",
         "end_time": "07:00 PM",
-        "category": "Health, Fitness & Yoga"
+        "category": "Health, Fitness & Yoga",
+        "stream_price": "₹199"
     },
     {
         "id": 197,
         "title": "Bangalore 10K Summer Run 2026",
         "date": "Apr 14, 2026",
         "desc": "Over 8,000 runners completed the certified 10K loop across Cubbon Park.",
-        "price": "\u20b9750",
+        "price": "₹750",
         "color": "#10b981",
         "image": "https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Concluded health, fitness & yoga landmark event.",
@@ -4242,7 +4438,8 @@ EVENTS = [
         "venue_address": "Nunegundlapalli, Bangalore",
         "time": "05:30 AM",
         "end_time": "09:30 AM",
-        "category": "Health, Fitness & Yoga"
+        "category": "Health, Fitness & Yoga",
+        "stream_price": "₹199"
     },
     {
         "id": 198,
@@ -4263,14 +4460,15 @@ EVENTS = [
         "venue_address": "Jayamahal, Bengaluru",
         "time": "06:00 AM",
         "end_time": "09:00 AM",
-        "category": "Health, Fitness & Yoga"
+        "category": "Health, Fitness & Yoga",
+        "stream_price": "₹199"
     },
     {
         "id": 199,
         "title": "Great Indian Food Truck Festival 2026",
         "date": "Nov 17, 2026",
         "desc": "50+ gourmet food trucks, live indie bands, artisanal desserts, and food tasting courts.",
-        "price": "\u20b9199",
+        "price": "₹199",
         "color": "#f97316",
         "image": "https://images.unsplash.com/photo-1565123409695-7b5ef63a2efb?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for food, tech & festivals enthusiasts and professionals.",
@@ -4284,14 +4482,15 @@ EVENTS = [
         "venue_address": "Sindhi High School Grounds, Bengaluru",
         "time": "12:00 PM",
         "end_time": "10:30 PM",
-        "category": "Food, Tech & Festivals"
+        "category": "Food, Tech & Festivals",
+        "stream_price": "₹199"
     },
     {
         "id": 200,
         "title": "Artisanal Specialty Coffee & Brewing Fest",
         "date": "Nov 24, 2026",
         "desc": "Pour-over masterclasses, espresso latte art showdowns, and single-origin bean tastings.",
-        "price": "\u20b9450",
+        "price": "₹450",
         "color": "#f97316",
         "image": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for food, tech & festivals enthusiasts and professionals.",
@@ -4305,14 +4504,15 @@ EVENTS = [
         "venue_address": "Koramangala 4th Block, Bangalore",
         "time": "10:00 AM",
         "end_time": "06:00 PM",
-        "category": "Food, Tech & Festivals"
+        "category": "Food, Tech & Festivals",
+        "stream_price": "₹199"
     },
     {
         "id": 201,
         "title": "Asian Street Food & Dim Sum Carnival",
         "date": "Dec 01, 2026",
         "desc": "Live wok stations: Ramen, bao buns, Korean corn dogs, Thai satay, and dumplings.",
-        "price": "\u20b9250",
+        "price": "₹250",
         "color": "#f97316",
         "image": "https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for food, tech & festivals enthusiasts and professionals.",
@@ -4326,14 +4526,15 @@ EVENTS = [
         "venue_address": "Lower Parel, Mumbai",
         "time": "01:00 PM",
         "end_time": "10:00 PM",
-        "category": "Food, Tech & Festivals"
+        "category": "Food, Tech & Festivals",
+        "stream_price": "₹199"
     },
     {
         "id": 202,
         "title": "Masterclass: Italian Sourdough & Woodfired Pizza",
         "date": "Dec 09, 2026",
         "desc": "Hands-on sourdough fermentation, hand-tossed dough shaping, and woodfired pizza ovens.",
-        "price": "\u20b91500",
+        "price": "₹1500",
         "color": "#f97316",
         "image": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for food, tech & festivals enthusiasts and professionals.",
@@ -4347,14 +4548,15 @@ EVENTS = [
         "venue_address": "Begumpet, Hyderabad",
         "time": "11:00 AM",
         "end_time": "04:00 PM",
-        "category": "Food, Tech & Festivals"
+        "category": "Food, Tech & Festivals",
+        "stream_price": "₹199"
     },
     {
         "id": 203,
         "title": "Craft Beer & BBQ Grill Fest 2026",
         "date": "Dec 18, 2026",
         "desc": "Slow-smoked briskets, artisanal sausages, vegan BBQ skewers, and 12 craft beer taps on pour.",
-        "price": "\u20b9899",
+        "price": "₹899",
         "color": "#f97316",
         "image": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for food, tech & festivals enthusiasts and professionals.",
@@ -4368,7 +4570,8 @@ EVENTS = [
         "venue_address": "Indiranagar, Bangalore",
         "time": "02:00 PM",
         "end_time": "11:00 PM",
-        "category": "Food, Tech & Festivals"
+        "category": "Food, Tech & Festivals",
+        "stream_price": "₹199"
     },
     {
         "id": 204,
@@ -4389,14 +4592,15 @@ EVENTS = [
         "venue_address": "Old Delhi",
         "time": "10:30 AM",
         "end_time": "08:00 PM",
-        "category": "Food, Tech & Festivals"
+        "category": "Food, Tech & Festivals",
+        "stream_price": "₹199"
     },
     {
         "id": 205,
         "title": "Vegan & Plant-Based Culinary Expo",
         "date": "Jan 12, 2027",
         "desc": "Plant-based meats, dairy-free cheeses, cruelty-free living, and superfood cooking demos.",
-        "price": "\u20b9200",
+        "price": "Free",
         "color": "#f97316",
         "image": "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for food, tech & festivals enthusiasts and professionals.",
@@ -4410,14 +4614,15 @@ EVENTS = [
         "venue_address": "Brigade Gateway, Malleshwaram, Bengaluru",
         "time": "10:00 AM",
         "end_time": "06:00 PM",
-        "category": "Food, Tech & Festivals"
+        "category": "Food, Tech & Festivals",
+        "stream_price": "₹199"
     },
     {
         "id": 206,
         "title": "Chocoholic: Chocolate & Dessert Expo",
         "date": "Jan 21, 2027",
         "desc": "Bean-to-bar bean roasting, truffle rolling workshops, and chocolate fountains.",
-        "price": "\u20b9350",
+        "price": "₹350",
         "color": "#f97316",
         "image": "https://images.unsplash.com/photo-1511381939415-e44015466834?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for food, tech & festivals enthusiasts and professionals.",
@@ -4431,14 +4636,15 @@ EVENTS = [
         "venue_address": "Rajajinagar, Bangalore",
         "time": "11:00 AM",
         "end_time": "08:30 PM",
-        "category": "Food, Tech & Festivals"
+        "category": "Food, Tech & Festivals",
+        "stream_price": "₹199"
     },
     {
         "id": 207,
         "title": "Mixology & Mocktail Craft Masterclass",
         "date": "Jan 30, 2027",
         "desc": "Infused syrups, botanical garnishes, smoked glasses, and flair bartending techniques.",
-        "price": "\u20b91200",
+        "price": "₹1200",
         "color": "#f97316",
         "image": "https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for food, tech & festivals enthusiasts and professionals.",
@@ -4452,7 +4658,8 @@ EVENTS = [
         "venue_address": "UB City 16th Floor, Vittal Mallya Rd, Bengaluru",
         "time": "04:00 PM",
         "end_time": "08:00 PM",
-        "category": "Food, Tech & Festivals"
+        "category": "Food, Tech & Festivals",
+        "stream_price": "₹199"
     },
     {
         "id": 208,
@@ -4473,14 +4680,15 @@ EVENTS = [
         "venue_address": "Gandhi Bazaar, Basavanagudi, Bengaluru",
         "time": "07:00 AM",
         "end_time": "01:00 PM",
-        "category": "Food, Tech & Festivals"
+        "category": "Food, Tech & Festivals",
+        "stream_price": "₹199"
     },
     {
         "id": 209,
         "title": "Global Cheese & Charcuterie Tasting Tour",
         "date": "Feb 17, 2027",
         "desc": "Artisanal Gouda, aged Cheddar, Brie, and imported olives tasting with sommeliers.",
-        "price": "\u20b91400",
+        "price": "₹1400",
         "color": "#f97316",
         "image": "https://images.unsplash.com/photo-1452195100486-9cc805987862?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for food, tech & festivals enthusiasts and professionals.",
@@ -4494,7 +4702,8 @@ EVENTS = [
         "venue_address": "MG Road, Yellappa Chetty Layout, Bengaluru",
         "time": "03:00 PM",
         "end_time": "07:30 PM",
-        "category": "Food, Tech & Festivals"
+        "category": "Food, Tech & Festivals",
+        "stream_price": "₹199"
     },
     {
         "id": 210,
@@ -4515,14 +4724,15 @@ EVENTS = [
         "venue_address": "Bellary Rd, Bengaluru",
         "time": "09:30 AM",
         "end_time": "05:00 PM",
-        "category": "Food, Tech & Festivals"
+        "category": "Food, Tech & Festivals",
+        "stream_price": "₹199"
     },
     {
         "id": 211,
         "title": "Taco & Mexican Fiesta Carnival",
         "date": "Mar 05, 2027",
         "desc": "Birria tacos, freshly mashed guacamole, churros with dulce de leche, and salsa dancing.",
-        "price": "\u20b9250",
+        "price": "₹250",
         "color": "#f97316",
         "image": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for food, tech & festivals enthusiasts and professionals.",
@@ -4536,14 +4746,15 @@ EVENTS = [
         "venue_address": "Vittal Mallya Rd, Bangalore",
         "time": "01:00 PM",
         "end_time": "09:30 PM",
-        "category": "Food, Tech & Festivals"
+        "category": "Food, Tech & Festivals",
+        "stream_price": "₹199"
     },
     {
         "id": 212,
         "title": "Baking Masterclass: French Macarons & Choux",
         "date": "Mar 14, 2027",
         "desc": "Piping techniques, chocolate ganache fillings, and delicate French pastry creation.",
-        "price": "\u20b91800",
+        "price": "₹1800",
         "color": "#f97316",
         "image": "https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for food, tech & festivals enthusiasts and professionals.",
@@ -4557,7 +4768,8 @@ EVENTS = [
         "venue_address": "Indiranagar, Bangalore",
         "time": "10:30 AM",
         "end_time": "03:30 PM",
-        "category": "Food, Tech & Festivals"
+        "category": "Food, Tech & Festivals",
+        "stream_price": "₹199"
     },
     {
         "id": 213,
@@ -4578,14 +4790,15 @@ EVENTS = [
         "venue_address": "Necklace Road, Hyderabad",
         "time": "12:30 PM",
         "end_time": "11:00 PM",
-        "category": "Food, Tech & Festivals"
+        "category": "Food, Tech & Festivals",
+        "stream_price": "₹199"
     },
     {
         "id": 214,
         "title": "Street Food of India Mega Carnival",
         "date": "Mar 30, 2027",
         "desc": "Over 100 stalls: Delhi chaat, Mumbai pav bhaji, Kolkata kathi rolls, and Indore poha.",
-        "price": "\u20b9150",
+        "price": "Free",
         "color": "#f97316",
         "image": "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for food, tech & festivals enthusiasts and professionals.",
@@ -4599,14 +4812,15 @@ EVENTS = [
         "venue_address": "Pragati Vihar, New Delhi",
         "time": "11:00 AM",
         "end_time": "10:00 PM",
-        "category": "Food, Tech & Festivals"
+        "category": "Food, Tech & Festivals",
+        "stream_price": "₹199"
     },
     {
         "id": 215,
         "title": "Bangalore Food Truck Carnival 2026",
         "date": "Jan 18, 2026",
         "desc": "Served over 15,000 foodies across 40 specialty food trucks.",
-        "price": "\u20b9199",
+        "price": "₹199",
         "color": "#f97316",
         "image": "https://images.unsplash.com/photo-1565123409695-7b5ef63a2efb?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Concluded food, tech & festivals landmark event.",
@@ -4620,14 +4834,15 @@ EVENTS = [
         "venue_address": "Palace Grounds, Bengaluru",
         "time": "12:00 PM",
         "end_time": "10:00 PM",
-        "category": "Food, Tech & Festivals"
+        "category": "Food, Tech & Festivals",
+        "stream_price": "₹199"
     },
     {
         "id": 216,
         "title": "Autumn Specialty Coffee Fest 2025",
         "date": "Nov 08, 2025",
         "desc": "National AeroPress and Barista championship qualifiers.",
-        "price": "\u20b9350",
+        "price": "₹350",
         "color": "#f97316",
         "image": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Concluded food, tech & festivals landmark event.",
@@ -4641,14 +4856,15 @@ EVENTS = [
         "venue_address": "Indiranagar, Bangalore",
         "time": "10:00 AM",
         "end_time": "06:00 PM",
-        "category": "Food, Tech & Festivals"
+        "category": "Food, Tech & Festivals",
+        "stream_price": "₹199"
     },
     {
         "id": 217,
         "title": "AI Agentic Systems & LLM Architecture Summit 2027",
         "date": "2026-11-28",
         "desc": "Hands-on engineering summit exploring multi-agent workflows, LangGraph, autonomous agents and enterprise LLM production deployments.",
-        "price": "\u20b9299",
+        "price": "₹299",
         "color": "#6366f1",
         "image": "/static/images/events/ai_summit.jpg",
         "purpose": "Equip engineers and researchers with the skills to architect and deploy production-grade multi-agent autonomous AI systems.",
@@ -4662,14 +4878,15 @@ EVENTS = [
         "venue_address": "Tech Hall A, Innovation Boulevard, Whitefield, Bangalore, Karnataka 560066",
         "time": "09:30 AM",
         "end_time": "05:30 PM",
-        "category": "Education"
+        "category": "Education",
+        "stream_price": "₹199"
     },
     {
         "id": 218,
         "title": "AR/VR Spatial Computing & Metaverse Hackathon",
         "date": "2026-12-05",
         "desc": "36-hour immersive hackathon building cutting-edge spatial computing applications for Apple Vision Pro, Meta Quest 3, and WebXR.",
-        "price": "₹0",
+        "price": "₹399",
         "color": "#8b5cf6",
         "image": "/static/images/events/web_mosaic.jpg",
         "purpose": "Foster student and indie developer innovation in next-generation spatial computing, spatial interactions, and mixed-reality toolsets.",
@@ -4683,7 +4900,8 @@ EVENTS = [
         "venue_address": "Innovation Lab 3, EPIP Zone, Whitefield, Bangalore, Karnataka 560066",
         "time": "08:00 AM",
         "end_time": "08:00 PM",
-        "category": "Education"
+        "category": "Education",
+        "stream_price": "₹199"
     },
     {
         "id": 219,
@@ -4704,7 +4922,8 @@ EVENTS = [
         "venue_address": "Sports Authority of India Complex, Netaji Subhas Southern Centre, Bangalore, Karnataka 560056",
         "time": "08:30 AM",
         "end_time": "06:00 PM",
-        "category": "Sports"
+        "category": "Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 220,
@@ -4725,7 +4944,8 @@ EVENTS = [
         "venue_address": "Sree Kanteerava Outdoor Stadium, Kasturba Road, Sampangi Rama Nagara, Bangalore, Karnataka 560001",
         "time": "09:00 AM",
         "end_time": "07:00 PM",
-        "category": "Sports"
+        "category": "Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 221,
@@ -4746,7 +4966,8 @@ EVENTS = [
         "venue_address": "Palace Grounds, Jayamahal Main Road, Vasanth Nagar, Bangalore, Karnataka 560006",
         "time": "06:30 PM",
         "end_time": "11:00 PM",
-        "category": "Music Concerts"
+        "category": "Music Concerts",
+        "stream_price": "₹199"
     },
     {
         "id": 222,
@@ -4767,7 +4988,8 @@ EVENTS = [
         "venue_address": "Lakeside Amphitheatre, Hebbal Outer Ring Road, Bangalore, Karnataka 560024",
         "time": "04:00 PM",
         "end_time": "11:30 PM",
-        "category": "Music Concerts"
+        "category": "Music Concerts",
+        "stream_price": "₹199"
     },
     {
         "id": 223,
@@ -4788,7 +5010,8 @@ EVENTS = [
         "venue_address": "PVR Director's Cut, Forum Mall, Hosur Road, Koramangala, Bangalore, Karnataka 560095",
         "time": "05:00 PM",
         "end_time": "08:30 PM",
-        "category": "Movie Promotions"
+        "category": "Movie Promotions",
+        "stream_price": "₹199"
     },
     {
         "id": 224,
@@ -4809,14 +5032,15 @@ EVENTS = [
         "venue_address": "INOX IMAX, Garuda Mall, Magrath Road, Ashok Nagar, Bangalore, Karnataka 560025",
         "time": "06:00 PM",
         "end_time": "09:30 PM",
-        "category": "Movie Promotions"
+        "category": "Movie Promotions",
+        "stream_price": "₹199"
     },
     {
         "id": 225,
         "title": "Cricket Legend Masterclass & Exclusive Fan Interaction",
         "date": "2026-11-27",
         "desc": "Intimate masterclass and fireside chat with India's legendary World Cup champion cricketer on leadership, mental resilience, and peak performance.",
-        "price": "\u20b91499",
+        "price": "₹1499",
         "color": "#eab308",
         "image": "/static/images/events/celeb_sports.jpg",
         "purpose": "Inspire students, corporate leaders, and athletes through firsthand leadership wisdom from a legendary sporting icon.",
@@ -4830,14 +5054,15 @@ EVENTS = [
         "venue_address": "M. Chinnaswamy Stadium VIP Lounge, Cubbon Road, Shivaji Nagar, Bangalore, Karnataka 560001",
         "time": "03:00 PM",
         "end_time": "06:30 PM",
-        "category": "Celebrity Meet-ups"
+        "category": "Celebrity Meet-ups",
+        "stream_price": "₹199"
     },
     {
         "id": 226,
         "title": "Top Standup Comics Live Podcast & VIP Meet & Greet",
         "date": "2026-12-09",
         "desc": "Unfiltered live recording of India's #1 comedy podcast followed by a personal VIP backstage hangout with the country's top comedy creators.",
-        "price": "\u20b9999",
+        "price": "₹999",
         "color": "#f97316",
         "image": "/static/images/events/celeb_comedy.jpg",
         "purpose": "Provide fans a hilarious behind-the-scenes look into comedy writing, podcast production, and unscripted humor.",
@@ -4851,14 +5076,15 @@ EVENTS = [
         "venue_address": "Good Shepherd Auditorium, Museum Road, Shanthala Nagar, Richmond Town, Bangalore, Karnataka 560025",
         "time": "07:00 PM",
         "end_time": "10:30 PM",
-        "category": "Celebrity Meet-ups"
+        "category": "Celebrity Meet-ups",
+        "stream_price": "₹199"
     },
     {
         "id": 227,
         "title": "Smart Greenhouse & Hydroponic Urban Farming Expo",
         "date": "2026-11-24",
         "desc": "Practical demonstration of automated climate-controlled greenhouses, vertical NFT hydroponics, and rooftop soil-less farming technologies.",
-        "price": "\u20b90",
+        "price": "₹350",
         "color": "#84cc16",
         "image": "/static/images/events/agri_smart.jpg",
         "purpose": "Educate urban citizens, hobbyist growers, and progressive farmers on zero-pesticide, high-yield soil-less cultivation.",
@@ -4872,14 +5098,15 @@ EVENTS = [
         "venue_address": "Gandhi Krishi Vigyana Kendra (GKVK), Bellary Road, Bangalore, Karnataka 560065",
         "time": "09:30 AM",
         "end_time": "04:30 PM",
-        "category": "Agriculture"
+        "category": "Agriculture",
+        "stream_price": "₹199"
     },
     {
         "id": 228,
         "title": "Kisan Drone Spraying & Solar Irrigation Conclave",
         "date": "2026-12-04",
         "desc": "State-wide exhibition of DGCA-approved agricultural spray drones, solar-powered drip irrigation pumps, and IoT soil moisture telematics.",
-        "price": "\u20b90",
+        "price": "₹450",
         "color": "#16a34a",
         "image": "/static/images/events/agri_expo.jpg",
         "purpose": "Equip farmers and agri-entrepreneurs with modern drone technology and renewable irrigation systems to slash input costs by 40%.",
@@ -4893,14 +5120,15 @@ EVENTS = [
         "venue_address": "University of Agricultural Sciences, Hebbal Campus, Bangalore, Karnataka 560024",
         "time": "09:00 AM",
         "end_time": "05:00 PM",
-        "category": "Agriculture"
+        "category": "Agriculture",
+        "stream_price": "₹199"
     },
     {
         "id": 229,
         "title": "Cyber Security for Citizens & Digital Fraud Prevention Summit",
         "date": "2026-11-25",
         "desc": "Public awareness summit in collaboration with Cyber Police and CERT-In explaining UPI frauds, phishing defense, SIM swap protection, and legal remedy.",
-        "price": "\u20b90",
+        "price": "₹299",
         "color": "#2563eb",
         "image": "/static/images/events/gov_civic.jpg",
         "purpose": "Educate everyday citizens, senior citizens, and students on safeguarding their digital identity and financial transactions.",
@@ -4914,14 +5142,15 @@ EVENTS = [
         "venue_address": "Vikas Soudha, Dr. Ambedkar Veedhi, Sampangi Rama Nagara, Bangalore, Karnataka 560001",
         "time": "10:00 AM",
         "end_time": "04:00 PM",
-        "category": "Government"
+        "category": "Government",
+        "stream_price": "₹199"
     },
     {
         "id": 230,
         "title": "National Youth Parliament & Public Policy Hackathon",
         "date": "2026-12-07",
         "desc": "Flagship democratic debate and policy hackathon where student delegates draft parliamentary bills on climate action, education reform, and urban transport.",
-        "price": "\u20b90",
+        "price": "₹399",
         "color": "#1d4ed8",
         "image": "/static/images/events/gov_youth.jpg",
         "purpose": "Nurture young civic leaders and channel youth policy recommendations directly to parliamentary committees.",
@@ -4935,19 +5164,20 @@ EVENTS = [
         "venue_address": "Sir Puttanna Chetty Town Hall, JC Road, Bangalore, Karnataka 560002",
         "time": "09:30 AM",
         "end_time": "06:00 PM",
-        "category": "Government"
+        "category": "Government",
+        "stream_price": "₹199"
     },
     {
         "id": 231,
         "title": "Rocket League & Brawlhalla Collegiate Championship",
         "date": "2026-11-28",
         "desc": "High-octane collegiate esports arena showdown featuring aerial Rocket League triples and fast-paced Brawlhalla platform brawls.",
-        "price": "\u20b9199",
+        "price": "₹199",
         "color": "#06b6d4",
         "image": "/static/images/events/esports_fifa.jpg",
         "purpose": "Provide collegiate esports teams a platform to showcase mechanical skill, team communication, and tournament prowess.",
         "full_details": "Played on ultra-low latency 240Hz monitors with live caster shoutcasting, spectator stadium seating, and Twitch / YouTube live streams.",
-        "outcome": "Champions take home \u20b91,00,000 cash prize, gaming gear bundles, and college championship trophy.",
+        "outcome": "Champions take home ₹1,00,000 cash prize, gaming gear bundles, and college championship trophy.",
         "seats_total": 220,
         "seats_filled": 85,
         "is_draft": 0,
@@ -4956,19 +5186,20 @@ EVENTS = [
         "venue_address": "PlayMax Esports Hub, 100 Feet Road, Indiranagar, Bangalore, Karnataka 560038",
         "time": "11:00 AM",
         "end_time": "07:30 PM",
-        "category": "Gaming & E-Sports"
+        "category": "Gaming & E-Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 232,
         "title": "Overwatch 2 & Marvel Rivals National Tournament",
         "date": "2026-12-10",
         "desc": "5v5 and 6v6 hero shooter championship uniting the top competitive teams across India for strategic supremacy.",
-        "price": "\u20b9249",
+        "price": "₹249",
         "color": "#0891b2",
         "image": "/static/images/events/esports_valorant.jpg",
         "purpose": "Crown the finest hero shooter squad in the country with professional tier-1 broadcast production.",
         "full_details": "Double-elimination bracket, dedicated coaching booths, pro gamer meetups, and open free-play LAN stations for attendees.",
-        "outcome": "\u20b91,50,000 prize pool, MVP gaming peripherals, and scouting opportunities for international esports organizations.",
+        "outcome": "₹1,50,000 prize pool, MVP gaming peripherals, and scouting opportunities for international esports organizations.",
         "seats_total": 300,
         "seats_filled": 130,
         "is_draft": 0,
@@ -4977,14 +5208,15 @@ EVENTS = [
         "venue_address": "Zeal Gaming Arena, 80 Feet Road, 4th Block, Koramangala, Bangalore, Karnataka 560034",
         "time": "10:30 AM",
         "end_time": "08:00 PM",
-        "category": "Gaming & E-Sports"
+        "category": "Gaming & E-Sports",
+        "stream_price": "₹199"
     },
     {
         "id": 233,
         "title": "DeepTech & Semiconductor Founders Conclave",
         "date": "2026-11-29",
         "desc": "Elite gathering of hardware startups, fabless semiconductor innovators, robotics founders, and sovereign deeptech venture capitalists.",
-        "price": "\u20b9599",
+        "price": "₹599",
         "color": "#0284c7",
         "image": "/static/images/events/startup_pitch.jpg",
         "purpose": "Accelerate India's semiconductor and hardware startup ecosystem through direct corporate partnerships and funding.",
@@ -4998,14 +5230,15 @@ EVENTS = [
         "venue_address": "The Leela Palace, Old Airport Road, HAL 2nd Stage, Bangalore, Karnataka 560008",
         "time": "09:00 AM",
         "end_time": "06:00 PM",
-        "category": "Business & Startup"
+        "category": "Business & Startup",
+        "stream_price": "₹199"
     },
     {
         "id": 234,
         "title": "B2B SaaS Growth & Global Expansion Masterclass",
         "date": "2026-12-11",
         "desc": "Intensive masterclass for SaaS founders and GTM leaders on scaling from $1M ARR to $10M ARR across US, Europe, and APAC markets.",
-        "price": "\u20b9499",
+        "price": "₹499",
         "color": "#0369a1",
         "image": "/static/images/events/startup_saas.jpg",
         "purpose": "Provide SaaS founders actionable outbound sales playbooks, PLG conversion frameworks, and enterprise pricing models.",
@@ -5019,14 +5252,15 @@ EVENTS = [
         "venue_address": "WeWork Galaxy, 43 Residency Road, Shanthala Nagar, Bangalore, Karnataka 560025",
         "time": "10:00 AM",
         "end_time": "05:00 PM",
-        "category": "Business & Startup"
+        "category": "Business & Startup",
+        "stream_price": "₹199"
     },
     {
         "id": 235,
         "title": "Kathak & Bharatanatyam Classical Dance Fest",
         "date": "2026-11-27",
         "desc": "Enchanting celebration of Indian classical dance traditions featuring Padma awardee maestros, rhythmic footwork, and live Carnatic orchestra.",
-        "price": "\u20b9299",
+        "price": "₹299",
         "color": "#d946ef",
         "image": "/static/images/events/art_theater.jpg",
         "purpose": "Preserve and celebrate India's ancient classical dance heritage through world-class auditorium performances.",
@@ -5040,14 +5274,15 @@ EVENTS = [
         "venue_address": "Ranga Shankara, 36/2 8th Cross Road, JP Nagar 2nd Phase, Bangalore, Karnataka 560078",
         "time": "06:30 PM",
         "end_time": "09:30 PM",
-        "category": "Art, Culture & Theater"
+        "category": "Art, Culture & Theater",
+        "stream_price": "₹199"
     },
     {
         "id": 236,
         "title": "Contemporary Sculpture & Modern Art Exhibition",
         "date": "2026-12-08",
         "desc": "Curated modern art exhibition showcasing avant-garde metal sculptures, interactive light art, and digital generative installations.",
-        "price": "\u20b9150",
+        "price": "₹150",
         "color": "#c026d3",
         "image": "/static/images/events/art_culture.jpg",
         "purpose": "Provide a premier platform for young contemporary artists and art collectors to engage with cutting-edge visual expressions.",
@@ -5061,14 +5296,15 @@ EVENTS = [
         "venue_address": "National Gallery of Modern Art, 49 Manikyavelu Mansion, Palace Road, Bangalore, Karnataka 560052",
         "time": "10:00 AM",
         "end_time": "06:00 PM",
-        "category": "Art, Culture & Theater"
+        "category": "Art, Culture & Theater",
+        "stream_price": "₹199"
     },
     {
         "id": 237,
         "title": "Functional Fitness & Hyrox Style Obstacle Challenge",
         "date": "2026-11-26",
         "desc": "High-adrenaline fitness race combining functional movements, sled pushes, rowing sprints, and kettlebell carries for all fitness levels.",
-        "price": "\u20b9399",
+        "price": "₹399",
         "color": "#14b8a6",
         "image": "/static/images/events/health_crossfit.jpg",
         "purpose": "Inspire everyday athletes to test their functional stamina, strength, and mental endurance in a supportive community race.",
@@ -5082,14 +5318,15 @@ EVENTS = [
         "venue_address": "Decathlon Sarjapur, 96/1 Carmeloaram Post, Sarjapur Main Road, Bangalore, Karnataka 560035",
         "time": "06:30 AM",
         "end_time": "01:00 PM",
-        "category": "Health, Fitness & Yoga"
+        "category": "Health, Fitness & Yoga",
+        "stream_price": "₹199"
     },
     {
         "id": 238,
         "title": "Pranayama, Sound Bath & Chakra Alignment Immersion",
         "date": "2026-12-06",
         "desc": "Peaceful day retreat featuring Tibetan singing bowls, ancient Vedic breathwork, guided mindfulness meditation, and organic sattvic meals.",
-        "price": "\u20b9499",
+        "price": "₹499",
         "color": "#0d9488",
         "image": "/static/images/events/health_yoga.jpg",
         "purpose": "Facilitate deep somatic relaxation, mental detoxification, and nervous system regulation amidst peaceful natural surroundings.",
@@ -5103,14 +5340,15 @@ EVENTS = [
         "venue_address": "Art of Living International Center, 21st Km Kanakapura Road, Udayapura, Bangalore, Karnataka 560082",
         "time": "08:00 AM",
         "end_time": "03:30 PM",
-        "category": "Health, Fitness & Yoga"
+        "category": "Health, Fitness & Yoga",
+        "stream_price": "₹199"
     },
     {
         "id": 239,
         "title": "Woodfired Neapolitan Pizza & Pasta Masterclass",
         "date": "2026-11-25",
         "desc": "Hands-on culinary masterclass teaching 72-hour sourdough pizza fermentation, hand-stretched mozzarella, and authentic handmade fresh pasta.",
-        "price": "\u20b9449",
+        "price": "₹449",
         "color": "#f97316",
         "image": "/static/images/events/food_pizza.jpg",
         "purpose": "Impart authentic Italian culinary mastery from sourdough starter care to wood-fired 90-second blistering techniques.",
@@ -5124,14 +5362,15 @@ EVENTS = [
         "venue_address": "The Culinary Studio, 12th Main Road, HAL 2nd Stage, Indiranagar, Bangalore, Karnataka 560038",
         "time": "11:00 AM",
         "end_time": "03:30 PM",
-        "category": "Food, Tech & Festivals"
+        "category": "Food, Tech & Festivals",
+        "stream_price": "₹199"
     },
     {
         "id": 240,
         "title": "Craft Chocolate Tasting & Cocoa Bean-to-Bar Expo",
         "date": "2026-12-05",
         "desc": "Artisanal festival celebrating Indian single-origin cocoa from Kerala, Karnataka, and Tamil Nadu with live stone-grinding and bonbon crafting.",
-        "price": "\u20b9349",
+        "price": "₹349",
         "color": "#ea580c",
         "image": "/static/images/events/food_fest.jpg",
         "purpose": "Promote sustainable bean-to-bar Indian craft chocolate makers and educate food enthusiasts on single-origin tasting profiles.",
@@ -5145,10 +5384,10 @@ EVENTS = [
         "venue_address": "UB City, 24 Vittal Mallya Road, KG Halli, D' Souza Layout, Bangalore, Karnataka 560001",
         "time": "12:00 PM",
         "end_time": "08:00 PM",
-        "category": "Food, Tech & Festivals"
+        "category": "Food, Tech & Festivals",
+        "stream_price": "₹199"
     }
 ]
-
 try:
     import razorpay
     RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID', 'rzp_test_demo')
@@ -5758,6 +5997,15 @@ def get_category(title, explicit_category=None):
             if c_str.lower() == vc.lower() or c_str.lower() in vc.lower():
                 return vc
         return c_str
+
+    if title and isinstance(title, str):
+        # Direct lookup from EVENTS predefined catalog if available
+        if '_EVENT_TITLE_MAP' not in globals():
+            global _EVENT_TITLE_MAP
+            _EVENT_TITLE_MAP = {ev['title']: ev['category'] for ev in EVENTS if isinstance(ev, dict) and 'title' in ev and 'category' in ev}
+        matched = _EVENT_TITLE_MAP.get(title) or _EVENT_TITLE_MAP.get(title.strip())
+        if matched:
+            return matched
 
     t = (title or "").lower()
     if any(k in t for k in ['gaming', 'esports', 'valorant', 'bgmi', 'fifa', 'apex', 'unreal', 'game jam', 'cosplay', 'arcade', 'speedrunning', 'racing', 'fgc', 'overwatch', 'brawlhalla', 'rocket league']):
@@ -6758,7 +7006,7 @@ def dashboard():
     
     # Categorize events and check registrations with 2-hour cutoff evaluation
     for ev in events:
-        ev['category'] = get_category(ev['title'])
+        ev['category'] = ev.get('category') or get_category(ev)
         status_info = get_event_status_info(ev, ref_now=current_date)
         
         ev['time'] = status_info['time_str']
@@ -6956,7 +7204,7 @@ def event_detail(event_id):
     if not event:
         return "Event not found", 404
     
-    event['category'] = get_category(event['title'])
+    event['category'] = event.get('category') or get_category(event)
     
     # Check 2-hour cutoff & expiry for the detail page
     current_date = datetime.now()
@@ -9393,7 +9641,7 @@ def host_analytics():
     
     enriched_events = []
     for ev in db_events:
-        ev['category'] = get_category(ev['title'])
+        ev['category'] = ev.get('category') or get_category(ev)
         ev['reg_count'] = reg_counts.get(ev['id'], 0)
         enriched_events.append(ev)
         
@@ -9557,7 +9805,7 @@ def api_events():
     event_list = []
     for ev in events:
         ev_copy = dict(ev)
-        ev_copy['category'] = get_category(ev_copy.get('title', ''))
+        ev_copy['category'] = ev.get('category') or get_category(ev)
         status_info = get_event_status_info(ev_copy, ref_now=current_date)
         
         ev_copy['time'] = status_info['time_str']
