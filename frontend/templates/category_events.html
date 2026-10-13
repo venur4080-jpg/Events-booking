@@ -846,76 +846,25 @@
             <button class="close-btn" id="closeSidebar" aria-label="Close sidebar" style="background:none;border:none;cursor:pointer;">&times;</button>
         </div>
 
-        <!-- Sidebar User Mini-Card -->
-        <div class="sidebar-user-card">
-            <div class="sidebar-user-avatar">
-                <div style="width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; font-weight: 800; color: #0f172a; font-size: 0.95rem; box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);">
-                    {{ (session.get('username') or 'U')[:2]|upper }}
-                </div>
-            </div>
-            <div style="overflow: hidden; flex: 1;">
-                <div style="font-weight: 700; font-size: 0.92rem; color: #ffffff; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">
-                    {{ session.get('username') or 'Attendee' }}
-                </div>
-                <div style="font-size: 0.74rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
-                    <span>{{ user_id_badge or 'UID-0001' }}</span>
-                    <span>•</span>
-                    {% if is_admin or session.get('username') in ['admin', 'Venu R'] %}
-                    <span style="color: #f59e0b; font-weight: 700;">Host & Admin</span>
-                    {% elif is_host %}
-                    <span style="color: #00f2fe; font-weight: 700;">Host</span>
-                    {% else %}
-                    <span style="color: #34d399; font-weight: 700;">Member</span>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
         <ul class="sidebar-links" role="list">
             <li><a href="{{ url_for('dashboard') }}">🏠 Dashboard</a></li>
-            <li>
-                <a href="{{ url_for('category_events', category_name='all') }}" class="active">
-                    🎪 Explore Categories
-                    <span class="sidebar-pill-badge pill-count">240 Events</span>
-                </a>
-            </li>
+            <li><a href="{{ url_for('category_events', category_name='all') }}" class="active">🎪 Explore Categories</a></li>
             <li><a href="{{ url_for('profile') }}">👤 My Profile</a></li>
-            <li>
-                <a href="{{ url_for('history') }}">
-                    📋 My Bookings
-                    <span class="sidebar-pill-badge pill-free">Active</span>
-                </a>
-            </li>
+            <li><a href="{{ url_for('history') }}">📋 My Bookings</a></li>
             <li><a href="{{ url_for('settings') }}">⚙️ Settings</a></li>
             {% if is_admin or session.get('username') in ['admin', 'Venu R'] %}
-            <li>
-                <a href="{{ url_for('admin_dashboard') }}" style="color:var(--admin-accent,#f59e0b);font-weight:700">
-                    ⚡ Admin Panel
-                    <span class="sidebar-pill-badge" style="background:rgba(245,158,11,0.2);color:#f59e0b;border:1px solid rgba(245,158,11,0.4)">Host</span>
-                </a>
-            </li>
+            <li><a href="{{ url_for('admin_dashboard') }}" style="color:var(--admin-accent,#f59e0b);font-weight:700">⚡ Admin Panel</a></li>
             {% endif %}
             {% if is_host %}
-            <li role="separator"><hr></li>
-            <li role="heading" aria-level="3">Host Management</li>
+            <li role="separator"><hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 1rem 0;"></li>
+            <li style="padding: 0 1rem; color: var(--primary); font-size: 0.8rem; font-weight: 800; text-transform: uppercase;">Host Management</li>
             <li><a href="{{ url_for('scan_ticket') }}">🎟️ Check-In Scanner</a></li>
             <li><a href="{{ url_for('checkin_history') }}">📅 Check-in History</a></li>
             <li><a href="{{ url_for('add_event') }}">➕ Add New Event</a></li>
             <li><a href="{{ url_for('host_analytics') }}">📈 Host Analytics</a></li>
             {% endif %}
-            <li role="separator"><hr></li>
-            <li style="margin-top: 0.35rem;">
-                <div style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 0.75rem 0.85rem; display: flex; flex-direction: column; gap: 6px;">
-                    <div style="font-size: 0.72rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Support & Contact</div>
-                    <a href="tel:+919686837274" style="font-size: 0.82rem; color: #cbd5e1; display: flex; align-items: center; gap: 8px; text-decoration: none; padding: 2px 0;">
-                        <span>📞</span> +91 9686837274
-                    </a>
-                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=venu.rachakondaa@gmail.com" target="_blank" rel="noopener noreferrer" style="font-size: 0.8rem; color: #cbd5e1; display: flex; align-items: center; gap: 8px; text-decoration: none; padding: 2px 0; word-break: break-all;">
-                        <span>📧</span> venu.rachakondaa@gmail.com
-                    </a>
-                </div>
-            </li>
-            <li><a href="{{ url_for('logout') }}" aria-label="Log out">🚪 Logout</a></li>
+            <li role="separator"><hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 1rem 0;"></li>
+            <li><a href="{{ url_for('logout') }}" style="color: var(--secondary);">🚪 Logout</a></li>
         </ul>
     </nav>
 
