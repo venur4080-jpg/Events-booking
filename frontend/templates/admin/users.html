@@ -49,11 +49,11 @@
                         <button class="action-btn btn-warning" type="submit" title="Demote to user">⬇ User</button>
                     </form>
                     {% endif %}
-                    {% if not u.is_admin %}
-                    <form action="{{ url_for('admin_delete_user', user_id=u.id) }}" method="POST" style="margin:0"
-                          onsubmit="return confirm('Delete user {{ u.username }}? This cannot be undone.')">
-                        <button class="action-btn btn-danger" type="submit">🗑 Delete</button>
-                    </form>
+                    {% if u.username.lower() not in ['admin', 'venu r'] and u.username.lower() != session.get('username', '').lower() %}
+                    <button class="action-btn btn-danger" type="button" 
+                            onclick="openDeleteUserModal({{ u.id }}, '{{ u.username|escape }}', '{{ (u.full_name or u.username)|escape }}')">
+                        🗑 Delete
+                    </button>
                     {% endif %}
                 </td>
             </tr>
@@ -64,6 +64,43 @@
     </table>
 </div>
 
+<!-- Host Delete User Verification Modal -->
+<div id="deleteUserModal" class="modal" style="display: none; position: fixed; z-index: 1200; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.85); backdrop-filter: blur(12px);">
+    <div style="border: 1px solid rgba(244, 63, 94, 0.45); max-width: 480px; margin: 8% auto; border-radius: 18px; padding: 2rem; background: #0f172a; box-shadow: 0 25px 50px rgba(0,0,0,0.8); color: #f1f5f9;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(244,63,94,0.15); border: 1px solid rgba(244,63,94,0.4); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                    ⚠️
+                </div>
+                <div>
+                    <h3 style="color: #fb7185; margin: 0; font-size: 1.2rem; font-family: var(--font-heading, sans-serif);">Delete User Account</h3>
+                    <span style="color: var(--text-muted); font-size: 0.8rem;">Host Security Verification</span>
+                </div>
+            </div>
+            <button type="button" onclick="closeDeleteUserModal()" style="background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; line-height: 1;">&times;</button>
+        </div>
+
+        <p style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5; margin-bottom: 1.2rem;">
+            Are you sure you want to permanently delete user <strong id="deleteTargetUsername" style="color: #fb7185;"></strong> (<span id="deleteTargetFullName"></span>)? All user event passes, registrations, and profile records will be permanently removed.
+        </p>
+
+        <form id="deleteUserForm" method="POST" action="" onsubmit="return validateHostUserDeletion()">
+            <input type="hidden" name="confirmed" value="true">
+            <div style="margin-bottom: 1.2rem;">
+                <label style="color: #f1f5f9; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.4rem; display: block;">
+                    Security Verification: Type <span style="color: #fb7185; font-family: monospace; background: rgba(244,63,94,0.15); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(244,63,94,0.3);">DELETE</span> to confirm
+                </label>
+                <input type="text" id="confirm_user_del_text" name="confirm_delete_text" class="input-field" placeholder="Type DELETE" autocomplete="off" style="width: 100%; font-family: monospace; letter-spacing: 2px; font-weight: 700; text-transform: uppercase; padding: 0.65rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.3); color: #fff;">
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button type="button" class="action-btn" style="background: rgba(255,255,255,0.1); color: #fff;" onclick="closeDeleteUserModal()">Cancel</button>
+                <button type="submit" class="action-btn btn-danger" style="padding: 0.6rem 1.4rem; font-weight: 700;">Confirm Delete</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
 function filterTable(tableId, query) {
     const rows = document.querySelectorAll(`#${tableId} tbody tr`);
@@ -72,5 +109,42 @@ function filterTable(tableId, query) {
         r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
     });
 }
+
+function openDeleteUserModal(userId, username, fullName) {
+    const modal = document.getElementById('deleteUserModal');
+    const form = document.getElementById('deleteUserForm');
+    const uSpan = document.getElementById('deleteTargetUsername');
+    const fSpan = document.getElementById('deleteTargetFullName');
+    const txtInput = document.getElementById('confirm_user_del_text');
+    
+    if (form) form.action = `/admin/users/${userId}/delete`;
+    if (uSpan) uSpan.textContent = '@' + username;
+    if (fSpan) fSpan.textContent = fullName;
+    if (txtInput) {
+        txtInput.value = '';
+        setTimeout(() => txtInput.focus(), 100);
+    }
+    if (modal) modal.style.display = 'block';
+}
+
+function closeDeleteUserModal() {
+    const modal = document.getElementById('deleteUserModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function validateHostUserDeletion() {
+    const txtInput = document.getElementById('confirm_user_del_text');
+    if (!txtInput || txtInput.value.trim().toUpperCase() !== 'DELETE') {
+        alert('⚠️ Security verification: Please type "DELETE" in capital letters to confirm account deletion.');
+        if (txtInput) txtInput.focus();
+        return false;
+    }
+    return true;
+}
+
+window.addEventListener('click', function(e) {
+    const modal = document.getElementById('deleteUserModal');
+    if (e.target === modal) closeDeleteUserModal();
+});
 </script>
 {% endblock %}

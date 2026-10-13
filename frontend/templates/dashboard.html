@@ -396,7 +396,7 @@
                     </div>
                 </div>
 
-                {% if is_admin or session.get('username') in ['admin', 'Venu R'] %}
+                {% if is_admin or is_host or session.get('username') in ['admin', 'Venu R'] %}
                 <a href="{{ url_for('admin_dashboard') }}"
                     style="margin-right:10px;color:var(--admin-accent,#f59e0b);font-weight:700;font-size:0.85rem;text-decoration:none;white-space:nowrap"
                     title="Admin Panel">⚡ Admin</a>
@@ -426,7 +426,7 @@
             <li><a href="{{ url_for('profile') }}">👤 My Profile</a></li>
             <li><a href="{{ url_for('history') }}">📋 My Bookings</a></li>
             <li><a href="{{ url_for('settings') }}">⚙️ Settings</a></li>
-            {% if is_admin or session.get('username') in ['admin', 'Venu R'] %}
+            {% if is_admin or is_host or session.get('username') in ['admin', 'Venu R'] %}
             <li><a href="{{ url_for('admin_dashboard') }}" style="color:var(--admin-accent,#f59e0b);font-weight:700">⚡ Admin Panel</a></li>
             {% endif %}
             {% if is_host %}
