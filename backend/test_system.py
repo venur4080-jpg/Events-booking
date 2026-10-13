@@ -1114,6 +1114,29 @@ class EventManagementSystemTests(unittest.TestCase):
         self.assertEqual(resp_all.status_code, 200)
         self.assertIn(b'All Categories', resp_all.data)
 
+    def test_18_promo_code_validation_and_conflict_detection(self):
+        """Verify promo code validation API and schedule conflict detection."""
+        # 1. Test invalid promo code
+        resp_invalid = self.client.post('/api/promo/validate', json={'code': 'INVALID999', 'price': '₹800'})
+        self.assertEqual(resp_invalid.status_code, 404)
+        self.assertFalse(resp_invalid.get_json()['ok'])
+
+        # 2. Test percentage promo code TECH2026 (30% off)
+        resp_tech = self.client.post('/api/promo/validate', json={'code': 'TECH2026', 'price': '₹800'})
+        self.assertEqual(resp_tech.status_code, 200)
+        data_tech = resp_tech.get_json()
+        self.assertTrue(data_tech['ok'])
+        self.assertEqual(data_tech['discount'], 240.0)
+        self.assertEqual(data_tech['final_price'], 560)
+
+        # 3. Test full waiver promo code CAMPUS100 (100% off)
+        resp_free = self.client.post('/api/promo/validate', json={'code': 'CAMPUS100', 'price': '₹800'})
+        self.assertEqual(resp_free.status_code, 200)
+        data_free = resp_free.get_json()
+        self.assertTrue(data_free['ok'])
+        self.assertEqual(data_free['discount'], 800.0)
+        self.assertEqual(data_free['final_price'], 0)
+
 
 from starlette.testclient import TestClient
 try:

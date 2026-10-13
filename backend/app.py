@@ -5903,6 +5903,7 @@ def get_event_status_info(event: dict, ref_now=None):
         status_reason = "This event has already taken place."
     elif is_today:
         if now >= end_dt:
+            is_cutoff_reached = True
             is_expired = True
             is_open = False
             status_label = "Event Ended"
@@ -6100,6 +6101,9 @@ def init_db():
         ("ALTER TABLE registrations ADD COLUMN cancellation_feedback TEXT DEFAULT ''",),
         ("ALTER TABLE registrations ADD COLUMN pass_type TEXT DEFAULT 'in_person'",),
         ("ALTER TABLE registrations ADD COLUMN amount_paid REAL DEFAULT 0.0",),
+        ("ALTER TABLE registrations ADD COLUMN promo_code TEXT DEFAULT ''",),
+        ("ALTER TABLE registrations ADD COLUMN discount_amount REAL DEFAULT 0.0",),
+        ("ALTER TABLE registrations ADD COLUMN original_amount REAL DEFAULT 0.0",),
     ]:
         try:
             c.execute(col[0])
@@ -7263,8 +7267,33 @@ def event_detail(event_id):
         google_cal_url = f"https://calendar.google.com/calendar/render?action=TEMPLATE&text={title_esc}&dates={dates_param}&details={desc_esc}&location={loc_esc}&sf=true&output=xml"
     except Exception:
         google_cal_url = "#"
-        
-    return render_template('details.html', event=event, username=username, is_host=is_host(), google_cal_url=google_cal_url)
+
+    # Check for schedule conflicts on the same date with active bookings
+    conflict_event = None
+    if username and not event['is_registered']:
+        try:
+            conn = get_db()
+            c = conn.cursor()
+            c.execute("""SELECT e.id, e.title, e.date, e.time, e.venue 
+                         FROM registrations r 
+                         JOIN events e ON r.event_id = e.id 
+                         WHERE r.username = ? AND (r.status != 'cancelled' OR r.status IS NULL) 
+                           AND e.id != ? AND e.date = ? 
+                         LIMIT 1""", (username, event_id, event['date']))
+            crow = c.fetchone()
+            conn.close()
+            if crow:
+                conflict_event = {
+                    'id': crow[0],
+                    'title': crow[1],
+                    'date': crow[2],
+                    'time': crow[3] or '10:00 AM',
+                    'venue': crow[4] or 'Main Auditorium'
+                }
+        except Exception:
+            conflict_event = None
+
+    return render_template('details.html', event=event, username=username, is_host=is_host(), google_cal_url=google_cal_url, conflict_event=conflict_event)
 
 def generate_ticket_pdf_bytes(event: dict, reg_info) -> bytes:
     """
@@ -7619,6 +7648,9 @@ def generate_invoice_pdf_bytes(event: dict, reg_info) -> bytes:
         reg_time = reg_info.get('reg_time') or datetime.now().strftime('%d %b %Y, %I:%M %p')
         ticket_code = reg_info.get('ticket_code') or f"TKT-{event.get('id', 1):03d}-{reg_id:05d}"
         pass_type = reg_info.get('pass_type', 'in_person')
+        promo_code = reg_info.get('promo_code') or ''
+        discount_amount = float(reg_info.get('discount_amount') or 0.0)
+        amount_paid_override = reg_info.get('amount_paid')
     else:
         reg_id = reg_info[0]
         full_name = reg_info[1] or 'Valued Attendee'
@@ -7631,29 +7663,37 @@ def generate_invoice_pdf_bytes(event: dict, reg_info) -> bytes:
         username = reg_info[10] if len(reg_info) > 10 else ''
         ticket_code = reg_info[12] if len(reg_info) > 12 and reg_info[12] else f"TKT-{event.get('id', 1):03d}-{reg_id:05d}"
         pass_type = reg_info[13] if len(reg_info) > 13 and reg_info[13] else 'in_person'
+        amount_paid_override = reg_info[14] if len(reg_info) > 14 else None
+        promo_code = reg_info[15] if len(reg_info) > 15 and reg_info[15] else ''
+        discount_amount = float(reg_info[16] if len(reg_info) > 16 and reg_info[16] else 0.0)
     
     price_str = str(event.get('price', 'Free')).strip()
-    is_free = price_str.lower() == 'free' or price_str in ('0', '₹0', '0.0', '')
-    
     clean_digits = re.sub(r'[^\d.]', '', price_str)
     try:
-        total_amount = float(clean_digits) if clean_digits else 0.0
+        base_unit = float(clean_digits) if clean_digits else 0.0
     except ValueError:
-        total_amount = 0.0
+        base_unit = 0.0
+
+    if amount_paid_override is not None and float(amount_paid_override) >= 0:
+        total_amount = float(amount_paid_override)
+    else:
+        total_amount = max(0.0, base_unit - discount_amount)
+
+    is_free = (total_amount == 0.0) or (price_str.lower() == 'free' and discount_amount == 0.0)
 
     if is_free or total_amount == 0.0:
         base_amount = 0.0
         cgst = 0.0
         sgst = 0.0
         total_display = "Free (INR 0.00)"
-        pay_status = "CONFIRMED - COMPLIMENTARY PASS"
+        pay_status = f"CONFIRMED - WAIVED VIA {promo_code}" if promo_code else "CONFIRMED - COMPLIMENTARY PASS"
     else:
         base_amount = round(total_amount / 1.18, 2)
         tax_total = round(total_amount - base_amount, 2)
         cgst = round(tax_total / 2, 2)
         sgst = round(tax_total - cgst, 2)
         total_display = f"INR {total_amount:.2f}"
-        pay_status = "PAID & VERIFIED"
+        pay_status = f"PAID & VERIFIED (Promo {promo_code})" if promo_code else "PAID & VERIFIED"
 
     pdf = FPDF(orientation='P', unit='mm', format='A4')
     pdf.set_auto_page_break(auto=False)
@@ -7794,6 +7834,14 @@ def generate_invoice_pdf_bytes(event: dict, reg_info) -> bytes:
     y = 117
     pdf.set_font('Helvetica', '', 8.5)
     pdf.set_text_color(71, 85, 105)
+
+    if discount_amount > 0 and promo_code:
+        pdf.set_xy(110, y)
+        pdf.cell(50, 4.5, f"Coupon ({promo_code}):", align='R')
+        pdf.set_text_color(22, 101, 52)
+        pdf.cell(36, 4.5, f"- INR {discount_amount:.2f}", align='R')
+        y += 4.5
+        pdf.set_text_color(71, 85, 105)
 
     pdf.set_xy(110, y)
     pdf.cell(50, 4.5, "Subtotal (Taxable Value):", align='R')
@@ -8545,6 +8593,52 @@ You can log in using either your User ID ({user_id}) or your registered email ad
 
 
 
+PROMO_CODES = {
+    'TECH2026': {'type': 'percent', 'val': 30, 'max': 300, 'desc': '30% Tech Fest Discount (up to ₹300)'},
+    'EARLYBIRD': {'type': 'percent', 'val': 25, 'max': 250, 'desc': '25% Early Bird Discount (up to ₹250)'},
+    'WELCOME50': {'type': 'percent', 'val': 50, 'max': 500, 'desc': '50% Welcome Discount (up to ₹500)'},
+    'CAMPUS100': {'type': 'percent', 'val': 100, 'max': 99999, 'desc': '100% Student Scholar Full Pass (Free Entry)'},
+    'FLAT100': {'type': 'flat', 'val': 100, 'max': 100, 'desc': 'Flat ₹100 Off'},
+    'VIPFREE': {'type': 'percent', 'val': 100, 'max': 99999, 'desc': '100% Complimentary VIP Access'}
+}
+
+@app.route('/api/promo/validate', methods=['POST'])
+def api_promo_validate():
+    data = request.get_json(silent=True) or {}
+    code = (data.get('code') or '').strip().upper()
+    price_raw = str(data.get('price') or '0')
+    
+    digits = re.sub(r'[^\d.]', '', price_raw)
+    try:
+        base_price = float(digits) if digits else 0.0
+    except ValueError:
+        base_price = 0.0
+
+    if not code:
+        return jsonify({'ok': False, 'error': 'Please enter a promo code.'}), 400
+
+    if code not in PROMO_CODES:
+        return jsonify({'ok': False, 'error': f'Coupon code "{code}" is invalid or expired.'}), 404
+
+    if base_price <= 0:
+        return jsonify({'ok': False, 'error': 'Promo codes cannot be applied to free events.'}), 400
+
+    rule = PROMO_CODES[code]
+    if rule['type'] == 'percent':
+        discount = round(min((base_price * rule['val'] / 100.0), rule.get('max', base_price)), 2)
+    else:
+        discount = round(min(rule['val'], base_price), 2)
+
+    final_price = max(0.0, round(base_price - discount, 2))
+    return jsonify({
+        'ok': True,
+        'code': code,
+        'discount': discount,
+        'final_price': int(final_price) if final_price.is_integer() else final_price,
+        'message': f"✓ {rule['desc']} applied! You saved ₹{int(discount) if discount.is_integer() else discount}."
+    })
+
+
 @app.route('/register/<int:event_id>', methods=['GET', 'POST'])
 def register_event(event_id):
     if not session.get('loggedin'):
@@ -8564,10 +8658,36 @@ def register_event(event_id):
     event['seats_left'] = status_info.get('seats_left') or max(0, event['seats_total'] - event['seats_filled'])
     event['is_in_person_sold_out'] = status_info.get('is_in_person_sold_out') or (event['seats_filled'] >= event['seats_total'])
 
-    # If the event has completely concluded in the past, close all registrations
-    if status_info.get('is_past_date') or (status_info.get('is_expired') and not status_info.get('is_today')):
+    # If the event has completely concluded in the past or earlier today, close all registrations
+    if status_info.get('is_past_date') or status_info.get('status_label') == 'Event Ended' or (status_info.get('is_expired') and not status_info.get('is_today')):
         flash("Registration is closed for this event as it has already passed.", "error")
         return redirect(url_for('event_detail', event_id=event_id))
+
+    # Check for schedule conflicts on the same date with active bookings
+    username = session.get('username')
+    conflict_event = None
+    if username:
+        try:
+            conn = get_db()
+            c = conn.cursor()
+            c.execute("""SELECT e.id, e.title, e.date, e.time, e.venue 
+                         FROM registrations r 
+                         JOIN events e ON r.event_id = e.id 
+                         WHERE r.username = ? AND (r.status != 'cancelled' OR r.status IS NULL) 
+                           AND e.id != ? AND e.date = ? 
+                         LIMIT 1""", (username, event_id, event['date']))
+            crow = c.fetchone()
+            conn.close()
+            if crow:
+                conflict_event = {
+                    'id': crow[0],
+                    'title': crow[1],
+                    'date': crow[2],
+                    'time': crow[3] or '10:00 AM',
+                    'venue': crow[4] or 'Main Auditorium'
+                }
+        except Exception:
+            conflict_event = None
 
     requested_type = request.args.get('type') or request.form.get('pass_type') or ('live_stream' if event['is_in_person_sold_out'] else 'in_person')
 
@@ -8583,19 +8703,20 @@ def register_event(event_id):
         college_id = request.form.get('college_id')
         payment_method = request.form.get('payment_method')
         upi_id = request.form.get('upi_id')
+        promo_code = request.form.get('promo_code', '').strip().upper()
         username = session.get('username')
 
         # Validate lead attendee email & mobile
         is_email_v, clean_email = validate_email_address(email or '')
         if not is_email_v:
             flash(clean_email, "error")
-            return render_template('registration.html', event=event, username=username, is_host=is_host(), error=clean_email, requested_type=pass_type)
+            return render_template('registration.html', event=event, username=username, is_host=is_host(), error=clean_email, requested_type=pass_type, conflict_event=conflict_event)
         email = clean_email
 
         is_phone_v, clean_phone = validate_mobile(phone or '')
         if not is_phone_v:
             flash(clean_phone, "error")
-            return render_template('registration.html', event=event, username=username, is_host=is_host(), error=clean_phone, requested_type=pass_type)
+            return render_template('registration.html', event=event, username=username, is_host=is_host(), error=clean_phone, requested_type=pass_type, conflict_event=conflict_event)
         phone = clean_phone
 
         team_name = request.form.get('team_name', '').strip() if reg_type == 'team' else ''
@@ -8613,14 +8734,14 @@ def register_event(event_id):
                     if not is_tm_e_v:
                         err = f"Teammate #{i} ({m_name or 'Member'}): {clean_tm_email}"
                         flash(err, "error")
-                        return render_template('registration.html', event=event, username=username, is_host=is_host(), error=err, requested_type=pass_type)
+                        return render_template('registration.html', event=event, username=username, is_host=is_host(), error=err, requested_type=pass_type, conflict_event=conflict_event)
                     m_email = clean_tm_email
                 if m_phone:
                     is_tm_p_v, clean_tm_phone = validate_mobile(m_phone)
                     if not is_tm_p_v:
                         err = f"Teammate #{i} ({m_name or 'Member'}): {clean_tm_phone}"
                         flash(err, "error")
-                        return render_template('registration.html', event=event, username=username, is_host=is_host(), error=err, requested_type=pass_type)
+                        return render_template('registration.html', event=event, username=username, is_host=is_host(), error=err, requested_type=pass_type, conflict_event=conflict_event)
                     m_phone = clean_tm_phone
 
                 if m_name:
@@ -8642,12 +8763,12 @@ def register_event(event_id):
             if seats_filled + total_people > seats_total or status_info.get('is_sold_out'):
                 err = f"In-person registration is full! This event has reached its capacity limit of {seats_total} seats ({seats_left} seat(s) left). Please choose the unlimited Live Stream Pass below."
                 flash(err, "error")
-                return render_template('registration.html', event=event, username=username, is_host=is_host(), error=err, requested_type='live_stream')
+                return render_template('registration.html', event=event, username=username, is_host=is_host(), error=err, requested_type='live_stream', conflict_event=conflict_event)
             
             if status_info.get('is_cutoff_reached'):
                 err = f"Registration is closed for in-person attendance 2 hours prior to start time ({status_info.get('cutoff_time_str')}). Please select the unlimited Live Stream Pass below."
                 flash(err, "error")
-                return render_template('registration.html', event=event, username=username, is_host=is_host(), error=err, requested_type='live_stream')
+                return render_template('registration.html', event=event, username=username, is_host=is_host(), error=err, requested_type='live_stream', conflict_event=conflict_event)
 
             seats_to_add = total_people
             ticket_prefix = "TKT"
@@ -8656,6 +8777,27 @@ def register_event(event_id):
             seats_to_add = 0
             ticket_prefix = "LIVE"
         
+        # Calculate pricing, promo discount, and final amount paid
+        raw_price_str = event.get('stream_price') if pass_type == 'live_stream' else event.get('price', 'Free')
+        clean_digits = re.sub(r'[^\d.]', '', str(raw_price_str))
+        try:
+            unit_price = float(clean_digits) if clean_digits else 0.0
+        except ValueError:
+            unit_price = 0.0
+            
+        base_total = round(unit_price * total_people, 2)
+        discount_amount = 0.0
+        if promo_code and promo_code in PROMO_CODES and base_total > 0:
+            rule = PROMO_CODES[promo_code]
+            if rule['type'] == 'percent':
+                discount_amount = round(min((base_total * rule['val'] / 100.0), rule.get('max', base_total)), 2)
+            else:
+                discount_amount = round(min(rule['val'], base_total), 2)
+        
+        amount_paid = max(0.0, round(base_total - discount_amount, 2))
+        if amount_paid == 0.0 and (not payment_method or payment_method == 'UPI'):
+            payment_method = 'Complimentary / Promo Waiver'
+
         try:
             conn = get_db()
             c = conn.cursor()
@@ -8670,14 +8812,15 @@ def register_event(event_id):
                 c.execute("""UPDATE registrations 
                              SET full_name = ?, email = ?, phone = ?, college_id = ?, payment_method = ?, upi_id = ?, 
                                  team_name = ?, team_members = ?, status = 'active', cancelled_at = NULL, checked_in = 0, 
-                                 checkin_time = NULL, timestamp = CURRENT_TIMESTAMP, ticket_code = ?, pass_type = ? 
+                                 checkin_time = NULL, timestamp = CURRENT_TIMESTAMP, ticket_code = ?, pass_type = ?,
+                                 promo_code = ?, discount_amount = ?, amount_paid = ? 
                              WHERE id = ?""",
-                          (full_name, email, phone, college_id, payment_method, upi_id, team_name, team_members_json, ticket_code, pass_type, reg_id))
+                          (full_name, email, phone, college_id, payment_method, upi_id, team_name, team_members_json, ticket_code, pass_type, promo_code, discount_amount, amount_paid, reg_id))
             else:
                 c.execute("""INSERT INTO registrations 
-                             (username, event_id, full_name, email, phone, college_id, payment_method, upi_id, team_name, team_members, pass_type, status) 
-                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')""",
-                          (username, event_id, full_name, email, phone, college_id, payment_method, upi_id, team_name, team_members_json, pass_type))
+                             (username, event_id, full_name, email, phone, college_id, payment_method, upi_id, team_name, team_members, pass_type, status, promo_code, discount_amount, amount_paid) 
+                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?)""",
+                          (username, event_id, full_name, email, phone, college_id, payment_method, upi_id, team_name, team_members_json, pass_type, promo_code, discount_amount, amount_paid))
                 reg_id = c.lastrowid
                 ticket_code = f"{ticket_prefix}-{event_id:03d}-{reg_id:05d}"
                 c.execute("UPDATE registrations SET ticket_code = ? WHERE id = ?", (ticket_code, reg_id))
@@ -8709,7 +8852,10 @@ def register_event(event_id):
                 'team_members': team_members,
                 'ticket_code': ticket_code,
                 'username': username,
-                'pass_type': pass_type
+                'pass_type': pass_type,
+                'amount_paid': amount_paid,
+                'promo_code': promo_code,
+                'discount_amount': discount_amount
             }
 
             try:
@@ -8738,12 +8884,12 @@ def register_event(event_id):
             details_str = f"Event: {event['title']} (ID {event_id}) [{pass_type.upper()}]" + (f" [Team: {team_name}, {total_people} members]" if team_name else "")
             log_action(username, 'register_event', details_str)
             push_notification(username, f" You are registered for {event['title']} ({'Live Stream Pass' if pass_type == 'live_stream' else 'In-Person Pass'})!", url_for('download_ticket', event_id=event_id))
-            return render_template('registration.html', event=event, success=True, username=username, is_host=is_host(), team_name=team_name, total_people=total_people, email=email, pass_type=pass_type, ticket_code=ticket_code)
+            return render_template('registration.html', event=event, success=True, username=username, is_host=is_host(), team_name=team_name, total_people=total_people, email=email, pass_type=pass_type, ticket_code=ticket_code, conflict_event=conflict_event)
 
         except Exception as e:
             return f"Error: {str(e)}", 500
             
-    return render_template('registration.html', event=event, username=session.get('username'), is_host=is_host(), requested_type=requested_type)
+    return render_template('registration.html', event=event, username=session.get('username'), is_host=is_host(), requested_type=requested_type, conflict_event=conflict_event)
 
 @app.route('/unregister/<int:event_id>', methods=['POST'])
 def unregister_event(event_id):
@@ -9209,7 +9355,7 @@ def download_invoice(event_id):
 
     conn = get_db()
     c = conn.cursor()
-    c.execute("""SELECT id, full_name, email, phone, college_id, payment_method, upi_id, timestamp, team_name, team_members, status, cancelled_at, ticket_code, pass_type, amount_paid 
+    c.execute("""SELECT id, full_name, email, phone, college_id, payment_method, upi_id, timestamp, team_name, team_members, status, cancelled_at, ticket_code, pass_type, amount_paid, promo_code, discount_amount 
                  FROM registrations 
                  WHERE username = ? AND event_id = ? 
                  ORDER BY id DESC LIMIT 1""", (username, event_id))
@@ -9220,7 +9366,7 @@ def download_invoice(event_id):
         flash("Registration not found. Please register first.", "error")
         return redirect(url_for('event_detail', event_id=event_id))
 
-    reg_id, full_name, email, phone, college_id, payment_method, upi_id, reg_time, team_name, team_members_raw, reg_status, cancelled_at, ticket_code, pass_type, amount_paid = registration
+    reg_id, full_name, email, phone, college_id, payment_method, upi_id, reg_time, team_name, team_members_raw, reg_status, cancelled_at, ticket_code, pass_type, amount_paid, promo_code, discount_amount = registration
     reg_dict = {
         'id': reg_id,
         'full_name': full_name or username,
@@ -9233,7 +9379,9 @@ def download_invoice(event_id):
         'username': username,
         'ticket_code': ticket_code or f"TKT-{event_id:03d}-{reg_id:05d}",
         'pass_type': pass_type or 'in_person',
-        'amount_paid': amount_paid or 0.0
+        'amount_paid': amount_paid or 0.0,
+        'promo_code': promo_code or '',
+        'discount_amount': discount_amount or 0.0
     }
 
     pdf_bytes = generate_invoice_pdf_bytes(event, reg_dict)
@@ -9255,7 +9403,7 @@ def download_invoice_by_reg(reg_id):
 
     conn = get_db()
     c = conn.cursor()
-    c.execute("""SELECT id, event_id, full_name, email, phone, college_id, payment_method, upi_id, timestamp, team_name, team_members, status, cancelled_at, ticket_code, pass_type, amount_paid, username 
+    c.execute("""SELECT id, event_id, full_name, email, phone, college_id, payment_method, upi_id, timestamp, team_name, team_members, status, cancelled_at, ticket_code, pass_type, amount_paid, username, promo_code, discount_amount 
                  FROM registrations 
                  WHERE id = ?""", (reg_id,))
     registration = c.fetchone()
@@ -9283,7 +9431,9 @@ def download_invoice_by_reg(reg_id):
         'username': registration[16],
         'ticket_code': registration[13] or f"TKT-{registration[1]:03d}-{registration[0]:05d}",
         'pass_type': registration[14] or 'in_person',
-        'amount_paid': registration[15] or 0.0
+        'amount_paid': registration[15] or 0.0,
+        'promo_code': registration[17] if len(registration) > 17 and registration[17] else '',
+        'discount_amount': registration[18] if len(registration) > 18 and registration[18] else 0.0
     }
 
     pdf_bytes = generate_invoice_pdf_bytes(event, reg_dict)

@@ -757,6 +757,30 @@
             if (modal && e.target === modal) {
                 closeUnregisterModal();
             }
+        // Offline Pass Sync Engine
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                const bookingCards = document.querySelectorAll('.booking-card');
+                if (bookingCards.length > 0) {
+                    const cachedPasses = [];
+                    bookingCards.forEach(card => {
+                        const titleEl = card.querySelector('.booking-title');
+                        const codeEl = card.querySelector('.tkt-code-badge') || card.querySelector('code');
+                        const dateEl = card.querySelector('.booking-date');
+                        if (titleEl) {
+                            cachedPasses.push({
+                                title: titleEl.textContent.trim(),
+                                code: codeEl ? codeEl.textContent.trim() : 'PASS-VERIFIED',
+                                date: dateEl ? dateEl.textContent.trim() : '',
+                                url: card.querySelector('a[href*="download_ticket"]') ? card.querySelector('a[href*="download_ticket"]').getAttribute('href') : '#'
+                            });
+                        }
+                    });
+                    localStorage.setItem('events_offline_wallet', JSON.stringify(cachedPasses));
+                }
+            } catch (e) {
+                console.warn('[PWA] Offline wallet cache sync warning:', e);
+            }
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/motion@latest/dist/motion.js"></script>

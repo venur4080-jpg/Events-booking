@@ -375,6 +375,15 @@
                     {{ event.full_details }}
                 </p>
                 
+                {% if conflict_event %}
+                <div class="schedule-conflict-banner" role="alert" style="background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 14px; padding: 1.1rem 1.4rem; margin-top: 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 14px; color: #fde68a; box-shadow: 0 4px 20px rgba(245, 158, 11, 0.15);">
+                    <span style="font-size: 1.8rem; line-height: 1;">⚠️</span>
+                    <div style="font-size: 0.92rem; line-height: 1.45;">
+                        <strong style="color: #fbbf24;">Schedule Conflict Alert:</strong> You already have a confirmed pass for <a href="{{ url_for('event_detail', event_id=conflict_event.id) }}" style="color: #00f2fe; font-weight: 700; text-decoration: underline;">{{ conflict_event.title }}</a> on this date ({{ conflict_event.date }} • {{ conflict_event.time }}).
+                    </div>
+                </div>
+                {% endif %}
+
                 <!-- Dual Admission Pass & Registration Options -->
                 <div style="margin-top: 2rem; margin-bottom: 2rem;">
                     <div class="section-title" style="margin-bottom: 1.2rem;">

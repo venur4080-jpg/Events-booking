@@ -256,6 +256,15 @@
                 {% endif %}
             {% endwith %}
 
+            {% if conflict_event %}
+            <div class="schedule-conflict-banner" role="alert" style="background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 14px; padding: 1rem 1.4rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 14px; color: #fde68a; box-shadow: 0 4px 20px rgba(245, 158, 11, 0.15);">
+                <span style="font-size: 1.6rem; line-height: 1;">⚠️</span>
+                <div style="font-size: 0.92rem; line-height: 1.45;">
+                    <strong style="color: #fbbf24;">Schedule Warning:</strong> You already have a confirmed registration for <strong>{{ conflict_event.title }}</strong> on this date ({{ conflict_event.date }} • {{ conflict_event.time }}).
+                </div>
+            </div>
+            {% endif %}
+
             <form method="POST" id="regForm" onsubmit="return validateEventRegForm(this)">
                 <!-- Pass Type Selection (In-Person with Limit vs Unlimited Live Stream) -->
                 <div style="margin-bottom: 1.8rem;">
@@ -389,10 +398,17 @@
                 <div style="margin-top: 1.2rem; background: rgba(0,242,254,0.04); border: 1px solid rgba(0,242,254,0.25); border-radius: 12px; padding: 1.2rem;">
                     <label style="display: block; color: #00f2fe; font-weight: 700; font-size: 0.88rem; margin-bottom: 0.4rem;">🏷️ Have a Promo Code?</label>
                     <div style="display: flex; gap: 8px;">
-                        <input type="text" id="promoCodeInput" placeholder="e.g. TECH2026, EARLYBIRD" class="input-field" style="text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">
+                        <input type="text" id="promoCodeInput" name="promo_code" placeholder="e.g. TECH2026, CAMPUS100" class="input-field" style="text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">
+                        <input type="hidden" name="discount_amount" id="discountAmountInput" value="0">
                         <button type="button" class="btn-primary" style="width: auto; padding: 0.6rem 1.2rem; margin: 0; font-size: 0.85rem; border-radius: 8px; font-weight: 700;" onclick="applyPromoCode()">Apply</button>
                     </div>
                     <div id="promoResultMsg" style="display: none; margin-top: 0.6rem; font-size: 0.82rem; font-weight: 600;"></div>
+                    <div style="margin-top: 0.65rem; display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                        <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600;">Try Coupons:</span>
+                        <button type="button" onclick="quickApplyPromo('TECH2026')" style="cursor: pointer; font-size: 0.72rem; background: rgba(0,242,254,0.12); color: #00f2fe; padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(0,242,254,0.3); font-weight: 700;">TECH2026 (30% off)</button>
+                        <button type="button" onclick="quickApplyPromo('CAMPUS100')" style="cursor: pointer; font-size: 0.72rem; background: rgba(16,185,129,0.12); color: #34d399; padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(16,185,129,0.3); font-weight: 700;">CAMPUS100 (Free Pass)</button>
+                        <button type="button" onclick="quickApplyPromo('EARLYBIRD')" style="cursor: pointer; font-size: 0.72rem; background: rgba(245,158,11,0.12); color: #fbbf24; padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(245,158,11,0.3); font-weight: 700;">EARLYBIRD (25% off)</button>
+                    </div>
                 </div>
 
                 <!-- Payment Section (Dynamically updated based on selected Pass Type) -->
@@ -667,9 +683,18 @@
             selectPassType(initialType);
         });
 
+        function quickApplyPromo(code) {
+            const input = document.getElementById('promoCodeInput');
+            if (input) {
+                input.value = code;
+                applyPromoCode();
+            }
+        }
+
         async function applyPromoCode() {
             const input = document.getElementById('promoCodeInput');
             const msgEl = document.getElementById('promoResultMsg');
+            const discountInput = document.getElementById('discountAmountInput');
             const code = input.value.trim().toUpperCase();
             if (!code) {
                 msgEl.style.display = 'block';
@@ -691,14 +716,31 @@
                 if (data.ok) {
                     msgEl.style.color = '#34d399';
                     msgEl.textContent = data.message;
+                    if (discountInput) discountInput.value = data.discount;
                     const priceDisplay = document.getElementById('displayEventPrice');
+                    const paymentSection = document.getElementById('paymentSectionWrapper');
+                    const upiInput = document.getElementById('upiIdInput');
+                    const submitBtn = document.getElementById('submitRegBtn');
+
                     if (priceDisplay) {
                         priceDisplay.innerHTML = `<span style="text-decoration: line-through; opacity: 0.6; font-size: 0.9rem; margin-right: 6px;">${currentPrice}</span> ₹${data.final_price}`;
                     }
+
+                    // If full waiver (₹0 final price)
+                    if (data.final_price === 0) {
+                        if (paymentSection) paymentSection.style.display = 'none';
+                        if (upiInput) {
+                            upiInput.required = false;
+                            upiInput.value = 'PROMO-FREE';
+                        }
+                        if (submitBtn) submitBtn.textContent = `Complete Registration • Free Pass (${code} Applied)`;
+                    }
+
                     if (window.showToast) showToast(`Promo Code ${code} Applied!`, 'success');
                 } else {
                     msgEl.style.color = '#ef4444';
                     msgEl.textContent = data.error || 'Invalid promo code.';
+                    if (discountInput) discountInput.value = '0';
                 }
             } catch (err) {
                 console.error("Promo error:", err);
