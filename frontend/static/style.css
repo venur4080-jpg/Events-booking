@@ -702,87 +702,199 @@ main {
     }
 }
 
-/* --- Sidebar Navigation --- */
+/* --- Sidebar Overlay & Backdrop Blur --- */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    background: rgba(4, 9, 20, 0.72);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 2400;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sidebar-overlay.active,
+body.sidebar-open .sidebar-overlay {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+body.sidebar-open {
+    overflow: hidden !important;
+    touch-action: none;
+}
+
+/* --- Premium Sidebar Drawer Navigation --- */
 .sidebar {
     position: fixed;
     top: 0;
-    left: -320px;
-    width: 300px;
+    left: -380px;
+    width: 325px;
+    max-width: 86vw;
     height: 100vh;
-    background: rgba(15, 23, 42, 0.95);
-    backdrop-filter: blur(20px);
-    border-right: 1px solid var(--glass-border);
-    z-index: 2000;
-    transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    padding: 2.5rem;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+    background: linear-gradient(180deg, rgba(10, 16, 31, 0.98) 0%, rgba(15, 23, 42, 0.98) 100%);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    border-right: 1px solid rgba(0, 242, 254, 0.16);
+    z-index: 2500;
+    transition: left 0.32s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.32s ease;
+    padding: 1.25rem 1.1rem 2.2rem 1.1rem;
     display: flex;
     flex-direction: column;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    overscroll-behavior: contain !important;
+    overscroll-behavior-y: contain !important;
+    -webkit-overflow-scrolling: touch;
+    box-shadow: none;
 }
 
 .sidebar.active {
-    left: 0;
-    box-shadow: 20px 0 50px rgba(0, 0, 0, 0.5);
+    left: 0 !important;
+    box-shadow: 20px 0 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 242, 254, 0.15) !important;
 }
 
+/* Slim Luminous Scrollbar */
+.sidebar::-webkit-scrollbar {
+    width: 5px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(0, 242, 254, 0.3);
+    border-radius: 10px;
+    transition: background 0.2s ease;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 242, 254, 0.7);
+}
+
+.sidebar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 242, 254, 0.3) transparent;
+}
+
+/* Sidebar Header */
 .sidebar-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 4rem;
+    padding-bottom: 0.85rem;
+    margin-bottom: 0.85rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    flex-shrink: 0;
 }
 
 .sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     font-family: var(--font-heading);
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.3px;
+}
+
+.sidebar-logo img {
+    height: 36px;
+    border-radius: 8px;
+    box-shadow: 0 0 12px rgba(0, 242, 254, 0.35);
+}
+
+.sidebar-logo span {
+    color: var(--primary);
 }
 
 .close-btn {
-    font-size: 2rem;
-    color: var(--text-muted);
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+    font-size: 1.35rem;
     cursor: pointer;
-    transition: 0.3s;
+    line-height: 1;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 0;
 }
 
 .close-btn:hover {
-    color: white;
+    background: rgba(239, 68, 68, 0.18);
+    border-color: rgba(239, 68, 68, 0.45);
+    color: #f87171;
     transform: rotate(90deg);
 }
 
-.sidebar-links {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
+/* Sidebar User Mini-Card */
 .sidebar-user-card {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 0.85rem 1rem;
-    margin: 0.25rem 0 1rem;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(0, 242, 254, 0.03));
-    border: 1px solid rgba(255, 255, 255, 0.09);
+    padding: 0.75rem 0.9rem;
+    margin: 0 0 0.85rem 0;
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.65), rgba(15, 23, 42, 0.75));
+    border: 1px solid rgba(0, 242, 254, 0.18);
     border-radius: 14px;
-    backdrop-filter: blur(12px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
+    flex-shrink: 0;
 }
 
 .sidebar-user-avatar {
     flex-shrink: 0;
 }
 
+/* Sidebar Links List */
+.sidebar-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    flex: 1 0 auto;
+}
+
+.sidebar-links li {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
 .sidebar-links a {
     position: relative;
-    font-size: 1.02rem;
-    color: var(--text-muted);
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: #94a3b8;
     display: flex;
     align-items: center;
-    gap: 0.85rem;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    padding: 0.75rem 1rem;
-    border-radius: 12px;
+    gap: 0.75rem;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 0.65rem 0.85rem;
+    border-radius: 10px;
     overflow: hidden;
+    text-decoration: none;
+    border: 1px solid transparent;
 }
 
 .sidebar-links a::before {
@@ -795,14 +907,15 @@ main {
     height: 60%;
     background: linear-gradient(180deg, var(--primary), var(--secondary));
     border-radius: 0 4px 4px 0;
-    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     box-shadow: 0 0 10px var(--primary);
 }
 
 .sidebar-links a:hover {
     color: #ffffff;
     background: rgba(0, 242, 254, 0.08);
-    transform: translateX(6px);
+    border-color: rgba(0, 242, 254, 0.16);
+    transform: translateX(4px);
 }
 
 .sidebar-links a:hover::before {
@@ -811,21 +924,23 @@ main {
 
 .sidebar-links a.active {
     color: #ffffff;
-    background: linear-gradient(90deg, rgba(0, 242, 254, 0.12), rgba(0, 242, 254, 0.02));
-    border: 1px solid rgba(0, 242, 254, 0.22);
+    background: linear-gradient(90deg, rgba(0, 242, 254, 0.16), rgba(79, 172, 254, 0.04));
+    border: 1px solid rgba(0, 242, 254, 0.32);
     font-weight: 700;
+    box-shadow: 0 0 15px rgba(0, 242, 254, 0.12);
 }
 
 .sidebar-links a.active::before {
     transform: translateY(-50%) scaleY(1);
 }
 
+/* Badges inside Sidebar Links */
 .sidebar-pill-badge {
     margin-left: auto;
-    font-size: 0.74rem;
+    font-size: 0.72rem;
     font-weight: 800;
     padding: 2px 8px;
-    border-radius: 12px;
+    border-radius: 10px;
     letter-spacing: 0.3px;
     white-space: nowrap;
 }
@@ -840,6 +955,41 @@ main {
     background: rgba(0, 242, 254, 0.15);
     color: var(--primary);
     border: 1px solid rgba(0, 242, 254, 0.3);
+}
+
+/* Sidebar Section Headers and Dividers */
+.sidebar-links hr {
+    border: 0 !important;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    margin: 0.45rem 0 !important;
+}
+
+.sidebar-links li[role="heading"] {
+    padding: 0.45rem 0.85rem 0.2rem;
+    color: var(--primary);
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    opacity: 0.85;
+}
+
+/* Logout Item in Sidebar */
+.sidebar-links a[href*="logout"] {
+    color: #f87171 !important;
+    margin-top: 0.35rem;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    font-weight: 600;
+}
+
+.sidebar-links a[href*="logout"]:hover {
+    background: rgba(239, 68, 68, 0.22);
+    border-color: rgba(239, 68, 68, 0.45);
+    color: #ffffff !important;
+    transform: translateX(4px);
+    box-shadow: 0 0 16px rgba(239, 68, 68, 0.25);
 }
 
 /* --- Price Filter Pills Bar --- */
@@ -4893,12 +5043,16 @@ body.light-mode .site-footer ul li a:hover {
 
     /* 3. Sliding Sidebar */
     .sidebar {
-        width: min(300px, 85vw) !important;
-        padding: 1.8rem 1.2rem !important;
+        width: min(315px, 88vw) !important;
+        padding: 1.15rem 1rem 2.2rem 1rem !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        overscroll-behavior: contain !important;
+        overscroll-behavior-y: contain !important;
     }
 
     .sidebar-header {
-        margin-bottom: 2rem !important;
+        margin-bottom: 0.85rem !important;
     }
 
     /* 4. Hero Section */

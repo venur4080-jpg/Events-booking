@@ -97,3 +97,132 @@ function validateEmailAddress(email) {
 
     return { valid: true, cleaned: val };
 }
+
+/**
+ * Universal Sidebar Drawer & Background Scroll-Lock Engine
+ * - Guarantees isolated sidebar scrolling without moving background page
+ * - Auto-creates backdrop blur overlay
+ * - MutationObserver syncs with individual page script toggles
+ * - Consumes wheel events to prevent scroll chaining
+ */
+(function() {
+    function initSidebarEngine() {
+        const sidebar = document.getElementById('sidebar');
+        if (!sidebar) return;
+
+        // Auto-inject overlay if not present
+        let overlay = document.getElementById('sidebarOverlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'sidebarOverlay';
+            overlay.className = 'sidebar-overlay';
+            overlay.setAttribute('aria-hidden', 'true');
+            document.body.appendChild(overlay);
+        }
+
+        function openSidebar() {
+            sidebar.classList.add('active');
+            sidebar.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('sidebar-open');
+            if (overlay) overlay.classList.add('active');
+            const hamburger = document.getElementById('hamburger');
+            if (hamburger) hamburger.setAttribute('aria-expanded', 'true');
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            sidebar.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('sidebar-open');
+            if (overlay) overlay.classList.remove('active');
+            const hamburger = document.getElementById('hamburger');
+            if (hamburger) hamburger.setAttribute('aria-expanded', 'false');
+        }
+
+        // Click delegation
+        document.addEventListener('click', function(e) {
+            const hamburger = e.target.closest('#hamburger');
+            if (hamburger) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (sidebar.classList.contains('active')) {
+                    closeSidebar();
+                } else {
+                    openSidebar();
+                }
+                return;
+            }
+
+            const closeBtn = e.target.closest('#closeSidebar, .close-btn');
+            if (closeBtn && sidebar.contains(closeBtn)) {
+                e.preventDefault();
+                e.stopPropagation();
+                closeSidebar();
+                return;
+            }
+
+            if (e.target === overlay) {
+                e.preventDefault();
+                e.stopPropagation();
+                closeSidebar();
+                return;
+            }
+
+            // Outside click when open
+            if (sidebar.classList.contains('active') && !sidebar.contains(e.target)) {
+                closeSidebar();
+            }
+        }, true);
+
+        // Escape key to close
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && sidebar.classList.contains('active')) {
+                closeSidebar();
+            }
+        });
+
+        // Strict Wheel Scroll Isolation: guarantees wheel events never leak to background body
+        sidebar.addEventListener('wheel', function(e) {
+            e.stopPropagation();
+            const scrollTop = sidebar.scrollTop;
+            const scrollHeight = sidebar.scrollHeight;
+            const height = sidebar.clientHeight;
+            const delta = e.deltaY;
+
+            // At boundaries, consume wheel so background page won't scroll
+            if ((delta < 0 && scrollTop <= 0) || (delta > 0 && (scrollTop + height >= scrollHeight - 1))) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // Touchmove containment for mobile
+        if (overlay) {
+            overlay.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+            }, { passive: false });
+        }
+
+        // MutationObserver to sync with any legacy page-level hamburger click handlers
+        const observer = new MutationObserver(function(mutations) {
+            for (let i = 0; i < mutations.length; i++) {
+                if (mutations[i].attributeName === 'class') {
+                    const isActive = sidebar.classList.contains('active');
+                    if (isActive) {
+                        document.body.classList.add('sidebar-open');
+                        if (overlay) overlay.classList.add('active');
+                    } else {
+                        document.body.classList.remove('sidebar-open');
+                        if (overlay) overlay.classList.remove('active');
+                    }
+                    break;
+                }
+            }
+        });
+        observer.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSidebarEngine);
+    } else {
+        initSidebarEngine();
+    }
+})();
