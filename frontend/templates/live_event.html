@@ -93,6 +93,22 @@
             100% { opacity: 1; transform: scale(1.15); box-shadow: 0 0 14px #ef4444; }
         }
 
+        @keyframes floatUpReaction {
+            0% { opacity: 1; transform: translateY(0) scale(0.8) rotate(0deg); }
+            50% { opacity: 0.95; transform: translateY(-120px) scale(1.4) rotate(15deg); }
+            100% { opacity: 0; transform: translateY(-260px) scale(1.1) rotate(-15deg); }
+        }
+
+        .floating-reaction-emoji {
+            position: absolute;
+            bottom: 25px;
+            font-size: 2.4rem;
+            pointer-events: none;
+            z-index: 50;
+            animation: floatUpReaction 2.2s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+            filter: drop-shadow(0 0 12px rgba(0, 242, 254, 0.6));
+        }
+
         /* Theater Grid Layout */
         .theater-grid {
             display: grid;
@@ -527,7 +543,11 @@
                 </div>
                 <h1>Live Video Projection: <span style="background: linear-gradient(135deg, #00f2fe, #4facfe); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">{{ event.title }}</span></h1>
             </div>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                <span id="liveViewerCountBadge" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); padding: 6px 14px; border-radius: 999px; font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;">
+                    <span class="pulse-dot" style="width: 7px; height: 7px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981; animation: pulseGlow 1.5s infinite alternate;"></span>
+                    <span id="liveViewerCount">1 Live Viewer</span>
+                </span>
                 <span style="background: rgba(0, 242, 254, 0.12); color: var(--primary); border: 1px solid rgba(0, 242, 254, 0.3); padding: 6px 14px; border-radius: 999px; font-weight: 700; font-size: 0.85rem;">
                     🏷️ {{ event.category }}
                 </span>
@@ -605,6 +625,23 @@
                         </div>
                         {% endif %}
                     </div>
+                    <!-- Floating Reactions Overlay Container -->
+                    <div id="floatingEmojiContainer" style="position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 25;"></div>
+                </div>
+
+                <!-- Live Audience Reactions & WebSocket Sync Bar -->
+                <div style="margin: 1rem 0 1.5rem; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(0, 242, 254, 0.25); border-radius: 14px; padding: 0.8rem 1.2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                        <span style="font-size: 0.85rem; color: #94a3b8; font-weight: 700;">Live Reactions:</span>
+                        <div style="display: flex; gap: 6px;">
+                            <button type="button" class="quick-chip-btn" onclick="sendStageReaction('❤️')" title="Send Love">❤️ Love</button>
+                            <button type="button" class="quick-chip-btn" onclick="sendStageReaction('🔥')" title="Send Fire">🔥 Fire</button>
+                            <button type="button" class="quick-chip-btn" onclick="sendStageReaction('👏')" title="Applause">👏 Clap</button>
+                            <button type="button" class="quick-chip-btn" onclick="sendStageReaction('🎉')" title="Celebrate">🎉 Party</button>
+                            <button type="button" class="quick-chip-btn" onclick="sendStageReaction('🚀')" title="Rocket">🚀 Boost</button>
+                        </div>
+                    </div>
+                    <span style="font-size: 0.78rem; color: #00f2fe; font-weight: 600;">⚡ Real-time WebSocket Stage</span>
                 </div>
 
                 <!-- Broadcaster Studio Controls (Upload Live Link, Dashcam, Upload Video) -->
@@ -1434,6 +1471,71 @@
             if (statusNote) statusNote.style.display = 'none';
         }
 
+        const currentUsername = "{{ username or 'Attendee' }}";
+        let stageWs = null;
+
+        function initStageWebSocket() {
+            const eventId = {{ event.id }};
+            const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            try {
+                stageWs = new WebSocket(`${wsProtocol}//${window.location.host}/ws/live/${eventId}`);
+                stageWs.onopen = function() {
+                    console.log("Connected to Live Stage WebSocket");
+                };
+                stageWs.onmessage = function(event) {
+                    try {
+                        const data = JSON.parse(event.data);
+                        if (data.type === 'viewer_count') {
+                            const el = document.getElementById('liveViewerCount');
+                            if (el) el.innerText = `${data.count} Live Viewers`;
+                        } else if (data.type === 'chat_message') {
+                            if (data.username !== currentUsername) {
+                                appendLiveChatMessage(data.username, data.message, data.time);
+                            }
+                        } else if (data.type === 'reaction') {
+                            spawnFloatingReaction(data.emoji);
+                        }
+                    } catch (err) {
+                        console.error("Stage WS parse error", err);
+                    }
+                };
+                stageWs.onclose = function() {
+                    setTimeout(initStageWebSocket, 3500);
+                };
+            } catch (e) {
+                console.log("Stage WS fallback", e);
+            }
+        }
+
+        function appendLiveChatMessage(username, message, time) {
+            const list = document.getElementById('qaList');
+            if (!list) return;
+            const div = document.createElement('div');
+            div.className = 'qa-item';
+            div.innerHTML = `<div style="display: flex; justify-content: space-between; align-items: baseline;"><strong style="color: var(--live-cyan);">${username}:</strong><span style="font-size: 0.72rem; color: #94a3b8;">${time || ''}</span></div><p style="color: #e2e8f0; margin: 4px 0 0 0; line-height: 1.45;">${message}</p>`;
+            list.appendChild(div);
+            list.scrollTop = list.scrollHeight;
+        }
+
+        function sendStageReaction(emoji) {
+            if (stageWs && stageWs.readyState === WebSocket.OPEN) {
+                stageWs.send(JSON.stringify({ action: 'reaction', emoji: emoji, username: currentUsername }));
+            }
+            spawnFloatingReaction(emoji);
+        }
+
+        function spawnFloatingReaction(emoji) {
+            const container = document.getElementById('floatingEmojiContainer');
+            if (!container) return;
+            const span = document.createElement('span');
+            span.className = 'floating-reaction-emoji';
+            span.innerText = emoji;
+            const leftPercent = 15 + Math.random() * 70;
+            span.style.left = `${leftPercent}%`;
+            container.appendChild(span);
+            setTimeout(() => { span.remove(); }, 2300);
+        }
+
         // Q&A Chat Submission
         async function submitQuestion(e) {
             e.preventDefault();
@@ -1450,6 +1552,11 @@
                 list.scrollTop = list.scrollHeight;
             }
             if (input) input.value = '';
+
+            // Send via WebSocket to all other viewers instantly
+            if (stageWs && stageWs.readyState === WebSocket.OPEN) {
+                stageWs.send(JSON.stringify({ action: 'chat', username: currentUsername, message: text }));
+            }
 
             try {
                 await fetch('/api/event/{{ event.id }}/live/questions', {
@@ -1485,8 +1592,9 @@
             }
         }
 
-        // Initialize cameras on page load and listen for device plug/unplug events
+        // Initialize cameras & WebSocket stage on page load
         document.addEventListener('DOMContentLoaded', () => {
+            initStageWebSocket();
             initCameraDevices();
             if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) {
                 navigator.mediaDevices.addEventListener('devicechange', () => {

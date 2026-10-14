@@ -344,15 +344,28 @@
                 <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; align-items: center;">
                     <span class="detail-badge" style="margin-bottom: 0;">📅 {{ event.date }}</span>
                     <span class="detail-badge" style="background: rgba(0, 242, 254, 0.2); border: 1px solid var(--primary); color: var(--primary); margin-bottom: 0;">⏰ {{ event.time }} - {{ event.end_time }}</span>
-                    {% if event.is_today and event.is_open %}
-                    <span class="detail-badge" style="background: rgba(245, 158, 11, 0.3); border: 1px solid #f59e0b; color: #fbbf24; margin-bottom: 0;">⚡ Closes at {{ event.cutoff_time }}</span>
+                    {% if event.is_live_now %}
+                    <span class="detail-badge" style="background: rgba(239, 68, 68, 0.25); border: 1px solid #ef4444; color: #fca5a5; margin-bottom: 0; font-weight: 800; display: inline-flex; align-items: center; gap: 6px;">
+                        <span class="pulse-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 8px #ef4444;"></span>
+                        🔴 LIVE NOW
+                    </span>
+                    {% elif event.is_today and event.is_open %}
+                    <span class="detail-badge" id="liveCountdownBadge" style="background: rgba(245, 158, 11, 0.3); border: 1px solid #f59e0b; color: #fbbf24; margin-bottom: 0;">⚡ Closes at {{ event.cutoff_time }}</span>
+                    {% elif event.is_tomorrow %}
+                    <span class="detail-badge" style="background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #34d399; margin-bottom: 0;">📅 Tomorrow</span>
+                    {% elif event.is_this_weekend %}
+                    <span class="detail-badge" style="background: rgba(168, 85, 247, 0.2); border: 1px solid #a855f7; color: #d8b4fe; margin-bottom: 0;">🎉 This Weekend</span>
                     {% endif %}
-                    <span class="detail-badge seat-detail-pill {% if event.is_in_person_sold_out %}soldout{% elif (event.seats_left or 100) < 15 %}warning{% else %}open{% endif %}">
+                    <span id="liveSeatPill" class="detail-badge seat-detail-pill {% if event.is_in_person_sold_out %}soldout{% elif (event.seats_left or 100) < 15 %}warning{% else %}open{% endif %}">
                         {% if event.is_in_person_sold_out %}
                         ⛔ 0 / {{ event.seats_total or 100 }} Seats Available (Sold Out)
                         {% else %}
-                        🪑 {{ event.seats_left }} / {{ event.seats_total or 100 }} Seats Available to Register
+                        🪑 <span id="dynamicSeatsNum">{{ event.seats_left }}</span> / {{ event.seats_total or 100 }} Seats Available to Register
                         {% endif %}
+                    </span>
+                    <span id="realtimeLiveIndicator" style="display: inline-flex; background: rgba(0, 242, 254, 0.15); border: 1px solid rgba(0, 242, 254, 0.4); color: #00f2fe; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; align-items: center; gap: 6px;">
+                        <span style="width: 6px; height: 6px; border-radius: 50%; background: #00f2fe; box-shadow: 0 0 6px #00f2fe; animation: pulseGlow 1.5s infinite alternate;"></span>
+                        Live Seat Sync
                     </span>
                 </div>
                 <h1 class="hero-title details-hero-title" style="text-align: left; margin: 0; font-size: 3.5rem;">{{ event.title }}</h1>
@@ -1108,6 +1121,98 @@
                 console.error("Error loading reviews:", err);
             }
         }
+
+        // ============================================================================
+        // REAL-TIME WEBSOCKET SEAT SYNC & LIVE COUNTDOWN
+        // ============================================================================
+        (function initRealtimeDetails() {
+            const eventId = {{ event.id }};
+            const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            let ws = null;
+            let reconnectTimer = null;
+
+            function connectWebSocket() {
+                try {
+                    ws = new WebSocket(`${wsProtocol}//${window.location.host}/ws/events/${eventId}`);
+                    
+                    ws.onopen = function() {
+                        const ind = document.getElementById('realtimeLiveIndicator');
+                        if (ind) ind.style.display = 'inline-flex';
+                    };
+
+                    ws.onmessage = function(event) {
+                        try {
+                            const data = JSON.parse(event.data);
+                            if (data.type === 'init' || data.type === 'seat_update') {
+                                updateSeatDisplay(data);
+                            }
+                        } catch (err) {
+                            console.error("WS Parse error", err);
+                        }
+                    };
+
+                    ws.onclose = function() {
+                        clearTimeout(reconnectTimer);
+                        reconnectTimer = setTimeout(connectWebSocket, 3000);
+                    };
+
+                    ws.onerror = function() {
+                        if (ws) ws.close();
+                    };
+                } catch (e) {
+                    console.log("WebSocket init fallback", e);
+                }
+            }
+
+            function updateSeatDisplay(data) {
+                const seatPill = document.getElementById('liveSeatPill');
+                const total = data.seats_total || 100;
+                const filled = data.seats_filled || 0;
+                const avail = data.seats_available !== undefined ? data.seats_available : Math.max(0, total - filled);
+
+                if (seatPill) {
+                    if (avail <= 0) {
+                        seatPill.className = 'detail-badge seat-detail-pill soldout';
+                        seatPill.innerHTML = `⛔ 0 / ${total} Seats Available (Sold Out)`;
+                    } else if (avail < 15) {
+                        seatPill.className = 'detail-badge seat-detail-pill warning';
+                        seatPill.innerHTML = `🪑 <span id="dynamicSeatsNum">${avail}</span> / ${total} Seats Available to Register`;
+                    } else {
+                        seatPill.className = 'detail-badge seat-detail-pill open';
+                        seatPill.innerHTML = `🪑 <span id="dynamicSeatsNum">${avail}</span> / ${total} Seats Available to Register`;
+                    }
+                    seatPill.style.transform = 'scale(1.08)';
+                    setTimeout(() => { seatPill.style.transform = 'scale(1)'; }, 350);
+                }
+
+                if (data.type === 'seat_update' && window.showToast) {
+                    showToast(`⚡ Live Seat Update: ${avail} / ${total} seats currently available!`, 'info');
+                }
+            }
+
+            // Real-time ticking countdown for today's cutoff
+            const cutoffSeconds = {{ event.time_until_cutoff_seconds or 0 }};
+            const countdownBadge = document.getElementById('liveCountdownBadge');
+            if (countdownBadge && cutoffSeconds > 0) {
+                let remaining = cutoffSeconds;
+                const timer = setInterval(() => {
+                    remaining--;
+                    if (remaining <= 0) {
+                        clearInterval(timer);
+                        countdownBadge.innerText = '⛔ Cutoff Reached';
+                        countdownBadge.style.color = '#ef4444';
+                        countdownBadge.style.borderColor = '#ef4444';
+                        return;
+                    }
+                    const hrs = Math.floor(remaining / 3600);
+                    const mins = Math.floor((remaining % 3600) / 60);
+                    const secs = remaining % 60;
+                    countdownBadge.innerText = `⚡ Closes in: ${hrs > 0 ? hrs + 'h ' : ''}${mins}m ${secs < 10 ? '0' : ''}${secs}s`;
+                }, 1000);
+            }
+
+            document.addEventListener('DOMContentLoaded', connectWebSocket);
+        })();
 
         document.addEventListener('DOMContentLoaded', loadAttendeesAndReviews);
     </script>

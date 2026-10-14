@@ -5866,7 +5866,12 @@ def get_event_status_info(event: dict, ref_now=None):
             'cutoff_dt': now - timedelta(hours=2),
             'status_label': 'Open',
             'status_badge': 'open',
-            'status_reason': ''
+            'status_reason': '',
+            'is_live_now': False,
+            'is_tomorrow': False,
+            'is_this_weekend': False,
+            'time_until_start_seconds': 0,
+            'time_until_cutoff_seconds': 0
         }
         
     start_h, start_m = parse_time_string(time_str, 10, 0)
@@ -5976,7 +5981,12 @@ def get_event_status_info(event: dict, ref_now=None):
         'status_badge': status_badge,
         'status_reason': status_reason,
         'maps_url': maps_url,
-        'maps_directions_url': maps_directions_url
+        'maps_directions_url': maps_directions_url,
+        'is_live_now': bool(is_today and (start_dt <= now < end_dt)),
+        'is_tomorrow': bool(event_date == (today_date + timedelta(days=1))),
+        'is_this_weekend': bool(event_date >= today_date and event_date.weekday() in (5, 6) and (event_date - today_date).days <= 7),
+        'time_until_start_seconds': max(0, int((start_dt - now).total_seconds())) if (start_dt > now) else 0,
+        'time_until_cutoff_seconds': max(0, int((cutoff_dt - now).total_seconds())) if (cutoff_dt > now) else 0
     }
 
 
@@ -6032,6 +6042,127 @@ def get_category(title, explicit_category=None):
     if any(k in t for k in ['government', 'gov', 'civic', 'swachh', 'digital india', 'public scheme', 'voter', 'panchayat', 'niti', 'policy', 'smart city', 'tribal', 'governance', 'citizen', 'parliament']):
         return 'Government'
     return 'Education'
+
+
+def sync_dynamic_realtime_events(conn=None):
+    """
+    Dynamically aligns catalog events across all 12 categories so that:
+    - Event 1: Today (Live / Active countdown)
+    - Event 2: Tomorrow
+    - Event 3 & 4: Coming Weekend (Saturday & Sunday)
+    - Events 5-8: Next Week (Monday, Wednesday, Friday, Saturday)
+    - Events 9-20: Future Horizon (spaced every 2-3 days over the next 45 days)
+    Guarantees no stale dates and keeps every category full of active real-time events.
+    Only updates predefined catalog events (id <= 240) to preserve custom/user events.
+    """
+    should_close = False
+    if conn is None:
+        conn = get_db()
+        should_close = True
+
+    try:
+        c = conn.cursor()
+        now = datetime.now()
+        today = now.date()
+
+        # Coming Weekend calculation
+        days_to_sat = (5 - today.weekday()) % 7
+        if days_to_sat <= 1:
+            days_to_sat += 7
+        sat_date = today + timedelta(days=days_to_sat)
+        sun_date = sat_date + timedelta(days=1)
+
+        # Next Monday calculation
+        days_to_mon = (7 - today.weekday()) % 7
+        if days_to_mon <= 0:
+            days_to_mon += 7
+        next_mon = today + timedelta(days=days_to_mon)
+
+        # Group predefined events (id <= 240) by category
+        c.execute("SELECT id, title, category FROM events WHERE id <= 240 ORDER BY id ASC")
+        rows = c.fetchall()
+
+        cat_groups = {}
+        for r in rows:
+            cat = get_category(r[1], explicit_category=r[2] if len(r) > 2 else None)
+            cat_groups.setdefault(cat, []).append(r[0])
+
+        for cat_i, (cat, evt_ids) in enumerate(cat_groups.items()):
+            for idx, eid in enumerate(evt_ids[:20]):
+                if idx == 0:
+                    d_str = today.strftime("%b %d, %Y")
+                    # Alternate between actively streaming LIVE NOW events and upcoming today events
+                    if cat_i % 2 == 0:
+                        live_start = now - timedelta(minutes=45)
+                        live_end = now + timedelta(hours=3)
+                        t_str = live_start.strftime("%I:%M %p")
+                        et_str = live_end.strftime("%I:%M %p")
+                    else:
+                        up_start = now + timedelta(hours=2, minutes=30)
+                        up_end = now + timedelta(hours=6)
+                        t_str = up_start.strftime("%I:%M %p")
+                        et_str = up_end.strftime("%I:%M %p")
+                elif idx == 1:
+                    d_str = (today + timedelta(days=1)).strftime("%b %d, %Y")
+                    t_str, et_str = "10:00 AM", "05:00 PM"
+                elif idx == 2:
+                    d_str = sat_date.strftime("%b %d, %Y")
+                    t_str, et_str = "11:00 AM", "06:00 PM"
+                elif idx == 3:
+                    d_str = sun_date.strftime("%b %d, %Y")
+                    t_str, et_str = "02:00 PM", "08:00 PM"
+                elif idx == 4:
+                    d_str = next_mon.strftime("%b %d, %Y")
+                    t_str, et_str = "10:00 AM", "05:00 PM"
+                elif idx == 5:
+                    d_str = (next_mon + timedelta(days=2)).strftime("%b %d, %Y")
+                    t_str, et_str = "10:00 AM", "05:00 PM"
+                elif idx == 6:
+                    d_str = (next_mon + timedelta(days=4)).strftime("%b %d, %Y")
+                    t_str, et_str = "10:00 AM", "05:00 PM"
+                elif idx == 7:
+                    d_str = (next_mon + timedelta(days=5)).strftime("%b %d, %Y")
+                    t_str, et_str = "11:00 AM", "06:00 PM"
+                else:
+                    d_str = (next_mon + timedelta(days=7 + (idx - 8) * 3)).strftime("%b %d, %Y")
+                    t_str, et_str = "10:00 AM", "05:00 PM"
+
+                c.execute("UPDATE events SET date = ?, time = ?, end_time = ? WHERE id = ?", (d_str, t_str, et_str, eid))
+
+        conn.commit()
+        invalidate_events_cache()
+    except Exception as e:
+        print(f"[Dynamic Realtime Events Warning] {e}")
+    finally:
+        if should_close:
+            conn.close()
+
+
+def trigger_seat_update_broadcast(event_id, seats_filled, seats_total):
+    """Dispatches a real-time WebSocket seat count update to all connected viewers."""
+    try:
+        from backend.fastapi_app import broadcast_seat_update_sync
+        broadcast_seat_update_sync(event_id, seats_filled, seats_total)
+    except Exception:
+        try:
+            from fastapi_app import broadcast_seat_update_sync
+            broadcast_seat_update_sync(event_id, seats_filled, seats_total)
+        except Exception:
+            pass
+
+
+def trigger_telemetry_checkin_broadcast(data):
+    """Dispatches a real-time gate scanner telemetry check-in event to all admin monitors."""
+    try:
+        from backend.fastapi_app import broadcast_checkin_telemetry_sync
+        broadcast_checkin_telemetry_sync(data)
+    except Exception:
+        try:
+            from fastapi_app import broadcast_checkin_telemetry_sync
+            broadcast_checkin_telemetry_sync(data)
+        except Exception:
+            pass
+
 
 def init_db():
     conn = get_db()
@@ -6284,6 +6415,9 @@ def init_db():
             c.execute(idx)
         except Exception:
             pass
+
+    # Dynamically roll calendar dates across all 12 categories for real-time engagement
+    sync_dynamic_realtime_events(conn)
 
     conn.commit()
     conn.close()
@@ -7032,11 +7166,22 @@ def dashboard():
         ev['is_in_person_sold_out'] = status_info.get('is_in_person_sold_out') or (ev['seats_filled'] >= ev['seats_total'])
         ev['stream_price'] = status_info.get('stream_price') or '₹199'
         ev['is_registered'] = ev['id'] in registered_ids
+        ev['is_live_now'] = status_info.get('is_live_now', False)
+        ev['is_tomorrow'] = status_info.get('is_tomorrow', False)
+        ev['is_this_weekend'] = status_info.get('is_this_weekend', False)
+        ev['time_until_start_seconds'] = status_info.get('time_until_start_seconds', 0)
+        ev['time_until_cutoff_seconds'] = status_info.get('time_until_cutoff_seconds', 0)
         
         if ev['is_expired'] and not ev['is_today']:
             past_events.append(ev)
         else:
             upcoming_events.append(ev)
+
+    # Sort upcoming events so Live Now, Today, Tomorrow, and This Weekend appear first
+    upcoming_events.sort(key=lambda x: (
+        0 if x.get('is_live_now') else (1 if x.get('is_today') else (2 if x.get('is_tomorrow') else (3 if x.get('is_this_weekend') else 4))),
+        x.get('id', 0)
+    ))
             
     # Calculate carousel angles only for upcoming events
     total_upcoming = len(upcoming_events)
@@ -7139,11 +7284,22 @@ def category_events(category_name=None):
         ev['is_in_person_sold_out'] = status_info.get('is_in_person_sold_out') or (ev['seats_filled'] >= ev['seats_total'])
         ev['stream_price'] = status_info.get('stream_price') or '₹199'
         ev['is_registered'] = ev['id'] in registered_ids
+        ev['is_live_now'] = status_info.get('is_live_now', False)
+        ev['is_tomorrow'] = status_info.get('is_tomorrow', False)
+        ev['is_this_weekend'] = status_info.get('is_this_weekend', False)
+        ev['time_until_start_seconds'] = status_info.get('time_until_start_seconds', 0)
+        ev['time_until_cutoff_seconds'] = status_info.get('time_until_cutoff_seconds', 0)
         
         if ev['is_expired'] and not ev['is_today']:
             past_events.append(ev)
         else:
             upcoming_events.append(ev)
+
+    # Sort upcoming events: Live Now, Today, Tomorrow, This Weekend appear first
+    upcoming_events.sort(key=lambda x: (
+        0 if x.get('is_live_now') else (1 if x.get('is_today') else (2 if x.get('is_tomorrow') else (3 if x.get('is_this_weekend') else 4))),
+        x.get('id', 0)
+    ))
 
     # Calculate carousel angles and radius for this category's upcoming active events
     all_category_events = upcoming_events + past_events
@@ -8838,6 +8994,15 @@ def register_event(event_id):
             invalidate_user_regs(username)
             invalidate_events_cache()
 
+            # Real-time WebSocket zero-latency broadcast
+            if seats_to_add > 0:
+                try:
+                    c_ev = get_event(event_id)
+                    if c_ev:
+                        trigger_seat_update_broadcast(event_id, c_ev.get('seats_filled', 0), c_ev.get('seats_total', 100))
+                except Exception:
+                    pass
+
             # Construct registration details dict & generate PDF ticket
             reg_dict = {
                 'id': reg_id,
@@ -8962,6 +9127,15 @@ def unregister_event(event_id):
             conn.commit()
             invalidate_user_regs(username)
             invalidate_events_cache()
+            
+            # Real-time WebSocket zero-latency broadcast
+            if seats_freed > 0:
+                try:
+                    c_ev = get_event(event_id)
+                    if c_ev:
+                        trigger_seat_update_broadcast(event_id, c_ev.get('seats_filled', 0), c_ev.get('seats_total', 100))
+                except Exception:
+                    pass
             
             event = get_event(event_id)
             ev_title = event['title'] if event else f"Event #{event_id}"
@@ -11144,6 +11318,16 @@ def api_verify_ticket():
         checkin_time_str = now_str
         invalidate_checkins_cache()
         log_action(session.get('username'), 'scan_ticket', f"Checked in {reg_dict['username']} for event #{reg_dict['event_id']} (Reg #{reg_dict['id']})")
+        trigger_telemetry_checkin_broadcast({
+            'reg_id': reg_dict['id'],
+            'attendee': reg_dict['full_name'] or reg_dict['username'],
+            'username': reg_dict['username'],
+            'college_id': reg_dict.get('college_id') or 'N/A',
+            'event_id': reg_dict['event_id'],
+            'event_title': reg_dict['event_title'],
+            'ticket_code': reg_dict.get('ticket_code') or '',
+            'checkin_time': checkin_time_str
+        })
     conn.close()
 
     return jsonify({
@@ -11422,16 +11606,23 @@ def serve_cached_static(filename):
     resp.headers['Cache-Control'] = 'public, max-age=86400, immutable'
     return resp
 
-# ASGI application wrapper for high-concurrency event-loop processing
+# ASGI application wrapper: Native FastAPI + WebSockets + Flask WSGI Mount
 try:
-    from a2wsgi import WSGIMiddleware
-    asgi_app = WSGIMiddleware(app, workers=256)
+    try:
+        from backend.fastapi_app import fastapi_app as _f_app
+    except ImportError:
+        from fastapi_app import fastapi_app as _f_app
+    asgi_app = _f_app
 except Exception:
     try:
-        from asgiref.wsgi import WsgiToAsgi
-        asgi_app = WsgiToAsgi(app)
+        from a2wsgi import WSGIMiddleware
+        asgi_app = WSGIMiddleware(app, workers=256)
     except Exception:
-        asgi_app = None
+        try:
+            from asgiref.wsgi import WsgiToAsgi
+            asgi_app = WsgiToAsgi(app)
+        except Exception:
+            asgi_app = None
 
 
 

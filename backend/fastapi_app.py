@@ -4,15 +4,17 @@ Integrates native async REST API endpoints, Pydantic validation schemas,
 interactive Swagger UI (/docs) and ReDoc (/redoc), with seamless WSGI mounting
 of the existing Flask Web Portal.
 """
-from typing import List, Optional, Any, Dict
+from typing import List, Optional, Any, Dict, Set
 from datetime import datetime
 import json
 import os
 import sys
 import sqlite3
+import asyncio
+import threading
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, APIRouter, HTTPException, Query, Path, status, Request
+from fastapi import FastAPI, APIRouter, HTTPException, Query, Path, status, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from a2wsgi import WSGIMiddleware
 from pydantic import BaseModel, Field
@@ -248,11 +250,135 @@ tags_metadata = [
         "name": "Admin & Metrics",
         "description": "Platform aggregate statistics, occupancy rates, and analytics.",
     },
+    {
+        "name": "Real-Time & WebSockets",
+        "description": "Zero-latency WebSockets hub for live seat availability, gate telemetry, and virtual stage chat.",
+    },
 ]
+
+# ============================================================================
+# REALTIME WEBSOCKET CONNECTION MANAGER & DISPATCH HUB
+# ============================================================================
+
+class RealtimeConnectionManager:
+    """Manages active WebSocket subscribers for events, telemetry, and live stages."""
+    def __init__(self):
+        self.event_subscribers: Dict[int, Set[WebSocket]] = {}
+        self.telemetry_subscribers: Set[WebSocket] = set()
+        self.live_stage_subscribers: Dict[int, Set[WebSocket]] = {}
+
+    async def connect_event(self, event_id: int, websocket: WebSocket):
+        await websocket.accept()
+        if event_id not in self.event_subscribers:
+            self.event_subscribers[event_id] = set()
+        self.event_subscribers[event_id].add(websocket)
+
+    def disconnect_event(self, event_id: int, websocket: WebSocket):
+        if event_id in self.event_subscribers:
+            self.event_subscribers[event_id].discard(websocket)
+            if not self.event_subscribers[event_id]:
+                del self.event_subscribers[event_id]
+
+    async def broadcast_seat_update(self, event_id: int, seats_filled: int, seats_total: int):
+        if event_id in self.event_subscribers:
+            seats_avail = max(0, seats_total - seats_filled)
+            payload = {
+                "type": "seat_update",
+                "event_id": event_id,
+                "seats_filled": seats_filled,
+                "seats_total": seats_total,
+                "seats_available": seats_avail,
+                "is_sold_out": seats_avail <= 0,
+                "timestamp": datetime.now().isoformat()
+            }
+            dead = set()
+            for ws in list(self.event_subscribers[event_id]):
+                try:
+                    await ws.send_json(payload)
+                except Exception:
+                    dead.add(ws)
+            for ws in dead:
+                self.event_subscribers[event_id].discard(ws)
+
+    async def connect_telemetry(self, websocket: WebSocket):
+        await websocket.accept()
+        self.telemetry_subscribers.add(websocket)
+
+    def disconnect_telemetry(self, websocket: WebSocket):
+        self.telemetry_subscribers.discard(websocket)
+
+    async def broadcast_telemetry(self, data: dict):
+        payload = {
+            "type": "telemetry_scan",
+            **data,
+            "timestamp": datetime.now().isoformat()
+        }
+        dead = set()
+        for ws in list(self.telemetry_subscribers):
+            try:
+                await ws.send_json(payload)
+            except Exception:
+                dead.add(ws)
+        for ws in dead:
+            self.telemetry_subscribers.discard(ws)
+
+    async def connect_live_stage(self, event_id: int, websocket: WebSocket):
+        await websocket.accept()
+        if event_id not in self.live_stage_subscribers:
+            self.live_stage_subscribers[event_id] = set()
+        self.live_stage_subscribers[event_id].add(websocket)
+
+    def disconnect_live_stage(self, event_id: int, websocket: WebSocket):
+        if event_id in self.live_stage_subscribers:
+            self.live_stage_subscribers[event_id].discard(websocket)
+            if not self.live_stage_subscribers[event_id]:
+                del self.live_stage_subscribers[event_id]
+
+    async def broadcast_live_stage(self, event_id: int, payload: dict):
+        if event_id in self.live_stage_subscribers:
+            dead = set()
+            for ws in list(self.live_stage_subscribers[event_id]):
+                try:
+                    await ws.send_json(payload)
+                except Exception:
+                    dead.add(ws)
+            for ws in dead:
+                self.live_stage_subscribers[event_id].discard(ws)
+
+
+realtime_hub = RealtimeConnectionManager()
+_main_event_loop = None
+
+
+def _dispatch_realtime_coro(coro):
+    """Safely dispatches coroutine onto running event loop or spawns thread."""
+    global _main_event_loop
+    try:
+        if _main_event_loop and _main_event_loop.is_running():
+            asyncio.run_coroutine_threadsafe(coro, _main_event_loop)
+        else:
+            threading.Thread(target=lambda: asyncio.run(coro), daemon=True).start()
+    except Exception as e:
+        print(f"[Realtime WebSocket Dispatch Warning] {e}")
+
+
+def broadcast_seat_update_sync(event_id: int, seats_filled: int, seats_total: int):
+    _dispatch_realtime_coro(realtime_hub.broadcast_seat_update(event_id, seats_filled, seats_total))
+
+
+def broadcast_checkin_telemetry_sync(data: dict):
+    _dispatch_realtime_coro(realtime_hub.broadcast_telemetry(data))
+
+
+def broadcast_live_stage_sync(event_id: int, payload: dict):
+    _dispatch_realtime_coro(realtime_hub.broadcast_live_stage(event_id, payload))
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Initialize SQLite database on startup
+    global _main_event_loop
+    _main_event_loop = asyncio.get_running_loop()
+    # Initialize SQLite database and dynamic rolling calendar on startup
     backend_module.init_db()
     yield
 
@@ -1046,6 +1172,197 @@ async def mark_notification_read(notification_id: int = Path(...)):
     conn.commit()
     conn.close()
     return StandardApiResponse(success=True, message="Notification marked as read")
+
+
+# ============================================================================
+# 7. REAL-TIME REST & WEBSOCKET ENDPOINTS
+# ============================================================================
+
+class RealtimeSeatBroadcastRequest(BaseModel):
+    event_id: int = Field(..., example=1)
+    seats_filled: int = Field(..., ge=0, example=24)
+    seats_total: int = Field(default=100, ge=1, example=100)
+
+
+class RealtimeTelemetryBroadcastRequest(BaseModel):
+    event_id: int = Field(..., example=1)
+    attendee: str = Field(..., example="Venu R")
+    username: str = Field(..., example="venu")
+    ticket_code: Optional[str] = Field(default="", example="TKT-001-00045")
+    checkin_time: Optional[str] = Field(default=None, example="14 Oct 2026, 03:30 PM")
+
+
+@api_v1.get(
+    "/realtime/status",
+    response_model=StandardApiResponse,
+    tags=["Real-Time & WebSockets"],
+    summary="Get active WebSocket connection metrics"
+)
+async def get_realtime_status():
+    total_event_listeners = sum(len(s) for s in realtime_hub.event_subscribers.values())
+    total_telemetry_listeners = len(realtime_hub.telemetry_subscribers)
+    total_stage_listeners = sum(len(s) for s in realtime_hub.live_stage_subscribers.values())
+
+    return StandardApiResponse(
+        success=True,
+        message="Real-time hub active and listening",
+        data={
+            "total_event_listeners": total_event_listeners,
+            "total_telemetry_listeners": total_telemetry_listeners,
+            "total_stage_listeners": total_stage_listeners,
+            "monitored_events": list(realtime_hub.event_subscribers.keys()),
+            "active_stages": list(realtime_hub.live_stage_subscribers.keys())
+        }
+    )
+
+
+@api_v1.post(
+    "/realtime/broadcast-seat",
+    response_model=StandardApiResponse,
+    tags=["Real-Time & WebSockets"],
+    summary="Trigger seat count broadcast across WebSockets"
+)
+async def api_broadcast_seat(payload: RealtimeSeatBroadcastRequest):
+    await realtime_hub.broadcast_seat_update(payload.event_id, payload.seats_filled, payload.seats_total)
+    return StandardApiResponse(success=True, message=f"Seat update broadcasted for event #{payload.event_id}")
+
+
+@api_v1.post(
+    "/realtime/broadcast-telemetry",
+    response_model=StandardApiResponse,
+    tags=["Real-Time & WebSockets"],
+    summary="Trigger telemetry check-in broadcast across WebSockets"
+)
+async def api_broadcast_telemetry(payload: RealtimeTelemetryBroadcastRequest):
+    await realtime_hub.broadcast_telemetry({
+        "event_id": payload.event_id,
+        "attendee": payload.attendee,
+        "username": payload.username,
+        "ticket_code": payload.ticket_code,
+        "checkin_time": payload.checkin_time or datetime.now().strftime("%d %b %Y, %I:%M %p")
+    })
+    return StandardApiResponse(success=True, message=f"Check-in telemetry broadcasted for event #{payload.event_id}")
+
+
+# ============================================================================
+# NATIVE FASTAPI WEBSOCKET ENDPOINTS
+# ============================================================================
+
+@fastapi_app.websocket("/ws/events/{event_id}")
+async def ws_event_details(websocket: WebSocket, event_id: int):
+    """
+    Subscribes client to zero-latency seat counter updates for a specific event.
+    Instantly pushes current seat availability upon handshake.
+    """
+    await realtime_hub.connect_event(event_id, websocket)
+    try:
+        conn = get_db(row_factory=True)
+        c = conn.cursor()
+        c.execute("SELECT id, title, seats_total, seats_filled FROM events WHERE id = ?", (event_id,))
+        row = c.fetchone()
+        conn.close()
+
+        if row:
+            seats_total = row["seats_total"] or 100
+            seats_filled = row["seats_filled"] or 0
+            seats_avail = max(0, seats_total - seats_filled)
+            await websocket.send_json({
+                "type": "init",
+                "event_id": event_id,
+                "seats_filled": seats_filled,
+                "seats_total": seats_total,
+                "seats_available": seats_avail,
+                "is_sold_out": seats_avail <= 0,
+                "timestamp": datetime.now().isoformat()
+            })
+
+        while True:
+            data = await websocket.receive_text()
+            if data == "ping":
+                await websocket.send_text("pong")
+    except WebSocketDisconnect:
+        realtime_hub.disconnect_event(event_id, websocket)
+    except Exception:
+        realtime_hub.disconnect_event(event_id, websocket)
+
+
+@fastapi_app.websocket("/ws/telemetry")
+async def ws_telemetry(websocket: WebSocket):
+    """
+    Subscribes gate scanning monitors and admin check-in history to real-time attendee admissions.
+    """
+    await realtime_hub.connect_telemetry(websocket)
+    try:
+        await websocket.send_json({
+            "type": "telemetry_connected",
+            "message": "Connected to real-time gate scanner telemetry",
+            "timestamp": datetime.now().isoformat()
+        })
+        while True:
+            data = await websocket.receive_text()
+            if data == "ping":
+                await websocket.send_text("pong")
+    except WebSocketDisconnect:
+        realtime_hub.disconnect_telemetry(websocket)
+    except Exception:
+        realtime_hub.disconnect_telemetry(websocket)
+
+
+@fastapi_app.websocket("/ws/live/{event_id}")
+async def ws_live_stage(websocket: WebSocket, event_id: int):
+    """
+    Real-time interactive stage channel: live audience chat, floating reactions, and viewer count.
+    """
+    await realtime_hub.connect_live_stage(event_id, websocket)
+    count = len(realtime_hub.live_stage_subscribers.get(event_id, set()))
+    try:
+        await websocket.send_json({
+            "type": "stage_connected",
+            "event_id": event_id,
+            "active_viewers": count,
+            "timestamp": datetime.now().isoformat()
+        })
+        await realtime_hub.broadcast_live_stage(event_id, {
+            "type": "viewer_count",
+            "count": count
+        })
+        while True:
+            raw_msg = await websocket.receive_text()
+            try:
+                data = json.loads(raw_msg)
+            except Exception:
+                data = {"action": "ping"}
+
+            action = data.get("action")
+            if action == "chat":
+                username = data.get("username", "Attendee")
+                message = data.get("message", "").strip()
+                if message:
+                    await realtime_hub.broadcast_live_stage(event_id, {
+                        "type": "chat_message",
+                        "username": username,
+                        "message": message,
+                        "time": datetime.now().strftime("%I:%M %p")
+                    })
+            elif action == "reaction":
+                emoji = data.get("emoji", "🔥")
+                sender = data.get("username", "Guest")
+                await realtime_hub.broadcast_live_stage(event_id, {
+                    "type": "reaction",
+                    "emoji": emoji,
+                    "sender": sender
+                })
+            elif action == "ping":
+                await websocket.send_text("pong")
+    except WebSocketDisconnect:
+        realtime_hub.disconnect_live_stage(event_id, websocket)
+        remaining = len(realtime_hub.live_stage_subscribers.get(event_id, set()))
+        await realtime_hub.broadcast_live_stage(event_id, {
+            "type": "viewer_count",
+            "count": remaining
+        })
+    except Exception:
+        realtime_hub.disconnect_live_stage(event_id, websocket)
 
 
 # ============================================================================

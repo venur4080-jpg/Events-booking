@@ -87,6 +87,10 @@
                 <div class="hamburger" id="hamburger">☰</div>
                 <div class="logo">Events <span>Booking</span></div>
                 <span style="background: rgba(0,242,254,0.15); color: var(--primary); font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 50px; border: 1px solid var(--primary); text-transform: uppercase;">Check-in History</span>
+                <span id="telemetryBadge" style="display: inline-flex; align-items: center; gap: 6px; background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 50px; border: 1px solid rgba(16, 185, 129, 0.4); text-transform: uppercase;">
+                    <span style="width: 7px; height: 7px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981; animation: pulseGlow 1.5s infinite alternate;"></span>
+                    <span id="telemetryStatusText">Telemetry Sync Live</span>
+                </span>
             </div>
             <div class="nav-links" style="display: flex; align-items: center; gap: 12px;">
                 <a href="{{ url_for('scan_ticket') }}" class="register-btn-sm" style="background: rgba(0, 242, 254, 0.15); color: var(--primary); border: 1px solid var(--primary); text-decoration: none; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 700;">📷 Live Scanner</a>
@@ -361,6 +365,114 @@
             document.getElementById('dateFilter').value = '';
             applyFilters();
         }
+
+        // ============================================================================
+        // REAL-TIME GATE CHECK-IN TELEMETRY WEBSOCKET LISTENER
+        // ============================================================================
+        (function initTelemetryListener() {
+            const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            let ws = null;
+            let reconnectTimer = null;
+
+            function connectTelemetry() {
+                try {
+                    ws = new WebSocket(`${wsProtocol}//${window.location.host}/ws/telemetry`);
+
+                    ws.onopen = function() {
+                        const statusTxt = document.getElementById('telemetryStatusText');
+                        if (statusTxt) statusTxt.innerText = 'Telemetry Sync Live';
+                    };
+
+                    ws.onmessage = function(event) {
+                        try {
+                            const data = JSON.parse(event.data);
+                            if (data.type === 'telemetry_scan') {
+                                handleLiveCheckinEvent(data);
+                            }
+                        } catch (err) {
+                            console.error("Telemetry parse error", err);
+                        }
+                    };
+
+                    ws.onclose = function() {
+                        const statusTxt = document.getElementById('telemetryStatusText');
+                        if (statusTxt) statusTxt.innerText = 'Telemetry Reconnecting...';
+                        clearTimeout(reconnectTimer);
+                        reconnectTimer = setTimeout(connectTelemetry, 3000);
+                    };
+
+                    ws.onerror = function() {
+                        if (ws) ws.close();
+                    };
+                } catch (e) {
+                    console.log("Telemetry WS fallback", e);
+                }
+            }
+
+            function handleLiveCheckinEvent(item) {
+                if (window.showToast) {
+                    showToast(`🎟️ Live Gate Admission: ${item.attendee} just checked into ${item.event_title}!`, 'success');
+                }
+
+                const totalStats = document.querySelectorAll('.dashboard-stat-number, .metric-number');
+                totalStats.forEach(el => {
+                    const val = parseInt(el.innerText);
+                    if (!isNaN(val)) el.innerText = val + 1;
+                });
+
+                const tbody = document.querySelector('.checkin-table tbody');
+                if (tbody) {
+                    const tr = document.createElement('tr');
+                    tr.className = 'checkin-row';
+                    tr.style.background = 'rgba(16, 185, 129, 0.22)';
+                    tr.style.transition = 'all 0.5s ease';
+                    tr.setAttribute('data-name', (item.attendee || '').toLowerCase());
+                    tr.setAttribute('data-username', (item.username || '').toLowerCase());
+                    tr.setAttribute('data-college', (item.college_id || '').toLowerCase());
+                    tr.setAttribute('data-event', item.event_title || '');
+
+                    const avatarName = encodeURIComponent(item.attendee || 'User');
+                    tr.innerHTML = `
+                        <td>
+                            <div class="user-avatar-cell">
+                                <img src="https://ui-avatars.com/api/?name=${avatarName}&background=00f2fe&color=0f172a&bold=true" class="user-avatar-sm" alt="avatar">
+                                <div>
+                                    <strong style="color: #ffffff; font-size: 0.95rem;">${item.attendee}</strong>
+                                    <span style="background: rgba(16, 185, 129, 0.25); color: #34d399; font-size: 0.68rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; margin-left: 6px;">⚡ JUST NOW</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="font-weight: 600; color: var(--primary);">@${item.username}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">ID: ${item.college_id || 'N/A'}</div>
+                        </td>
+                        <td>
+                            <strong style="color: #ffffff;">${item.event_title}</strong>
+                            <div style="font-size: 0.76rem; color: var(--text-muted);">Code: ${item.ticket_code || 'Verified'}</div>
+                        </td>
+                        <td>
+                            <span style="background: rgba(255, 255, 255, 0.05); color: var(--text-muted); padding: 3px 8px; border-radius: 6px; font-size: 0.78rem;">👤 Solo</span>
+                        </td>
+                        <td>
+                            <strong style="color: #ffffff; font-size: 0.85rem;">${item.checkin_time}</strong>
+                        </td>
+                        <td>
+                            <span style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); padding: 3px 10px; border-radius: 20px; font-size: 0.76rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                                <span>✓</span> Verified Live
+                            </span>
+                        </td>
+                    `;
+
+                    tbody.insertBefore(tr, tbody.firstChild);
+
+                    setTimeout(() => {
+                        tr.style.background = '';
+                    }, 4000);
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', connectTelemetry);
+        })();
     </script>
     <script src="{{ url_for('static', filename='animations.js') }}"></script>
 </body>
