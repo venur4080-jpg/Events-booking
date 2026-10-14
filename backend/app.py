@@ -5423,8 +5423,8 @@ else:
 app = Flask(__name__, template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
 app.secret_key = os.environ.get('SECRET_KEY', 'events_secure_session_key_2026')
 is_dev = '--dev' in sys.argv or os.environ.get('FLASK_ENV') == 'development' or os.environ.get('DEBUG') == '1'
-app.config['TEMPLATES_AUTO_RELOAD'] = is_dev
-app.jinja_env.auto_reload = is_dev
+app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.jinja_env.auto_reload = True
 
 # Enterprise Session & Payload Hardening
 app.config['SESSION_COOKIE_HTTPONLY'] = True

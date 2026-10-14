@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#00f2fe">
     <link rel="manifest" href="/manifest.json">
     <!-- Fonts and CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=5.1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=6.0">
     <style>
         .calendar-container,
         .calendar-container * {
@@ -318,6 +318,138 @@
                 grid-template-columns: 1fr !important;
             }
         }
+
+        /* --- Live Event Countdown Banner Direct Alignment Rules --- */
+        .event-countdown-banner {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9)) !important;
+            border: 1px solid rgba(0, 242, 254, 0.35) !important;
+            border-radius: 18px !important;
+            padding: 1.25rem 1.6rem !important;
+            margin: 1.5rem auto 2.5rem !important;
+            max-width: 1200px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            flex-wrap: wrap !important;
+            gap: 1.25rem !important;
+            backdrop-filter: blur(16px) !important;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35), 0 0 20px rgba(0, 242, 254, 0.15) !important;
+            position: relative !important;
+            overflow: hidden !important;
+        }
+        .event-countdown-banner::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 220px;
+            height: 100%;
+            background: radial-gradient(circle at right, rgba(0, 242, 254, 0.12), transparent 70%);
+            pointer-events: none;
+        }
+        .countdown-info-wrap {
+            display: flex !important;
+            align-items: center !important;
+            gap: 14px !important;
+            min-width: 260px !important;
+            flex: 1 1 300px !important;
+        }
+        .countdown-controls-wrap {
+            display: flex !important;
+            align-items: center !important;
+            gap: 16px !important;
+            flex-wrap: wrap !important;
+            justify-content: flex-end !important;
+            flex-shrink: 0 !important;
+        }
+        .countdown-digits {
+            display: flex !important;
+            flex-direction: row !important;
+            gap: 8px !important;
+            align-items: center !important;
+            flex-wrap: nowrap !important;
+            flex-shrink: 0 !important;
+        }
+        .countdown-segment {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background: rgba(0, 0, 0, 0.6) !important;
+            border: 1px solid rgba(0, 242, 254, 0.28) !important;
+            border-radius: 10px !important;
+            padding: 6px 12px !important;
+            min-width: 52px !important;
+            text-align: center !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35) !important;
+            box-sizing: border-box !important;
+        }
+        .countdown-number {
+            font-size: 1.35rem !important;
+            font-weight: 800 !important;
+            color: #00f2fe !important;
+            font-family: var(--font-heading, 'Outfit', sans-serif) !important;
+            line-height: 1.1 !important;
+            display: block !important;
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.4) !important;
+        }
+        .countdown-label {
+            font-size: 0.65rem !important;
+            font-weight: 700 !important;
+            color: #94a3b8 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.8px !important;
+            margin-top: 2px !important;
+            display: block !important;
+        }
+        .countdown-btn-group {
+            display: flex !important;
+            gap: 8px !important;
+            align-items: center !important;
+            flex-shrink: 0 !important;
+        }
+        @media (max-width: 900px) {
+            .event-countdown-banner {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 1.25rem !important;
+                padding: 1.25rem !important;
+            }
+            .countdown-controls-wrap {
+                justify-content: space-between !important;
+                width: 100% !important;
+            }
+        }
+        @media (max-width: 560px) {
+            .countdown-controls-wrap {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 1rem !important;
+            }
+            .countdown-digits {
+                width: 100% !important;
+                justify-content: space-between !important;
+                gap: 6px !important;
+            }
+            .countdown-segment {
+                flex: 1 !important;
+                min-width: 0 !important;
+                padding: 6px 4px !important;
+            }
+            .countdown-number {
+                font-size: 1.2rem !important;
+            }
+            .countdown-btn-group {
+                width: 100% !important;
+            }
+            .countdown-btn-group a {
+                flex: 1 !important;
+                text-align: center !important;
+                justify-content: center !important;
+            }
+        }
     </style>
     <!-- Theme loader (before paint to avoid flash) -->
     <script src="{{ url_for('static', filename='themes.js') }}?v=5.0"></script>
@@ -517,47 +649,51 @@
     <!-- ⏱️ Live Next Event Countdown Banner -->
     {% set next_event = (upcoming_events[0] if upcoming_events else None) %}
     {% if next_event %}
-    <div class="event-countdown-banner" id="eventCountdownBanner" data-date="{{ next_event.date }}" data-time="{{ next_event.time }}">
-        <div style="display: flex; align-items: center; gap: 14px;">
-            <div style="font-size: 2.2rem; filter: drop-shadow(0 0 10px rgba(0,242,254,0.5));">⏳</div>
+    <div class="event-countdown-banner" id="eventCountdownBanner" data-date="{{ next_event.date }}" data-time="{{ next_event.time }}"
+         style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9)); border: 1px solid rgba(0, 242, 254, 0.35); border-radius: 18px; padding: 1.25rem 1.6rem; margin: 1.5rem auto 2.5rem; max-width: 1200px; width: 100%; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.25rem; backdrop-filter: blur(16px); box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35), 0 0 20px rgba(0, 242, 254, 0.15); position: relative; overflow: hidden;">
+        
+        <!-- Left: Event Information -->
+        <div class="countdown-info-wrap" style="display: flex; align-items: center; gap: 14px; min-width: 260px; flex: 1 1 300px;">
+            <div style="font-size: 2.2rem; filter: drop-shadow(0 0 10px rgba(0,242,254,0.5)); flex-shrink: 0;">⏳</div>
             <div>
-                <span style="font-size: 0.72rem; font-weight: 800; letter-spacing: 1.2px; color: var(--primary); text-transform: uppercase;">
+                <span style="font-size: 0.72rem; font-weight: 800; letter-spacing: 1.2px; color: var(--primary, #00f2fe); text-transform: uppercase;">
                     ⚡ NEXT UPCOMING EVENT COUNTDOWN
                 </span>
                 <h3 style="margin: 3px 0 0; font-size: 1.25rem; font-weight: 800; color: #ffffff;">
                     {{ next_event.title }}
                 </h3>
-                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 3px;">
+                <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 3px;">
                     📅 {{ next_event.date }} &bull; ⏰ {{ next_event.time }} &bull; 📍 {{ next_event.venue }}
                 </div>
             </div>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
-            <div class="countdown-digits" id="liveCountdownTimer">
-                <div class="countdown-segment">
-                    <span class="countdown-number" id="cdDays">00</span>
-                    <span class="countdown-label">Days</span>
+        <!-- Right: Countdown Digits & Action Buttons -->
+        <div class="countdown-controls-wrap" style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap; justify-content: flex-end;">
+            <div class="countdown-digits" id="liveCountdownTimer" style="display: flex; flex-direction: row; gap: 8px; align-items: center; flex-wrap: nowrap; flex-shrink: 0;">
+                <div class="countdown-segment" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(0, 242, 254, 0.28); border-radius: 10px; padding: 6px 12px; min-width: 52px; text-align: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35); box-sizing: border-box;">
+                    <span class="countdown-number" id="cdDays" style="font-size: 1.35rem; font-weight: 800; color: #00f2fe; font-family: var(--font-heading, 'Outfit', sans-serif); line-height: 1.1; display: block; text-shadow: 0 0 10px rgba(0, 242, 254, 0.4);">00</span>
+                    <span class="countdown-label" style="font-size: 0.65rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 2px; display: block;">Days</span>
                 </div>
-                <div class="countdown-segment">
-                    <span class="countdown-number" id="cdHours">00</span>
-                    <span class="countdown-label">Hours</span>
+                <div class="countdown-segment" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(0, 242, 254, 0.28); border-radius: 10px; padding: 6px 12px; min-width: 52px; text-align: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35); box-sizing: border-box;">
+                    <span class="countdown-number" id="cdHours" style="font-size: 1.35rem; font-weight: 800; color: #00f2fe; font-family: var(--font-heading, 'Outfit', sans-serif); line-height: 1.1; display: block; text-shadow: 0 0 10px rgba(0, 242, 254, 0.4);">00</span>
+                    <span class="countdown-label" style="font-size: 0.65rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 2px; display: block;">Hours</span>
                 </div>
-                <div class="countdown-segment">
-                    <span class="countdown-number" id="cdMinutes">00</span>
-                    <span class="countdown-label">Mins</span>
+                <div class="countdown-segment" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(0, 242, 254, 0.28); border-radius: 10px; padding: 6px 12px; min-width: 52px; text-align: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35); box-sizing: border-box;">
+                    <span class="countdown-number" id="cdMinutes" style="font-size: 1.35rem; font-weight: 800; color: #00f2fe; font-family: var(--font-heading, 'Outfit', sans-serif); line-height: 1.1; display: block; text-shadow: 0 0 10px rgba(0, 242, 254, 0.4);">00</span>
+                    <span class="countdown-label" style="font-size: 0.65rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 2px; display: block;">Mins</span>
                 </div>
-                <div class="countdown-segment">
-                    <span class="countdown-number" id="cdSeconds">00</span>
-                    <span class="countdown-label">Secs</span>
+                <div class="countdown-segment" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(0, 242, 254, 0.28); border-radius: 10px; padding: 6px 12px; min-width: 52px; text-align: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35); box-sizing: border-box;">
+                    <span class="countdown-number" id="cdSeconds" style="font-size: 1.35rem; font-weight: 800; color: #00f2fe; font-family: var(--font-heading, 'Outfit', sans-serif); line-height: 1.1; display: block; text-shadow: 0 0 10px rgba(0, 242, 254, 0.4);">00</span>
+                    <span class="countdown-label" style="font-size: 0.65rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 2px; display: block;">Secs</span>
                 </div>
             </div>
 
-            <div style="display: flex; gap: 8px;">
-                <a href="{{ url_for('event_detail', event_id=next_event.id) }}" class="btn-primary" style="padding: 0.65rem 1.2rem; font-size: 0.85rem; font-weight: 700; text-decoration: none; border-radius: 10px;">
+            <div class="countdown-btn-group" style="display: flex; gap: 8px; align-items: center; flex-shrink: 0;">
+                <a href="{{ url_for('event_detail', event_id=next_event.id) }}" class="btn-primary" style="padding: 0.65rem 1.25rem; font-size: 0.85rem; font-weight: 700; text-decoration: none; border-radius: 10px; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center;">
                     View Details ➔
                 </a>
-                <a href="{{ url_for('event_google_calendar', event_id=next_event.id) }}" target="_blank" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 0.65rem 1rem; font-size: 0.85rem; border-radius: 10px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;" title="Add to Google Calendar">
+                <a href="{{ url_for('event_google_calendar', event_id=next_event.id) }}" target="_blank" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 0.65rem 1rem; font-size: 0.85rem; border-radius: 10px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;" title="Add to Google Calendar">
                     📅 Calendar
                 </a>
             </div>
