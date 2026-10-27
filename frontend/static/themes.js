@@ -172,10 +172,35 @@
 
   // ─── 4. Color Accent Themes ───────────────────────────────────────────────
   const colorThemes = {
+    cerulean: {
+      '--primary': '#008be3',
+      '--primary-dark': '#0062a3',
+      '--primary-light': '#38bdf8',
+      '--primary-glow': 'rgba(0, 139, 227, 0.45)',
+      '--secondary': '#ff1389',
+      '--secondary-dark': '#d1006a',
+      '--secondary-light': '#ff4da6',
+      '--secondary-glow': 'rgba(255, 19, 137, 0.45)',
+      '--bg-dark': '#070709',
+      '--bg-page': '#050507',
+      '--bg-card': 'rgba(13, 13, 18, 0.78)',
+      '--bg-card-solid': '#0d0d12',
+      '--glass-border': 'rgba(0, 139, 227, 0.22)',
+    },
     ocean: {
-      '--primary': '#00f2fe',
-      '--primary-dark': '#4facfe',
-      '--secondary': '#ff0080',
+      '--primary': '#008be3',
+      '--primary-dark': '#0062a3',
+      '--primary-light': '#38bdf8',
+      '--primary-glow': 'rgba(0, 139, 227, 0.45)',
+      '--secondary': '#ff1389',
+      '--secondary-dark': '#d1006a',
+      '--secondary-light': '#ff4da6',
+      '--secondary-glow': 'rgba(255, 19, 137, 0.45)',
+      '--bg-dark': '#070709',
+      '--bg-page': '#050507',
+      '--bg-card': 'rgba(13, 13, 18, 0.78)',
+      '--bg-card-solid': '#0d0d12',
+      '--glass-border': 'rgba(0, 139, 227, 0.22)',
     },
     emerald: {
       '--primary': '#10b981',
@@ -200,12 +225,12 @@
   };
 
   function applyColorTheme(themeName) {
-    const theme = colorThemes[themeName] || colorThemes['ocean'];
+    const theme = colorThemes[themeName] || colorThemes['cerulean'];
     const root = document.documentElement;
     Object.entries(theme).forEach(([varName, value]) => {
       root.style.setProperty(varName, value);
     });
-    localStorage.setItem('selectedColorTheme', themeName);
+    localStorage.setItem('selectedColorTheme', themeName || 'cerulean');
   }
 
   // ─── 5. Live Background & Atmospheric Particle Simulation Engine ───────────
@@ -329,7 +354,7 @@
         twinkleSpeed: 0.02 + Math.random() * 0.04,
         vx: (Math.random() - 0.5) * 0.15,
         vy: (Math.random() - 0.5) * 0.15,
-        color: Math.random() > 0.4 ? '255, 255, 255' : (Math.random() > 0.5 ? '0, 242, 254' : '167, 139, 250')
+        color: Math.random() > 0.4 ? '255, 255, 255' : (Math.random() > 0.5 ? '0, 139, 227' : '255, 19, 137')
       };
     } else if (type === 'leaves') {
       return {
@@ -638,16 +663,16 @@
         box-sizing: border-box !important;
       }
       .nature-modal-content {
-        background: #0f172a !important;
+        background: #070709 !important;
         backdrop-filter: blur(24px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border: 1px solid rgba(0, 139, 227, 0.25) !important;
         border-radius: 20px !important;
         padding: 2rem !important;
         max-width: 760px !important;
         width: 100% !important;
         max-height: 85vh !important;
         overflow-y: auto !important;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7) !important;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9), 0 0 35px rgba(0, 139, 227, 0.15) !important;
         box-sizing: border-box !important;
       }
       body.light-mode .nature-modal-content {
@@ -668,7 +693,7 @@
         cursor: pointer !important;
         border: 2px solid rgba(255, 255, 255, 0.12) !important;
         transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        background: rgba(0, 0, 0, 0.4) !important;
+        background: rgba(0, 0, 0, 0.5) !important;
         height: 115px !important;
         display: flex !important;
         flex-direction: column !important;
@@ -677,8 +702,8 @@
         box-sizing: border-box !important;
       }
       .nature-card.active {
-        border-color: #00f2fe !important;
-        box-shadow: 0 0 20px rgba(0, 242, 254, 0.5) !important;
+        border-color: #008be3 !important;
+        box-shadow: 0 0 20px rgba(0, 139, 227, 0.5) !important;
       }
       .nature-card img.nature-card-bg {
         position: absolute !important;
@@ -696,7 +721,7 @@
         content: '' !important;
         position: absolute !important;
         inset: 0 !important;
-        background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.25) 60%, transparent 100%) !important;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.3) 60%, transparent 100%) !important;
         z-index: 2 !important;
       }
       .nature-card-info {
@@ -718,8 +743,8 @@
         position: absolute !important;
         top: 8px !important;
         right: 8px !important;
-        background: #00f2fe !important;
-        color: #0f172a !important;
+        background: #ff1389 !important;
+        color: #ffffff !important;
         font-size: 0.68rem !important;
         font-weight: 800 !important;
         padding: 2px 7px !important;
@@ -846,7 +871,7 @@
     const savedWallpaper = localStorage.getItem('natureWallpaperTheme') || 'dynamic';
     applyNatureWallpaper(savedWallpaper);
 
-    const savedColor = localStorage.getItem('selectedColorTheme') || 'ocean';
+    const savedColor = localStorage.getItem('selectedColorTheme') || 'cerulean';
     applyColorTheme(savedColor);
 
     const isMotion = localStorage.getItem('liveMotionEnabled') !== 'false';

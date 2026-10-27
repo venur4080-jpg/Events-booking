@@ -40,7 +40,7 @@
             border-radius: 16px;
             overflow: hidden;
             background: rgba(10, 15, 29, 0.7);
-            border: 1px solid rgba(0, 242, 254, 0.25);
+            border: 1px solid rgba(0, 139, 227, 0.25);
             min-height: 220px;
             display: flex;
             flex-direction: column;
@@ -49,9 +49,9 @@
             transition: all 0.3s ease;
         }
         .scanner-viewport-box.drag-over {
-            border-color: #00f2fe;
-            background: rgba(0, 242, 254, 0.12);
-            box-shadow: 0 0 25px rgba(0, 242, 254, 0.35);
+            border-color: #008be3;
+            background: rgba(0, 139, 227, 0.12);
+            box-shadow: 0 0 25px rgba(0, 139, 227, 0.35);
         }
 
         /* Reticle corners */
@@ -59,7 +59,7 @@
             position: absolute;
             width: 22px;
             height: 22px;
-            border-color: #00f2fe;
+            border-color: #008be3;
             border-style: solid;
             pointer-events: none;
             z-index: 2;
@@ -100,8 +100,8 @@
             left: 10%;
             right: 10%;
             height: 2px;
-            background: linear-gradient(90deg, transparent, #00f2fe 35%, #4facfe 65%, transparent);
-            box-shadow: 0 0 12px #00f2fe, 0 0 20px #00f2fe;
+            background: linear-gradient(90deg, transparent, #008be3 35%, #ff1389 65%, transparent);
+            box-shadow: 0 0 12px #008be3, 0 0 20px #008be3;
             animation: scanLaserSweep 2.8s ease-in-out infinite;
             pointer-events: none;
             z-index: 2;
@@ -138,7 +138,7 @@
         }
         .stat-chip:hover {
             background: rgba(30, 41, 59, 0.8);
-            border-color: rgba(0, 242, 254, 0.3);
+            border-color: rgba(0, 139, 227, 0.3);
             transform: translateY(-2px);
         }
         .stat-chip-num {
@@ -169,9 +169,9 @@
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            background: rgba(0, 242, 254, 0.09);
-            border: 1px solid rgba(0, 242, 254, 0.25);
-            color: #00f2fe;
+            background: rgba(0, 139, 227, 0.09);
+            border: 1px solid rgba(0, 139, 227, 0.25);
+            color: #008be3;
             font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
             font-size: 0.74rem;
             font-weight: 700;
@@ -181,8 +181,8 @@
             transition: all 0.2s;
         }
         .guide-pill:hover {
-            background: rgba(0, 242, 254, 0.22);
-            border-color: #00f2fe;
+            background: rgba(0, 139, 227, 0.22);
+            border-color: #008be3;
             transform: scale(1.03);
         }
 
@@ -203,11 +203,11 @@
         }
         .control-pill-btn:hover {
             background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(0, 242, 254, 0.4);
+            border-color: rgba(0, 139, 227, 0.4);
             color: #ffffff;
         }
         .control-pill-btn.active {
-            background: rgba(0, 242, 254, 0.15);
+            background: rgba(0, 139, 227, 0.15);
             border-color: var(--primary);
             color: var(--primary);
         }
@@ -222,10 +222,10 @@
             position: relative;
         }
         .status-preview {
-            background: linear-gradient(135deg, rgba(0, 242, 254, 0.12), rgba(30, 41, 59, 0.8));
+            background: linear-gradient(135deg, rgba(0, 139, 227, 0.12), rgba(30, 41, 59, 0.8));
             border: 2px solid var(--primary);
             color: #ffffff;
-            box-shadow: 0 0 25px rgba(0, 242, 254, 0.2);
+            box-shadow: 0 0 25px rgba(0, 139, 227, 0.2);
         }
         .status-success {
             background: rgba(16, 185, 129, 0.18);
@@ -270,7 +270,7 @@
         }
         .feed-item:hover {
             background: rgba(30, 41, 59, 0.8);
-            border-color: rgba(0, 242, 254, 0.35);
+            border-color: rgba(0, 139, 227, 0.35);
             transform: translateY(-2px);
         }
         .feed-item.new-scan {
@@ -287,8 +287,8 @@
             width: 38px;
             height: 38px;
             border-radius: 10px;
-            background: linear-gradient(135deg, rgba(0,242,254,0.2), rgba(79,70,229,0.3));
-            border: 1px solid rgba(0,242,254,0.35);
+            background: linear-gradient(135deg, rgba(0, 139, 227,0.2), rgba(79,70,229,0.3));
+            border: 1px solid rgba(0, 139, 227,0.35);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -302,9 +302,9 @@
             font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
             font-size: 0.76rem;
             font-weight: 700;
-            color: #00f2fe;
-            background: rgba(0, 242, 254, 0.12);
-            border: 1px solid rgba(0, 242, 254, 0.35);
+            color: #008be3;
+            background: rgba(0, 139, 227, 0.12);
+            border: 1px solid rgba(0, 139, 227, 0.35);
             padding: 2px 7px;
             border-radius: 6px;
             display: inline-block;
@@ -332,9 +332,9 @@
             color: #f59e0b;
         }
         .verified-pill.pending {
-            background: rgba(0, 242, 254, 0.18);
-            border: 1px solid #00f2fe;
-            color: #00f2fe;
+            background: rgba(0, 139, 227, 0.18);
+            border: 1px solid #008be3;
+            color: #008be3;
         }
         .verified-pill .dot {
             width: 6px;
@@ -383,7 +383,7 @@
         }
         body.light-mode .feed-item:hover {
             background: #f8fafc;
-            border-color: #00f2fe;
+            border-color: #008be3;
         }
         body.light-mode .feed-item strong,
         body.light-mode .feed-item span[style*="color: #ffffff"] {
@@ -402,7 +402,7 @@
         <div class="nav-container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
             <div style="display: flex; align-items: center; gap: 10px;">
                 <div class="logo">Events <span>Booking</span></div>
-                <span style="background: rgba(0,242,254,0.15); color: var(--primary); font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 50px; border: 1px solid var(--primary); text-transform: uppercase;">Check-in Portal</span>
+                <span style="background: rgba(0, 139, 227,0.15); color: var(--primary); font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 50px; border: 1px solid var(--primary); text-transform: uppercase;">Check-in Portal</span>
             </div>
             <div class="nav-links" style="display: flex; align-items: center; gap: 12px;">
                 <a href="{{ url_for('dashboard') }}" class="nav-btn-dash">🏠 Dashboard</a>
@@ -428,7 +428,7 @@
                 <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 4px;">2-Step Gate Verification: Scan/Lookup QR, verify attendee credentials, and approve event admission.</p>
             </div>
             <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-                <div style="background: rgba(0, 242, 254, 0.1); border: 1px solid var(--primary); padding: 0.7rem 1.4rem; border-radius: 14px; text-align: center;">
+                <div style="background: rgba(0, 139, 227, 0.1); border: 1px solid var(--primary); padding: 0.7rem 1.4rem; border-radius: 14px; text-align: center;">
                     <div style="font-size: 0.75rem; color: var(--primary); text-transform: uppercase; font-weight: 800; letter-spacing: 1px;">Live Check-in Count</div>
                     <div id="checkinCounter" style="font-size: 1.8rem; font-weight: 800; color: white;">0</div>
                 </div>
@@ -465,14 +465,14 @@
                         <div class="reticle-corner bottom-right"></div>
                         <div class="laser-scanline"></div>
 
-                        <div style="font-size: 2.4rem; margin-bottom: 8px; filter: drop-shadow(0 0 10px rgba(0,242,254,0.5));">🎯</div>
+                        <div style="font-size: 2.4rem; margin-bottom: 8px; filter: drop-shadow(0 0 10px rgba(0, 139, 227,0.5));">🎯</div>
                         <div style="color: #ffffff; font-weight: 700; font-size: 1.05rem;">Optical QR Scanner Ready</div>
                         <p style="color: var(--text-muted); font-size: 0.85rem; margin: 4px 0 16px; max-width: 320px;">
                             Start live camera feed or drag & drop a ticket image/PDF to verify instantly.
                         </p>
 
                         <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
-                            <button onclick="startScanner()" class="register-btn-sm" style="background: var(--primary); color: #0f172a; font-weight: 700; padding: 0.5rem 1.1rem; box-shadow: 0 0 15px rgba(0,242,254,0.3);">
+                            <button onclick="startScanner()" class="register-btn-sm" style="background: var(--primary); color: #0f172a; font-weight: 700; padding: 0.5rem 1.1rem; box-shadow: 0 0 15px rgba(0, 139, 227,0.3);">
                                 📸 Start Camera Feed
                             </button>
                             <label for="qrFileInput" class="control-pill-btn" style="cursor: pointer; padding: 0.5rem 1rem;">
@@ -565,7 +565,7 @@
                             <span style="width: 6px; height: 6px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981;"></span> LIVE
                         </span>
                     </div>
-                    <a href="{{ url_for('checkin_history') }}" style="color: var(--primary); font-size: 0.85rem; font-weight: 700; text-decoration: none; padding: 5px 12px; background: rgba(0,242,254,0.12); border: 1px solid rgba(0,242,254,0.3); border-radius: 8px; transition: all 0.2s;">View All History →</a>
+                    <a href="{{ url_for('checkin_history') }}" style="color: var(--primary); font-size: 0.85rem; font-weight: 700; text-decoration: none; padding: 5px 12px; background: rgba(0, 139, 227,0.12); border: 1px solid rgba(0, 139, 227,0.3); border-radius: 8px; transition: all 0.2s;">View All History →</a>
                 </div>
                 <div id="checkinFeed">
                     <div style="text-align: center; color: var(--text-muted); padding: 2.5rem 1rem; font-size: 0.9rem;">
@@ -765,7 +765,7 @@
 
                     card.innerHTML = `
                         <!-- Step Progress Banner -->
-                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0, 242, 254, 0.12); border: 1px solid var(--primary); padding: 8px 12px; border-radius: 10px; margin-bottom: 12px; flex-wrap: wrap; gap: 6px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0, 139, 227, 0.12); border: 1px solid var(--primary); padding: 8px 12px; border-radius: 10px; margin-bottom: 12px; flex-wrap: wrap; gap: 6px;">
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <span style="background: var(--primary); color: #0f172a; font-size: 0.74rem; font-weight: 800; padding: 2px 7px; border-radius: 4px; text-transform: uppercase;">Step 1 of 2</span>
                                 <strong style="color: #ffffff; font-size: 0.88rem;">Identity & Registration Check</strong>
@@ -785,7 +785,7 @@
 
                             <div>
                                 <strong style="color: var(--text-muted); font-size: 0.74rem; display: block; text-transform: uppercase;">🎓 Student ID / USN</strong>
-                                <span style="font-weight: 800; color: #00f2fe; font-size: 1rem;">${data.college_id}</span>
+                                <span style="font-weight: 800; color: #008be3; font-size: 1rem;">${data.college_id}</span>
                             </div>
 
                             <div>
@@ -803,7 +803,7 @@
                                 <span style="color: #cbd5e1;">${data.event_date || 'Today'} (${data.venue || 'Auditorium'})</span>
                             </div>
 
-                            ${data.team_name ? `<div style="grid-column: 1 / -1;"><strong style="color: var(--text-muted); font-size: 0.74rem; display: block; text-transform: uppercase;">👥 Registered Team</strong><span style="color: #00f2fe; font-weight: 700;">${data.team_name}</span></div>` : ''}
+                            ${data.team_name ? `<div style="grid-column: 1 / -1;"><strong style="color: var(--text-muted); font-size: 0.74rem; display: block; text-transform: uppercase;">👥 Registered Team</strong><span style="color: #008be3; font-weight: 700;">${data.team_name}</span></div>` : ''}
                         </div>
 
                         <!-- Step 2 Approval Action Bar -->

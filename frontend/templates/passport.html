@@ -34,7 +34,7 @@
             left: 0;
             right: 0;
             height: 4px;
-            background: linear-gradient(90deg, #f59e0b, #ec4899, #00f2fe, #10b981);
+            background: linear-gradient(90deg, #f59e0b, #ec4899, #008be3, #10b981);
         }
 
         .passport-emblem {
@@ -96,10 +96,10 @@
 
         .xp-progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #00f2fe, #f59e0b);
+            background: linear-gradient(90deg, #008be3, #f59e0b);
             border-radius: 10px;
             transition: width 1s ease-out;
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.6);
+            box-shadow: 0 0 15px rgba(0, 139, 227, 0.6);
         }
 
         /* Passport Stamp Booklet Grid */
@@ -112,7 +112,7 @@
 
         .passport-stamp-card {
             background: rgba(15, 23, 42, 0.8);
-            border: 2px dashed rgba(0, 242, 254, 0.3);
+            border: 2px dashed rgba(0, 139, 227, 0.3);
             border-radius: 20px;
             padding: 1.8rem;
             position: relative;
@@ -127,7 +127,7 @@
         .passport-stamp-card:hover {
             transform: translateY(-5px) rotate(1deg);
             border-color: var(--primary);
-            box-shadow: 0 15px 35px rgba(0, 242, 254, 0.25);
+            box-shadow: 0 15px 35px rgba(0, 139, 227, 0.25);
         }
 
         .passport-stamp-card.verified-stamp {
@@ -285,7 +285,7 @@
                 </h2>
                 <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0;">Official stamped records for completed check-ins</p>
             </div>
-            <span style="background: rgba(0, 242, 254, 0.15); color: var(--primary); font-weight: 700; padding: 4px 12px; border-radius: 50px; font-size: 0.85rem;">
+            <span style="background: rgba(0, 139, 227, 0.15); color: var(--primary); font-weight: 700; padding: 4px 12px; border-radius: 50px; font-size: 0.85rem;">
                 {{ stamps|length }} Visas Stamped
             </span>
         </div>

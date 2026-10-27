@@ -4,8 +4,8 @@
   "description": "Discover and book tickets for hackathons, workshops & seminars",
   "start_url": "/dashboard",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#00f2fe",
+  "background_color": "#070709",
+  "theme_color": "#008be3",
   "orientation": "portrait-primary",
   "icons": [
     {

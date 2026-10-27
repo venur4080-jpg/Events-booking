@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ category_info.title }} Events | Events Booking</title>
     <meta name="description" content="Explore {{ category_info.title }} events, hackathons, concerts, competitions, and summits.">
-    <meta name="theme-color" content="{{ category_info.color or '#00f2fe' }}">
+    <meta name="theme-color" content="{{ category_info.color or '#008be3' }}">
     <link rel="manifest" href="/manifest.json">
     <!-- Fonts and CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=5.1">
@@ -115,11 +115,11 @@
             text-decoration: none;
         }
         .category-back-btn:hover {
-            background: rgba(0, 242, 254, 0.15);
+            background: rgba(0, 139, 227, 0.15);
             border-color: var(--primary);
             color: var(--primary);
             transform: translateX(-4px);
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
+            box-shadow: 0 0 20px rgba(0, 139, 227, 0.3);
         }
         .category-page-banner {
             max-width: 1280px;
@@ -146,7 +146,7 @@
             left: 0;
             right: 0;
             height: 4px;
-            background: var(--cat-gradient, linear-gradient(90deg, #00f2fe, #4facfe));
+            background: var(--cat-gradient, linear-gradient(90deg, #008be3, #0062a3));
         }
         .category-banner-left {
             flex: 1 1 500px;
@@ -158,7 +158,7 @@
             font-size: 0.8rem;
             font-weight: 800;
             letter-spacing: 1.5px;
-            color: var(--cat-color, #00f2fe);
+            color: var(--cat-color, #008be3);
             text-transform: uppercase;
             margin-bottom: 0.5rem;
         }
@@ -207,12 +207,12 @@
             justify-content: center;
             font-size: 3.5rem;
             background: rgba(255, 255, 255, 0.06);
-            border: 2px solid var(--cat-color, rgba(0, 242, 254, 0.4));
-            box-shadow: 0 0 35px var(--cat-color, rgba(0, 242, 254, 0.3));
+            border: 2px solid var(--cat-color, rgba(0, 139, 227, 0.4));
+            box-shadow: 0 0 35px var(--cat-color, rgba(0, 139, 227, 0.3));
             animation: floatGently 4s ease-in-out infinite;
         }
         .category-gradient-text {
-            background: var(--cat-gradient, linear-gradient(135deg, #00f2fe, #4facfe));
+            background: var(--cat-gradient, linear-gradient(135deg, #008be3, #0062a3));
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -285,10 +285,10 @@
             box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
         }
         .category-pill-tab.active {
-            background: linear-gradient(135deg, rgba(0, 242, 254, 0.22), rgba(79, 172, 254, 0.3));
+            background: linear-gradient(135deg, rgba(0, 139, 227, 0.22), rgba(0, 98, 163, 0.3));
             border-color: var(--primary);
             color: #ffffff;
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.35);
+            box-shadow: 0 0 20px rgba(0, 139, 227, 0.35);
             font-weight: 700;
         }
         .category-pill-tab-count {
@@ -333,7 +333,7 @@
             background: var(--primary);
             color: var(--bg-dark);
             font-weight: 700;
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+            box-shadow: 0 0 15px rgba(0, 139, 227, 0.4);
         }
 
         /* Grid View Layout */
@@ -361,7 +361,7 @@
         .grid-event-card:hover {
             transform: translateY(-8px);
             border-color: var(--primary);
-            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), 0 0 25px rgba(0, 242, 254, 0.25);
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), 0 0 25px rgba(0, 139, 227, 0.25);
         }
         .grid-event-card-title {
             font-size: 1.15rem;
@@ -777,14 +777,14 @@
     <script src="{{ url_for('static', filename='themes.js') }}?v=5.0"></script>
 </head>
 
-<body data-cat-color="{{ category_info.color or '#00f2fe' }}" data-cat-gradient="{{ category_info.gradient or 'linear-gradient(135deg, #00f2fe, #4facfe)' }}">
+<body data-cat-color="{{ category_info.color or '#008be3' }}" data-cat-gradient="{{ category_info.gradient or 'linear-gradient(135deg, #008be3, #0062a3)' }}">
     <script>
         if (localStorage.getItem('theme') === 'light') {
             document.body.classList.add('light-mode');
         }
         if (window.loadPersistedTheme) loadPersistedTheme();
-        const catCol = document.body.getAttribute('data-cat-color') || '#00f2fe';
-        const catGrad = document.body.getAttribute('data-cat-gradient') || 'linear-gradient(135deg, #00f2fe, #4facfe)';
+        const catCol = document.body.getAttribute('data-cat-color') || '#008be3';
+        const catGrad = document.body.getAttribute('data-cat-gradient') || 'linear-gradient(135deg, #008be3, #0062a3)';
         document.documentElement.style.setProperty('--cat-color', catCol);
         document.documentElement.style.setProperty('--cat-gradient', catGrad);
     </script>
@@ -799,13 +799,22 @@
                 <button class="hamburger" id="hamburger" aria-label="Open sidebar menu" aria-expanded="false" aria-controls="sidebar" style="background:none;border:none;cursor:pointer;">☰</button>
                 <div class="logo" style="display: flex; align-items: center; gap: 10px;">
                     <a href="{{ url_for('dashboard') }}" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit;">
-                        <img src="{{ url_for('static', filename='logo.png') }}" alt="Events Booking Logo" style="height: 35px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);">
+                        <img src="{{ url_for('static', filename='logo.png') }}" alt="Events Booking Logo" style="height: 35px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 139, 227, 0.3);">
                         <div aria-label="Events Booking home">Events <span>Booking</span></div>
                     </a>
                 </div>
             </div>
             <div class="nav-links" style="display: flex; align-items: center; gap: 10px;">
                 <a href="{{ url_for('dashboard') }}" style="color: var(--primary); font-weight: 600; font-size: 0.9rem; text-decoration: none; margin-right: 6px;">🏠 Dashboard</a>
+                {% if user_subscription and user_subscription.is_active %}
+                <a href="{{ url_for('subscriptions_page') }}" style="background: linear-gradient(135deg, rgba(255,19,137,0.2), rgba(0,139,227,0.2)); border: 1px solid var(--neon-rose, #ff1389); color: #fff; padding: 4px 10px; border-radius: 999px; font-size: 0.78rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
+                    👑 {{ user_subscription.plan_title }}
+                </a>
+                {% else %}
+                <a href="{{ url_for('subscriptions_page') }}" style="background: rgba(0, 139, 227, 0.15); border: 1px solid rgba(0, 139, 227, 0.4); color: var(--primary); padding: 4px 10px; border-radius: 999px; font-size: 0.78rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
+                    ⭐ Subscribe
+                </a>
+                {% endif %}
                 <span style="margin-right: 8px; color: var(--text-muted); font-weight: 500;">Welcome, <strong style="color: white;">{{ username }}</strong></span>
                 {% if current_user %}
                 <a href="{{ url_for('profile') }}" style="display: inline-flex; align-items: center;" title="My Profile" aria-label="Go to your profile">
@@ -840,7 +849,7 @@
     <nav class="sidebar" id="sidebar" role="complementary" aria-label="Sidebar navigation" aria-hidden="true">
         <div class="sidebar-header">
             <div class="sidebar-logo" style="display: flex; align-items: center; gap: 10px;">
-                <img src="{{ url_for('static', filename='logo.png') }}" alt="Events Booking Logo" style="height: 40px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Events Booking Logo" style="height: 40px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 139, 227, 0.3);">
                 <div>Events <span>Booking</span></div>
             </div>
             <button class="close-btn" id="closeSidebar" aria-label="Close sidebar" style="background:none;border:none;cursor:pointer;">&times;</button>
@@ -848,6 +857,7 @@
 
         <ul class="sidebar-links" role="list">
             <li><a href="{{ url_for('dashboard') }}">🏠 Dashboard</a></li>
+            <li><a href="{{ url_for('subscriptions_page') }}" style="color: #ff1389; font-weight: 700;">👑 Live Stage Pass (Hotstar)</a></li>
             <li><a href="{{ url_for('category_events', category_name='all') }}" class="active">🎪 Explore Categories</a></li>
             <li><a href="{{ url_for('profile') }}">👤 My Profile</a></li>
             <li><a href="{{ url_for('history') }}">📋 My Bookings</a></li>
@@ -875,7 +885,7 @@
         </a>
         <div style="display: flex; align-items: center; gap: 8px;">
             <span style="font-size: 0.85rem; color: var(--text-muted);">Active Domain:</span>
-            <span style="background: rgba(0, 242, 254, 0.15); color: var(--primary); border: 1px solid rgba(0, 242, 254, 0.35); padding: 4px 12px; border-radius: 999px; font-weight: 700; font-size: 0.85rem;">
+            <span style="background: rgba(0, 139, 227, 0.15); color: var(--primary); border: 1px solid rgba(0, 139, 227, 0.35); padding: 4px 12px; border-radius: 999px; font-weight: 700; font-size: 0.85rem;">
                 {{ category_info.icon }} {{ category_info.title }}
             </span>
         </div>
@@ -950,23 +960,23 @@
                 </select>
             </div>
 
-            <div class="price-filter-pill-group" role="tablist" aria-label="Price Quick Filter">
+            <div class="price-filter-pill-group" role="tablist" aria-label="Access Tier Quick Filter">
                 <button type="button" class="price-pill-btn active" id="catPillAll" onclick="selectCategoryPricePill('all')">
-                    🌐 All
+                    <span>🌐</span> Universal Access
                 </button>
                 <button type="button" class="price-pill-btn pill-free-btn" id="catPillFree" onclick="selectCategoryPricePill('free')">
-                    ✨ Free Only
+                    <span>⚡</span> Open Entry
                 </button>
-                <button type="button" class="price-pill-btn" id="catPillPaid" onclick="selectCategoryPricePill('paid')">
-                    🎟️ Paid Only
+                <button type="button" class="price-pill-btn pill-paid-btn" id="catPillPaid" onclick="selectCategoryPricePill('paid')">
+                    <span>💎</span> VIP & Premium Tier
                 </button>
             </div>
 
             <div class="select-wrapper">
                 <select id="priceFilter" class="filter-select" onchange="filterEvents()">
-                    <option value="all">All Prices</option>
-                    <option value="free">Free Only</option>
-                    <option value="paid">Paid Only</option>
+                    <option value="all">🌐 Universal Access</option>
+                    <option value="free">⚡ Open Entry (Complimentary)</option>
+                    <option value="paid">💎 VIP & Premium Tier</option>
                 </select>
             </div>
 
@@ -1012,7 +1022,7 @@
                             <img src="{{ event.image }}" alt="{{ event.title }}" class="card-image" loading="lazy"
                                 onerror="this.src='https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070&auto=format&fit=crop';">
                             <div class="date-badge">{{ event.date }}</div>
-                            <div class="category-badge" style="position: absolute; top: 12px; left: 12px; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); padding: 4px 10px; border-radius: 20px; font-size: 0.76rem; color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.35); font-weight: 700;">
+                            <div class="category-badge" style="position: absolute; top: 12px; left: 12px; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); padding: 4px 10px; border-radius: 20px; font-size: 0.76rem; color: #008be3; border: 1px solid rgba(0, 139, 227, 0.35); font-weight: 700;">
                                 {{ event.category }}
                             </div>
                         </a>
@@ -1061,7 +1071,7 @@
                             <!-- Available Seats with Total Seats to Register -->
                             <div class="event-seats-box">
                                 <span style="color: #cbd5e1; display: inline-flex; align-items: center; gap: 4px;">
-                                    <span>🪑</span> Seats: <strong style="color: #00f2fe;">{{ event.seats_left }}</strong> / {{ event.seats_total or 100 }}
+                                    <span>🪑</span> Seats: <strong style="color: #008be3;">{{ event.seats_left }}</strong> / {{ event.seats_total or 100 }}
                                 </span>
                                 {% if event.is_in_person_sold_out %}
                                 <span class="seat-badge-soldout">⛔ Sold Out</span>
@@ -1089,7 +1099,7 @@
                                 <div style="display: flex; gap: 8px; align-items: center; flex-wrap: nowrap; justify-content: center; width: 100%;">
                                     {% if event.is_open %}
                                         {% if event.is_registered %}
-                                        <a href="{{ url_for('view_ticket_interactive', event_id=event.id) }}" class="register-btn-sm" style="background: rgba(0, 242, 254, 0.2); color: var(--primary); text-decoration: none;" title="Open Holographic Pass">🎟️ Pass</a>
+                                        <a href="{{ url_for('view_ticket_interactive', event_id=event.id) }}" class="register-btn-sm" style="background: rgba(0, 139, 227, 0.2); color: var(--primary); text-decoration: none;" title="Open Holographic Pass">🎟️ Pass</a>
                                         {% if event.checked_in %}
                                         <span class="register-btn-sm" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 8px; font-weight: 700;">✓ Completed</span>
                                         {% else %}
@@ -1100,7 +1110,7 @@
                                         {% endif %}
                                     {% else %}
                                         {% if event.is_registered %}
-                                        <a href="{{ url_for('view_ticket_interactive', event_id=event.id) }}" class="register-btn-sm" style="background: rgba(0, 242, 254, 0.2); color: var(--primary); text-decoration: none;" title="Open Holographic Pass">🎟️ Pass</a>
+                                        <a href="{{ url_for('view_ticket_interactive', event_id=event.id) }}" class="register-btn-sm" style="background: rgba(0, 139, 227, 0.2); color: var(--primary); text-decoration: none;" title="Open Holographic Pass">🎟️ Pass</a>
                                         {% if event.checked_in %}
                                         <span class="register-btn-sm" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 8px; font-weight: 700;">✓ Completed</span>
                                         {% else %}
@@ -1151,7 +1161,7 @@
         <div class="grid-event-card" data-id="{{ event.id }}" data-category="{{ event.category }}" data-price="{% if event.price.lower() == 'free' %}free{% else %}paid{% endif %}">
             <a href="{{ url_for('event_detail', event_id=event.id) }}" style="display: block; position: relative; overflow: hidden; height: 180px; text-decoration: none;">
                 <img src="{{ event.image }}" alt="{{ event.title }}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease;" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070&auto=format&fit=crop';">
-                <div style="position: absolute; top: 10px; left: 10px; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(8px); padding: 4px 10px; border-radius: 20px; font-size: 0.74rem; color: var(--primary); font-weight: 700; border: 1px solid rgba(0, 242, 254, 0.35); z-index: 5;">
+                <div style="position: absolute; top: 10px; left: 10px; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(8px); padding: 4px 10px; border-radius: 20px; font-size: 0.74rem; color: var(--primary); font-weight: 700; border: 1px solid rgba(0, 139, 227, 0.35); z-index: 5;">
                     {{ event.category }}
                 </div>
                 <div class="date-badge" style="position: absolute; top: 10px; right: 10px; bottom: auto; left: auto; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(8px); padding: 4px 10px; border-radius: 20px; font-size: 0.74rem; color: #ffffff; font-weight: 700; border: 1px solid rgba(255, 255, 255, 0.15); height: auto; max-height: 28px; z-index: 5; display: inline-flex; align-items: center; white-space: nowrap;">
@@ -1180,9 +1190,9 @@
                     </div>
 
                     <!-- Available Seats with Total Seats to Register -->
-                    <div class="grid-seats-box" style="margin: 0.5rem 0; padding: 5px 9px; background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 0.76rem;">
+                    <div class="grid-seats-box" style="margin: 0.5rem 0; padding: 5px 9px; background: rgba(0, 139, 227, 0.05); border: 1px solid rgba(0, 139, 227, 0.2); border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 0.76rem;">
                         <span style="color: #cbd5e1; display: inline-flex; align-items: center; gap: 4px;">
-                            <span>🪑</span> Seats: <strong style="color: #00f2fe;">{{ event.seats_left }}</strong> / {{ event.seats_total or 100 }}
+                            <span>🪑</span> Seats: <strong style="color: #008be3;">{{ event.seats_left }}</strong> / {{ event.seats_total or 100 }}
                         </span>
                         {% if event.is_in_person_sold_out %}
                         <span class="seat-badge-soldout">Sold Out</span>
@@ -1213,12 +1223,12 @@
         <div class="calendar-header" style="flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; display: flex; margin-bottom: 1rem;">
             <div style="display: flex; gap: 6px; align-items: center;">
                 <button class="calendar-nav-btn" onclick="prevMonth()" title="Previous Month">◀ Prev</button>
-                <button class="calendar-nav-btn" onclick="jumpToToday()" title="Jump to Current Month" style="background: rgba(0, 242, 254, 0.15); border-color: var(--primary); color: var(--primary);">⚡ Today</button>
+                <button class="calendar-nav-btn" onclick="jumpToToday()" title="Jump to Current Month" style="background: rgba(0, 139, 227, 0.15); border-color: var(--primary); color: var(--primary);">⚡ Today</button>
             </div>
             <div style="text-align: center; flex: 1; min-width: 260px;">
                 <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 4px;">
                     <h2 id="calendarTitle" style="margin: 0; font-size: 1.5rem; color: white;">Month Year</h2>
-                    <span id="calendarEventCountBadge" style="background: rgba(0, 242, 254, 0.18); color: var(--primary); border: 1px solid rgba(0, 242, 254, 0.4); font-size: 0.75rem; font-weight: 700; padding: 2px 10px; border-radius: 12px;">0 Events</span>
+                    <span id="calendarEventCountBadge" style="background: rgba(0, 139, 227, 0.18); color: var(--primary); border: 1px solid rgba(0, 139, 227, 0.4); font-size: 0.75rem; font-weight: 700; padding: 2px 10px; border-radius: 12px;">0 Events</span>
                 </div>
                 <div class="calendar-legend">
                     <span style="display: inline-flex; align-items: center; gap: 5px;"><span class="event-status-dot dot-open"></span> Open / Upcoming</span>
@@ -1275,7 +1285,7 @@
 
                         <a href="{{ url_for('event_detail', event_id=event.id) }}" class="image-wrapper" style="display: block; overflow: hidden; position: relative; text-decoration: none;">
                             <img src="{{ event.image }}" alt="{{ event.title }}" style="width: 100%; height: 185px; object-fit: cover; filter: contrast(1.05) saturate(1.15);" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070&auto=format&fit=crop';">
-                            <div class="category-badge" style="position: absolute; top: 10px; right: 10px; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(8px); padding: 4px 10px; border-radius: 20px; font-size: 0.76rem; color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.35); font-weight: 600;">
+                            <div class="category-badge" style="position: absolute; top: 10px; right: 10px; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(8px); padding: 4px 10px; border-radius: 20px; font-size: 0.76rem; color: #008be3; border: 1px solid rgba(0, 139, 227, 0.35); font-weight: 600;">
                                 {{ event.category }}
                             </div>
                         </a>
@@ -1317,7 +1327,7 @@
         <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 3rem;">
             <div style="flex: 1 1 300px;">
                 <h3 style="color: var(--primary); font-size: 1.8rem; margin-bottom: 1rem; font-weight: 800; display: flex; align-items: center; gap: 12px;">
-                    <img src="{{ url_for('static', filename='logo.png') }}" alt="Events Booking Logo" style="height: 45px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);">
+                    <img src="{{ url_for('static', filename='logo.png') }}" alt="Events Booking Logo" style="height: 45px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 139, 227, 0.3);">
                     <div>Events <span style="color: white;">Booking</span></div>
                 </h3>
                 <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem;">

@@ -75,7 +75,7 @@
 
         .back-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 242, 254, 0.4);
+            box-shadow: 0 5px 15px rgba(0, 139, 227, 0.4);
         }
 
         .input-row {
@@ -122,7 +122,7 @@
             transition: all 0.3s;
         }
         .pass-choice-inperson {
-            background: rgba(0, 242, 254, 0.08);
+            background: rgba(0, 139, 227, 0.08);
             border: 2px solid var(--primary);
         }
         .pass-choice-livestream {
@@ -136,7 +136,7 @@
 
         .reg-progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #00f2fe, #4facfe);
+            background: linear-gradient(90deg, #008be3, #0062a3);
         }
         .reg-progress-fill.soldout {
             background: #ef4444;
@@ -196,8 +196,8 @@
                     You are now registered for <strong>{{ event.title }}</strong>.
                     {% endif %}
                 </p>
-                <div style="background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.25); border-radius: 12px; padding: 1.2rem; margin-bottom: 2rem; text-align: left;">
-                    <div style="display: flex; align-items: center; gap: 0.6rem; color: #00f2fe; font-weight: 700; font-size: 0.95rem; margin-bottom: 0.4rem;">
+                <div style="background: rgba(0, 139, 227, 0.08); border: 1px solid rgba(0, 139, 227, 0.25); border-radius: 12px; padding: 1.2rem; margin-bottom: 2rem; text-align: left;">
+                    <div style="display: flex; align-items: center; gap: 0.6rem; color: #008be3; font-weight: 700; font-size: 0.95rem; margin-bottom: 0.4rem;">
                         <span>📧</span> Confirmation Email & Ticket Sent!
                     </div>
                     <p style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5; margin: 0;">
@@ -205,7 +205,7 @@
                     </p>
                 </div>
                 <div style="display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap;">
-                    <a href="{{ url_for('view_ticket_interactive', event_id=event.id) }}" class="back-btn" style="background: linear-gradient(135deg, #00f2fe, #4facfe); color: #020617; font-weight: 800; box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);">🎟️ View Holographic Pass</a>
+                    <a href="{{ url_for('view_ticket_interactive', event_id=event.id) }}" class="back-btn" style="background: linear-gradient(135deg, #008be3, #0062a3); color: #020617; font-weight: 800; box-shadow: 0 0 20px rgba(0, 139, 227, 0.4);">🎟️ View Holographic Pass</a>
                     <a href="{{ url_for('download_ticket', event_id=event.id) }}" class="back-btn" style="background: rgba(255,255,255,0.12); color: white; border: 1px solid rgba(255,255,255,0.2);" target="_blank">📥 Download PDF</a>
                     <a href="{{ url_for('event_calendar_ics', event_id=event.id) }}" class="back-btn" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">📅 Sync to Calendar</a>
                     <a href="{{ url_for('dashboard') }}" class="back-btn">🏠 Dashboard</a>
@@ -224,9 +224,9 @@
                         📍 {{ event.venue or 'Tech Arena' }} ↗
                     </a>
                 </p>
-                <div style="margin-top: 10px; display: inline-flex; align-items: center; gap: 8px; background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.3); padding: 5px 14px; border-radius: 999px; font-size: 0.82rem;">
+                <div style="margin-top: 10px; display: inline-flex; align-items: center; gap: 8px; background: rgba(0, 139, 227, 0.08); border: 1px solid rgba(0, 139, 227, 0.3); padding: 5px 14px; border-radius: 999px; font-size: 0.82rem;">
                     <span>🪑</span>
-                    <span style="color: #cbd5e1;">Available Seats: <strong style="color: #00f2fe;">{{ event.seats_left }}</strong> / {{ event.seats_total or 100 }} Total</span>
+                    <span style="color: #cbd5e1;">Available Seats: <strong style="color: #008be3;">{{ event.seats_left }}</strong> / {{ event.seats_total or 100 }} Total</span>
                     {% if event.is_in_person_sold_out %}
                     <span class="reg-seat-text-soldout">• In-Person Sold Out</span>
                     {% elif (event.seats_left or 100) < 15 %}
@@ -340,7 +340,7 @@
                 <input type="hidden" name="reg_type" id="regTypeInput" value="solo">
 
                 <!-- Team Specific Options (Hidden by default) -->
-                <div id="teamOptionsSection" style="display: none; background: rgba(0,242,254,0.04); border: 1px solid rgba(0,242,254,0.2); border-radius: 14px; padding: 1.2rem; margin-bottom: 1.5rem;">
+                <div id="teamOptionsSection" style="display: none; background: rgba(0, 139, 227,0.04); border: 1px solid rgba(0, 139, 227,0.2); border-radius: 14px; padding: 1.2rem; margin-bottom: 1.5rem;">
                     <div class="input-group">
                         <label style="color: var(--primary);">Team Name *</label>
                         <input type="text" name="team_name" id="teamNameInput" class="input-field" placeholder="e.g. Byte Busters">
@@ -395,8 +395,8 @@
                 </div>
 
                 <!-- Promo Code Engine -->
-                <div style="margin-top: 1.2rem; background: rgba(0,242,254,0.04); border: 1px solid rgba(0,242,254,0.25); border-radius: 12px; padding: 1.2rem;">
-                    <label style="display: block; color: #00f2fe; font-weight: 700; font-size: 0.88rem; margin-bottom: 0.4rem;">🏷️ Have a Promo Code?</label>
+                <div style="margin-top: 1.2rem; background: rgba(0, 139, 227,0.04); border: 1px solid rgba(0, 139, 227,0.25); border-radius: 12px; padding: 1.2rem;">
+                    <label style="display: block; color: #008be3; font-weight: 700; font-size: 0.88rem; margin-bottom: 0.4rem;">🏷️ Have a Promo Code?</label>
                     <div style="display: flex; gap: 8px;">
                         <input type="text" id="promoCodeInput" name="promo_code" placeholder="e.g. TECH2026, CAMPUS100" class="input-field" style="text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">
                         <input type="hidden" name="discount_amount" id="discountAmountInput" value="0">
@@ -405,7 +405,7 @@
                     <div id="promoResultMsg" style="display: none; margin-top: 0.6rem; font-size: 0.82rem; font-weight: 600;"></div>
                     <div style="margin-top: 0.65rem; display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
                         <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600;">Try Coupons:</span>
-                        <button type="button" onclick="quickApplyPromo('TECH2026')" style="cursor: pointer; font-size: 0.72rem; background: rgba(0,242,254,0.12); color: #00f2fe; padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(0,242,254,0.3); font-weight: 700;">TECH2026 (30% off)</button>
+                        <button type="button" onclick="quickApplyPromo('TECH2026')" style="cursor: pointer; font-size: 0.72rem; background: rgba(0, 139, 227,0.12); color: #008be3; padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(0, 139, 227,0.3); font-weight: 700;">TECH2026 (30% off)</button>
                         <button type="button" onclick="quickApplyPromo('CAMPUS100')" style="cursor: pointer; font-size: 0.72rem; background: rgba(16,185,129,0.12); color: #34d399; padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(16,185,129,0.3); font-weight: 700;">CAMPUS100 (Free Pass)</button>
                         <button type="button" onclick="quickApplyPromo('EARLYBIRD')" style="cursor: pointer; font-size: 0.72rem; background: rgba(245,158,11,0.12); color: #fbbf24; padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(245,158,11,0.3); font-weight: 700;">EARLYBIRD (25% off)</button>
                     </div>
@@ -418,7 +418,7 @@
                             <h3 style="color: white; margin: 0; font-size: 1.1rem;">Payment Information</h3>
                             <span id="passNamePriceLabel" style="font-size: 0.8rem; color: var(--text-muted);">In-Person Pass Fee</span>
                         </div>
-                        <span id="displayEventPrice" style="font-size: 1.2rem; font-weight: 800; color: #00f2fe; font-family: var(--font-heading);">{{ event.price }}</span>
+                        <span id="displayEventPrice" style="font-size: 1.2rem; font-weight: 800; color: #008be3; font-family: var(--font-heading);">{{ event.price }}</span>
                     </div>
                     <div class="payment-methods">
                         <label class="payment-option">
@@ -654,9 +654,9 @@
                     if (isFree) upiIdInput.value = 'N/A';
                 }
             } else {
-                inPersonCard.style.background = 'rgba(0, 242, 254, 0.08)';
+                inPersonCard.style.background = 'rgba(0, 139, 227, 0.08)';
                 inPersonCard.style.borderColor = 'var(--primary)';
-                inPersonCard.style.boxShadow = '0 0 20px rgba(0, 242, 254, 0.2)';
+                inPersonCard.style.boxShadow = '0 0 20px rgba(0, 139, 227, 0.2)';
 
                 liveStreamCard.style.background = 'rgba(255, 255, 255, 0.03)';
                 liveStreamCard.style.borderColor = 'rgba(255, 255, 255, 0.1)';

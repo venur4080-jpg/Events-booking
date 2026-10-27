@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | Events Booking</title>
     <meta name="description" content="Discover exclusive hackathons, workshops, esports, concerts, and summits across 12 domain categories.">
-    <meta name="theme-color" content="#00f2fe">
+    <meta name="theme-color" content="#008be3">
     <link rel="manifest" href="/manifest.json">
     <!-- Fonts and CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=6.0">
@@ -69,15 +69,15 @@
         }
         .dashboard-stat-card:hover {
             transform: translateY(-4px);
-            border-color: rgba(0, 242, 254, 0.4);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 15px rgba(0, 242, 254, 0.2);
+            border-color: rgba(0, 139, 227, 0.4);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 15px rgba(0, 139, 227, 0.2);
         }
         .dashboard-stat-icon {
             width: 48px;
             height: 48px;
             border-radius: 14px;
-            background: rgba(0, 242, 254, 0.12);
-            border: 1px solid rgba(0, 242, 254, 0.3);
+            background: rgba(0, 139, 227, 0.12);
+            border: 1px solid rgba(0, 139, 227, 0.3);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -103,15 +103,51 @@
             padding: 0 1.5rem;
             box-sizing: border-box;
         }
+        .highlights-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.25rem;
+            margin-bottom: 1.8rem;
+            padding-bottom: 1.1rem;
+            border-bottom: 1px solid rgba(0, 139, 227, 0.2);
+        }
+        .highlights-title-block {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .highlights-kicker {
+            font-size: 0.82rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: var(--primary, #008be3);
+            text-transform: uppercase;
+        }
+        .highlights-heading {
+            color: #ffffff;
+            font-size: 1.85rem;
+            font-weight: 800;
+            margin: 0;
+            line-height: 1.25;
+        }
+        .highlights-controls-wrap {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
         .highlights-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+            gap: 1.6rem;
+            margin-top: 0.5rem;
+            align-items: stretch;
         }
         .highlight-card {
-            background: rgba(15, 23, 42, 0.82);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(13, 13, 18, 0.85);
+            border: 1px solid rgba(0, 139, 227, 0.22);
             border-radius: 20px;
             overflow: hidden;
             display: flex;
@@ -119,12 +155,12 @@
             height: 100%;
             backdrop-filter: blur(16px);
             transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
         }
         .highlight-card:hover {
             transform: translateY(-6px);
             border-color: var(--primary);
-            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5), 0 0 25px rgba(0, 242, 254, 0.25);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8), 0 0 25px rgba(0, 139, 227, 0.3);
         }
         .highlight-card-title {
             font-size: 1.12rem;
@@ -177,6 +213,23 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
+        .highlight-image-box {
+            position: relative;
+            height: 180px;
+            width: 100%;
+            overflow: hidden;
+            border-radius: 20px 20px 0 0;
+            background: #0d0d12;
+        }
+        .highlight-image-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .highlight-card:hover .highlight-image-box img {
+            transform: scale(1.06);
+        }
         .highlight-card-footer {
             margin-top: auto;
             display: flex;
@@ -184,6 +237,21 @@
             align-items: center;
             border-top: 1px solid rgba(255, 255, 255, 0.08);
             padding-top: 0.85rem;
+            gap: 10px;
+        }
+        .event-price-tag {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 34px;
+            padding: 0 12px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            box-sizing: border-box;
+            flex-shrink: 0;
         }
         .card-btn-action {
             height: 34px;
@@ -199,11 +267,24 @@
             text-decoration: none;
             transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
             white-space: nowrap;
+            box-sizing: border-box;
         }
-        .card-btn-action:hover:not([disabled]) {
-            transform: translateY(-2px) scale(1.03);
-            filter: brightness(1.2);
-            box-shadow: 0 0 16px rgba(0, 242, 254, 0.45);
+        .card-action-btn-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .highlights-empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 4rem 1.5rem;
+            background: rgba(13, 13, 18, 0.75);
+            border: 1px dashed rgba(0, 139, 227, 0.35);
+            border-radius: 20px;
+            backdrop-filter: blur(14px);
+            margin: 1rem 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
         }
         .btn-domain-link {
             height: 34px;
@@ -224,8 +305,8 @@
             white-space: nowrap;
         }
         .btn-domain-link:hover {
-            background: rgba(0, 242, 254, 0.12);
-            box-shadow: 0 0 12px rgba(0, 242, 254, 0.3);
+            background: rgba(0, 139, 227, 0.12);
+            box-shadow: 0 0 12px rgba(0, 139, 227, 0.3);
         }
 
         body.light-mode .dashboard-stat-card {
@@ -247,25 +328,32 @@
         /* Seat Status Pills & Badges */
         .seat-status-pill {
             position: absolute;
-            bottom: 8px;
+            bottom: 10px;
             left: 10px;
-            background: rgba(15, 23, 42, 0.88);
+            background: rgba(7, 7, 9, 0.88);
             backdrop-filter: blur(8px);
-            padding: 3px 9px;
+            padding: 4px 10px;
             border-radius: 12px;
             font-size: 0.72rem;
             font-weight: 700;
             border: 1px solid rgba(255, 255, 255, 0.15);
             z-index: 5;
+            pointer-events: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
         .seat-status-pill.soldout {
             color: #f87171;
+            border-color: rgba(239, 68, 68, 0.35);
         }
         .seat-status-pill.warning {
             color: #fbbf24;
+            border-color: rgba(245, 158, 11, 0.35);
         }
         .seat-status-pill.open {
             color: #34d399;
+            border-color: rgba(16, 185, 129, 0.35);
         }
 
         .seat-reg-badge {
@@ -322,7 +410,7 @@
         /* --- Live Event Countdown Banner Direct Alignment Rules --- */
         .event-countdown-banner {
             background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9)) !important;
-            border: 1px solid rgba(0, 242, 254, 0.35) !important;
+            border: 1px solid rgba(0, 139, 227, 0.35) !important;
             border-radius: 18px !important;
             padding: 1.25rem 1.6rem !important;
             margin: 1.5rem auto 2.5rem !important;
@@ -335,7 +423,7 @@
             flex-wrap: wrap !important;
             gap: 1.25rem !important;
             backdrop-filter: blur(16px) !important;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35), 0 0 20px rgba(0, 242, 254, 0.15) !important;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35), 0 0 20px rgba(0, 139, 227, 0.15) !important;
             position: relative !important;
             overflow: hidden !important;
         }
@@ -346,7 +434,7 @@
             right: 0;
             width: 220px;
             height: 100%;
-            background: radial-gradient(circle at right, rgba(0, 242, 254, 0.12), transparent 70%);
+            background: radial-gradient(circle at right, rgba(0, 139, 227, 0.12), transparent 70%);
             pointer-events: none;
         }
         .countdown-info-wrap {
@@ -378,7 +466,7 @@
             align-items: center !important;
             justify-content: center !important;
             background: rgba(0, 0, 0, 0.6) !important;
-            border: 1px solid rgba(0, 242, 254, 0.28) !important;
+            border: 1px solid rgba(0, 139, 227, 0.28) !important;
             border-radius: 10px !important;
             padding: 6px 12px !important;
             min-width: 52px !important;
@@ -389,11 +477,11 @@
         .countdown-number {
             font-size: 1.35rem !important;
             font-weight: 800 !important;
-            color: #00f2fe !important;
+            color: #008be3 !important;
             font-family: var(--font-heading, 'Outfit', sans-serif) !important;
             line-height: 1.1 !important;
             display: block !important;
-            text-shadow: 0 0 10px rgba(0, 242, 254, 0.4) !important;
+            text-shadow: 0 0 10px rgba(0, 139, 227, 0.4) !important;
         }
         .countdown-label {
             font-size: 0.65rem !important;
@@ -482,7 +570,7 @@
                 <div class="logo" style="display: flex; align-items: center; gap: 10px;">
                     <a href="{{ url_for('dashboard') }}" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit;">
                         <img src="{{ url_for('static', filename='logo.png') }}" alt="Events Booking Logo"
-                            style="height: 35px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);">
+                            style="height: 35px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 139, 227, 0.3);">
                         <div aria-label="Events Booking home">Events <span>Booking</span></div>
                     </a>
                 </div>
@@ -528,6 +616,18 @@
                     </div>
                 </div>
 
+                <!-- Live Stream Subscription Badge / Button -->
+                {% if user_subscription %}
+                <a href="{{ url_for('subscriptions_page') }}" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 20px; font-size: 0.76rem; font-weight: 800; white-space: nowrap; {% if user_subscription.plan_type == 'super' %}background: linear-gradient(135deg, rgba(255, 19, 137, 0.2), rgba(0, 139, 227, 0.2)); border: 1px solid #ff1389; color: #ff5eb0; box-shadow: 0 0 12px rgba(255,19,137,0.35);{% else %}background: rgba(0, 139, 227, 0.15); border: 1px solid #008be3; color: #008be3;{% endif %}" title="{{ user_subscription.plan_title }} Active">
+                    <span>{{ '👑' if user_subscription.plan_type == 'super' else '💎' }}</span>
+                    <span>{{ user_subscription.plan_title }}</span>
+                </a>
+                {% else %}
+                <a href="{{ url_for('subscriptions_page') }}" class="card-btn-action" style="height: 32px; padding: 0 12px; font-size: 0.76rem; background: linear-gradient(135deg, #008be3, #0062a3); color: #ffffff; text-decoration: none; border-radius: 20px; box-shadow: 0 0 12px rgba(0, 139, 227, 0.35);" title="Hotstar Stage Pass Subscriptions">
+                    <span>⭐</span> Subscribe
+                </a>
+                {% endif %}
+
                 {% if is_admin or is_host or session.get('username') in ['admin', 'Venu R'] %}
                 <a href="{{ url_for('admin_dashboard') }}"
                     style="margin-right:10px;color:var(--admin-accent,#f59e0b);font-weight:700;font-size:0.85rem;text-decoration:none;white-space:nowrap"
@@ -544,7 +644,7 @@
         <div class="sidebar-header">
             <div class="sidebar-logo" style="display: flex; align-items: center; gap: 10px;">
                 <img src="{{ url_for('static', filename='logo.png') }}" alt="Events Booking Logo"
-                    style="height: 40px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);">
+                    style="height: 40px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 139, 227, 0.3);">
                 <div>Events <span>Booking</span></div>
             </div>
             <button class="close-btn" id="closeSidebar" aria-label="Close sidebar"
@@ -553,6 +653,7 @@
 
         <ul class="sidebar-links" role="list">
             <li><a href="{{ url_for('dashboard') }}" class="active" aria-current="page">🏠 Dashboard</a></li>
+            <li><a href="{{ url_for('subscriptions_page') }}" style="color: #008be3; font-weight: 700;">👑 Live Stage Pass (Hotstar)</a></li>
             <li><a href="{{ url_for('category_events', category_name='all') }}">🎪 Browse All Categories</a></li>
             <li><a href="{{ url_for('passport_page') }}">🛂 Event Passport & XP</a></li>
             <li><a href="{{ url_for('teams_page') }}">🤝 AI Team Matcher</a></li>
@@ -592,18 +693,18 @@
 
     <!-- Hero Section -->
     <header class="hero-section" id="mainContent">
-        <h1 class="hero-title">Future Tech & Domain<br><span style="background: linear-gradient(135deg, #00f2fe, #4facfe, #ff0080); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Experience Hub</span></h1>
+        <h1 class="hero-title">Future Tech & Domain<br><span style="background: linear-gradient(135deg, #008be3 0%, #38bdf8 35%, #ff1389 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Experience Hub</span></h1>
         <p class="hero-subtitle">
             Explore 12 vibrant event domains — from AI Hackathons & Music Concerts to Esports Arenas and Startup Summits.<br>Select any category below to immerse in its live interactive carousel & event passes.
         </p>
         <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
             <a href="{{ url_for('category_events', category_name='all') }}" class="register-btn"
-                style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; padding: 0.9rem 2rem; font-size: 1.05rem; background: var(--primary); color: var(--bg-dark); font-weight: 700; border-radius: 50px; box-shadow: 0 0 25px rgba(0, 242, 254, 0.45); transition: all 0.3s ease;">
+                style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; padding: 0.9rem 2rem; font-size: 1.05rem; background: var(--primary); color: var(--bg-dark); font-weight: 700; border-radius: 50px; box-shadow: 0 0 25px rgba(0, 139, 227, 0.45); transition: all 0.3s ease;">
                 🌐 Explore All Events ({{ total_events_count }})
             </a>
             {% if is_host %}
             <a href="{{ url_for('add_event') }}" class="register-btn"
-                style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; padding: 0.9rem 1.8rem; font-size: 1.05rem; background: rgba(0, 242, 254, 0.15); color: var(--primary); border: 1px solid var(--primary); font-weight: 700; border-radius: 50px;">
+                style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; padding: 0.9rem 1.8rem; font-size: 1.05rem; background: rgba(0, 139, 227, 0.15); color: var(--primary); border: 1px solid var(--primary); font-weight: 700; border-radius: 50px;">
                 + Add New Event
             </a>
             <a href="{{ url_for('scan_ticket') }}" class="register-btn"
@@ -650,13 +751,13 @@
     {% set next_event = (upcoming_events[0] if upcoming_events else None) %}
     {% if next_event %}
     <div class="event-countdown-banner" id="eventCountdownBanner" data-date="{{ next_event.date }}" data-time="{{ next_event.time }}"
-         style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9)); border: 1px solid rgba(0, 242, 254, 0.35); border-radius: 18px; padding: 1.25rem 1.6rem; margin: 1.5rem auto 2.5rem; max-width: 1200px; width: 100%; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.25rem; backdrop-filter: blur(16px); box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35), 0 0 20px rgba(0, 242, 254, 0.15); position: relative; overflow: hidden;">
+         style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9)); border: 1px solid rgba(0, 139, 227, 0.35); border-radius: 18px; padding: 1.25rem 1.6rem; margin: 1.5rem auto 2.5rem; max-width: 1200px; width: 100%; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.25rem; backdrop-filter: blur(16px); box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35), 0 0 20px rgba(0, 139, 227, 0.15); position: relative; overflow: hidden;">
         
         <!-- Left: Event Information -->
         <div class="countdown-info-wrap" style="display: flex; align-items: center; gap: 14px; min-width: 260px; flex: 1 1 300px;">
-            <div style="font-size: 2.2rem; filter: drop-shadow(0 0 10px rgba(0,242,254,0.5)); flex-shrink: 0;">⏳</div>
+            <div style="font-size: 2.2rem; filter: drop-shadow(0 0 10px rgba(0, 139, 227,0.5)); flex-shrink: 0;">⏳</div>
             <div>
-                <span style="font-size: 0.72rem; font-weight: 800; letter-spacing: 1.2px; color: var(--primary, #00f2fe); text-transform: uppercase;">
+                <span style="font-size: 0.72rem; font-weight: 800; letter-spacing: 1.2px; color: var(--primary, #008be3); text-transform: uppercase;">
                     ⚡ NEXT UPCOMING EVENT COUNTDOWN
                 </span>
                 <h3 style="margin: 3px 0 0; font-size: 1.25rem; font-weight: 800; color: #ffffff;">
@@ -671,20 +772,20 @@
         <!-- Right: Countdown Digits & Action Buttons -->
         <div class="countdown-controls-wrap" style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap; justify-content: flex-end;">
             <div class="countdown-digits" id="liveCountdownTimer" style="display: flex; flex-direction: row; gap: 8px; align-items: center; flex-wrap: nowrap; flex-shrink: 0;">
-                <div class="countdown-segment" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(0, 242, 254, 0.28); border-radius: 10px; padding: 6px 12px; min-width: 52px; text-align: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35); box-sizing: border-box;">
-                    <span class="countdown-number" id="cdDays" style="font-size: 1.35rem; font-weight: 800; color: #00f2fe; font-family: var(--font-heading, 'Outfit', sans-serif); line-height: 1.1; display: block; text-shadow: 0 0 10px rgba(0, 242, 254, 0.4);">00</span>
+                <div class="countdown-segment" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(0, 139, 227, 0.28); border-radius: 10px; padding: 6px 12px; min-width: 52px; text-align: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35); box-sizing: border-box;">
+                    <span class="countdown-number" id="cdDays" style="font-size: 1.35rem; font-weight: 800; color: #008be3; font-family: var(--font-heading, 'Outfit', sans-serif); line-height: 1.1; display: block; text-shadow: 0 0 10px rgba(0, 139, 227, 0.4);">00</span>
                     <span class="countdown-label" style="font-size: 0.65rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 2px; display: block;">Days</span>
                 </div>
-                <div class="countdown-segment" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(0, 242, 254, 0.28); border-radius: 10px; padding: 6px 12px; min-width: 52px; text-align: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35); box-sizing: border-box;">
-                    <span class="countdown-number" id="cdHours" style="font-size: 1.35rem; font-weight: 800; color: #00f2fe; font-family: var(--font-heading, 'Outfit', sans-serif); line-height: 1.1; display: block; text-shadow: 0 0 10px rgba(0, 242, 254, 0.4);">00</span>
+                <div class="countdown-segment" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(0, 139, 227, 0.28); border-radius: 10px; padding: 6px 12px; min-width: 52px; text-align: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35); box-sizing: border-box;">
+                    <span class="countdown-number" id="cdHours" style="font-size: 1.35rem; font-weight: 800; color: #008be3; font-family: var(--font-heading, 'Outfit', sans-serif); line-height: 1.1; display: block; text-shadow: 0 0 10px rgba(0, 139, 227, 0.4);">00</span>
                     <span class="countdown-label" style="font-size: 0.65rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 2px; display: block;">Hours</span>
                 </div>
-                <div class="countdown-segment" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(0, 242, 254, 0.28); border-radius: 10px; padding: 6px 12px; min-width: 52px; text-align: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35); box-sizing: border-box;">
-                    <span class="countdown-number" id="cdMinutes" style="font-size: 1.35rem; font-weight: 800; color: #00f2fe; font-family: var(--font-heading, 'Outfit', sans-serif); line-height: 1.1; display: block; text-shadow: 0 0 10px rgba(0, 242, 254, 0.4);">00</span>
+                <div class="countdown-segment" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(0, 139, 227, 0.28); border-radius: 10px; padding: 6px 12px; min-width: 52px; text-align: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35); box-sizing: border-box;">
+                    <span class="countdown-number" id="cdMinutes" style="font-size: 1.35rem; font-weight: 800; color: #008be3; font-family: var(--font-heading, 'Outfit', sans-serif); line-height: 1.1; display: block; text-shadow: 0 0 10px rgba(0, 139, 227, 0.4);">00</span>
                     <span class="countdown-label" style="font-size: 0.65rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 2px; display: block;">Mins</span>
                 </div>
-                <div class="countdown-segment" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(0, 242, 254, 0.28); border-radius: 10px; padding: 6px 12px; min-width: 52px; text-align: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35); box-sizing: border-box;">
-                    <span class="countdown-number" id="cdSeconds" style="font-size: 1.35rem; font-weight: 800; color: #00f2fe; font-family: var(--font-heading, 'Outfit', sans-serif); line-height: 1.1; display: block; text-shadow: 0 0 10px rgba(0, 242, 254, 0.4);">00</span>
+                <div class="countdown-segment" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(0, 139, 227, 0.28); border-radius: 10px; padding: 6px 12px; min-width: 52px; text-align: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35); box-sizing: border-box;">
+                    <span class="countdown-number" id="cdSeconds" style="font-size: 1.35rem; font-weight: 800; color: #008be3; font-family: var(--font-heading, 'Outfit', sans-serif); line-height: 1.1; display: block; text-shadow: 0 0 10px rgba(0, 139, 227, 0.4);">00</span>
                     <span class="countdown-label" style="font-size: 0.65rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 2px; display: block;">Secs</span>
                 </div>
             </div>
@@ -908,7 +1009,7 @@
 
     <!-- 🎯 Recommended For You Ribbon -->
     <section id="aiRecommendationsSection" style="max-width: 1280px; margin: 2rem auto 3rem; padding: 0 1.5rem; box-sizing: border-box; display: none;">
-        <div style="background: linear-gradient(135deg, rgba(0, 242, 254, 0.08), rgba(139, 92, 246, 0.1)); border: 1px solid rgba(0, 242, 254, 0.28); border-radius: 20px; padding: 1.8rem; box-shadow: 0 10px 30px rgba(0,0,0,0.4);">
+        <div style="background: linear-gradient(135deg, rgba(0, 139, 227, 0.08), rgba(139, 92, 246, 0.1)); border: 1px solid rgba(0, 139, 227, 0.28); border-radius: 20px; padding: 1.8rem; box-shadow: 0 10px 30px rgba(0,0,0,0.4);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 8px;">
                 <div>
                     <h2 style="color: #ffffff; font-size: 1.35rem; font-weight: 800; margin: 0 0 0.2rem; display: flex; align-items: center; gap: 8px;">
@@ -916,7 +1017,7 @@
                     </h2>
                     <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">Personalized picks matched to your skills, past bookings, and interests.</p>
                 </div>
-                <span style="font-size: 0.76rem; background: rgba(0, 242, 254, 0.15); color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.35); padding: 3px 12px; border-radius: 999px; font-weight: 700;">✨ Handpicked For You</span>
+                <span style="font-size: 0.76rem; background: rgba(0, 139, 227, 0.15); color: #008be3; border: 1px solid rgba(0, 139, 227, 0.35); padding: 3px 12px; border-radius: 999px; font-weight: 700;">✨ Handpicked For You</span>
             </div>
             <div id="aiRecGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem;">
                 <!-- Dynamically filled by JS -->
@@ -926,24 +1027,24 @@
 
     <!-- ⚡ Happening Today & Trending Highlights (Compact Grid Preview) -->
     <section class="highlights-section" aria-label="Trending Highlights">
-        <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px; margin-bottom: 0.5rem;">
-            <div>
-                <span style="font-size: 0.8rem; font-weight: 800; letter-spacing: 1.5px; color: var(--primary); text-transform: uppercase;">⚡ ACTIVE HIGHLIGHTS</span>
-                <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 800; margin: 0.2rem 0 0;">Trending & Upcoming <span style="background: linear-gradient(135deg, #00f2fe, #4facfe); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Events</span></h2>
+        <div class="highlights-header-row">
+            <div class="highlights-title-block">
+                <span class="highlights-kicker">⚡ ACTIVE HIGHLIGHTS</span>
+                <h2 class="highlights-heading">Trending & Upcoming <span style="background: linear-gradient(135deg, #008be3 0%, #ff1389 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Events</span></h2>
             </div>
-            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                <div class="price-filter-pill-group" role="tablist" aria-label="Price Filter">
-                    <button type="button" class="price-pill-btn active" onclick="filterHighlightsPrice('all', this)" id="pillAllBtn">
-                        🌐 All Passes
+            <div class="highlights-controls-wrap">
+                <div class="price-filter-pill-group" role="tablist" aria-label="Pass Tier Filter">
+                    <button type="button" class="price-pill-btn active" onclick="filterHighlightsPrice('all', this)" id="pillAllBtn" title="Universal Access: All pass categories">
+                        <span>🌐</span> <span>Universal Access</span>
                     </button>
-                    <button type="button" class="price-pill-btn pill-free-btn" onclick="filterHighlightsPrice('free', this)" id="pillFreeBtn">
-                        ✨ Free Only
+                    <button type="button" class="price-pill-btn pill-free-btn" onclick="filterHighlightsPrice('free', this)" id="pillFreeBtn" title="Open Entry: Complimentary & free admission passes">
+                        <span>⚡</span> <span>Open Entry</span>
                     </button>
-                    <button type="button" class="price-pill-btn" onclick="filterHighlightsPrice('paid', this)" id="pillPaidBtn">
-                        🎟️ Paid Passes
+                    <button type="button" class="price-pill-btn pill-paid-btn" onclick="filterHighlightsPrice('paid', this)" id="pillPaidBtn" title="VIP & Premium Tier: Priority, exclusive access passes">
+                        <span>💎</span> <span>VIP & Premium Tier</span>
                     </button>
                 </div>
-                <div class="calendar-legend" style="margin: 0;">
+                <div class="calendar-legend" style="margin: 0; background: rgba(13, 13, 18, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); padding: 5px 12px; border-radius: 12px; backdrop-filter: blur(10px);">
                     <span style="display: inline-flex; align-items: center; gap: 5px;"><span class="event-status-dot dot-open"></span> Open</span>
                     <span style="display: inline-flex; align-items: center; gap: 5px;"><span class="event-status-dot dot-today"></span> Today</span>
                     <span style="display: inline-flex; align-items: center; gap: 5px;"><span class="event-status-dot dot-closed"></span> Closed</span>
@@ -954,12 +1055,14 @@
         <div class="highlights-grid">
             {% for event in upcoming_events[:6] %}
             <div class="highlight-card" data-id="{{ event.id }}" data-category="{{ event.category }}" data-price="{% if event.price.lower() == 'free' %}free{% else %}paid{% endif %}" data-cutoff-time="{{ event.cutoff_time }}" data-is-today="{{ '1' if event.is_today else '0' }}">
-                <a href="{{ url_for('event_detail', event_id=event.id) }}" style="display: block; position: relative; height: 180px; overflow: hidden; text-decoration: none;">
-                    <img src="{{ event.image }}" alt="{{ event.title }}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease;" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070&auto=format&fit=crop';">
-                    <a href="{{ url_for('category_events', category_name=event.category) }}" onclick="event.stopPropagation();" style="position: absolute; top: 10px; left: 10px; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(8px); padding: 4px 10px; border-radius: 20px; font-size: 0.74rem; color: var(--primary); font-weight: 700; border: 1px solid rgba(0, 242, 254, 0.35); text-decoration: none; z-index: 5;">
+                <div class="highlight-image-box">
+                    <a href="{{ url_for('event_detail', event_id=event.id) }}" style="display: block; width: 100%; height: 100%; text-decoration: none;" title="{{ event.title }}">
+                        <img src="{{ event.image }}" alt="{{ event.title }}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070&auto=format&fit=crop';">
+                    </a>
+                    <a href="{{ url_for('category_events', category_name=event.category) }}" onclick="event.stopPropagation();" style="position: absolute; top: 10px; left: 10px; background: rgba(7, 7, 9, 0.88); backdrop-filter: blur(8px); padding: 4px 10px; border-radius: 20px; font-size: 0.74rem; color: var(--primary); font-weight: 700; border: 1px solid rgba(0, 139, 227, 0.35); text-decoration: none; z-index: 5;">
                         {{ event.category }} ➔
                     </a>
-                    <div class="date-badge" style="position: absolute; top: 10px; right: 10px; bottom: auto; left: auto; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(8px); padding: 4px 10px; border-radius: 20px; font-size: 0.74rem; color: #ffffff; font-weight: 700; border: 1px solid rgba(255, 255, 255, 0.15); height: auto; max-height: 28px; z-index: 5; display: inline-flex; align-items: center; white-space: nowrap;">
+                    <div class="date-badge" style="position: absolute; top: 10px; right: 10px; bottom: auto; left: auto; background: rgba(7, 7, 9, 0.88); backdrop-filter: blur(8px); padding: 4px 10px; border-radius: 20px; font-size: 0.74rem; color: #ffffff; font-weight: 700; border: 1px solid rgba(255, 255, 255, 0.15); height: auto; max-height: 28px; z-index: 5; display: inline-flex; align-items: center; white-space: nowrap;">
                         {{ event.date }}
                     </div>
                     {% if event.is_in_person_sold_out %}
@@ -969,7 +1072,7 @@
                     {% else %}
                     <div class="seat-status-pill open">🪑 {{ event.seats_left }}/{{ event.seats_total or 100 }} seats</div>
                     {% endif %}
-                </a>
+                </div>
                 <div style="padding: 1.25rem; display: flex; flex-direction: column; flex: 1; justify-content: space-between;">
                     <div>
                         <h3 class="highlight-card-title">
@@ -1007,9 +1110,9 @@
                         </div>
 
                         <!-- Available Seats with Total Seats to Register -->
-                        <div style="margin: 0.6rem 0; padding: 6px 10px; background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem;">
+                        <div style="margin: 0.6rem 0; padding: 6px 10px; background: rgba(0, 139, 227, 0.05); border: 1px solid rgba(0, 139, 227, 0.2); border-radius: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem;">
                             <span style="color: #cbd5e1; display: inline-flex; align-items: center; gap: 5px;">
-                                <span>🪑</span> Available: <strong style="color: #00f2fe;">{{ event.seats_left }}</strong> / {{ event.seats_total or 100 }} Total
+                                <span>🪑</span> Available: <strong style="color: #008be3;">{{ event.seats_left }}</strong> / {{ event.seats_total or 100 }} Total
                             </span>
                             {% if event.is_in_person_sold_out %}
                             <span class="seat-reg-badge soldout">Sold Out</span>
@@ -1031,9 +1134,9 @@
                         {% endif %}
                         <div class="card-action-btn-group">
                             {% if event.is_registered %}
-                            <a href="{{ url_for('view_ticket_interactive', event_id=event.id) }}" class="card-btn-action" style="background: rgba(0, 242, 254, 0.2); color: var(--primary);" title="Open Holographic Pass">🎟️ Pass</a>
+                            <a href="{{ url_for('view_ticket_interactive', event_id=event.id) }}" class="card-btn-action" style="background: rgba(0, 139, 227, 0.2); color: var(--primary);" title="Open Holographic Pass">🎟️ Pass</a>
                             {% elif event.is_open %}
-                            <a href="{{ url_for('register_event', event_id=event.id) }}" class="card-btn-action" style="background: var(--primary); color: #0f172a;">Register</a>
+                            <a href="{{ url_for('register_event', event_id=event.id) }}" class="card-btn-action" style="background: var(--primary); color: #070709;">Register</a>
                             {% else %}
                             <button class="card-btn-action" style="background: rgba(255,255,255,0.08); color: var(--text-muted); cursor: not-allowed; border: 1px solid rgba(255,255,255,0.1);" disabled>Closed</button>
                             {% endif %}
@@ -1043,6 +1146,16 @@
                 </div>
             </div>
             {% endfor %}
+            <div id="highlightsEmptyState" class="highlights-empty-state" style="display: none;">
+                <div style="font-size: 2.6rem; margin-bottom: 0.6rem;">🎟️</div>
+                <h4 style="font-size: 1.3rem; font-weight: 800; color: #ffffff; margin-bottom: 0.4rem;">No Events in Selected Access Tier</h4>
+                <p style="color: var(--text-muted); font-size: 0.92rem; max-width: 440px; margin: 0 auto 1.3rem; line-height: 1.5;">
+                    No upcoming events are currently categorized under this tier. Switch to Universal Access to explore all scheduled event passes.
+                </p>
+                <button type="button" class="card-btn-action" onclick="filterHighlightsPrice('all', document.getElementById('pillAllBtn'))" style="background: var(--primary); color: #070709; padding: 0.65rem 1.6rem; height: auto; border-radius: 50px; font-weight: 800; display: inline-flex; margin: 0 auto; box-shadow: 0 4px 15px rgba(0, 139, 227, 0.4);">
+                    View Universal Access ➔
+                </button>
+            </div>
         </div>
 
     </section>
@@ -1054,7 +1167,7 @@
             <div style="flex: 1 1 300px;">
                 <h3 style="color: var(--primary); font-size: 1.8rem; margin-bottom: 1rem; font-weight: 800; display: flex; align-items: center; gap: 12px;">
                     <img src="{{ url_for('static', filename='logo.png') }}" alt="Events Booking Logo"
-                        style="height: 45px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);">
+                        style="height: 45px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 139, 227, 0.3);">
                     <div>Events <span style="color: white;">Booking</span></div>
                 </h3>
                 <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem;">
@@ -1155,16 +1268,16 @@
                 if (data.ok && data.recommendations && data.recommendations.length > 0 && grid && sec) {
                     sec.style.display = 'block';
                     grid.innerHTML = data.recommendations.map(ev => `
-                        <div style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(0, 242, 254, 0.25); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 8px 20px rgba(0,0,0,0.35); transition: transform 0.25s, border-color 0.25s;" onmouseover="this.style.transform='translateY(-3px)'; this.style.borderColor='rgba(0,242,254,0.6)';" onmouseout="this.style.transform='none'; this.style.borderColor='rgba(0,242,254,0.25)';">
+                        <div style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(0, 139, 227, 0.25); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 8px 20px rgba(0,0,0,0.35); transition: transform 0.25s, border-color 0.25s;" onmouseover="this.style.transform='translateY(-3px)'; this.style.borderColor='rgba(0, 139, 227,0.6)';" onmouseout="this.style.transform='none'; this.style.borderColor='rgba(0, 139, 227,0.25)';">
                             <div style="position: relative; height: 110px; overflow: hidden;">
                                 <img src="${ev.image}" alt="${ev.title}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070&auto=format&fit=crop';">
-                                <span style="position: absolute; top: 8px; right: 8px; background: rgba(0,242,254,0.9); color: #020617; font-weight: 800; font-size: 0.72rem; padding: 2px 8px; border-radius: 999px;">
+                                <span style="position: absolute; top: 8px; right: 8px; background: rgba(0, 139, 227,0.9); color: #020617; font-weight: 800; font-size: 0.72rem; padding: 2px 8px; border-radius: 999px;">
                                     ${ev.match_score}% Match
                                 </span>
                             </div>
                             <div style="padding: 0.9rem 1rem; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
                                 <div>
-                                    <span style="font-size: 0.72rem; color: #00f2fe; font-weight: 700; text-transform: uppercase;">${ev.category || 'Tech Event'}</span>
+                                    <span style="font-size: 0.72rem; color: #008be3; font-weight: 700; text-transform: uppercase;">${ev.category || 'Tech Event'}</span>
                                     <h4 style="color: #ffffff; font-size: 0.98rem; font-weight: 700; margin: 0.2rem 0 0.4rem; line-height: 1.3;">
                                         <a href="/event/${ev.id}" style="color: inherit; text-decoration: none;">${ev.title}</a>
                                     </h4>
@@ -1208,20 +1321,27 @@
             if (formToDelete) formToDelete.submit();
         }
 
-        // 1-Click Highlights Price Filter
+        // 1-Click Highlights Price / Access Tier Filter
         function filterHighlightsPrice(type, btn) {
             document.querySelectorAll('.price-filter-pill-group .price-pill-btn').forEach(b => b.classList.remove('active'));
             if (btn) btn.classList.add('active');
 
             const cards = document.querySelectorAll('.highlights-grid .highlight-card');
+            let visibleCount = 0;
             cards.forEach(card => {
                 const cardPrice = (card.getAttribute('data-price') || '').toLowerCase();
                 if (type === 'all' || cardPrice === type) {
-                    card.style.display = '';
+                    card.style.display = 'flex';
+                    visibleCount++;
                 } else {
                     card.style.display = 'none';
                 }
             });
+
+            const emptyState = document.getElementById('highlightsEmptyState');
+            if (emptyState) {
+                emptyState.style.display = (visibleCount === 0) ? 'block' : 'none';
+            }
         }
 
         // Live Event Countdown Timer

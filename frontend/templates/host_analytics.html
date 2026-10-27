@@ -49,7 +49,7 @@
             font-weight: 800;
             color: var(--primary);
             font-family: var(--font-heading);
-            text-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+            text-shadow: 0 0 15px rgba(0, 139, 227, 0.3);
         }
         .charts-grid {
             display: grid;
@@ -76,7 +76,7 @@
             color: var(--primary);
             font-size: 1.3rem;
             margin-bottom: 1.5rem;
-            text-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+            text-shadow: 0 0 10px rgba(0, 139, 227, 0.2);
         }
         .events-table-card {
             background: rgba(255, 255, 255, 0.03);
@@ -112,7 +112,7 @@
             border-bottom: none;
         }
         .csv-btn {
-            background: rgba(0, 242, 254, 0.15);
+            background: rgba(0, 139, 227, 0.15);
             border: 1px solid var(--primary);
             color: var(--primary);
             padding: 0.5rem 1rem;
@@ -129,7 +129,7 @@
         .csv-btn:hover {
             background: var(--primary);
             color: #0f172a;
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+            box-shadow: 0 0 15px rgba(0, 139, 227, 0.4);
             transform: translateY(-1px);
         }
     </style>
@@ -147,7 +147,7 @@
             <div style="display: flex; align-items: center;">
                 <div class="hamburger" id="hamburger">☰</div>
                 <div class="logo" style="display: flex; align-items: center; gap: 10px;">
-                    <img src="{{ url_for('static', filename='logo.png') }}" alt="Events Booking Logo" style="height: 35px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);">
+                    <img src="{{ url_for('static', filename='logo.png') }}" alt="Events Booking Logo" style="height: 35px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 139, 227, 0.3);">
                     <div>Events <span>Booking</span></div>
                 </div>
             </div>
@@ -166,7 +166,7 @@
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo" style="display: flex; align-items: center; gap: 10px;">
-                <img src="{{ url_for('static', filename='logo.png') }}" alt="Events Booking Logo" style="height: 40px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Events Booking Logo" style="height: 40px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 139, 227, 0.3);">
                 <div>Events <span>Booking</span></div>
             </div>
             <div class="close-btn" id="closeSidebar">&times;</div>
@@ -259,7 +259,7 @@
                         <td style="font-weight: 600; color: var(--text-main);">{{ event.title }}</td>
                         <td>{{ event.date }}</td>
                         <td>
-                            <span style="padding: 4px 10px; border-radius: 20px; background: rgba(0,242,254,0.1); border: 1px solid var(--primary); font-size: 0.8rem; font-weight: 600; color: var(--primary);">
+                            <span style="padding: 4px 10px; border-radius: 20px; background: rgba(0, 139, 227,0.1); border: 1px solid var(--primary); font-size: 0.8rem; font-weight: 600; color: var(--primary);">
                                 {{ event.category }}
                             </span>
                         </td>
@@ -316,8 +316,8 @@
                 datasets: [{
                     label: 'Registrations',
                     data: slicedData,
-                    backgroundColor: 'rgba(0, 242, 254, 0.6)',
-                    borderColor: 'rgba(0, 242, 254, 1)',
+                    backgroundColor: 'rgba(0, 139, 227, 0.6)',
+                    borderColor: 'rgba(0, 139, 227, 1)',
                     borderWidth: 1,
                     borderRadius: 8
                 }]
@@ -354,9 +354,9 @@
                 datasets: [{
                     data: catData,
                     backgroundColor: [
-                        'rgba(0, 242, 254, 0.7)',
+                        'rgba(0, 139, 227, 0.7)',
                         'rgba(255, 0, 128, 0.7)',
-                        'rgba(79, 172, 254, 0.7)',
+                        'rgba(0, 98, 163, 0.7)',
                         'rgba(254, 225, 64, 0.7)',
                         'rgba(161, 140, 209, 0.7)',
                         'rgba(251, 194, 235, 0.7)',

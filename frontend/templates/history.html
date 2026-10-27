@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Bookings | Events Booking</title>
-    <meta name="theme-color" content="#00f2fe">
+    <meta name="theme-color" content="#008be3">
     <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=5.0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
@@ -38,7 +38,7 @@
         }
         .summary-stat-box:hover {
             transform: translateY(-2px);
-            border-color: rgba(0, 242, 254, 0.4);
+            border-color: rgba(0, 139, 227, 0.4);
         }
         body.light-mode .summary-stat-box {
             background: #ffffff;
@@ -53,7 +53,7 @@
             align-items: center;
             justify-content: center;
             font-size: 1.4rem;
-            background: rgba(0, 242, 254, 0.12);
+            background: rgba(0, 139, 227, 0.12);
             color: var(--primary);
             flex-shrink: 0;
         }
@@ -96,9 +96,9 @@
             font-weight: 700;
         }
         .filter-tab-btn:hover:not(.active) {
-            background: rgba(0, 242, 254, 0.15);
+            background: rgba(0, 139, 227, 0.15);
             color: #ffffff;
-            box-shadow: 0 0 12px rgba(0, 242, 254, 0.25);
+            box-shadow: 0 0 12px rgba(0, 139, 227, 0.25);
             transform: translateY(-1px);
         }
 
@@ -133,8 +133,8 @@
         }
         .booking-card:hover {
             transform: translateY(-4px);
-            border-color: rgba(0, 242, 254, 0.4);
-            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45), 0 0 20px rgba(0, 242, 254, 0.15);
+            border-color: rgba(0, 139, 227, 0.4);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45), 0 0 20px rgba(0, 139, 227, 0.15);
         }
         body.light-mode .booking-card {
             background: #ffffff;
@@ -197,7 +197,7 @@
         }
         .unreg-modal-content {
             background: #0f172a !important;
-            border: 1px solid rgba(0, 242, 254, 0.25) !important;
+            border: 1px solid rgba(0, 139, 227, 0.25) !important;
             border-radius: 20px !important;
             max-width: 580px !important;
             width: 100% !important;
@@ -227,8 +227,8 @@
             margin-bottom: 8px !important;
         }
         .unreg-reason-option:hover {
-            background: rgba(0, 242, 254, 0.08) !important;
-            border-color: rgba(0, 242, 254, 0.35) !important;
+            background: rgba(0, 139, 227, 0.08) !important;
+            border-color: rgba(0, 139, 227, 0.35) !important;
         }
         body.light-mode .unreg-reason-option {
             background: #f8fafc !important;
@@ -240,7 +240,7 @@
             border-color: #cbd5e1 !important;
         }
         .unreg-reason-option input[type="radio"] {
-            accent-color: #00f2fe !important;
+            accent-color: #008be3 !important;
             cursor: pointer !important;
             width: 16px !important;
             height: 16px !important;
@@ -362,7 +362,7 @@
                             {{ message }}
                         </div>
                         {% else %}
-                        <div style="padding: 1rem 1.4rem; border-radius: 12px; margin-bottom: 0.8rem; font-size: 0.95rem; font-weight: 500; text-align: center; background: rgba(0, 242, 254, 0.12); border: 1px solid rgba(0, 242, 254, 0.3); color: var(--primary);">
+                        <div style="padding: 1rem 1.4rem; border-radius: 12px; margin-bottom: 0.8rem; font-size: 0.95rem; font-weight: 500; text-align: center; background: rgba(0, 139, 227, 0.12); border: 1px solid rgba(0, 139, 227, 0.3); color: var(--primary);">
                             {{ message }}
                         </div>
                         {% endif %}
@@ -483,7 +483,7 @@
 
                         <!-- Action Buttons -->
                         <div class="booking-actions">
-                            <a href="{{ url_for('event_detail', event_id=item.id) }}" class="register-btn-sm" style="background: rgba(0, 242, 254, 0.15); color: var(--primary); border: 1px solid var(--primary); text-decoration: none; padding: 0.5rem 0.9rem; font-size: 0.85rem; border-radius: 8px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
+                            <a href="{{ url_for('event_detail', event_id=item.id) }}" class="register-btn-sm" style="background: rgba(0, 139, 227, 0.15); color: var(--primary); border: 1px solid var(--primary); text-decoration: none; padding: 0.5rem 0.9rem; font-size: 0.85rem; border-radius: 8px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
                                 View Details
                             </a>
                             {% if item.reg_status == 'cancelled' %}
@@ -491,7 +491,7 @@
                                 🔍 Live Status
                             </a>
                             {% else %}
-                            <a href="{{ url_for('view_ticket_interactive', event_id=item.id) }}" class="register-btn-sm" style="background: rgba(0, 242, 254, 0.15); color: var(--primary); border: 1px solid var(--primary); text-decoration: none; padding: 0.5rem 0.9rem; font-size: 0.85rem; border-radius: 8px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
+                            <a href="{{ url_for('view_ticket_interactive', event_id=item.id) }}" class="register-btn-sm" style="background: rgba(0, 139, 227, 0.15); color: var(--primary); border: 1px solid var(--primary); text-decoration: none; padding: 0.5rem 0.9rem; font-size: 0.85rem; border-radius: 8px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
                                 🎟️ Holographic Pass
                             </a>
                             <a href="{{ url_for('download_invoice', event_id=item.id) }}" class="register-btn-sm" target="_blank" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); text-decoration: none; padding: 0.5rem 0.9rem; font-size: 0.85rem; border-radius: 8px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;" title="Download PDF Tax Invoice & Receipt">

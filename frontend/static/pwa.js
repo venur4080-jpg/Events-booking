@@ -116,7 +116,7 @@
         <button id="pwa-close-btn" style="background:none;border:none;color:#94a3b8;font-size:1.2rem;cursor:pointer;line-height:1;">&times;</button>
       </div>
       <div style="display:flex;gap:8px;margin-top:4px;">
-        <button id="pwa-install-btn" style="flex:1;background:var(--primary, #00f2fe);color:#0f172a;border:none;padding:8px 12px;border-radius:8px;font-weight:700;font-size:0.85rem;cursor:pointer;transition:transform 0.2s;">
+        <button id="pwa-install-btn" style="flex:1;background:var(--primary, #008be3);color:#070709;border:none;padding:8px 12px;border-radius:8px;font-weight:700;font-size:0.85rem;cursor:pointer;transition:transform 0.2s;box-shadow: 0 4px 12px rgba(0,139,227,0.35);">
           📲 Install Now
         </button>
         <button id="pwa-later-btn" style="background:rgba(255,255,255,0.06);color:#e2e8f0;border:1px solid rgba(255,255,255,0.1);padding:8px 12px;border-radius:8px;font-weight:600;font-size:0.85rem;cursor:pointer;">

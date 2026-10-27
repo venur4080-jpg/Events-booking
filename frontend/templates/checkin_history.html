@@ -40,7 +40,7 @@
         }
         .filter-select:focus, .filter-input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+            box-shadow: 0 0 10px rgba(0, 139, 227, 0.2);
         }
         .filter-select option {
             background: #0f172a;
@@ -86,14 +86,14 @@
             <div style="display: flex; align-items: center; gap: 10px;">
                 <div class="hamburger" id="hamburger">☰</div>
                 <div class="logo">Events <span>Booking</span></div>
-                <span style="background: rgba(0,242,254,0.15); color: var(--primary); font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 50px; border: 1px solid var(--primary); text-transform: uppercase;">Check-in History</span>
+                <span style="background: rgba(0, 139, 227,0.15); color: var(--primary); font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 50px; border: 1px solid var(--primary); text-transform: uppercase;">Check-in History</span>
                 <span id="telemetryBadge" style="display: inline-flex; align-items: center; gap: 6px; background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 50px; border: 1px solid rgba(16, 185, 129, 0.4); text-transform: uppercase;">
                     <span style="width: 7px; height: 7px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981; animation: pulseGlow 1.5s infinite alternate;"></span>
                     <span id="telemetryStatusText">Telemetry Sync Live</span>
                 </span>
             </div>
             <div class="nav-links" style="display: flex; align-items: center; gap: 12px;">
-                <a href="{{ url_for('scan_ticket') }}" class="register-btn-sm" style="background: rgba(0, 242, 254, 0.15); color: var(--primary); border: 1px solid var(--primary); text-decoration: none; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 700;">📷 Live Scanner</a>
+                <a href="{{ url_for('scan_ticket') }}" class="register-btn-sm" style="background: rgba(0, 139, 227, 0.15); color: var(--primary); border: 1px solid var(--primary); text-decoration: none; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 700;">📷 Live Scanner</a>
                 <a href="{{ url_for('dashboard') }}" class="nav-btn-dash">🏠 Dashboard</a>
                 <a href="{{ url_for('logout') }}" class="logout-btn-unique">⏻ Logout</a>
             </div>

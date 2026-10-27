@@ -54,10 +54,10 @@ function buildOnboardingModal() {
 
   overlay.innerHTML = `
     <div id="onboardingModal" style="
-      background: var(--bg-card, #1e293b);
-      border: 1px solid var(--glass-border, rgba(255,255,255,0.12));
+      background: var(--bg-card, #070709);
+      border: 1px solid var(--glass-border, rgba(0, 139, 227, 0.25));
       border-radius: 24px;
-      box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+      box-shadow: 0 32px 80px rgba(0,0,0,0.8), 0 0 30px rgba(0, 139, 227, 0.15);
       max-width: 480px; width: 90%;
       padding: 0;
       overflow: hidden;
@@ -67,7 +67,7 @@ function buildOnboardingModal() {
     ">
       <!-- Progress Bar -->
       <div style="height: 4px; background: rgba(255,255,255,0.08);">
-        <div id="ob-progress" style="height:100%; background: var(--primary, #00f2fe); width:0%; transition: width 0.4s ease; border-radius: 4px;"></div>
+        <div id="ob-progress" style="height:100%; background: linear-gradient(90deg, var(--primary, #008be3), var(--secondary, #ff1389)); width:0%; transition: width 0.4s ease; border-radius: 4px;"></div>
       </div>
 
       <!-- Content Area -->
@@ -103,10 +103,10 @@ function buildOnboardingModal() {
           " aria-label="Previous slide">← Back</button>
 
           <button id="ob-next" onclick="onboardNext()" style="
-            background: var(--primary, #00f2fe); border: none;
-            color: #0f172a; padding: 0.6rem 1.8rem;
+            background: var(--primary, #008be3); border: none;
+            color: #070709; padding: 0.6rem 1.8rem;
             border-radius: 50px; cursor: pointer; font-size: 0.9rem; font-weight: 700;
-            transition: all 0.2s ease; font-family: inherit;
+            transition: all 0.2s ease; font-family: inherit; box-shadow: 0 4px 14px rgba(0, 139, 227, 0.4);
           " aria-label="Next slide">Next →</button>
         </div>
       </div>
@@ -160,7 +160,7 @@ function renderSlide(idx) {
       dot.style.cssText = `
         width: ${i === idx ? '24px' : '8px'}; height: 8px;
         border-radius: 50px; transition: all 0.3s ease;
-        background: ${i === idx ? 'var(--primary, #00f2fe)' : 'rgba(255,255,255,0.2)'};
+        background: ${i === idx ? 'var(--primary, #008be3)' : 'rgba(255,255,255,0.2)'};
       `;
       dots.appendChild(dot);
     });

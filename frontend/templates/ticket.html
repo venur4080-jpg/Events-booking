@@ -10,15 +10,15 @@
     <script src="{{ url_for('static', filename='themes.js') }}?v=6.0"></script>
     <style>
         :root {
-            --tkt-cyan: #00f2fe;
-            --tkt-blue: #4facfe;
-            --tkt-purple: #7928ca;
-            --tkt-pink: #ff0080;
+            --tkt-cyan: #008be3;
+            --tkt-blue: #0062a3;
+            --tkt-purple: #008be3;
+            --tkt-pink: #ff1389;
             --tkt-gold: #f59e0b;
             --tkt-emerald: #10b981;
-            --tkt-bg: #070c18;
-            --tkt-card-bg: rgba(15, 23, 42, 0.94);
-            --tkt-foil: linear-gradient(135deg, rgba(255, 0, 128, 0.35), rgba(121, 40, 202, 0.35), rgba(0, 242, 254, 0.35), rgba(16, 185, 129, 0.35));
+            --tkt-bg: #070709;
+            --tkt-card-bg: rgba(13, 13, 18, 0.94);
+            --tkt-foil: linear-gradient(135deg, rgba(255, 19, 137, 0.4), rgba(0, 139, 227, 0.4), rgba(56, 189, 248, 0.35));
         }
 
         /* Holographic Theme Palettes */
@@ -44,8 +44,8 @@
         body {
             background-color: var(--tkt-bg);
             background-image: 
-                radial-gradient(circle at 20% 15%, rgba(0, 242, 254, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 80% 85%, rgba(121, 40, 202, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 20% 15%, rgba(0, 139, 227, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 85%, rgba(255, 19, 137, 0.15) 0%, transparent 45%),
                 linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
             background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
@@ -112,20 +112,20 @@
             transform: translateY(-2px);
             border-color: var(--tkt-cyan);
             color: var(--tkt-cyan);
-            box-shadow: 0 0 16px rgba(0, 242, 254, 0.3);
-            background: rgba(0, 242, 254, 0.1);
+            box-shadow: 0 0 16px rgba(0, 139, 227, 0.3);
+            background: rgba(0, 139, 227, 0.1);
         }
 
         .t-btn-primary {
             background: linear-gradient(135deg, var(--tkt-cyan), var(--tkt-blue));
             color: #040914 !important;
             border: none;
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+            box-shadow: 0 0 20px rgba(0, 139, 227, 0.4);
         }
 
         .t-btn-primary:hover {
             transform: translateY(-2px) scale(1.03);
-            box-shadow: 0 0 28px rgba(0, 242, 254, 0.65);
+            box-shadow: 0 0 28px rgba(0, 139, 227, 0.65);
             filter: brightness(1.12);
         }
 
@@ -178,8 +178,8 @@
             width: 100%;
             border-radius: 28px;
             background: var(--tkt-card-bg);
-            border: 1.5px solid rgba(0, 242, 254, 0.35);
-            box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.8), 0 0 35px rgba(0, 242, 254, 0.18);
+            border: 1.5px solid rgba(0, 139, 227, 0.35);
+            box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.8), 0 0 35px rgba(0, 139, 227, 0.18);
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
             overflow: hidden;
@@ -242,7 +242,7 @@
             left: 0;
             right: 0;
             height: 6px;
-            background: linear-gradient(90deg, #ff0080, #7928ca, #00f2fe, #4facfe, #10b981, #f59e0b, #ff0080);
+            background: linear-gradient(90deg, #ff0080, #7928ca, #008be3, #0062a3, #10b981, #f59e0b, #ff0080);
             background-size: 300% 100%;
             animation: topFoilRun 5s linear infinite;
             z-index: 10;
@@ -301,13 +301,13 @@
         .notch-circle-top {
             top: -16px;
             left: -16px;
-            border-bottom: 1.5px solid rgba(0, 242, 254, 0.35);
+            border-bottom: 1.5px solid rgba(0, 139, 227, 0.35);
         }
 
         .notch-circle-bottom {
             bottom: -16px;
             left: -16px;
-            border-top: 1.5px solid rgba(0, 242, 254, 0.35);
+            border-top: 1.5px solid rgba(0, 139, 227, 0.35);
         }
 
         /* Right Security & QR Stub */
@@ -346,11 +346,11 @@
 
         .brand-badge span {
             color: var(--tkt-cyan);
-            text-shadow: 0 0 15px rgba(0, 242, 254, 0.6);
+            text-shadow: 0 0 15px rgba(0, 139, 227, 0.6);
         }
 
         .pass-tier-badge {
-            background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(121, 40, 202, 0.35));
+            background: linear-gradient(135deg, rgba(0, 139, 227, 0.2), rgba(121, 40, 202, 0.35));
             border: 1px solid var(--tkt-cyan);
             color: var(--tkt-cyan);
             font-size: 0.76rem;
@@ -362,7 +362,7 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            box-shadow: 0 0 14px rgba(0, 242, 254, 0.25);
+            box-shadow: 0 0 14px rgba(0, 139, 227, 0.25);
         }
 
         .event-hero-title {
@@ -443,7 +443,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+            box-shadow: 0 0 15px rgba(0, 139, 227, 0.4);
             flex-shrink: 0;
         }
 
@@ -476,8 +476,8 @@
         }
 
         .maps-action-chip {
-            background: rgba(0, 242, 254, 0.15);
-            border: 1px solid rgba(0, 242, 254, 0.35);
+            background: rgba(0, 139, 227, 0.15);
+            border: 1px solid rgba(0, 139, 227, 0.35);
             color: var(--tkt-cyan);
             font-size: 0.8rem;
             font-weight: 700;
@@ -494,7 +494,7 @@
         .maps-action-chip:hover {
             background: var(--tkt-cyan);
             color: #040914;
-            box-shadow: 0 0 14px rgba(0, 242, 254, 0.5);
+            box-shadow: 0 0 14px rgba(0, 139, 227, 0.5);
             transform: scale(1.05);
         }
 
@@ -504,8 +504,8 @@
             font-size: 0.92rem;
             font-weight: 800;
             color: var(--tkt-cyan);
-            background: rgba(0, 242, 254, 0.12);
-            border: 1px solid rgba(0, 242, 254, 0.3);
+            background: rgba(0, 139, 227, 0.12);
+            border: 1px solid rgba(0, 139, 227, 0.3);
             padding: 5px 14px;
             border-radius: 10px;
             letter-spacing: 0.8px;
@@ -517,7 +517,7 @@
             background: #ffffff;
             padding: 14px;
             border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 242, 254, 0.2);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 139, 227, 0.2);
             display: inline-block;
             margin-bottom: 1rem;
             position: relative;
@@ -541,12 +541,12 @@
             width: 64px;
             height: 64px;
             border-radius: 50%;
-            background: radial-gradient(circle at 35% 35%, #ff0080, #7928ca, #00f2fe, #10b981, #f59e0b);
+            background: radial-gradient(circle at 35% 35%, #ff0080, #7928ca, #008be3, #10b981, #f59e0b);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.7rem;
-            box-shadow: 0 0 25px rgba(0, 242, 254, 0.7), inset 0 0 10px rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 25px rgba(0, 139, 227, 0.7), inset 0 0 10px rgba(255, 255, 255, 0.5);
             border: 2px solid rgba(255, 255, 255, 0.6);
             animation: holoSealRotate 5s ease-in-out infinite alternate;
             margin: 0.6rem auto;
@@ -752,7 +752,7 @@
         <div class="toolbar-group">
             <!-- Palette Shifter -->
             <div class="theme-pill-selector" title="Switch Holographic Laser Theme">
-                <button class="theme-dot-btn active" style="background: #00f2fe;" onclick="setTicketTheme('cyan')" title="Cyber Cyan"></button>
+                <button class="theme-dot-btn active" style="background: #008be3;" onclick="setTicketTheme('cyan')" title="Cerulean Blue & Rose"></button>
                 <button class="theme-dot-btn" style="background: #fbbf24;" onclick="setTicketTheme('gold')" title="VIP Gold"></button>
                 <button class="theme-dot-btn" style="background: #f472b6;" onclick="setTicketTheme('nebula')" title="Nebula Pink"></button>
                 <button class="theme-dot-btn" style="background: #34d399;" onclick="setTicketTheme('matrix')" title="Matrix Emerald"></button>
@@ -797,7 +797,7 @@
                         <!-- Brand & Pass Status -->
                         <div class="brand-header-row">
                             <div class="brand-badge">
-                                <img src="{{ url_for('static', filename='logo.png') }}" alt="Events Booking Logo" style="height: 40px; border-radius: 10px; box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);">
+                                <img src="{{ url_for('static', filename='logo.png') }}" alt="Events Booking Logo" style="height: 40px; border-radius: 10px; box-shadow: 0 0 15px rgba(0, 139, 227, 0.4);">
                                 <div>Events <span>Booking</span></div>
                             </div>
 
@@ -847,10 +847,10 @@
                             </div>
 
                             {% if reg.team_name %}
-                            <div class="matrix-cell" style="grid-column: 1 / -1; background: rgba(0, 242, 254, 0.05); padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid rgba(0, 242, 254, 0.2);">
+                            <div class="matrix-cell" style="grid-column: 1 / -1; background: rgba(0, 139, 227, 0.05); padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid rgba(0, 139, 227, 0.2);">
                                 <div class="cell-label">👥 Team Squad: {{ reg.team_name }}</div>
                                 <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px;">
-                                    <span style="background: rgba(0, 242, 254, 0.15); color: var(--tkt-cyan); font-size: 0.76rem; font-weight: 700; padding: 3px 8px; border-radius: 6px;">👑 Leader: {{ reg.full_name }}</span>
+                                    <span style="background: rgba(0, 139, 227, 0.15); color: var(--tkt-cyan); font-size: 0.76rem; font-weight: 700; padding: 3px 8px; border-radius: 6px;">👑 Leader: {{ reg.full_name }}</span>
                                     {% for member in reg.team_members %}
                                     <span style="background: rgba(255, 255, 255, 0.08); color: #cbd5e1; font-size: 0.76rem; font-weight: 600; padding: 3px 8px; border-radius: 6px;">👤 {{ member }}</span>
                                     {% endfor %}

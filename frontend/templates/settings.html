@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Account Settings | Events Booking</title>
-    <meta name="theme-color" content="#00f2fe">
+    <meta name="theme-color" content="#008be3">
     <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=5.0">
     <script src="{{ url_for('static', filename='themes.js') }}?v=5.0"></script>
@@ -110,7 +110,7 @@
             border-radius: 50%;
         }
         input:checked + .switch-slider {
-            background-color: #00f2fe;
+            background-color: #008be3;
         }
         input:checked + .switch-slider:before {
             transform: translateX(28px);
@@ -144,11 +144,11 @@
         .nature-tile:hover {
             transform: translateY(-3px);
             border-color: var(--primary);
-            box-shadow: 0 8px 24px rgba(0, 242, 254, 0.25);
+            box-shadow: 0 8px 24px rgba(0, 139, 227, 0.25);
         }
         .nature-tile.active {
-            border-color: #00f2fe !important;
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.5) !important;
+            border-color: #008be3 !important;
+            box-shadow: 0 0 20px rgba(0, 139, 227, 0.5) !important;
         }
         .nature-tile-img {
             position: absolute;
@@ -193,7 +193,7 @@
             position: absolute;
             top: 8px;
             right: 8px;
-            background: #00f2fe;
+            background: #008be3;
             color: #0f172a;
             font-size: 0.68rem;
             font-weight: 800;
@@ -260,7 +260,7 @@
             gap: 5px;
         }
         .particle-mode-chip:hover {
-            background: rgba(0, 242, 254, 0.15);
+            background: rgba(0, 139, 227, 0.15);
             border-color: var(--primary);
             color: var(--primary);
             transform: translateY(-1px);
@@ -270,7 +270,7 @@
             color: #0f172a;
             border-color: var(--primary);
             font-weight: 700;
-            box-shadow: 0 0 12px rgba(0, 242, 254, 0.4);
+            box-shadow: 0 0 12px rgba(0, 139, 227, 0.4);
         }
         body.light-mode .particle-mode-chip {
             background: #f1f5f9;
@@ -351,8 +351,8 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: rgba(0, 242, 254, 0.12);
-            border: 1px solid rgba(0, 242, 254, 0.35);
+            background: rgba(0, 139, 227, 0.12);
+            border: 1px solid rgba(0, 139, 227, 0.35);
             color: var(--primary);
             font-size: 0.82rem;
             font-weight: 700;
@@ -393,6 +393,15 @@
             </div>
             <div class="nav-links" style="display: flex; align-items: center; gap: 12px;">
                 <a href="{{ url_for('dashboard') }}" class="nav-btn-dash">🏠 Dashboard</a>
+                {% if user_subscription and user_subscription.is_active %}
+                <a href="{{ url_for('subscriptions_page') }}" style="background: linear-gradient(135deg, rgba(255,19,137,0.2), rgba(0,139,227,0.2)); border: 1px solid var(--neon-rose, #ff1389); color: #fff; padding: 5px 12px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                    👑 {{ user_subscription.plan_title }}
+                </a>
+                {% else %}
+                <a href="{{ url_for('subscriptions_page') }}" style="background: rgba(0, 139, 227, 0.15); border: 1px solid rgba(0, 139, 227, 0.4); color: var(--primary); padding: 5px 12px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                    ⭐ Subscribe
+                </a>
+                {% endif %}
                 <a href="{{ url_for('logout') }}" class="logout-btn-unique">⏻ Logout</a>
             </div>
         </div>
@@ -406,6 +415,7 @@
         </div>
         <ul class="sidebar-links">
             <li><a href="{{ url_for('dashboard') }}">🏠 Dashboard</a></li>
+            <li><a href="{{ url_for('subscriptions_page') }}" style="color: #ff1389; font-weight: 700;">👑 Live Stage Pass (Hotstar)</a></li>
             <li><a href="{{ url_for('profile') }}">👤 My Profile</a></li>
             <li><a href="{{ url_for('history') }}">📋 My Bookings</a></li>
             <li><a href="{{ url_for('settings') }}" class="active">⚙️ Settings</a></li>
@@ -463,6 +473,88 @@
                 {{ error }}
             </div>
             {% endif %}
+
+            <!-- SECTION 0: 👑 Live VIP Subscription (Hotstar Pass) -->
+            <div class="settings-card" style="border: 1px solid rgba(255, 19, 137, 0.35); background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 10, 30, 0.5) 100%);">
+                <div class="settings-section-title" style="color: #ff1389;">
+                    <span>👑</span> Live Stage Pass & Subscription
+                </div>
+                <p class="settings-section-desc">
+                    Manage your Hotstar-style live streaming membership. Enjoy zero-fee admission to live events, single-screen device protection, and ultra-crisp HD/2K video feeds.
+                </p>
+
+                {% if user_subscription and user_subscription.is_active %}
+                <div style="background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 19, 137, 0.3); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.2rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                                <span style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; color: #fff;">
+                                    {{ user_subscription.plan_title }}
+                                </span>
+                                <span style="background: linear-gradient(135deg, #ff1389, #008be3); color: #fff; font-size: 0.72rem; font-weight: 800; padding: 3px 10px; border-radius: 999px; text-transform: uppercase;">
+                                    Active Pass
+                                </span>
+                            </div>
+                            <div style="color: var(--text-muted); font-size: 0.88rem;">
+                                Billing: <strong style="color: #fff;">{{ user_subscription.billing_cycle|capitalize }}</strong> • Valid until <strong style="color: #38bdf8;">{{ user_subscription.expires_at[:10] if user_subscription.expires_at else 'Active' }}</strong> ({{ user_subscription.days_remaining }} days left)
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <a href="{{ url_for('subscriptions_page') }}" class="t-btn" style="background: linear-gradient(135deg, #008be3, #0062a3); color: #fff; font-size: 0.82rem; padding: 6px 14px; border-radius: 10px; text-decoration: none; font-weight: 700;">
+                                🔄 Switch / Upgrade Plan
+                            </a>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 0.2rem;">
+                        <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 10px 14px;">
+                            <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 2px;">Max Video Quality</div>
+                            <div style="font-size: 0.95rem; font-weight: 800; color: #38bdf8;">
+                                {% if user_subscription.plan_id == 'super' %}
+                                2K QHD & 1080p FHD
+                                {% else %}
+                                720p HD (1080p/2K locked)
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 10px 14px;">
+                            <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 2px;">Live Admission Coverage</div>
+                            <div style="font-size: 0.95rem; font-weight: 800; color: #10b981;">
+                                {% if user_subscription.plan_id == 'super' %}
+                                ALL Events Included (₹0)
+                                {% else %}
+                                Events up to ₹1,000 (Free)
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 10px 14px;">
+                            <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 2px;">Concurrency</div>
+                            <div style="font-size: 0.95rem; font-weight: 800; color: #fbbf24;">1 Screen at a time</div>
+                        </div>
+                    </div>
+
+                    {% if user_subscription.plan_id == 'normal' %}
+                    <div style="background: rgba(255, 19, 137, 0.12); border: 1px solid rgba(255, 19, 137, 0.28); border-radius: 10px; padding: 10px 14px; font-size: 0.82rem; color: #cbd5e1; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                        <span>🚀 <strong>Want 1080p / 2K & unlimited access to &gt;₹1,000 events?</strong> Upgrade to Super Pack today.</span>
+                        <a href="{{ url_for('subscriptions_page') }}" style="color: #ff1389; font-weight: 800; text-decoration: none;">Upgrade &rarr;</a>
+                    </div>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div style="background: rgba(0, 0, 0, 0.35); border: 1px dashed rgba(255, 255, 255, 0.18); border-radius: 16px; padding: 1.8rem; text-align: center;">
+                    <div style="font-size: 2.2rem; margin-bottom: 0.6rem;">🎟️</div>
+                    <h3 style="font-size: 1.2rem; color: #fff; margin-bottom: 0.4rem; font-family: var(--font-heading);">No Active Live Pass</h3>
+                    <p style="color: var(--text-muted); font-size: 0.88rem; max-width: 520px; margin: 0 auto 1.2rem; line-height: 1.5;">
+                        Subscribe to watch live concerts, hackathons, and esports directly without individual ticket passes. Choose Normal (720p HD, up to ₹1,000) or Super VIP (2K/1080p, unlimited).
+                    </p>
+                    <a href="{{ url_for('subscriptions_page') }}" style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #ff1389, #008be3); color: #fff; font-weight: 800; padding: 10px 22px; border-radius: 12px; text-decoration: none; font-size: 0.92rem; box-shadow: 0 0 20px rgba(255, 19, 137, 0.4);">
+                        <span>👑</span> Explore Hotstar Subscription Plans
+                    </a>
+                </div>
+                {% endif %}
+            </div>
 
             <!-- SECTION 1: Appearance & Nature Wallpapers -->
             <div class="settings-card">
@@ -630,8 +722,8 @@
                         Color Accent Palettes
                     </h4>
                     <div class="color-themes-row">
-                        <button type="button" class="color-theme-btn" onclick="applySettingsColor('ocean')">
-                            <span class="color-dot" style="background: #00f2fe; box-shadow: 0 0 8px #00f2fe;"></span> Ocean Cyan
+                        <button type="button" class="color-theme-btn" onclick="applySettingsColor('cerulean')">
+                            <span class="color-dot" style="background: linear-gradient(135deg, #008be3, #ff1389); box-shadow: 0 0 10px #008be3;"></span> Cerulean & Neon Rose
                         </button>
                         <button type="button" class="color-theme-btn" onclick="applySettingsColor('emerald')">
                             <span class="color-dot" style="background: #10b981; box-shadow: 0 0 8px #10b981;"></span> Emerald Green
@@ -1192,7 +1284,8 @@
             }
             if (window.showToast) {
                 const cNames = {
-                    ocean: 'Ocean Cyan',
+                    cerulean: 'Cerulean Blue & Neon Rose',
+                    ocean: 'Cerulean Blue & Neon Rose',
                     emerald: 'Emerald Green',
                     sunset: 'Sunset Orange',
                     neon: 'Neon Violet',

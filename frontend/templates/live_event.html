@@ -11,8 +11,8 @@
     <script src="{{ url_for('static', filename='themes.js') }}?v=6.0"></script>
     <style>
         :root {
-            --live-cyan: #00f2fe;
-            --live-blue: #4facfe;
+            --live-cyan: #008be3;
+            --live-blue: #0062a3;
             --live-red: #ef4444;
             --live-green: #10b981;
             --live-bg: #070c18;
@@ -22,7 +22,7 @@
         body {
             background-color: var(--live-bg);
             background-image: 
-                radial-gradient(circle at 10% 20%, rgba(0, 242, 254, 0.06) 0%, transparent 40%),
+                radial-gradient(circle at 10% 20%, rgba(0, 139, 227, 0.06) 0%, transparent 40%),
                 radial-gradient(circle at 90% 80%, rgba(239, 68, 68, 0.08) 0%, transparent 45%),
                 linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
@@ -106,7 +106,7 @@
             pointer-events: none;
             z-index: 50;
             animation: floatUpReaction 2.2s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
-            filter: drop-shadow(0 0 12px rgba(0, 242, 254, 0.6));
+            filter: drop-shadow(0 0 12px rgba(0, 139, 227, 0.6));
         }
 
         /* Theater Grid Layout */
@@ -130,8 +130,8 @@
             overflow: hidden;
             position: relative;
             aspect-ratio: 16 / 9;
-            border: 1.5px solid rgba(0, 242, 254, 0.35);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 242, 254, 0.15);
+            border: 1.5px solid rgba(0, 139, 227, 0.35);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 139, 227, 0.15);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -199,16 +199,16 @@
         }
 
         .studio-tab-btn:hover {
-            background: rgba(0, 242, 254, 0.12);
+            background: rgba(0, 139, 227, 0.12);
             color: var(--live-cyan);
-            border-color: rgba(0, 242, 254, 0.35);
+            border-color: rgba(0, 139, 227, 0.35);
         }
 
         .studio-tab-btn.active {
-            background: linear-gradient(135deg, rgba(0, 242, 254, 0.25), rgba(79, 172, 254, 0.25));
+            background: linear-gradient(135deg, rgba(0, 139, 227, 0.25), rgba(0, 98, 163, 0.25));
             border-color: var(--live-cyan);
             color: var(--live-cyan);
-            box-shadow: 0 0 14px rgba(0, 242, 254, 0.25);
+            box-shadow: 0 0 14px rgba(0, 139, 227, 0.25);
         }
 
         .studio-panel-content {
@@ -236,7 +236,7 @@
             flex: 1 1 280px;
             min-width: 240px;
             background: rgba(10, 16, 30, 0.85);
-            border: 1px solid rgba(0, 242, 254, 0.3);
+            border: 1px solid rgba(0, 139, 227, 0.3);
             border-radius: 12px;
             padding: 0.75rem 1.1rem;
             color: #ffffff;
@@ -248,7 +248,7 @@
 
         .studio-text-input:focus {
             border-color: var(--live-cyan);
-            box-shadow: 0 0 14px rgba(0, 242, 254, 0.3);
+            box-shadow: 0 0 14px rgba(0, 139, 227, 0.3);
             background: rgba(15, 23, 42, 0.95);
         }
 
@@ -265,14 +265,14 @@
             border-radius: 12px;
             border: none;
             cursor: pointer;
-            box-shadow: 0 0 16px rgba(0, 242, 254, 0.35);
+            box-shadow: 0 0 16px rgba(0, 139, 227, 0.35);
             transition: all 0.2s ease;
             white-space: nowrap;
         }
 
         .studio-action-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 0 24px rgba(0, 242, 254, 0.6);
+            box-shadow: 0 0 24px rgba(0, 139, 227, 0.6);
             filter: brightness(1.1);
         }
 
@@ -304,10 +304,10 @@
         }
 
         .quick-chip-btn:hover {
-            background: rgba(0, 242, 254, 0.16);
+            background: rgba(0, 139, 227, 0.16);
             color: var(--live-cyan);
             border-color: var(--live-cyan);
-            box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
+            box-shadow: 0 0 10px rgba(0, 139, 227, 0.3);
         }
 
         .studio-screenshare-btn {
@@ -338,7 +338,7 @@
 
         .stage-ctrl-pill {
             background: rgba(15, 23, 42, 0.88);
-            border: 1px solid rgba(0, 242, 254, 0.35);
+            border: 1px solid rgba(0, 139, 227, 0.35);
             color: #ffffff;
             padding: 6px 13px;
             border-radius: 20px;
@@ -354,17 +354,17 @@
         }
 
         .stage-ctrl-pill:hover {
-            background: rgba(0, 242, 254, 0.2);
+            background: rgba(0, 139, 227, 0.2);
             border-color: var(--live-cyan);
             color: var(--live-cyan);
-            box-shadow: 0 0 16px rgba(0, 242, 254, 0.45);
+            box-shadow: 0 0 16px rgba(0, 139, 227, 0.45);
             transform: translateY(-1px);
         }
 
         /* Drag & Drop Upload Zone */
         .video-drop-zone {
-            border: 2px dashed rgba(0, 242, 254, 0.35);
-            background: rgba(0, 242, 254, 0.04);
+            border: 2px dashed rgba(0, 139, 227, 0.35);
+            background: rgba(0, 139, 227, 0.04);
             border-radius: 16px;
             padding: 2rem 1.5rem;
             text-align: center;
@@ -374,8 +374,8 @@
 
         .video-drop-zone:hover, .video-drop-zone.dragover {
             border-color: var(--live-cyan);
-            background: rgba(0, 242, 254, 0.08);
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.2);
+            background: rgba(0, 139, 227, 0.08);
+            box-shadow: 0 0 20px rgba(0, 139, 227, 0.2);
         }
 
         /* Right Q&A and Chat Panel */
@@ -429,7 +429,7 @@
         }
 
         .qa-item:hover {
-            border-color: rgba(0, 242, 254, 0.25);
+            border-color: rgba(0, 139, 227, 0.25);
             background: rgba(255, 255, 255, 0.06);
         }
 
@@ -451,7 +451,7 @@
             min-width: 0 !important;
             width: 100% !important;
             background: rgba(10, 16, 30, 0.85) !important;
-            border: 1.5px solid rgba(0, 242, 254, 0.3) !important;
+            border: 1.5px solid rgba(0, 139, 227, 0.3) !important;
             border-radius: 12px !important;
             padding: 0.75rem 1.1rem !important;
             font-size: 0.9rem !important;
@@ -463,7 +463,7 @@
 
         .qa-input-field:focus {
             border-color: var(--live-cyan) !important;
-            box-shadow: 0 0 14px rgba(0, 242, 254, 0.3) !important;
+            box-shadow: 0 0 14px rgba(0, 139, 227, 0.3) !important;
             background: rgba(15, 23, 42, 0.95) !important;
         }
 
@@ -477,21 +477,21 @@
             justify-content: center !important;
             gap: 6px !important;
             padding: 0.75rem 1.3rem !important;
-            background: linear-gradient(135deg, #00f2fe, #4facfe) !important;
+            background: linear-gradient(135deg, #008be3, #0062a3) !important;
             color: #040914 !important;
             font-weight: 800 !important;
             font-size: 0.9rem !important;
             border-radius: 12px !important;
             border: none !important;
             cursor: pointer !important;
-            box-shadow: 0 0 16px rgba(0, 242, 254, 0.4) !important;
+            box-shadow: 0 0 16px rgba(0, 139, 227, 0.4) !important;
             transition: all 0.2s ease !important;
             white-space: nowrap !important;
         }
 
         .qa-send-btn:hover {
             transform: translateY(-2px) scale(1.03) !important;
-            box-shadow: 0 0 25px rgba(0, 242, 254, 0.65) !important;
+            box-shadow: 0 0 25px rgba(0, 139, 227, 0.65) !important;
             filter: brightness(1.12) !important;
         }
 
@@ -509,8 +509,75 @@
         .upload-progress-bar {
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg, #00f2fe, #10b981);
+            background: linear-gradient(90deg, #008be3, #10b981);
             transition: width 0.2s ease;
+        }
+
+        /* Video Quality Switcher & Concurrency Overlays */
+        .quality-selector-wrap {
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            z-index: 15;
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            background: rgba(7, 7, 9, 0.88);
+            backdrop-filter: blur(12px);
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+        }
+
+        .quality-pill-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            color: #94a3b8;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .quality-pill-btn:hover:not(.locked) {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .quality-pill-btn.active {
+            background: #008be3;
+            color: #070709 !important;
+            font-weight: 800;
+            box-shadow: 0 0 10px rgba(0, 139, 227, 0.5);
+        }
+
+        .quality-pill-btn.locked {
+            color: #64748b;
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+        }
+
+        .quality-pill-btn.locked:hover {
+            color: #ff5eb0;
+            border-color: #ff1389;
+            background: rgba(255, 19, 137, 0.12);
+        }
+
+        .vip-crown-badge {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.35));
+            border: 1px solid #f59e0b;
+            color: #fbbf24;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 1px 6px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
         }
     </style>
 </head>
@@ -528,7 +595,7 @@
             </div>
             <div class="nav-links" style="display: flex; align-items: center; gap: 12px;">
                 <a href="{{ url_for('event_detail', event_id=event.id) }}" class="category-back-btn" style="padding: 0.5rem 1.1rem; font-size: 0.85rem; border-radius: 10px; text-decoration: none;">← Back to Event</a>
-                <a href="{{ url_for('view_ticket_interactive', event_id=event.id) }}" class="category-back-btn" style="background: rgba(0, 242, 254, 0.15); color: var(--primary); border: 1px solid var(--primary); padding: 0.5rem 1.1rem; font-size: 0.85rem; border-radius: 10px; text-decoration: none;">🎟️ My Pass</a>
+                <a href="{{ url_for('view_ticket_interactive', event_id=event.id) }}" class="category-back-btn" style="background: rgba(0, 139, 227, 0.15); color: var(--primary); border: 1px solid var(--primary); padding: 0.5rem 1.1rem; font-size: 0.85rem; border-radius: 10px; text-decoration: none;">🎟️ My Pass</a>
             </div>
         </div>
     </nav>
@@ -541,14 +608,14 @@
                     <span class="pulse-dot"></span>
                     <span id="liveStatusText">LIVE INTERACTIVE STAGE</span>
                 </div>
-                <h1>Live Video Projection: <span style="background: linear-gradient(135deg, #00f2fe, #4facfe); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">{{ event.title }}</span></h1>
+                <h1>Live Video Projection: <span style="background: linear-gradient(135deg, #008be3, #0062a3); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">{{ event.title }}</span></h1>
             </div>
             <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
                 <span id="liveViewerCountBadge" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); padding: 6px 14px; border-radius: 999px; font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;">
                     <span class="pulse-dot" style="width: 7px; height: 7px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981; animation: pulseGlow 1.5s infinite alternate;"></span>
                     <span id="liveViewerCount">1 Live Viewer</span>
                 </span>
-                <span style="background: rgba(0, 242, 254, 0.12); color: var(--primary); border: 1px solid rgba(0, 242, 254, 0.3); padding: 6px 14px; border-radius: 999px; font-weight: 700; font-size: 0.85rem;">
+                <span style="background: rgba(0, 139, 227, 0.12); color: var(--primary); border: 1px solid rgba(0, 139, 227, 0.3); padding: 6px 14px; border-radius: 999px; font-weight: 700; font-size: 0.85rem;">
                     🏷️ {{ event.category }}
                 </span>
                 <span style="background: rgba(255, 255, 255, 0.08); color: #cbd5e1; border: 1px solid rgba(255, 255, 255, 0.15); padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: 0.85rem;">
@@ -592,45 +659,116 @@
                                 Select a live stream link, connect your Dashcam/Camera, or upload a video file using the broadcaster studio below.
                             </p>
                             <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); padding: 6px 18px; border-radius: 999px; font-weight: 700; font-size: 0.85rem;">
-                                ✓ Pass Verified & Unlocked ({{ access_info.access_type }})
+                                {% if access_info.access_type == 'super_subscription' %}
+                                <span>👑 Super Pack Active: Unlimited Ultra HD Access</span>
+                                {% elif access_info.access_type == 'normal_subscription' %}
+                                <span>💎 Normal Pack Active: 720p HD Access (&le; ₹1,000 Event Included)</span>
+                                {% elif access_info.access_type == 'host' %}
+                                <span>⭐ Host Broadcaster Stage</span>
+                                {% else %}
+                                <span>✓ Pass Verified & Unlocked ({{ access_info.access_type }})</span>
+                                {% endif %}
                             </div>
                         </div>
-                        {% else %}
-                        <div style="text-align: center; padding: 2.5rem 1.5rem; max-width: 540px;">
-                            <div style="font-size: 3.5rem; margin-bottom: 0.8rem;">🔒</div>
-                            <h3 style="color: #ffffff; font-size: 1.4rem; margin-bottom: 0.4rem;">Live Stream Access Required</h3>
-                            <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; margin-bottom: 1rem;">
-                                Unlock this live projection stage with your Ticket ID or obtain an unlimited virtual Live Stream Pass.
+
+                        <!-- Video Quality Selector Toolbar (Hotstar Style) -->
+                        <div class="quality-selector-wrap" id="qualitySelectorBar">
+                            <span style="font-size: 0.72rem; color: #94a3b8; font-weight: 700; margin-left: 4px;">HD:</span>
+                            <button type="button" class="quality-pill-btn" onclick="setStreamQuality('auto', this)">Auto</button>
+                            <button type="button" class="quality-pill-btn active" onclick="setStreamQuality('720p', this)">720p</button>
+                            {% if access_info.max_quality == '2k' %}
+                            <button type="button" class="quality-pill-btn" onclick="setStreamQuality('1080p', this)">1080p</button>
+                            <button type="button" class="quality-pill-btn" onclick="setStreamQuality('2k', this)">2K QHD</button>
+                            {% else %}
+                            <button type="button" class="quality-pill-btn locked" onclick="promptUpgradeModal('1080p')" title="1080p requires Super Pack">1080p 🔒</button>
+                            <button type="button" class="quality-pill-btn locked" onclick="promptUpgradeModal('2K QHD')" title="2K requires Super Pack">2K 🔒</button>
+                            {% endif %}
+                        </div>
+
+                        {% elif access_info.blocked_reason == 'price_exceeds_normal_pack' %}
+                        <!-- Hotstar Normal Pack Paywall (Event > ₹1,000) -->
+                        <div style="text-align: center; padding: 2.5rem 1.5rem; max-width: 580px;">
+                            <div style="font-size: 3.5rem; margin-bottom: 0.8rem;">💎🔒</div>
+                            <div style="background: rgba(0, 139, 227, 0.15); border: 1px solid rgba(0, 139, 227, 0.4); padding: 4px 14px; border-radius: 20px; font-size: 0.76rem; font-weight: 800; color: #008be3; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 0.8rem;">
+                                💎 Normal Pack Active
+                            </div>
+                            <h3 style="color: #ffffff; font-size: 1.45rem; margin-bottom: 0.4rem;">Event Price Exceeds ₹1,000 Plan Limit</h3>
+                            <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; margin-bottom: 1.2rem;">
+                                This premium event is priced at <strong style="color: #ff1389;">₹{{ event.price }}</strong>. 
+                                Your <strong>Normal Pack</strong> includes live broadcasts up to <strong>₹1,000</strong>. 
+                                Upgrade to the <strong>Super Pack</strong> to watch ALL events for free, or purchase an individual stream pass.
                             </p>
                             
-                            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 0.8rem 1rem; margin-bottom: 1.5rem; display: inline-flex; align-items: center; gap: 8px;">
-                                <span style="font-size: 1.2rem;">📡</span>
+                            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                                <a href="{{ url_for('subscriptions_page') }}" class="studio-action-btn" style="text-decoration: none; background: linear-gradient(135deg, #ff1389 0%, #008be3 100%); color: white; border: none; padding: 0.75rem 1.4rem; border-radius: 12px; font-weight: 800; box-shadow: 0 4px 20px rgba(255, 19, 137, 0.5);">
+                                    👑 Upgrade to Super Pack (Watch Free)
+                                </a>
+                                <a href="{{ url_for('register_event', event_id=event.id) }}?type=live_stream" class="studio-action-btn" style="text-decoration: none; background: rgba(255, 255, 255, 0.08); color: white; border: 1px solid rgba(255, 255, 255, 0.2); padding: 0.75rem 1.4rem; border-radius: 12px; font-weight: 700;">
+                                    📡 Buy Stream Pass ({{ event.stream_price or '₹199' }})
+                                </a>
+                                <button type="button" class="category-back-btn" onclick="unlockWithTicket()" style="padding: 0.75rem 1.4rem; border-radius: 12px; font-size: 0.88rem;">
+                                    🎟️ Unlock with Ticket
+                                </button>
+                            </div>
+                        </div>
+
+                        {% else %}
+                        <!-- General / No Subscription Paywall -->
+                        <div style="text-align: center; padding: 2.5rem 1.5rem; max-width: 560px;">
+                            <div style="font-size: 3.5rem; margin-bottom: 0.8rem;">🔒</div>
+                            <h3 style="color: #ffffff; font-size: 1.4rem; margin-bottom: 0.4rem;">Live Stream Access Required</h3>
+                            <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; margin-bottom: 1.2rem;">
+                                Subscribe to our Hotstar-style Stage Passes to watch live broadcasts without paying per event, or unlock with a ticket/pass.
+                            </p>
+                            
+                            <div style="background: rgba(0, 139, 227, 0.08); border: 1px solid rgba(0, 139, 227, 0.25); border-radius: 12px; padding: 0.8rem 1rem; margin-bottom: 1.5rem; display: inline-flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 1.3rem;">👑</span>
                                 <div style="text-align: left;">
-                                    <div style="color: #ffffff; font-size: 0.85rem; font-weight: 700;">Live Stream Pass: <span style="color: #34d399; font-weight: 800;">{{ event.stream_price or '₹199' }}</span></div>
-                                    <div style="color: #94a3b8; font-size: 0.74rem;">🌐 Unlimited Virtual Registrations • No Seat Limit</div>
+                                    <div style="color: #ffffff; font-size: 0.85rem; font-weight: 700;">Live Subscription: <span style="color: #008be3; font-weight: 800;">From ₹149/mo</span></div>
+                                    <div style="color: #94a3b8; font-size: 0.74rem;">Normal (up to ₹1,000 events free) • Super (ALL events unlimited)</div>
                                 </div>
                             </div>
 
                             <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                                <a href="{{ url_for('register_event', event_id=event.id) }}?type=live_stream" class="studio-action-btn" style="text-decoration: none; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; padding: 0.75rem 1.4rem; border-radius: 12px; font-weight: 700;">
-                                    📡 Get Stream Pass ({{ event.stream_price or '₹199' }})
+                                <a href="{{ url_for('subscriptions_page') }}" class="studio-action-btn" style="text-decoration: none; background: linear-gradient(135deg, #008be3, #0062a3); color: white; border: none; padding: 0.75rem 1.4rem; border-radius: 12px; font-weight: 800;">
+                                    ⭐ View Subscription Plans
                                 </a>
-                                <button type="button" class="studio-action-btn" onclick="unlockWithTicket()">
+                                <a href="{{ url_for('register_event', event_id=event.id) }}?type=live_stream" class="studio-action-btn" style="text-decoration: none; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; padding: 0.75rem 1.4rem; border-radius: 12px; font-weight: 700;">
+                                    📡 Buy Pass ({{ event.stream_price or '₹199' }})
+                                </a>
+                                <button type="button" class="category-back-btn" onclick="unlockWithTicket()" style="padding: 0.75rem 1.4rem; border-radius: 12px; font-size: 0.88rem;">
                                     🎟️ Unlock with Ticket
                                 </button>
-                                <a href="{{ url_for('event_detail', event_id=event.id) }}" class="category-back-btn" style="text-decoration: none; padding: 0.75rem 1.4rem; border-radius: 12px; font-size: 0.88rem;">
-                                    Event Details
-                                </a>
                             </div>
                         </div>
                         {% endif %}
                     </div>
+
+                    <!-- Single Screen Concurrency Overlay (Hotstar 1-User Enforcement) -->
+                    <div id="concurrencyOverlay" style="position: absolute; inset: 0; background: rgba(7, 7, 9, 0.94); backdrop-filter: blur(14px); z-index: 40; display: none; align-items: center; justify-content: center; padding: 2rem; text-align: center;">
+                        <div style="max-width: 440px;">
+                            <div style="font-size: 3.5rem; margin-bottom: 0.8rem;">⚠️</div>
+                            <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.4rem; color: #ffffff; margin: 0 0 0.5rem;">Streaming on Another Device</h3>
+                            <p style="color: #94a3b8; font-size: 0.88rem; line-height: 1.5; margin: 0 0 1.5rem;">
+                                Your subscription allows streaming on <strong style="color: #ffffff;">1 screen at a time</strong>. Playback is paused here because streaming was detected on another window or device.
+                            </p>
+                            <div style="display: flex; gap: 10px; justify-content: center;">
+                                <button type="button" class="studio-action-btn" onclick="takeoverStreamSession()">
+                                    ▶️ Watch Here Instead
+                                </button>
+                                <a href="{{ url_for('dashboard') }}" class="category-back-btn" style="padding: 0.75rem 1.4rem; border-radius: 12px; font-size: 0.88rem; text-decoration: none;">
+                                    Exit Stage
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Floating Reactions Overlay Container -->
                     <div id="floatingEmojiContainer" style="position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 25;"></div>
                 </div>
 
                 <!-- Live Audience Reactions & WebSocket Sync Bar -->
-                <div style="margin: 1rem 0 1.5rem; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(0, 242, 254, 0.25); border-radius: 14px; padding: 0.8rem 1.2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                <div style="margin: 1rem 0 1.5rem; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(0, 139, 227, 0.25); border-radius: 14px; padding: 0.8rem 1.2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
                     <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                         <span style="font-size: 0.85rem; color: #94a3b8; font-weight: 700;">Live Reactions:</span>
                         <div style="display: flex; gap: 6px;">
@@ -641,7 +779,7 @@
                             <button type="button" class="quick-chip-btn" onclick="sendStageReaction('🚀')" title="Rocket">🚀 Boost</button>
                         </div>
                     </div>
-                    <span style="font-size: 0.78rem; color: #00f2fe; font-weight: 600;">⚡ Real-time WebSocket Stage</span>
+                    <span style="font-size: 0.78rem; color: #008be3; font-weight: 600;">⚡ Real-time WebSocket Stage</span>
                 </div>
 
                 <!-- Broadcaster Studio Controls (Upload Live Link, Dashcam, Upload Video) -->
@@ -743,7 +881,7 @@
                         </div>
 
                         <!-- Active Video Card & Control Bar -->
-                        <div id="videoControlCard" style="display: none; margin-top: 12px; background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.25); border-radius: 14px; padding: 12px 16px;">
+                        <div id="videoControlCard" style="display: none; margin-top: 12px; background: rgba(0, 139, 227, 0.08); border: 1px solid rgba(0, 139, 227, 0.25); border-radius: 14px; padding: 12px 16px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
                                 <div>
                                     <strong style="color: #ffffff; font-size: 0.92rem; display: block;" id="videoFileNameDisplay">video.mp4</strong>
@@ -1415,11 +1553,11 @@
                 muteText.innerText = muted ? 'Unmute' : 'Mute';
             }
             if (overlayPauseBtn) {
-                overlayPauseBtn.style.borderColor = paused ? '#facc15' : 'rgba(0, 242, 254, 0.35)';
+                overlayPauseBtn.style.borderColor = paused ? '#facc15' : 'rgba(0, 139, 227, 0.35)';
                 overlayPauseBtn.style.color = paused ? '#fde047' : '#ffffff';
             }
             if (overlayMuteBtn) {
-                overlayMuteBtn.style.borderColor = muted ? '#ef4444' : 'rgba(0, 242, 254, 0.35)';
+                overlayMuteBtn.style.borderColor = muted ? '#ef4444' : 'rgba(0, 139, 227, 0.35)';
                 overlayMuteBtn.style.color = muted ? '#fca5a5' : '#ffffff';
             }
         }
@@ -1592,6 +1730,66 @@
             }
         }
 
+        // Video Quality Switcher Handler
+        function setStreamQuality(quality, btn) {
+            document.querySelectorAll('#qualitySelectorBar .quality-pill-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            if (window.showToast) {
+                window.showToast(`🎬 Stream Quality Adjusted: ${quality.toUpperCase()}`, 'success', 2200);
+            }
+        }
+
+        function promptUpgradeModal(qualityLabel) {
+            const titleEl = document.getElementById('lockedQualityTitle');
+            const descEl = document.getElementById('lockedQualityDesc');
+            if (titleEl) titleEl.textContent = `${qualityLabel} Exclusive to Super Pack`;
+            if (descEl) descEl.innerHTML = `Full HD 1080p and Ultra 2K QHD are available only with <strong style="color: #ff5eb0;">Super Pack</strong>. Your current plan streams in 720p HD. Upgrade to unlock all resolutions and watch all events for free!`;
+            const modal = document.getElementById('qualityUpgradeModal');
+            if (modal) modal.style.display = 'flex';
+        }
+
+        // Hotstar-Style 1-Screen / Concurrent Session Enforcement
+        let streamSessionId = sessionStorage.getItem('hotstar_stream_session_id');
+        if (!streamSessionId) {
+            streamSessionId = 'sess_' + Math.random().toString(36).substring(2, 10) + '_' + Date.now();
+            sessionStorage.setItem('hotstar_stream_session_id', streamSessionId);
+        }
+
+        async function sendStreamHeartbeat(takeover = false) {
+            try {
+                const res = await fetch('/api/event/{{ event.id }}/live/heartbeat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: streamSessionId, takeover: takeover })
+                });
+                const data = await res.json();
+                const overlay = document.getElementById('concurrencyOverlay');
+                if (data.is_concurrent) {
+                    if (overlay) overlay.style.display = 'flex';
+                    const vid = document.getElementById('stageVideo');
+                    if (vid) vid.pause();
+                } else {
+                    if (overlay) overlay.style.display = 'none';
+                }
+            } catch (e) {
+                // Heartbeat skipped
+            }
+        }
+
+        function takeoverStreamSession() {
+            sendStreamHeartbeat(true);
+            const overlay = document.getElementById('concurrencyOverlay');
+            if (overlay) overlay.style.display = 'none';
+            const vid = document.getElementById('stageVideo');
+            if (vid) vid.play();
+            if (window.showToast) window.showToast('▶️ Resumed live playback on this screen', 'success', 2500);
+        }
+
+        {% if access_info.has_access %}
+        setInterval(() => sendStreamHeartbeat(false), 12000);
+        sendStreamHeartbeat(false);
+        {% endif %}
+
         // Initialize cameras & WebSocket stage on page load
         document.addEventListener('DOMContentLoaded', () => {
             initStageWebSocket();
@@ -1604,6 +1802,27 @@
             }
         });
     </script>
+
+    <!-- Quality Upgrade Modal -->
+    <div id="qualityUpgradeModal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 999; display: none; align-items: center; justify-content: center; padding: 1rem;">
+        <div style="background: #0d0d14; border: 1.5px solid #ff1389; border-radius: 20px; max-width: 440px; width: 100%; padding: 2rem; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.9), 0 0 35px rgba(255,19,137,0.35);">
+            <div style="font-size: 3rem; margin-bottom: 0.6rem;">👑</div>
+            <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.35rem; color: #ffffff; margin: 0 0 0.5rem;" id="lockedQualityTitle">
+                1080p / 2K Exclusive to Super Pack
+            </h3>
+            <p style="color: #94a3b8; font-size: 0.88rem; line-height: 1.5; margin: 0 0 1.5rem;" id="lockedQualityDesc">
+                Full HD 1080p and Ultra 2K QHD streaming are exclusive to the <strong style="color: #ff5eb0;">Super Pack</strong>. Normal Pack streams in 720p HD.
+            </p>
+            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                <a href="{{ url_for('subscriptions_page') }}" class="studio-action-btn" style="background: linear-gradient(135deg, #ff1389 0%, #008be3 100%); text-decoration: none; padding: 0.75rem 1.4rem; border-radius: 12px; font-weight: 800; box-shadow: 0 4px 18px rgba(255,19,137,0.5);">
+                    👑 Upgrade to Super Pack (From ₹299/mo)
+                </a>
+                <button type="button" class="category-back-btn" onclick="document.getElementById('qualityUpgradeModal').style.display='none'" style="padding: 0.75rem 1.2rem; border-radius: 12px; font-size: 0.85rem;">
+                    Stay on 720p
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

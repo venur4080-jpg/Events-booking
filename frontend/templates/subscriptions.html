@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Stream Subscriptions | Hotstar Pass - Events Booking</title>
+    <meta name="description" content="Subscribe to Normal or Super Pack to watch live interactive stage broadcasts and dashcam streams without paying for individual passes.">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=6.0">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='themes.js') }}?v=6.0"></script>
+    <script src="{{ url_for('static', filename='toast.js') }}"></script>
+    <script src="{{ url_for('static', filename='confetti.js') }}"></script>
+
+    <style>
+        :root {
+            --sub-bg: #070709;
+            --sub-card: rgba(13, 13, 18, 0.88);
+            --sub-primary: #008be3;
+            --sub-rose: #ff1389;
+            --sub-gold: #f59e0b;
+            --sub-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background-color: var(--sub-bg);
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(0, 139, 227, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 85% 25%, rgba(255, 19, 137, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 50% 85%, rgba(0, 139, 227, 0.06) 0%, transparent 50%),
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+            color: #ffffff;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .sub-container {
+            max-width: 1240px;
+            margin: 2rem auto 5rem;
+            padding: 0 1.5rem;
+            box-sizing: border-box;
+        }
+
+        /* Hero Header */
+        .sub-hero {
+            text-align: center;
+            max-width: 780px;
+            margin: 0 auto 2.5rem;
+        }
+
+        .sub-pill-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 139, 227, 0.12);
+            border: 1px solid rgba(0, 139, 227, 0.35);
+            color: #008be3;
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 5px 14px;
+            border-radius: 999px;
+            margin-bottom: 1rem;
+            box-shadow: 0 0 16px rgba(0, 139, 227, 0.2);
+        }
+
+        .sub-hero h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.85rem;
+            font-weight: 900;
+            line-height: 1.15;
+            letter-spacing: -1px;
+            margin: 0 0 1rem;
+        }
+
+        .sub-hero p {
+            color: var(--text-muted, #94a3b8);
+            font-size: 1.05rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Billing Cycle Toggle */
+        .billing-toggle-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 2rem 0 3rem;
+        }
+
+        .cycle-switch-box {
+            display: inline-flex;
+            background: rgba(18, 18, 24, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 50px;
+            padding: 4px;
+            position: relative;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        .cycle-option-btn {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-size: 0.92rem;
+            font-weight: 700;
+            padding: 8px 22px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .cycle-option-btn.active {
+            background: linear-gradient(135deg, #008be3 0%, #0062a3 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 18px rgba(0, 139, 227, 0.45);
+        }
+
+        .save-discount-pill {
+            background: linear-gradient(135deg, rgba(255, 19, 137, 0.2), rgba(255, 19, 137, 0.35));
+            color: #ff5eb0;
+            border: 1px solid rgba(255, 19, 137, 0.5);
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 999px;
+            letter-spacing: 0.3px;
+        }
+
+        /* Plan Cards Grid */
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            align-items: stretch;
+            margin-bottom: 4rem;
+        }
+
+        @media (max-width: 992px) {
+            .plans-grid {
+                grid-template-columns: 1fr;
+                max-width: 500px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+
+        .plan-card {
+            background: var(--sub-card);
+            border: 1px solid var(--sub-border);
+            border-radius: 24px;
+            padding: 2.2rem 1.8rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            backdrop-filter: blur(16px);
+            transition: all 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+        }
+
+        .plan-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(0, 139, 227, 0.4);
+            box-shadow: 0 22px 50px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 139, 227, 0.15);
+        }
+
+        /* Super VIP Featured Card */
+        .plan-card.featured {
+            border: 1.5px solid #ff1389;
+            background: linear-gradient(180deg, rgba(255, 19, 137, 0.08) 0%, rgba(13, 13, 18, 0.95) 30%);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 35px rgba(255, 19, 137, 0.25);
+            transform: scale(1.03);
+            z-index: 2;
+        }
+
+        .plan-card.featured:hover {
+            transform: scale(1.04) translateY(-6px);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 45px rgba(255, 19, 137, 0.4);
+        }
+
+        .featured-ribbon {
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #ff1389 0%, #008be3 100%);
+            color: #ffffff;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 5px 16px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(255, 19, 137, 0.5);
+            white-space: nowrap;
+        }
+
+        .plan-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .plan-icon-tag {
+            font-size: 1.8rem;
+            margin-bottom: 0.6rem;
+            display: inline-block;
+        }
+
+        .plan-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin: 0 0 0.3rem;
+        }
+
+        .plan-tagline {
+            color: #94a3b8;
+            font-size: 0.86rem;
+            margin: 0;
+            min-height: 2.2rem;
+        }
+
+        .plan-pricing-box {
+            padding: 1.2rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 1.5rem;
+        }
+
+        .price-currency {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #008be3;
+            vertical-align: top;
+        }
+
+        .price-amount {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.7rem;
+            font-weight: 900;
+            color: #ffffff;
+            line-height: 1;
+        }
+
+        .price-cycle {
+            color: #94a3b8;
+            font-size: 0.88rem;
+            font-weight: 600;
+        }
+
+        .price-effective {
+            color: #34d399;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        /* Features List */
+        .plan-features-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex-grow: 1;
+        }
+
+        .plan-feature-item {
+            font-size: 0.88rem;
+            color: #cbd5e1;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            line-height: 1.45;
+        }
+
+        .plan-feature-item.highlighted {
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        .feature-icon-check {
+            color: #34d399;
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+
+        .feature-icon-lock {
+            color: #ef4444;
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+
+        /* Plan Action Button */
+        .btn-subscribe {
+            width: 100%;
+            height: 48px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #008be3 0%, #0062a3 100%);
+            color: #ffffff !important;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 18px rgba(0, 139, 227, 0.4);
+            box-sizing: border-box;
+        }
+
+        .btn-subscribe:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 139, 227, 0.6);
+            filter: brightness(1.1);
+        }
+
+        .btn-subscribe.btn-super {
+            background: linear-gradient(135deg, #ff1389 0%, #008be3 100%);
+            box-shadow: 0 4px 20px rgba(255, 19, 137, 0.45);
+        }
+
+        .btn-subscribe.btn-super:hover {
+            box-shadow: 0 8px 28px rgba(255, 19, 137, 0.7);
+        }
+
+        .btn-subscribe.btn-current {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #34d399 !important;
+            box-shadow: none;
+            cursor: default;
+        }
+
+        /* Active Subscription Status Banner */
+        .active-sub-banner {
+            background: linear-gradient(135deg, rgba(7, 7, 9, 0.95), rgba(13, 13, 18, 0.95));
+            border: 1.5px solid rgba(0, 139, 227, 0.4);
+            border-radius: 20px;
+            padding: 1.6rem 2rem;
+            margin-bottom: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 139, 227, 0.15);
+        }
+
+        /* Comparison Matrix */
+        .matrix-card {
+            background: var(--sub-card);
+            border: 1px solid var(--sub-border);
+            border-radius: 24px;
+            padding: 2.2rem;
+            margin-bottom: 4rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            overflow-x: auto;
+        }
+
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            min-width: 650px;
+        }
+
+        .matrix-table th {
+            padding: 1rem 1.2rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 800;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .matrix-table td {
+            padding: 1rem 1.2rem;
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            color: #cbd5e1;
+        }
+
+        .matrix-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Checkout Modal */
+        .checkout-modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .checkout-modal-card {
+            background: #0d0d14;
+            border: 1px solid rgba(0, 139, 227, 0.4);
+            border-radius: 24px;
+            max-width: 500px;
+            width: 100%;
+            padding: 2rem;
+            box-sizing: border-box;
+            position: relative;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(0, 139, 227, 0.25);
+            animation: modalPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.92); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .payment-method-tile {
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            padding: 0.8rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .payment-method-tile.selected {
+            border-color: var(--sub-primary);
+            background: rgba(0, 139, 227, 0.1);
+            box-shadow: 0 0 14px rgba(0, 139, 227, 0.25);
+        }
+
+        /* FAQ Accordion */
+        .faq-item {
+            background: rgba(13, 13, 18, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 1.1rem 1.4rem;
+            font-weight: 700;
+            font-size: 0.95rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .faq-answer {
+            padding: 0 1.4rem 1.1rem;
+            color: #94a3b8;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            display: none;
+        }
+
+        .faq-item.open .faq-answer {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Unified Navbar -->
+    <nav class="navbar" role="navigation">
+        <div class="nav-container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <div class="logo" style="display: flex; align-items: center; gap: 10px;">
+                <a href="{{ url_for('dashboard') }}" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit;">
+                    <img src="{{ url_for('static', filename='logo.png') }}" alt="Events Booking Logo" style="height: 38px; border-radius: 8px;">
+                    <div>Events <span>Booking</span></div>
+                </a>
+            </div>
+
+            <div class="nav-links" style="display: flex; align-items: center; gap: 12px;">
+                <a href="{{ url_for('dashboard') }}" class="footer-nav-link" style="color: #cbd5e1; text-decoration: none; font-size: 0.88rem; font-weight: 600;">← Back to Dashboard</a>
+                
+                {% if user_subscription %}
+                <span style="background: rgba(0, 139, 227, 0.15); border: 1px solid var(--sub-primary); color: var(--sub-primary); padding: 5px 12px; border-radius: 20px; font-size: 0.82rem; font-weight: 800; display: inline-flex; align-items: center; gap: 5px;">
+                    {{ user_subscription.badge }} Active
+                </span>
+                {% else %}
+                <button type="button" onclick="scrollToPlans()" class="card-btn-action" style="background: var(--primary); color: #070709; font-weight: 800;">
+                    ⭐ Subscribe
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="sub-container">
+
+        <!-- Active Subscription Banner (if subscribed) -->
+        {% if current_sub %}
+        <div class="active-sub-banner">
+            <div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                    <span style="font-size: 1.5rem;">{{ '👑' if current_sub.plan_type == 'super' else '💎' }}</span>
+                    <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.4rem; margin: 0; color: #ffffff;">
+                        {{ current_sub.plan_title }} Active
+                    </h3>
+                    <span style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); padding: 2px 8px; border-radius: 999px; font-size: 0.72rem; font-weight: 800;">
+                        ● ACTIVE ({{ current_sub.billing_cycle | capitalize }})
+                    </span>
+                </div>
+                <p style="color: #94a3b8; font-size: 0.88rem; margin: 0 0 6px;">
+                    Streaming Quality: <strong style="color: #008be3;">{{ current_sub.quality_label }}</strong> • Single Screen • 
+                    {% if current_sub.plan_type == 'super' %}
+                    <strong style="color: #ff5eb0;">Unlimited access to ALL live stage events</strong>
+                    {% else %}
+                    <strong style="color: #34d399;">Free live access to events up to ₹1,000</strong>
+                    {% endif %}
+                </p>
+                <div style="font-size: 0.78rem; color: #64748b;">
+                    Renews/Expires on: <span style="color: #cbd5e1; font-weight: 600;">{{ current_sub.expires_at }}</span> ({{ current_sub.days_left }} days remaining) • ID: {{ current_sub.payment_id }}
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; align-items: center;">
+                {% if current_sub.plan_type == 'normal' %}
+                <button type="button" class="btn-subscribe btn-super" onclick="openCheckoutModal('super', activeBillingCycle)" style="height: 40px; padding: 0 18px; font-size: 0.85rem; width: auto;">
+                    👑 Upgrade to Super Pack
+                </button>
+                {% endif %}
+                <button type="button" class="quick-chip-btn" onclick="cancelSubscription()" style="padding: 8px 14px; font-size: 0.8rem; border-color: rgba(239, 68, 68, 0.4); color: #fca5a5;">
+                    Cancel Auto-Renewal
+                </button>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Hero Header -->
+        <div class="sub-hero">
+            <div class="sub-pill-badge">
+                <span>⚡</span> Hotstar-Style Live Stage Passes
+            </div>
+            <h1>Watch Live Streams <span style="background: linear-gradient(135deg, #008be3 0%, #ff1389 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Without Extra Fees</span></h1>
+            <p>
+                Subscribe to our stage streaming packs for uninterrupted live camera projections, multi-angle dashcam feeds, and live interactive Q&A.
+            </p>
+
+            <!-- Billing Toggle Switch -->
+            <div class="billing-toggle-wrap">
+                <div class="cycle-switch-box">
+                    <button type="button" class="cycle-option-btn active" id="btnMonthly" onclick="setBillingCycle('monthly')">
+                        Monthly
+                    </button>
+                    <button type="button" class="cycle-option-btn" id="btnYearly" onclick="setBillingCycle('yearly')">
+                        Yearly <span class="save-discount-pill">Save 58%</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3 Subscription Cards (Free vs Normal vs Super) -->
+        <div class="plans-grid" id="plansSection">
+
+            <!-- Card 1: Free Tier (Pay per event) -->
+            <div class="plan-card">
+                <div>
+                    <div class="plan-header">
+                        <span class="plan-icon-tag">🎟️</span>
+                        <h3 class="plan-title">Pay As You Go</h3>
+                        <p class="plan-tagline">Standard visitor access for individual registrations</p>
+                    </div>
+
+                    <div class="plan-pricing-box">
+                        <span class="price-currency">₹</span><span class="price-amount">0</span>
+                        <span class="price-cycle">/ forever</span>
+                        <div class="price-effective" style="color: #94a3b8;">Pay per ticket or pass</div>
+                    </div>
+
+                    <ul class="plan-features-list">
+                        <li class="plan-feature-item">
+                            <span class="feature-icon-check">✓</span>
+                            <span>Browse events & holographic ticketing</span>
+                        </li>
+                        <li class="plan-feature-item">
+                            <span class="feature-icon-lock">✕</span>
+                            <span>No included live stream passes</span>
+                        </li>
+                        <li class="plan-feature-item">
+                            <span class="feature-icon-lock">✕</span>
+                            <span>Live streams cost ₹199 - ₹999 per event</span>
+                        </li>
+                        <li class="plan-feature-item">
+                            <span class="feature-icon-check">✓</span>
+                            <span>Standard 480p preview video</span>
+                        </li>
+                        <li class="plan-feature-item">
+                            <span class="feature-icon-lock">✕</span>
+                            <span>No VIP chat crown or priority badge</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    {% if not current_sub %}
+                    <button class="btn-subscribe btn-current" disabled>Current Status</button>
+                    {% else %}
+                    <a href="{{ url_for('dashboard') }}" class="btn-subscribe" style="background: rgba(255,255,255,0.08); color: var(--text-muted) !important; box-shadow: none;">Default</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Card 2: Normal Pack -->
+            <div class="plan-card" style="border-color: rgba(0, 139, 227, 0.4);">
+                <div>
+                    <div class="plan-header">
+                        <span class="plan-icon-tag">💎</span>
+                        <h3 class="plan-title">Normal Pack</h3>
+                        <p class="plan-tagline">Essential live streaming for tech marathons and community summits</p>
+                    </div>
+
+                    <div class="plan-pricing-box">
+                        <span class="price-currency">₹</span>
+                        <span class="price-amount" id="normalPriceAmount">149</span>
+                        <span class="price-cycle" id="normalPriceCycle">/ month</span>
+                        <div class="price-effective" id="normalPriceEffective">Billed monthly</div>
+                    </div>
+
+                    <ul class="plan-features-list">
+                        <li class="plan-feature-item highlighted">
+                            <span class="feature-icon-check">✓</span>
+                            <span><strong>1 User / Screen at a time</strong></span>
+                        </li>
+                        <li class="plan-feature-item highlighted">
+                            <span class="feature-icon-check">✓</span>
+                            <span><strong>720p HD Quality video</strong> (No 1080p)</span>
+                        </li>
+                        <li class="plan-feature-item highlighted">
+                            <span class="feature-icon-check">✓</span>
+                            <span><strong>FREE Live Access to events &le; ₹1,000</strong></span>
+                        </li>
+                        <li class="plan-feature-item" style="color: #fbbf24;">
+                            <span style="color: #fbbf24; font-weight: 700;">⚠️</span>
+                            <span>Events > ₹1,000 require pay-per-event</span>
+                        </li>
+                        <li class="plan-feature-item">
+                            <span class="feature-icon-check">✓</span>
+                            <span>Interactive Live Reactions & Q&A voting</span>
+                        </li>
+                        <li class="plan-feature-item">
+                            <span class="feature-icon-check">✓</span>
+                            <span>Zero stream commercials</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    {% if current_sub and current_sub.plan_type == 'normal' %}
+                    <button class="btn-subscribe btn-current" disabled>✓ Active Plan</button>
+                    {% else %}
+                    <button type="button" class="btn-subscribe" onclick="openCheckoutModal('normal', activeBillingCycle)">
+                        Subscribe to Normal
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Card 3: Super Pack (Hotstar Premium Style Featured) -->
+            <div class="plan-card featured">
+                <div class="featured-ribbon">⭐ BEST VALUE &bull; ALL-ACCESS PASS</div>
+                <div>
+                    <div class="plan-header" style="margin-top: 0.5rem;">
+                        <span class="plan-icon-tag">👑</span>
+                        <h3 class="plan-title" style="background: linear-gradient(135deg, #ffffff 0%, #ff5eb0 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Super Pack</h3>
+                        <p class="plan-tagline">Unlimited Full HD & 2K QHD stage broadcasts for every single event</p>
+                    </div>
+
+                    <div class="plan-pricing-box">
+                        <span class="price-currency" style="color: #ff1389;">₹</span>
+                        <span class="price-amount" id="superPriceAmount">299</span>
+                        <span class="price-cycle" id="superPriceCycle">/ month</span>
+                        <div class="price-effective" id="superPriceEffective" style="color: #ff5eb0;">Billed monthly</div>
+                    </div>
+
+                    <ul class="plan-features-list">
+                        <li class="plan-feature-item highlighted">
+                            <span class="feature-icon-check" style="color: #ff1389;">✓</span>
+                            <span><strong>1 User / Screen at a time</strong></span>
+                        </li>
+                        <li class="plan-feature-item highlighted">
+                            <span class="feature-icon-check" style="color: #ff1389;">✓</span>
+                            <span><strong>1080p Full HD & Ultra 2K QHD</strong></span>
+                        </li>
+                        <li class="plan-feature-item highlighted">
+                            <span class="feature-icon-check" style="color: #ff1389;">✓</span>
+                            <span><strong>ALL Live Events Included for FREE</strong> (Even > ₹1,000!)</span>
+                        </li>
+                        <li class="plan-feature-item highlighted">
+                            <span class="feature-icon-check" style="color: #ff1389;">✓</span>
+                            <span><strong>👑 VIP Crown Badge in Live Chat</strong></span>
+                        </li>
+                        <li class="plan-feature-item">
+                            <span class="feature-icon-check">✓</span>
+                            <span>Multi-Camera Dashcam & Backstage feed</span>
+                        </li>
+                        <li class="plan-feature-item">
+                            <span class="feature-icon-check">✓</span>
+                            <span>Dolby Digital Atmospheric Stage Audio</span>
+                        </li>
+                        <li class="plan-feature-item">
+                            <span class="feature-icon-check">✓</span>
+                            <span>Priority Live Stage Question Highlighting</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    {% if current_sub and current_sub.plan_type == 'super' %}
+                    <button class="btn-subscribe btn-current" disabled>✓ Active Super VIP</button>
+                    {% else %}
+                    <button type="button" class="btn-subscribe btn-super" onclick="openCheckoutModal('super', activeBillingCycle)">
+                        Get Super Pack VIP ➔
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Detailed Feature Matrix Comparison -->
+        <div class="matrix-card">
+            <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.4rem; color: #ffffff; margin: 0 0 1.2rem;">
+                Detailed Plan Feature Matrix
+            </h3>
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th style="color: var(--text-muted); width: 38%;">Feature</th>
+                        <th style="color: #94a3b8; width: 20%;">Free</th>
+                        <th style="color: #008be3; width: 21%;">Normal Pack</th>
+                        <th style="color: #ff5eb0; width: 21%;">Super Pack 👑</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Concurrent Screens</strong></td>
+                        <td>None</td>
+                        <td><span style="color: #ffffff; font-weight: 700;">1 Screen</span></td>
+                        <td><span style="color: #ffffff; font-weight: 700;">1 Screen</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Maximum Video Quality</strong></td>
+                        <td>480p preview</td>
+                        <td><span style="color: #34d399; font-weight: 700;">720p HD</span> (1080p locked)</td>
+                        <td><span style="color: #ff5eb0; font-weight: 800;">1080p FHD & 2K QHD</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Live Event Free Access</strong></td>
+                        <td>Pay per event</td>
+                        <td><strong style="color: #34d399;">Free up to ₹1,000 events</strong></td>
+                        <td><strong style="color: #ff5eb0;">ALL Events Free (Unlimited)</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Events Above ₹1,000</strong></td>
+                        <td>Pay full price</td>
+                        <td><span style="color: #fbbf24;">Must pay to watch</span></td>
+                        <td><span style="color: #34d399; font-weight: 800;">100% Included (₹0)</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Multi-Camera / Dashcam Feed</strong></td>
+                        <td>Locked</td>
+                        <td>Single Stage Angle</td>
+                        <td><span style="color: #34d399; font-weight: 700;">Full Multi-Angle Stage</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Live Chat VIP Crown Badge</strong></td>
+                        <td>No</td>
+                        <td>No</td>
+                        <td><span style="color: #f59e0b; font-weight: 800;">👑 VIP Crown Badge</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Audio Experience</strong></td>
+                        <td>Standard Stereo</td>
+                        <td>High-Fidelity Stereo</td>
+                        <td><span style="color: #008be3; font-weight: 700;">Dolby Digital Atmos</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Hotstar Subscription FAQ -->
+        <div style="max-width: 800px; margin: 0 auto 3rem;">
+            <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.4rem; text-align: center; color: #ffffff; margin-bottom: 1.5rem;">
+                Frequently Asked Questions
+            </h3>
+
+            <div class="faq-item open">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>How does the ₹1,000 limit work in the Normal Pack?</span>
+                    <span>▾</span>
+                </div>
+                <div class="faq-answer">
+                    With the Normal Pack, any live event whose registration or pass price is up to ₹1,000 is 100% free to watch. If an exclusive or celebrity event costs more than ₹1,000 (e.g. ₹1,200 or ₹1,500), Normal Pack subscribers can either purchase a single pass for that event or upgrade to the Super Pack for unlimited access to all events!
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>Can I stream in 1080p or 2K on the Normal Pack?</span>
+                    <span>▾</span>
+                </div>
+                <div class="faq-answer">
+                    The Normal Pack is capped at 720p HD. If you want ultra-crisp 1080p Full HD or 2K QHD video quality, you will need the Super Pack.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>How many devices can watch at the same time?</span>
+                    <span>▾</span>
+                </div>
+                <div class="faq-answer">
+                    Just like Hotstar Mobile / Super plans, both Normal and Super packs support 1 active streaming session at a time per account. If playback is started on a second device, you will be prompted to watch on the new device.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>Can I cancel or upgrade my subscription anytime?</span>
+                    <span>▾</span>
+                </div>
+                <div class="faq-answer">
+                    Yes! You can upgrade from Normal Pack to Super Pack anytime with pro-rated billing, or cancel auto-renewal with 1 click while retaining access until your billing cycle concludes.
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Instant Checkout Simulator Modal -->
+    <div class="checkout-modal-backdrop" id="checkoutModal">
+        <div class="checkout-modal-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem;">
+                <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.3rem; margin: 0; color: #ffffff;" id="modalPlanTitle">
+                    Subscribe to Pack
+                </h3>
+                <button type="button" onclick="closeCheckoutModal()" style="background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer;">✕</button>
+            </div>
+
+            <!-- Order Summary -->
+            <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 1.2rem; margin-bottom: 1.2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span style="color: #cbd5e1; font-size: 0.9rem;" id="modalPlanSummary">Plan: Super Pack (Yearly)</span>
+                    <strong style="color: #ffffff; font-size: 1.1rem;" id="modalPlanPrice">₹1,499</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: #64748b;">
+                    <span>Taxes & GST (Included)</span>
+                    <span style="color: #34d399;">₹0.00</span>
+                </div>
+                <div style="border-top: 1px dashed rgba(255, 255, 255, 0.1); margin-top: 10px; padding-top: 10px; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-weight: 700; color: #ffffff;">Total Payable:</span>
+                    <span style="font-family: 'Outfit', sans-serif; font-size: 1.4rem; font-weight: 900; color: #008be3;" id="modalFinalAmount">₹1,499</span>
+                </div>
+            </div>
+
+            <!-- Payment Methods -->
+            <div style="margin-bottom: 1.5rem;">
+                <label style="font-size: 0.82rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">
+                    Select Payment Method:
+                </label>
+                <div class="payment-method-tile selected" onclick="selectPaymentMethod(this, 'UPI')">
+                    <span style="font-size: 1.2rem;">⚡</span>
+                    <div style="flex: 1;">
+                        <div style="font-size: 0.88rem; font-weight: 700; color: #ffffff;">UPI Instant Pay (Google Pay / PhonePe / Paytm)</div>
+                        <div style="font-size: 0.74rem; color: #94a3b8;">Zero convenience fees & instant activation</div>
+                    </div>
+                </div>
+                <div class="payment-method-tile" onclick="selectPaymentMethod(this, 'Card')">
+                    <span style="font-size: 1.2rem;">💳</span>
+                    <div style="flex: 1;">
+                        <div style="font-size: 0.88rem; font-weight: 700; color: #ffffff;">Debit / Credit Card (Visa, Mastercard, RuPay)</div>
+                        <div style="font-size: 0.74rem; color: #94a3b8;">Encrypted 256-bit checkout</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="button" class="btn-subscribe btn-super" id="btnPayConfirm" onclick="confirmSubscriptionPayment()">
+                <span>🔒</span> Complete Payment (<span id="btnPayAmountText">₹1,499</span>)
+            </button>
+            <div style="text-align: center; margin-top: 8px; font-size: 0.74rem; color: #64748b;">
+                Instant activation • Safe & secure simulated checkout
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let activeBillingCycle = 'yearly';
+        let selectedPlanToBuy = 'super';
+        let selectedPaymentMethodName = 'UPI';
+
+        const planPricing = {
+            normal: {
+                monthly: 149,
+                yearly: 899,
+                effectiveYearly: '₹75/mo (Save 50%)'
+            },
+            super: {
+                monthly: 299,
+                yearly: 1499,
+                effectiveYearly: '₹125/mo (Save 58%)'
+            }
+        };
+
+        function setBillingCycle(cycle) {
+            activeBillingCycle = cycle;
+            document.getElementById('btnMonthly').classList.toggle('active', cycle === 'monthly');
+            document.getElementById('btnYearly').classList.toggle('active', cycle === 'yearly');
+
+            if (cycle === 'yearly') {
+                document.getElementById('normalPriceAmount').textContent = planPricing.normal.yearly;
+                document.getElementById('normalPriceCycle').textContent = '/ year';
+                document.getElementById('normalPriceEffective').textContent = planPricing.normal.effectiveYearly;
+
+                document.getElementById('superPriceAmount').textContent = planPricing.super.yearly;
+                document.getElementById('superPriceCycle').textContent = '/ year';
+                document.getElementById('superPriceEffective').textContent = planPricing.super.effectiveYearly;
+            } else {
+                document.getElementById('normalPriceAmount').textContent = planPricing.normal.monthly;
+                document.getElementById('normalPriceCycle').textContent = '/ month';
+                document.getElementById('normalPriceEffective').textContent = 'Billed monthly';
+
+                document.getElementById('superPriceAmount').textContent = planPricing.super.monthly;
+                document.getElementById('superPriceCycle').textContent = '/ month';
+                document.getElementById('superPriceEffective').textContent = 'Billed monthly';
+            }
+        }
+
+        function scrollToPlans() {
+            document.getElementById('plansSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function toggleFaq(el) {
+            const item = el.parentElement;
+            item.classList.toggle('open');
+        }
+
+        function selectPaymentMethod(tile, method) {
+            document.querySelectorAll('.payment-method-tile').forEach(t => t.classList.remove('selected'));
+            tile.classList.add('selected');
+            selectedPaymentMethodName = method;
+        }
+
+        function openCheckoutModal(planType, cycle) {
+            selectedPlanToBuy = planType;
+            const price = planPricing[planType][cycle];
+            const title = planType === 'super' ? 'Super Pack (Hotstar VIP)' : 'Normal Pack';
+            
+            document.getElementById('modalPlanTitle').textContent = `Subscribe to ${title}`;
+            document.getElementById('modalPlanSummary').textContent = `${title} • ${cycle.toUpperCase()}`;
+            document.getElementById('modalPlanPrice').textContent = `₹${price}`;
+            document.getElementById('modalFinalAmount').textContent = `₹${price}`;
+            document.getElementById('btnPayAmountText').textContent = `₹${price}`;
+            
+            document.getElementById('checkoutModal').style.display = 'flex';
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('checkoutModal').style.display = 'none';
+        }
+
+        async function confirmSubscriptionPayment() {
+            const btn = document.getElementById('btnPayConfirm');
+            btn.disabled = true;
+            btn.innerHTML = '<span>⏳</span> Activating Subscription...';
+
+            try {
+                const res = await fetch('/api/subscription/subscribe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        plan_type: selectedPlanToBuy,
+                        billing_cycle: activeBillingCycle,
+                        payment_method: selectedPaymentMethodName
+                    })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    if (window.triggerConfetti) window.triggerConfetti();
+                    if (window.showToast) window.showToast(data.message, 'success', 3500);
+                    closeCheckoutModal();
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1400);
+                } else {
+                    alert(data.error || 'Payment failed. Please try again.');
+                    btn.disabled = false;
+                    btn.innerHTML = 'Complete Payment';
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Connection error. Please try again.');
+                btn.disabled = false;
+                btn.innerHTML = 'Complete Payment';
+            }
+        }
+
+        async function cancelSubscription() {
+            if (!confirm('Are you sure you want to cancel auto-renewal? You will keep watching live streams until the end of your billing cycle.')) return;
+            try {
+                const res = await fetch('/api/subscription/cancel', { method: 'POST' });
+                const data = await res.json();
+                if (data.ok) {
+                    if (window.showToast) window.showToast(data.message, 'info', 3000);
+                    setTimeout(() => window.location.reload(), 1200);
+                }
+            } catch (err) {
+                alert('Error cancelling subscription.');
+            }
+        }
+    </script>
+</body>
+</html>

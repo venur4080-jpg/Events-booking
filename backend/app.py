@@ -113,7 +113,7 @@ EVENTS = [
         "date": "Nov 12, 2026",
         "desc": "24-hour intense coding marathon with real-world problems and mentor guidance.",
         "price": "Free",
-        "color": "#4facfe",
+        "color": "#0062a3",
         "image": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Rapid prototyping and algorithmic problem solving.",
         "full_details": "A 24-hour marathon where student teams build scalable solutions for real-world civic and enterprise challenges. Includes 1-on-1 mentorship from top engineering leads.",
@@ -135,7 +135,7 @@ EVENTS = [
         "date": "Nov 18, 2026",
         "desc": "Explore modern Generative AI, LLM architectures, and agentic workflows.",
         "price": "₹800",
-        "color": "#00f2fe",
+        "color": "#008be3",
         "image": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Deep dive into state-of-the-art AI advancements.",
         "full_details": "Hands-on sessions on Transformer architectures, Retrieval-Augmented Generation (RAG), and fine-tuning open-source models with industry researchers.",
@@ -421,7 +421,7 @@ EVENTS = [
         "date": "Feb 05, 2027",
         "desc": "Leverage AI to discover security vulnerabilities and generate exploit payloads.",
         "price": "₹1200",
-        "color": "#00f2fe",
+        "color": "#008be3",
         "image": "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Applying machine learning to modern vulnerability discovery.",
         "full_details": "Hands-on workshop demonstrating LLM-guided fuzzing, automated AST vulnerability scanning, and red-team automated evasion.",
@@ -1213,7 +1213,7 @@ EVENTS = [
         "date": "Mar 08, 2027",
         "desc": "Bass-heavy trap, dubstep, and future bass beats with LED wristband synchronization.",
         "price": "₹1600",
-        "color": "#00f2fe",
+        "color": "#008be3",
         "image": "https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Deliver high-energy bass music festival production with interactive lighting.",
         "full_details": "Massive stadium stage with heavy subwoofers, CO2 cryo jets, and interactive RFID wristbands.",
@@ -1323,7 +1323,7 @@ EVENTS = [
         "date": "Nov 21, 2026",
         "desc": "World premiere of the official trailer on IMAX with director Q&A and cast interaction.",
         "price": "Free",
-        "color": "#00f2fe",
+        "color": "#008be3",
         "image": "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Engage fans with cutting-edge sci-fi cinema previews.",
         "full_details": "IMAX laser trailer premiere, behind-the-scenes world-building breakdown, and interactive fan question mic session.",
@@ -6291,6 +6291,24 @@ def init_db():
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )''')
 
+    # Hotstar-Style Live Stream Subscriptions Table
+    c.execute('''CREATE TABLE IF NOT EXISTS subscriptions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL,
+        plan_type TEXT NOT NULL,
+        billing_cycle TEXT NOT NULL,
+        price_paid REAL NOT NULL,
+        max_quality TEXT NOT NULL DEFAULT '720p',
+        max_event_price_inr REAL,
+        max_screens INTEGER DEFAULT 1,
+        status TEXT DEFAULT 'active',
+        started_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        expires_at DATETIME NOT NULL,
+        payment_id TEXT DEFAULT '',
+        payment_method TEXT DEFAULT 'UPI',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )''')
+
     c.execute('''CREATE TABLE IF NOT EXISTS team_match_posts (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         event_id INTEGER NOT NULL,
@@ -6361,7 +6379,7 @@ def init_db():
                        ev.get('full_details', ''),
                        ev.get('outcome', ''),
                        ev.get('image', ''),
-                       ev.get('color', '#4facfe'),
+                       ev.get('color', '#0062a3'),
                        ev.get('price', 'Free'),
                        ev['title']))
     
@@ -6410,6 +6428,8 @@ def init_db():
         "CREATE INDEX IF NOT EXISTS idx_events_draft ON events(is_draft);",
         "CREATE INDEX IF NOT EXISTS idx_audit_created ON audit_log(created_at);",
         "CREATE INDEX IF NOT EXISTS idx_audit_user ON audit_log(username);",
+        "CREATE INDEX IF NOT EXISTS idx_subs_user ON subscriptions(username, status);",
+        "CREATE INDEX IF NOT EXISTS idx_subs_expires ON subscriptions(expires_at);",
     ]:
         try:
             c.execute(idx)
@@ -6425,15 +6445,266 @@ def init_db():
 
 init_db()
 
+# ─── Hotstar-Style Live Stream Subscriptions (Normal & Super Packs) ──────────
+
+SUBSCRIPTION_PLANS = {
+    'normal': {
+        'id': 'normal',
+        'title': 'Normal Pack',
+        'badge': '💎 Normal Pack',
+        'tagline': 'Essential Stage Pass for Live Streams',
+        'monthly_price': 149,
+        'yearly_price': 899,
+        'yearly_saving_pct': 50,
+        'max_quality': '720p',
+        'quality_label': '720p HD (No 1080p)',
+        'max_screens': 1,
+        'max_event_price_inr': 1000.0,
+        'includes_free_up_to': 1000,
+        'features': [
+            '1 Screen / Device at a time',
+            '720p HD Video Quality (1080p locked)',
+            'Watch all live events up to ₹1,000 for FREE',
+            'Events over ₹1,000 require pay-per-event',
+            'Standard Live Stage Chat & Audience Reactions',
+            'Interactive Q&A Access'
+        ]
+    },
+    'super': {
+        'id': 'super',
+        'title': 'Super Pack',
+        'badge': '👑 Super VIP',
+        'tagline': 'Unlimited Full HD & 2K QHD Live Stage Pass',
+        'monthly_price': 299,
+        'yearly_price': 1499,
+        'yearly_saving_pct': 58,
+        'max_quality': '2k',
+        'quality_label': '1080p FHD & 2K QHD',
+        'max_screens': 1,
+        'max_event_price_inr': None,
+        'includes_free_up_to': None,
+        'is_featured': True,
+        'features': [
+            '1 User / Screen at a time',
+            '1080p Full HD & 2K QHD Ultra High Definition',
+            'ALL Live Events included with ₹0 Extra Fee (even > ₹1,000!)',
+            '👑 VIP Crown Badge in Live Stage Chat',
+            'Multi-Camera Dashcam & Backstage Angle Feed',
+            'Dolby Digital Atmospheric Stage Audio',
+            'Priority Live Q&A Question Highlighting',
+            'Ad-Free Live Stage Transmission'
+        ]
+    }
+}
+
+def parse_price_amount(price_str):
+    if not price_str:
+        return 0.0
+    s = str(price_str).lower().strip()
+    if 'free' in s:
+        return 0.0
+    cleaned = re.sub(r'[^\d.]', '', s)
+    try:
+        return float(cleaned) if cleaned else 0.0
+    except Exception:
+        return 0.0
+
+def get_user_subscription(username):
+    if not username:
+        return None
+    try:
+        conn = get_db(row_factory=True)
+        c = conn.cursor()
+        c.execute("""
+            SELECT id, username, plan_type, billing_cycle, price_paid, max_quality, 
+                   max_event_price_inr, max_screens, status, started_at, expires_at, payment_id, payment_method
+            FROM subscriptions 
+            WHERE username = ? AND status = 'active' AND datetime(expires_at) > datetime('now')
+            ORDER BY id DESC LIMIT 1
+        """, (username,))
+        row = c.fetchone()
+        conn.close()
+        if row:
+            d = dict(row)
+            plan_meta = SUBSCRIPTION_PLANS.get(d['plan_type'], {})
+            d['plan_title'] = plan_meta.get('title', d['plan_type'].capitalize())
+            d['badge'] = plan_meta.get('badge', d['plan_type'])
+            d['quality_label'] = plan_meta.get('quality_label', d['max_quality'])
+            try:
+                exp_dt = datetime.fromisoformat(d['expires_at'].replace(' ', 'T'))
+                d['days_left'] = max(0, (exp_dt - datetime.now()).days)
+                d['is_expired'] = datetime.now() > exp_dt
+            except Exception:
+                d['days_left'] = 30
+                d['is_expired'] = False
+            return d
+    except Exception as e:
+        print(f"[SUBSCRIPTION FETCH ERROR] {e}")
+    return None
+
+def check_live_stream_access(username, event_id, event=None):
+    if not event:
+        event = get_event(event_id)
+    if not event:
+        return {
+            'has_access': False,
+            'access_type': 'none',
+            'max_quality': '720p',
+            'blocked_reason': 'event_not_found',
+            'plan': None,
+            'is_vip': False
+        }
+
+    # 1. Host or Admin always has full access
+    user_is_host_or_admin = False
+    try:
+        from flask import has_request_context
+        if has_request_context():
+            user_is_host_or_admin = is_host() or is_admin()
+        else:
+            conn = get_db()
+            c = conn.cursor()
+            c.execute("SELECT role, is_admin FROM users WHERE username = ?", (username,))
+            u_row = c.fetchone()
+            conn.close()
+            if u_row and (u_row[0] == 'host' or u_row[1] == 1):
+                user_is_host_or_admin = True
+    except Exception:
+        pass
+
+    if username and user_is_host_or_admin:
+        return {
+            'has_access': True,
+            'access_type': 'host',
+            'max_quality': '2k',
+            'plan': 'host',
+            'is_vip': True,
+            'subscription': None
+        }
+
+    if not username:
+        return {
+            'has_access': False,
+            'access_type': 'none',
+            'max_quality': '720p',
+            'blocked_reason': 'not_logged_in',
+            'plan': None,
+            'is_vip': False
+        }
+
+    # 2. Check if user has an in-person ticket or paid virtual pass
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT id FROM registrations WHERE username = ? AND event_id = ? AND (status IS NULL OR status = 'active')", (username, event_id))
+    has_reg = c.fetchone() is not None
+    
+    c.execute("SELECT id, pass_type FROM live_stream_passes WHERE username = ? AND event_id = ?", (username, event_id))
+    vpass = c.fetchone()
+    conn.close()
+
+    sub = get_user_subscription(username)
+
+    if has_reg:
+        return {
+            'has_access': True,
+            'access_type': 'registered_ticket',
+            'max_quality': '2k' if (sub and sub['plan_type'] == 'super') else '1080p',
+            'plan': sub['plan_type'] if sub else 'ticket',
+            'is_vip': bool(sub and sub['plan_type'] == 'super'),
+            'subscription': sub
+        }
+
+    if vpass:
+        return {
+            'has_access': True,
+            'access_type': vpass[1] if (len(vpass) > 1 and vpass[1]) else 'virtual_pass',
+            'max_quality': '2k' if (sub and sub['plan_type'] == 'super') else '1080p',
+            'plan': sub['plan_type'] if sub else 'virtual_pass',
+            'is_vip': bool(sub and sub['plan_type'] == 'super'),
+            'subscription': sub
+        }
+
+    # 3. Check Active Hotstar-Style Subscriptions
+    if sub:
+        plan = sub['plan_type']
+        if plan == 'super':
+            # Super Pack: 1080p / 2K quality, ALL events covered for free!
+            return {
+                'has_access': True,
+                'access_type': 'super_subscription',
+                'max_quality': '2k',
+                'plan': 'super',
+                'is_vip': True,
+                'subscription': sub
+            }
+        elif plan == 'normal':
+            # Normal Pack: 720p HD only, events <= ₹1000 covered for free!
+            event_price_num = parse_price_amount(event.get('price'))
+            if event_price_num <= 1000.0:
+                return {
+                    'has_access': True,
+                    'access_type': 'normal_subscription',
+                    'max_quality': '720p',
+                    'plan': 'normal',
+                    'is_vip': False,
+                    'subscription': sub,
+                    'event_price': event_price_num
+                }
+            else:
+                # Event price is > ₹1000! User cannot get free access with Normal pack.
+                return {
+                    'has_access': False,
+                    'access_type': 'none',
+                    'blocked_reason': 'price_exceeds_normal_pack',
+                    'max_quality': '720p',
+                    'plan': 'normal',
+                    'is_vip': False,
+                    'subscription': sub,
+                    'event_price': event_price_num,
+                    'threshold': 1000.0
+                }
+
+    # 4. No Subscription and No Pass
+    return {
+        'has_access': False,
+        'access_type': 'none',
+        'blocked_reason': 'no_subscription',
+        'max_quality': '720p',
+        'plan': None,
+        'is_vip': False,
+        'subscription': None,
+        'event_price': parse_price_amount(event.get('price'))
+    }
+
+# Concurrent Single-Screen Session Tracker
+_ACTIVE_STREAM_VIEWERS = {} # username -> {'session_id': id, 'event_id': id, 'timestamp': ts}
+
+def register_stream_heartbeat(username, session_id, event_id, takeover=False):
+    if not username:
+        return True, session_id
+    now = time.time()
+    existing = _ACTIVE_STREAM_VIEWERS.get(username)
+    if existing and not takeover:
+        if existing['session_id'] != session_id and (now - existing['timestamp']) < 25.0:
+            return False, existing['session_id']
+    _ACTIVE_STREAM_VIEWERS[username] = {
+        'session_id': session_id,
+        'event_id': event_id,
+        'timestamp': now
+    }
+    return True, session_id
+
 @app.context_processor
 def inject_user_data():
     current_user = None
     user_is_admin = False
     user_is_host = False
+    user_sub = None
     if session.get('loggedin'):
         username = session.get('username')
         user_is_admin = is_admin()
         user_is_host = is_host()
+        user_sub = get_user_subscription(username)
         
         photo = session.get('profile_photo')
         user_id = session.get('user_id')
@@ -6458,8 +6729,13 @@ def inject_user_data():
                     user_id = res[2] if (len(res) > 2 and res[2]) else f"UID-{res[1]:04d}"
                     session['user_id'] = user_id
         
-        current_user = {'username': username, 'profile_photo': photo, 'user_id': user_id or 'UID-0001'}
-    return dict(current_user=current_user, is_admin=user_is_admin, is_host=user_is_host)
+        current_user = {
+            'username': username, 
+            'profile_photo': photo, 
+            'user_id': user_id or 'UID-0001',
+            'subscription': user_sub
+        }
+    return dict(current_user=current_user, is_admin=user_is_admin, is_host=user_is_host, user_subscription=user_sub)
 
 # Universal Validation Helpers for Email & Mobile Number 
 def validate_mobile(phone: str):
@@ -6687,11 +6963,11 @@ def send_email_otp(recipient_email: str, otp_code: str):
         <meta charset="utf-8">
         <style>
             body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0b0f19; color: #f8fafc; margin: 0; padding: 20px; }}
-            .email-container {{ max-width: 500px; margin: 0 auto; background: #131d31; border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 16px; padding: 30px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }}
+            .email-container {{ max-width: 500px; margin: 0 auto; background: #131d31; border: 1px solid rgba(0, 139, 227, 0.3); border-radius: 16px; padding: 30px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }}
             .logo {{ font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: 2px; margin-bottom: 20px; }}
-            .logo span {{ color: #00f2fe; }}
+            .logo span {{ color: #008be3; }}
             .title {{ font-size: 18px; font-weight: 600; color: #94a3b8; margin-bottom: 15px; }}
-            .otp-box {{ background: rgba(0, 242, 254, 0.1); border: 2px dashed #00f2fe; border-radius: 12px; padding: 18px; margin: 25px 0; font-size: 34px; font-weight: 800; letter-spacing: 8px; color: #00f2fe; font-family: monospace; }}
+            .otp-box {{ background: rgba(0, 139, 227, 0.1); border: 2px dashed #008be3; border-radius: 12px; padding: 18px; margin: 25px 0; font-size: 34px; font-weight: 800; letter-spacing: 8px; color: #008be3; font-family: monospace; }}
             .expiry-note {{ font-size: 13px; color: #f59e0b; margin-bottom: 20px; font-weight: 600; }}
             .footer {{ font-size: 12px; color: #64748b; line-height: 1.6; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 20px; margin-top: 20px; }}
         </style>
@@ -7018,8 +7294,8 @@ def login():
 CATEGORY_METADATA = {
     'Education': {
         'icon': '🎓',
-        'color': '#00f2fe',
-        'gradient': 'linear-gradient(135deg, #00f2fe, #4facfe)',
+        'color': '#008be3',
+        'gradient': 'linear-gradient(135deg, #008be3, #0062a3)',
         'kicker': 'KNOWLEDGE & CODE',
         'title': 'Education',
         'desc': 'Tech hackathons, AI summits, coding bootcamps, workshops & seminars.',
@@ -7318,8 +7594,8 @@ def category_events(category_name=None):
     if active_category == 'all':
         category_info = {
             'icon': '🌐',
-            'color': '#00f2fe',
-            'gradient': 'linear-gradient(135deg, #00f2fe, #4facfe)',
+            'color': '#008be3',
+            'gradient': 'linear-gradient(135deg, #008be3, #0062a3)',
             'kicker': 'ALL DOMAINS & TRACKS',
             'title': 'All Categories',
             'desc': 'Discover all events, hackathons, workshops, conferences and cultural summits across all 12 domains.',
@@ -7328,8 +7604,8 @@ def category_events(category_name=None):
     else:
         category_info = CATEGORY_METADATA.get(active_category, {
             'icon': '✨',
-            'color': '#00f2fe',
-            'gradient': 'linear-gradient(135deg, #00f2fe, #4facfe)',
+            'color': '#008be3',
+            'gradient': 'linear-gradient(135deg, #008be3, #0062a3)',
             'kicker': 'DOMAIN HUB',
             'title': active_category,
             'desc': f'Explore curated events, workshops, and competitions in {active_category}.',
@@ -7523,7 +7799,7 @@ def generate_ticket_pdf_bytes(event: dict, reg_info) -> bytes:
     pdf.rect(0, 0, 210, 297, 'F')
     
     # Outer Decorative Border
-    pdf.set_draw_color(0, 242, 254) # Cyan
+    pdf.set_draw_color(0, 139, 227) # Cyan
     pdf.set_line_width(0.8)
     pdf.rect(8, 8, 194, 281)
     
@@ -7541,7 +7817,7 @@ def generate_ticket_pdf_bytes(event: dict, reg_info) -> bytes:
     pdf.cell(120, 8, header_title, align='L')
     
     pdf.set_font("Helvetica", 'B', 10)
-    pdf.set_text_color(0, 242, 254)
+    pdf.set_text_color(0, 139, 227)
     pdf.set_xy(135, 13)
     pdf.cell(60, 8, f"REF: {ticket_num}", align='R')
     
@@ -7561,7 +7837,7 @@ def generate_ticket_pdf_bytes(event: dict, reg_info) -> bytes:
         pdf.set_xy(135, 22)
         pdf.cell(60, 6, "STATUS: CONFIRMED & VERIFIED", align='R')
     
-    pdf.set_draw_color(0, 242, 254)
+    pdf.set_draw_color(0, 139, 227)
     pdf.line(10, 36, 200, 36)
     
     # 1. Main Event Details Block
@@ -7576,7 +7852,7 @@ def generate_ticket_pdf_bytes(event: dict, reg_info) -> bytes:
     pdf.cell(178, 7, event.get('title', ''), align='L')
     
     pdf.set_font("Helvetica", 'B', 9.5)
-    pdf.set_text_color(0, 242, 254)
+    pdf.set_text_color(0, 139, 227)
     pdf.set_xy(16, 50)
     pdf.cell(178, 6, f"Date: {event.get('date', '')} | Category: {category_name} | Fee: {str(event.get('price', 'Free')).replace('₹', 'Rs. ')} | {pass_type_str}", align='L')
     
@@ -7589,14 +7865,14 @@ def generate_ticket_pdf_bytes(event: dict, reg_info) -> bytes:
     # 2. Venue & Physical Location Section
     pdf.set_fill_color(18, 30, 49)
     pdf.rect(12, 80, 186, 36, 'F')
-    pdf.set_draw_color(0, 242, 254)
+    pdf.set_draw_color(0, 139, 227)
     pdf.set_line_width(0.4)
     pdf.rect(12, 80, 186, 36)
-    pdf.set_fill_color(0, 242, 254)
+    pdf.set_fill_color(0, 139, 227)
     pdf.rect(12, 80, 3.5, 36, 'F')
     
     pdf.set_font("Helvetica", 'B', 10)
-    pdf.set_text_color(0, 242, 254)
+    pdf.set_text_color(0, 139, 227)
     pdf.set_xy(18, 83)
     pdf.cell(176, 5.5, "EVENT VENUE & PHYSICAL LOCATION ADDRESS", align='L')
     
@@ -7611,7 +7887,7 @@ def generate_ticket_pdf_bytes(event: dict, reg_info) -> bytes:
     pdf.cell(176, 5, f"Street Address: {venue_addr}", align='L', link=maps_search_url)
     
     pdf.set_font("Helvetica", 'U', 8.5)
-    pdf.set_text_color(0, 242, 254)
+    pdf.set_text_color(0, 139, 227)
     pdf.set_xy(18, 100.5)
     pdf.cell(176, 5, "Google Maps: Click here to navigate via GPS live coordinates", align='L', link=maps_search_url)
     
@@ -7639,7 +7915,7 @@ def generate_ticket_pdf_bytes(event: dict, reg_info) -> bytes:
     pdf.rect(12, attendee_top_y, 186, 40 if reg_status == 'cancelled' else 42)
     
     pdf.set_font("Helvetica", 'B', 10.5)
-    pdf.set_text_color(0, 242, 254)
+    pdf.set_text_color(0, 139, 227)
     pdf.set_xy(16, attendee_top_y + 3)
     pdf.cell(178, 6, "ATTENDEE & REGISTRATION DETAILS", align='L')
     
@@ -7712,12 +7988,12 @@ def generate_ticket_pdf_bytes(event: dict, reg_info) -> bytes:
     # 5. Verification & Bottom QR Code
     pdf.set_fill_color(24, 34, 53)
     pdf.rect(12, 230, 186, 50, 'F')
-    pdf.set_draw_color(0, 242, 254)
+    pdf.set_draw_color(0, 139, 227)
     pdf.set_line_width(0.5)
     pdf.rect(12, 230, 186, 50)
     
     pdf.set_font("Helvetica", 'B', 10.5)
-    pdf.set_text_color(0, 242, 254)
+    pdf.set_text_color(0, 139, 227)
     pdf.set_xy(16, 234)
     pdf.cell(125, 6, "DIGITAL PASS VERIFICATION & SECURITY CODE", align='L')
     
@@ -7859,8 +8135,8 @@ def generate_invoice_pdf_bytes(event: dict, reg_info) -> bytes:
     pdf.set_fill_color(15, 23, 42)
     pdf.rect(0, 0, 210, 48, 'F')
 
-    # Top Cyan Line Accent (#00f2fe)
-    pdf.set_fill_color(0, 242, 254)
+    # Top Cyan Line Accent (#008be3)
+    pdf.set_fill_color(0, 139, 227)
     pdf.rect(0, 0, 210, 3, 'F')
 
     # Platform Title & Invoice Type
@@ -7870,7 +8146,7 @@ def generate_invoice_pdf_bytes(event: dict, reg_info) -> bytes:
     pdf.cell(100, 10, "EVENTS BOOKING", align='L')
 
     pdf.set_font('Helvetica', 'B', 13)
-    pdf.set_text_color(0, 242, 254)
+    pdf.set_text_color(0, 139, 227)
     pdf.set_xy(110, 12)
     pdf.cell(86, 10, "TAX INVOICE / RECEIPT", align='R')
 
@@ -7889,7 +8165,7 @@ def generate_invoice_pdf_bytes(event: dict, reg_info) -> bytes:
     pdf.set_font('Helvetica', 'B', 8.5)
     pdf.cell(46, 5, "Invoice Number:", align='R')
     pdf.set_font('Helvetica', '', 8.5)
-    pdf.set_text_color(0, 242, 254)
+    pdf.set_text_color(0, 139, 227)
     pdf.cell(40, 5, f"INV-2026-{reg_id:05d}", align='R')
 
     pdf.set_xy(110, 28)
@@ -8017,7 +8293,7 @@ def generate_invoice_pdf_bytes(event: dict, reg_info) -> bytes:
     # Total Highlight Box
     pdf.set_fill_color(248, 250, 252)
     pdf.rect(110, y, 86, 9.5, 'F')
-    pdf.set_fill_color(0, 242, 254)
+    pdf.set_fill_color(0, 139, 227)
     pdf.rect(110, y, 2.5, 9.5, 'F')
 
     pdf.set_xy(114, y + 2)
@@ -8087,7 +8363,7 @@ def generate_invoice_pdf_bytes(event: dict, reg_info) -> bytes:
     # Bottom Footer
     pdf.set_fill_color(15, 23, 42)
     pdf.rect(0, 275, 210, 22, 'F')
-    pdf.set_fill_color(0, 242, 254)
+    pdf.set_fill_color(0, 139, 227)
     pdf.rect(0, 275, 210, 1.5, 'F')
 
     pdf.set_xy(14, 280)
@@ -8148,7 +8424,7 @@ def generate_certificate_pdf_bytes(event: dict, reg_info) -> bytes:
     pdf.rect(0, 0, 297, 210, 'F')
 
     # Outer Ornate Border: Cyan
-    pdf.set_draw_color(0, 242, 254)
+    pdf.set_draw_color(0, 139, 227)
     pdf.set_line_width(1.2)
     pdf.rect(7, 7, 283, 196)
 
@@ -8158,7 +8434,7 @@ def generate_certificate_pdf_bytes(event: dict, reg_info) -> bytes:
     pdf.rect(10, 10, 277, 190)
 
     # Corner Filigree Accents
-    pdf.set_draw_color(0, 242, 254)
+    pdf.set_draw_color(0, 139, 227)
     pdf.set_line_width(0.6)
     pdf.line(13, 13, 26, 13)
     pdf.line(13, 13, 13, 26)
@@ -8172,7 +8448,7 @@ def generate_certificate_pdf_bytes(event: dict, reg_info) -> bytes:
     # Top Brand Header
     pdf.set_xy(15, 16)
     pdf.set_font("Helvetica", 'B', 12)
-    pdf.set_text_color(0, 242, 254)
+    pdf.set_text_color(0, 139, 227)
     pdf.cell(267, 6, "EVENTS BOOKING - SMART EVENT PLATFORM", align='C')
 
     pdf.set_xy(15, 23)
@@ -8199,7 +8475,7 @@ def generate_certificate_pdf_bytes(event: dict, reg_info) -> bytes:
     pdf.cell(267, 10, recipient_name.upper(), align='C')
 
     # Decorative Underline
-    pdf.set_draw_color(0, 242, 254)
+    pdf.set_draw_color(0, 139, 227)
     pdf.set_line_width(0.6)
     name_w = min(180, max(80, len(recipient_name) * 6.5))
     pdf.line((297 - name_w) / 2, 71, (297 + name_w) / 2, 71)
@@ -8212,7 +8488,7 @@ def generate_certificate_pdf_bytes(event: dict, reg_info) -> bytes:
 
     pdf.set_xy(25, 85)
     pdf.set_font("Helvetica", 'B', 15)
-    pdf.set_text_color(0, 242, 254) # Cyan
+    pdf.set_text_color(0, 139, 227) # Cyan
     safe_ev_title = event_title if len(event_title) <= 60 else event_title[:57] + "..."
     pdf.cell(247, 8, f'"{safe_ev_title}"', align='C')
 
@@ -8245,7 +8521,7 @@ def generate_certificate_pdf_bytes(event: dict, reg_info) -> bytes:
 
     pdf.set_xy(26, 134)
     pdf.set_font("Courier", 'B', 13)
-    pdf.set_text_color(0, 242, 254)
+    pdf.set_text_color(0, 139, 227)
     pdf.cell(75, 5, "Venu Rachakonda", align='L')
 
     pdf.set_xy(26, 142)
@@ -8263,7 +8539,7 @@ def generate_certificate_pdf_bytes(event: dict, reg_info) -> bytes:
     # Center Column: Credentials & Seal
     pdf.set_xy(108, 125)
     pdf.set_font("Helvetica", 'B', 9.5)
-    pdf.set_text_color(0, 242, 254)
+    pdf.set_text_color(0, 139, 227)
     pdf.cell(80, 5, "VERIFIED CREDENTIALS", align='C')
 
     pdf.set_xy(108, 134)
@@ -8311,7 +8587,7 @@ def generate_certificate_pdf_bytes(event: dict, reg_info) -> bytes:
 
     pdf.set_xy(218, 171)
     pdf.set_font("Helvetica", 'B', 7.5)
-    pdf.set_text_color(0, 242, 254)
+    pdf.set_text_color(0, 139, 227)
     pdf.cell(58, 4, "SCAN TO AUTHENTICATE PASS", align='C')
 
     # Bottom Footer Micro-Text
@@ -8387,16 +8663,16 @@ def send_registration_confirmation_email(recipient_email: str, recipient_name: s
             <meta charset="utf-8">
             <style>
                 body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0b0f19; color: #f8fafc; margin: 0; padding: 20px; }}
-                .container {{ max-width: 600px; margin: 0 auto; background: #131d31; border: 1px solid rgba(0, 242, 254, 0.35); border-radius: 18px; padding: 32px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); }}
+                .container {{ max-width: 600px; margin: 0 auto; background: #131d31; border: 1px solid rgba(0, 139, 227, 0.35); border-radius: 18px; padding: 32px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); }}
                 .logo {{ font-size: 26px; font-weight: 800; color: #ffffff; letter-spacing: 2px; text-align: center; margin-bottom: 8px; }}
-                .logo span {{ color: #00f2fe; }}
+                .logo span {{ color: #008be3; }}
                 .badge {{ display: inline-block; background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; color: #10b981; font-weight: 700; font-size: 12px; padding: 6px 14px; border-radius: 50px; text-transform: uppercase; letter-spacing: 1px; }}
                 .event-card {{ background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 22px; margin: 24px 0; }}
                 .event-title {{ font-size: 20px; font-weight: 700; color: #ffffff; margin: 0 0 8px 0; }}
                 .info-row {{ display: flex; justify-content: space-between; margin: 8px 0; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 6px; }}
                 .info-label {{ color: #94a3b8; }}
                 .info-val {{ color: #f1f5f9; font-weight: 600; text-align: right; }}
-                .attachment-notice {{ background: rgba(0, 242, 254, 0.08); border-left: 4px solid #00f2fe; padding: 14px 18px; border-radius: 8px; margin: 20px 0; font-size: 13.5px; color: #e2e8f0; }}
+                .attachment-notice {{ background: rgba(0, 139, 227, 0.08); border-left: 4px solid #008be3; padding: 14px 18px; border-radius: 8px; margin: 20px 0; font-size: 13.5px; color: #e2e8f0; }}
                 .footer {{ font-size: 12px; color: #64748b; line-height: 1.6; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 20px; margin-top: 25px; text-align: center; }}
             </style>
         </head>
@@ -8428,7 +8704,7 @@ def send_registration_confirmation_email(recipient_email: str, recipient_name: s
                     </div>
                     <div class="info-row">
                         <span class="info-label">🎟️ Pass Reference</span>
-                        <span class="info-val" style="color: #00f2fe;">{ticket_num}</span>
+                        <span class="info-val" style="color: #008be3;">{ticket_num}</span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">👥 Pass Category</span>
@@ -8454,7 +8730,7 @@ def send_registration_confirmation_email(recipient_email: str, recipient_name: s
                 
                 <div class="footer">
                     &copy; 2026 Events Booking. All rights reserved.<br>
-                    Need assistance? Reach out to <a href="mailto:{smtp_email}" style="color: #00f2fe; text-decoration: none;">{smtp_email}</a>.
+                    Need assistance? Reach out to <a href="mailto:{smtp_email}" style="color: #008be3; text-decoration: none;">{smtp_email}</a>.
                 </div>
             </div>
         </body>
@@ -8547,7 +8823,7 @@ def send_unregistration_confirmation_email(recipient_email: str, recipient_name:
                 body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0b0f19; color: #f8fafc; margin: 0; padding: 20px; }}
                 .container {{ max-width: 600px; margin: 0 auto; background: #131d31; border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 18px; padding: 32px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); }}
                 .logo {{ font-size: 26px; font-weight: 800; color: #ffffff; letter-spacing: 2px; text-align: center; margin-bottom: 8px; }}
-                .logo span {{ color: #00f2fe; }}
+                .logo span {{ color: #008be3; }}
                 .badge {{ display: inline-block; background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #ef4444; font-weight: 700; font-size: 12px; padding: 6px 14px; border-radius: 50px; text-transform: uppercase; letter-spacing: 1px; }}
                 .event-card {{ background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 22px; margin: 24px 0; }}
                 .event-title {{ font-size: 20px; font-weight: 700; color: #ffffff; margin: 0 0 8px 0; }}
@@ -8555,7 +8831,7 @@ def send_unregistration_confirmation_email(recipient_email: str, recipient_name:
                 .info-label {{ color: #94a3b8; }}
                 .info-val {{ color: #f1f5f9; font-weight: 600; text-align: right; }}
                 .status-notice {{ background: rgba(239, 68, 68, 0.08); border-left: 4px solid #ef4444; padding: 14px 18px; border-radius: 8px; margin: 20px 0; font-size: 13.5px; color: #fca5a5; }}
-                .re-register-notice {{ background: rgba(0, 242, 254, 0.08); border: 1px dashed rgba(0, 242, 254, 0.4); border-radius: 10px; padding: 14px; margin: 20px 0; font-size: 13px; color: #cbd5e1; text-align: center; }}
+                .re-register-notice {{ background: rgba(0, 139, 227, 0.08); border: 1px dashed rgba(0, 139, 227, 0.4); border-radius: 10px; padding: 14px; margin: 20px 0; font-size: 13px; color: #cbd5e1; text-align: center; }}
                 .footer {{ font-size: 12px; color: #64748b; line-height: 1.6; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 20px; margin-top: 25px; text-align: center; }}
             </style>
         </head>
@@ -8605,7 +8881,7 @@ def send_unregistration_confirmation_email(recipient_email: str, recipient_name:
                 
                 <div class="footer">
                     &copy; 2026 Events Booking. All rights reserved.<br>
-                    Need assistance? Contact our helpdesk at <a href="mailto:{smtp_email}" style="color: #00f2fe; text-decoration: none;">{smtp_email}</a>.
+                    Need assistance? Contact our helpdesk at <a href="mailto:{smtp_email}" style="color: #008be3; text-decoration: none;">{smtp_email}</a>.
                 </div>
             </div>
         </body>
@@ -8667,12 +8943,12 @@ def send_account_welcome_email(recipient_email: str, recipient_name: str, userna
             <meta charset="utf-8">
             <style>
                 body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0b0f19; color: #f8fafc; margin: 0; padding: 20px; }}
-                .container {{ max-width: 600px; margin: 0 auto; background: #131d31; border: 1px solid rgba(0, 242, 254, 0.35); border-radius: 18px; padding: 32px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); }}
+                .container {{ max-width: 600px; margin: 0 auto; background: #131d31; border: 1px solid rgba(0, 139, 227, 0.35); border-radius: 18px; padding: 32px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); }}
                 .logo {{ font-size: 26px; font-weight: 800; color: #ffffff; letter-spacing: 2px; text-align: center; margin-bottom: 8px; }}
-                .logo span {{ color: #00f2fe; }}
-                .badge {{ display: inline-block; background: rgba(0, 242, 254, 0.15); border: 1px solid #00f2fe; color: #00f2fe; font-weight: 700; font-size: 12px; padding: 6px 14px; border-radius: 50px; text-transform: uppercase; letter-spacing: 1px; }}
+                .logo span {{ color: #008be3; }}
+                .badge {{ display: inline-block; background: rgba(0, 139, 227, 0.15); border: 1px solid #008be3; color: #008be3; font-weight: 700; font-size: 12px; padding: 6px 14px; border-radius: 50px; text-transform: uppercase; letter-spacing: 1px; }}
                 .user-card {{ background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 22px; margin: 24px 0; }}
-                .uid-box {{ background: rgba(0, 242, 254, 0.1); border: 2px dashed #00f2fe; border-radius: 12px; padding: 16px; margin: 18px 0; text-align: center; font-size: 28px; font-weight: 800; letter-spacing: 4px; color: #00f2fe; font-family: monospace; }}
+                .uid-box {{ background: rgba(0, 139, 227, 0.1); border: 2px dashed #008be3; border-radius: 12px; padding: 16px; margin: 18px 0; text-align: center; font-size: 28px; font-weight: 800; letter-spacing: 4px; color: #008be3; font-family: monospace; }}
                 .info-row {{ display: flex; justify-content: space-between; margin: 8px 0; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 6px; }}
                 .info-label {{ color: #94a3b8; }}
                 .info-val {{ color: #f1f5f9; font-weight: 600; text-align: right; }}
@@ -8709,7 +8985,7 @@ def send_account_welcome_email(recipient_email: str, recipient_name: str, userna
                     </div>
                     <div class="info-row" style="border-bottom: none;">
                         <span class="info-label">🔑 Login Method</span>
-                        <span class="info-val" style="color: #00f2fe;">User ID ({user_id}) or Email</span>
+                        <span class="info-val" style="color: #008be3;">User ID ({user_id}) or Email</span>
                     </div>
                 </div>
                 
@@ -10222,7 +10498,7 @@ def history():
                 'desc': event.get('desc', ''),
                 'image': event.get('image', ''),
                 'price': event.get('price', 'Free'),
-                'color': event.get('color', '#00f2fe'),
+                'color': event.get('color', '#008be3'),
                 'venue': event.get('venue', 'Main Campus Auditorium'),
                 'venue_address': event.get('venue_address', ''),
                 'category': get_category(event.get('title', '')),
@@ -11657,55 +11933,20 @@ def live_event_page(event_id):
         
     username = session.get('username')
     stream_config = get_stream_config(event_id)
+    access_info = check_live_stream_access(username, event_id, event)
     
-    has_access = False
-    access_type = 'none'
-    if username:
-        if is_host() or is_admin():
-            has_access = True
-            access_type = 'host'
-        else:
-            conn = get_db()
-            c = conn.cursor()
-            c.execute("SELECT id FROM registrations WHERE username = ? AND event_id = ? AND (status IS NULL OR status = 'active')", (username, event_id))
-            if c.fetchone():
-                has_access = True
-                access_type = 'registered_ticket'
-            else:
-                c.execute("SELECT id, pass_type FROM live_stream_passes WHERE username = ? AND event_id = ?", (username, event_id))
-                row = c.fetchone()
-                if row:
-                    has_access = True
-                    access_type = row[1] if (len(row) > 1 and row[1]) else 'virtual_pass'
-            conn.close()
-
-    access_info = {'has_access': has_access, 'access_type': access_type}
-    return render_template('live_event.html', event=event, username=username, is_host=is_host(), stream_config=stream_config, access_info=access_info)
+    return render_template('live_event.html', 
+                           event=event, 
+                           username=username, 
+                           is_host=is_host(), 
+                           stream_config=stream_config, 
+                           access_info=access_info)
 
 @app.route('/api/event/<int:event_id>/live/data')
 def api_live_event_data(event_id):
     username = session.get('username')
-    has_access = False
-    access_type = 'none'
-    
-    if username:
-        if is_host() or is_admin():
-            has_access = True
-            access_type = 'host'
-        else:
-            conn = get_db()
-            c = conn.cursor()
-            c.execute("SELECT id FROM registrations WHERE username = ? AND event_id = ? AND (status IS NULL OR status = 'active')", (username, event_id))
-            if c.fetchone():
-                has_access = True
-                access_type = 'registered_ticket'
-            else:
-                c.execute("SELECT id, pass_type FROM live_stream_passes WHERE username = ? AND event_id = ?", (username, event_id))
-                row = c.fetchone()
-                if row:
-                    has_access = True
-                    access_type = row[1] if (len(row) > 1 and row[1]) else 'virtual_pass'
-            conn.close()
+    event = get_event(event_id)
+    access_info = check_live_stream_access(username, event_id, event)
 
     cfg = get_stream_config(event_id)
     conn = get_db()
@@ -11716,7 +11957,7 @@ def api_live_event_data(event_id):
     
     return jsonify({
         'ok': True,
-        'access': {'has_access': has_access, 'access_type': access_type},
+        'access': access_info,
         'stream_config': cfg,
         'questions': questions
     })
@@ -11901,6 +12142,120 @@ def host_studio_page(event_id):
     if not event:
         return "Event not found", 404
     return render_template('live_event.html', event=event, username=session.get('username'), is_host=True, is_studio=True)
+
+
+# ─── Live Stream Subscription Routes (Hotstar Style) ─────────────────────────
+
+@app.route('/subscriptions')
+@app.route('/plans')
+def subscriptions_page():
+    username = session.get('username')
+    current_sub = get_user_subscription(username) if username else None
+    return render_template('subscriptions.html', 
+                           current_sub=current_sub, 
+                           plans=SUBSCRIPTION_PLANS,
+                           username=username)
+
+@app.route('/api/subscription/subscribe', methods=['POST'])
+def api_subscribe():
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Please log in to purchase a subscription.'}), 401
+    
+    username = session.get('username')
+    data = request.get_json() or {}
+    plan_type = data.get('plan_type', '').lower().strip()
+    billing_cycle = data.get('billing_cycle', 'monthly').lower().strip()
+    payment_method = data.get('payment_method', 'UPI')
+    
+    if plan_type not in ('normal', 'super'):
+        return jsonify({'ok': False, 'error': 'Invalid subscription pack.'}), 400
+    if billing_cycle not in ('monthly', 'yearly'):
+        billing_cycle = 'monthly'
+        
+    plan_cfg = SUBSCRIPTION_PLANS[plan_type]
+    price_paid = float(plan_cfg['yearly_price'] if billing_cycle == 'yearly' else plan_cfg['monthly_price'])
+    max_quality = plan_cfg['max_quality']
+    max_event_price = plan_cfg['max_event_price_inr']
+    max_screens = plan_cfg['max_screens']
+    
+    days = 365 if billing_cycle == 'yearly' else 30
+    expires_at = datetime.now() + timedelta(days=days)
+    expires_str = expires_at.strftime('%Y-%m-%d %H:%M:%S')
+    
+    payment_id = f"SUB-{plan_type.upper()}-{random.randint(100000, 999999)}"
+    
+    conn = get_db()
+    c = conn.cursor()
+    # Mark existing active subscriptions as upgraded/superseded
+    c.execute("UPDATE subscriptions SET status = 'superseded' WHERE username = ? AND status = 'active'", (username,))
+    
+    c.execute("""
+        INSERT INTO subscriptions (username, plan_type, billing_cycle, price_paid, max_quality, max_event_price_inr, max_screens, status, expires_at, payment_id, payment_method)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?)
+    """, (username, plan_type, billing_cycle, price_paid, max_quality, max_event_price, max_screens, expires_str, payment_id, payment_method))
+    
+    plan_name = plan_cfg['title']
+    cycle_name = 'Annual (1 Year)' if billing_cycle == 'yearly' else 'Monthly'
+    c.execute("INSERT INTO notifications (username, message, link) VALUES (?, ?, ?)",
+              (username, f"🎉 You are now subscribed to {plan_name} ({cycle_name})! Enjoy live interactive stage broadcasts.", url_for('subscriptions_page')))
+    
+    conn.commit()
+    conn.close()
+    
+    log_action(username, 'SUBSCRIBE', f"Subscribed to {plan_name} ({billing_cycle}) for ₹{price_paid}")
+    
+    return jsonify({
+        'ok': True,
+        'message': f"🎉 Successfully subscribed to {plan_name} ({cycle_name})!",
+        'subscription': {
+            'plan_type': plan_type,
+            'plan_title': plan_name,
+            'billing_cycle': billing_cycle,
+            'price_paid': price_paid,
+            'max_quality': max_quality,
+            'expires_at': expires_str,
+            'payment_id': payment_id
+        }
+    })
+
+@app.route('/api/subscription/cancel', methods=['POST'])
+def api_cancel_subscription():
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Please log in.'}), 401
+    username = session.get('username')
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("UPDATE subscriptions SET status = 'cancelled' WHERE username = ? AND status = 'active'", (username,))
+    conn.commit()
+    conn.close()
+    log_action(username, 'CANCEL_SUBSCRIPTION', 'User cancelled active subscription auto-renewal.')
+    return jsonify({'ok': True, 'message': 'Subscription auto-renewal cancelled. You can continue streaming until your billing period ends.'})
+
+@app.route('/api/subscription/current')
+def api_current_subscription():
+    username = session.get('username')
+    if not username:
+        return jsonify({'ok': True, 'subscription': None})
+    sub = get_user_subscription(username)
+    return jsonify({'ok': True, 'subscription': sub})
+
+@app.route('/api/event/<int:event_id>/live/heartbeat', methods=['POST'])
+def api_live_heartbeat(event_id):
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Please log in.'}), 401
+    username = session.get('username')
+    data = request.get_json() or {}
+    session_id = data.get('session_id') or session.get('session_id') or 'sess_default'
+    takeover = bool(data.get('takeover'))
+    
+    allowed, active_sess_id = register_stream_heartbeat(username, session_id, event_id, takeover=takeover)
+    if not allowed:
+        return jsonify({
+            'ok': False,
+            'is_concurrent': True,
+            'message': 'Streaming Paused: Your subscription plan allows 1 screen/user at a time. Active playback is already in progress on another device/window.'
+        })
+    return jsonify({'ok': True, 'is_concurrent': False})
 
 
 if __name__ == '__main__':

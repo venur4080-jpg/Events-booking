@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ event.title }} | Events Booking</title>
-    <meta name="theme-color" content="#00f2fe">
+    <meta name="theme-color" content="#008be3">
     <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=5.0">
     <script src="{{ url_for('static', filename='themes.js') }}?v=5.0"></script>
@@ -63,12 +63,12 @@
             display: inline-block;
             padding: 6px 15px;
             border-radius: 50px;
-            background: var(--event-color, #00f2fe);
+            background: var(--event-color, #008be3);
             color: white;
             font-size: 0.85rem;
             font-weight: 700;
             margin-bottom: 1rem;
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
+            box-shadow: 0 0 20px rgba(0, 139, 227, 0.3);
         }
 
         .details-grid {
@@ -242,7 +242,7 @@
 
         .seat-progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #00f2fe, #4facfe);
+            background: linear-gradient(90deg, #008be3, #0062a3);
         }
         .seat-progress-fill.soldout {
             background: #ef4444;
@@ -343,7 +343,7 @@
             <div class="hero-overlay">
                 <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; align-items: center;">
                     <span class="detail-badge" style="margin-bottom: 0;">📅 {{ event.date }}</span>
-                    <span class="detail-badge" style="background: rgba(0, 242, 254, 0.2); border: 1px solid var(--primary); color: var(--primary); margin-bottom: 0;">⏰ {{ event.time }} - {{ event.end_time }}</span>
+                    <span class="detail-badge" style="background: rgba(0, 139, 227, 0.2); border: 1px solid var(--primary); color: var(--primary); margin-bottom: 0;">⏰ {{ event.time }} - {{ event.end_time }}</span>
                     {% if event.is_live_now %}
                     <span class="detail-badge" style="background: rgba(239, 68, 68, 0.25); border: 1px solid #ef4444; color: #fca5a5; margin-bottom: 0; font-weight: 800; display: inline-flex; align-items: center; gap: 6px;">
                         <span class="pulse-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 8px #ef4444;"></span>
@@ -363,8 +363,8 @@
                         🪑 <span id="dynamicSeatsNum">{{ event.seats_left }}</span> / {{ event.seats_total or 100 }} Seats Available to Register
                         {% endif %}
                     </span>
-                    <span id="realtimeLiveIndicator" style="display: inline-flex; background: rgba(0, 242, 254, 0.15); border: 1px solid rgba(0, 242, 254, 0.4); color: #00f2fe; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; align-items: center; gap: 6px;">
-                        <span style="width: 6px; height: 6px; border-radius: 50%; background: #00f2fe; box-shadow: 0 0 6px #00f2fe; animation: pulseGlow 1.5s infinite alternate;"></span>
+                    <span id="realtimeLiveIndicator" style="display: inline-flex; background: rgba(0, 139, 227, 0.15); border: 1px solid rgba(0, 139, 227, 0.4); color: #008be3; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; align-items: center; gap: 6px;">
+                        <span style="width: 6px; height: 6px; border-radius: 50%; background: #008be3; box-shadow: 0 0 6px #008be3; animation: pulseGlow 1.5s infinite alternate;"></span>
                         Live Seat Sync
                     </span>
                 </div>
@@ -392,7 +392,7 @@
                 <div class="schedule-conflict-banner" role="alert" style="background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 14px; padding: 1.1rem 1.4rem; margin-top: 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 14px; color: #fde68a; box-shadow: 0 4px 20px rgba(245, 158, 11, 0.15);">
                     <span style="font-size: 1.8rem; line-height: 1;">⚠️</span>
                     <div style="font-size: 0.92rem; line-height: 1.45;">
-                        <strong style="color: #fbbf24;">Schedule Conflict Alert:</strong> You already have a confirmed pass for <a href="{{ url_for('event_detail', event_id=conflict_event.id) }}" style="color: #00f2fe; font-weight: 700; text-decoration: underline;">{{ conflict_event.title }}</a> on this date ({{ conflict_event.date }} • {{ conflict_event.time }}).
+                        <strong style="color: #fbbf24;">Schedule Conflict Alert:</strong> You already have a confirmed pass for <a href="{{ url_for('event_detail', event_id=conflict_event.id) }}" style="color: #008be3; font-weight: 700; text-decoration: underline;">{{ conflict_event.title }}</a> on this date ({{ conflict_event.date }} • {{ conflict_event.time }}).
                     </div>
                 </div>
                 {% endif %}
@@ -405,7 +405,7 @@
 
                     <div class="admission-passes-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.2rem;">
                         <!-- Card 1: In-Person Pass with Registration Limit -->
-                        <div style="background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 16px; padding: 1.4rem; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; flex-direction: column; justify-content: space-between;">
+                        <div style="background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(0, 139, 227, 0.3); border-radius: 16px; padding: 1.4rem; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; flex-direction: column; justify-content: space-between;">
                             <div>
                                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.8rem;">
                                     <div style="display: flex; align-items: center; gap: 8px;">
@@ -415,7 +415,7 @@
                                             <span style="font-size: 0.78rem; color: var(--primary); font-weight: 600;">Seated Physical Access</span>
                                         </div>
                                     </div>
-                                    <span class="price-large" style="font-size: 1.5rem; color: #00f2fe;">{% if event.is_expired and not event.is_today %}Closed{% else %}{{ event.price }}{% endif %}</span>
+                                    <span class="price-large" style="font-size: 1.5rem; color: #008be3;">{% if event.is_expired and not event.is_today %}Closed{% else %}{{ event.price }}{% endif %}</span>
                                 </div>
                                 <p style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.4; margin-bottom: 1rem;">
                                     Direct auditorium seating, physical badge, networking kit, and venue access.
@@ -499,6 +499,32 @@
                                 </div>
                             </div>
 
+                            <!-- Subscription Perks Status Badge -->
+                            {% if user_subscription %}
+                                {% if user_subscription.plan_type == 'super' %}
+                                <div style="margin-bottom: 0.8rem; background: rgba(255, 19, 137, 0.12); border: 1px solid rgba(255, 19, 137, 0.35); padding: 8px 12px; border-radius: 10px; font-size: 0.8rem; color: #ff5eb0; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 1.1rem;">👑</span>
+                                    <span>Included with your <strong>Super Pack</strong>! Watch 100% Free in 2K QHD.</span>
+                                </div>
+                                {% elif user_subscription.plan_type == 'normal' %}
+                                    {% if (event.price.lower() == 'free' or (event.price | replace('₹','') | replace(',','') | float(1001) <= 1000.0)) %}
+                                    <div style="margin-bottom: 0.8rem; background: rgba(0, 139, 227, 0.12); border: 1px solid rgba(0, 139, 227, 0.35); padding: 8px 12px; border-radius: 10px; font-size: 0.8rem; color: #008be3; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                                        <span style="font-size: 1.1rem;">💎</span>
+                                        <span>Included with your <strong>Normal Pack</strong>! Watch Free in 720p HD (&le; ₹1,000).</span>
+                                    </div>
+                                    {% else %}
+                                    <div style="margin-bottom: 0.8rem; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.35); padding: 8px 12px; border-radius: 10px; font-size: 0.8rem; color: #fbbf24; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                                        <span style="font-size: 1.1rem;">⚠️</span>
+                                        <span>Event price ({{ event.price }}) exceeds ₹1,000 Normal Pack limit. Upgrade to Super Pack or buy pass.</span>
+                                    </div>
+                                    {% endif %}
+                                {% endif %}
+                            {% else %}
+                            <a href="{{ url_for('subscriptions_page') }}" style="display: block; margin-bottom: 0.8rem; text-align: center; font-size: 0.8rem; color: #008be3; text-decoration: none; font-weight: 700; background: rgba(0, 139, 227, 0.08); border: 1px dashed rgba(0, 139, 227, 0.3); padding: 6px; border-radius: 8px;">
+                                ⭐ Subscribe from ₹149/mo for Free Live Streams ➔
+                            </a>
+                            {% endif %}
+
                             <!-- Live Stream Actions -->
                             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                                 <a href="{{ url_for('live_event_page', event_id=event.id) }}" class="btn-primary" style="flex: 1; padding: 0.75rem 1rem; background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(220, 38, 38, 0.45)); border: 1px solid rgba(239, 68, 68, 0.6); color: #fca5a5; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; border-radius: 10px; font-weight: 700; font-size: 0.88rem; text-align: center;">
@@ -506,7 +532,7 @@
                                     📹 Enter Live Room
                                 </a>
 
-                                {% if not event.is_registered %}
+                                {% if not event.is_registered and not (user_subscription and (user_subscription.plan_type == 'super' or (user_subscription.plan_type == 'normal' and (event.price.lower() == 'free' or (event.price | replace('₹','') | replace(',','') | float(1001) <= 1000.0))))) %}
                                 <a href="{{ url_for('register_event', event_id=event.id) }}?type=live_stream" class="btn-primary" style="flex: 1; padding: 0.75rem 1rem; background: linear-gradient(135deg, #10b981, #059669); color: white; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; font-weight: 700; font-size: 0.88rem; text-align: center; border: none;">
                                     📡 Register Stream Pass ({{ event.stream_price or '₹199' }})
                                 </a>
@@ -543,7 +569,7 @@
                             🗺️ Open in Google Maps
                         </a>
                         <a href="{{ event.maps_directions_url or ('https://www.google.com/maps/dir/?api=1&destination=' ~ (((event.venue or '') ~ ' ' ~ (event.venue_address or '')) | urlencode)) }}" 
-                           target="_blank" rel="noopener noreferrer" class="venue-map-link" style="background: rgba(0, 242, 254, 0.1); border-color: var(--primary); color: var(--primary);">
+                           target="_blank" rel="noopener noreferrer" class="venue-map-link" style="background: rgba(0, 139, 227, 0.1); border-color: var(--primary); color: var(--primary);">
                             🧭 Get Directions
                         </a>
                         <button type="button" class="venue-map-link" style="background: rgba(255,255,255,0.06); border-color: var(--glass-border); color: var(--text-muted); cursor: pointer;"
@@ -555,12 +581,12 @@
                 </div>
 
                 <!-- 👥 Attendee Networking Directory ("Who's Attending") -->
-                <div class="info-card" style="margin-top: 2rem; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(0, 242, 254, 0.25); border-radius: 16px; padding: 1.5rem;">
+                <div class="info-card" style="margin-top: 2rem; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(0, 139, 227, 0.25); border-radius: 16px; padding: 1.5rem;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <div class="section-title" style="margin: 0; color: #00f2fe; font-size: 1.15rem;">
+                        <div class="section-title" style="margin: 0; color: #008be3; font-size: 1.15rem;">
                             <span>👥</span> Who's Attending (Networking)
                         </div>
-                        <span id="attendeeCountBadge" style="background: rgba(0, 242, 254, 0.12); color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.3); padding: 3px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700;">Loading...</span>
+                        <span id="attendeeCountBadge" style="background: rgba(0, 139, 227, 0.12); color: #008be3; border: 1px solid rgba(0, 139, 227, 0.3); padding: 3px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700;">Loading...</span>
                     </div>
                     <div id="attendeesGrid" style="display: flex; gap: 10px; flex-wrap: wrap;">
                         <div style="color: var(--text-muted); font-size: 0.88rem;">Loading registered peers...</div>
@@ -592,7 +618,7 @@
 
             <div class="sidebar-info">
                 <!-- 🪑 Available Seats & Registration Limit Card -->
-                <div class="info-card" style="border: 1px solid rgba(0, 242, 254, 0.4); background: linear-gradient(135deg, rgba(0, 242, 254, 0.08), rgba(15, 23, 42, 0.9)); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);">
+                <div class="info-card" style="border: 1px solid rgba(0, 139, 227, 0.4); background: linear-gradient(135deg, rgba(0, 139, 227, 0.08), rgba(15, 23, 42, 0.9)); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
                         <span style="color: var(--primary); font-weight: 800; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.8px;">
                             🪑 Seat Availability
@@ -1075,7 +1101,7 @@
                                 <div style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); padding: 6px 12px; border-radius: 999px; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
                                     <img src="${a.profile_photo}" alt="${a.username}" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;">
                                     <span style="color: #ffffff; font-size: 0.82rem; font-weight: 600;">${a.full_name}</span>
-                                    <span style="font-size: 0.72rem; color: #00f2fe; background: rgba(0,242,254,0.12); padding: 1px 6px; border-radius: 6px;">${a.role}</span>
+                                    <span style="font-size: 0.72rem; color: #008be3; background: rgba(0, 139, 227,0.12); padding: 1px 6px; border-radius: 6px;">${a.role}</span>
                                 </div>
                             `).join('');
                         }
@@ -1108,7 +1134,7 @@
                             listEl.innerHTML = rData.reviews.slice(0, 5).map(r => `
                                 <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); padding: 0.9rem 1.1rem; border-radius: 12px;">
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
-                                        <strong style="color: #00f2fe; font-size: 0.88rem;">@${r.username}</strong>
+                                        <strong style="color: #008be3; font-size: 0.88rem;">@${r.username}</strong>
                                         <span style="color: #fbbf24; font-size: 0.85rem;">${'★'.repeat(r.rating)}</span>
                                     </div>
                                     <p style="color: #cbd5e1; font-size: 0.85rem; margin: 0; line-height: 1.4;">${r.comment || 'Great event, highly recommended!'}</p>

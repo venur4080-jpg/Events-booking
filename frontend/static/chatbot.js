@@ -18,9 +18,9 @@ Keep responses concise (2-3 sentences max). Be friendly and enthusiastic.`;
       <button id="chatbot-trigger" aria-label="Open AI chat assistant" style="
         position:fixed; bottom:2rem; right:2rem; z-index:99990;
         width:58px; height:58px; border-radius:50%; border:none;
-        background:linear-gradient(135deg,var(--primary,#00f2fe),var(--secondary,#ff0080));
-        color:#0f172a; font-size:1.5rem; cursor:pointer;
-        box-shadow:0 8px 25px rgba(0,242,254,0.4);
+        background:linear-gradient(135deg,var(--primary,#008be3),var(--secondary,#ff1389));
+        color:#ffffff; font-size:1.5rem; cursor:pointer;
+        box-shadow:0 8px 25px rgba(0,139,227,0.4);
         display:flex; align-items:center; justify-content:center;
         transition:transform 0.3s ease, box-shadow 0.3s ease;
         animation: chatPulse 2.5s ease infinite;
@@ -42,12 +42,12 @@ Keep responses concise (2-3 sentences max). Be friendly and enthusiastic.`;
         <!-- Header -->
         <div style="
           padding:1rem 1.2rem; display:flex; align-items:center; gap:0.75rem;
-          border-bottom:1px solid var(--glass-border,rgba(255,255,255,0.08));
-          background:linear-gradient(135deg,rgba(0,242,254,0.08),rgba(255,0,128,0.05));
+          border-bottom:1px solid var(--glass-border,rgba(0,139,227,0.18));
+          background:linear-gradient(135deg,rgba(0,139,227,0.12),rgba(255,19,137,0.1));
         ">
           <div style="
             width:36px;height:36px;border-radius:50%;
-            background:linear-gradient(135deg,var(--primary,#00f2fe),var(--secondary,#ff0080));
+            background:linear-gradient(135deg,var(--primary,#008be3),var(--secondary,#ff1389));
             display:flex;align-items:center;justify-content:center;font-size:1.1rem;
           ">🤖</div>
           <div>
@@ -82,9 +82,9 @@ Keep responses concise (2-3 sentences max). Be friendly and enthusiastic.`;
             transition:border-color 0.2s;
           ">
           <button id="chatbot-send" aria-label="Send message" style="
-            background:var(--primary,#00f2fe); border:none; border-radius:50%;
+            background:var(--primary,#008be3); border:none; border-radius:50%;
             width:38px;height:38px; display:flex;align-items:center;justify-content:center;
-            cursor:pointer; font-size:1rem; flex-shrink:0; color:#0f172a; transition:0.2s;
+            cursor:pointer; font-size:1rem; flex-shrink:0; color:#070709; transition:0.2s;
           ">➤</button>
         </div>
       </div>
@@ -94,8 +94,8 @@ Keep responses concise (2-3 sentences max). Be friendly and enthusiastic.`;
     const style = document.createElement('style');
     style.textContent = `
       @keyframes chatPulse {
-        0%,100% { box-shadow: 0 8px 25px rgba(0,242,254,0.4); }
-        50%      { box-shadow: 0 8px 35px rgba(0,242,254,0.7), 0 0 0 8px rgba(0,242,254,0.1); }
+        0%,100% { box-shadow: 0 8px 25px rgba(0,139,227,0.4); }
+        50%      { box-shadow: 0 8px 35px rgba(0,139,227,0.7), 0 0 0 8px rgba(0,139,227,0.15); }
       }
       #chatbot-panel::-webkit-scrollbar { width: 4px; }
       #chatbot-panel::-webkit-scrollbar-track { background: transparent; }
@@ -173,7 +173,7 @@ Keep responses concise (2-3 sentences max). Be friendly and enthusiastic.`;
     div.innerHTML = `
       <div style="
         max-width:80%; padding:0.65rem 0.9rem; border-radius:${isUser ? '16px 16px 4px 16px' : '16px 16px 16px 4px'};
-        background:${isUser ? 'linear-gradient(135deg,var(--primary,#00f2fe),rgba(0,180,220,0.8))' : 'rgba(255,255,255,0.07)'};
+        background:${isUser ? 'linear-gradient(135deg,var(--primary,#008be3),rgba(0,98,163,0.9))' : 'rgba(13,13,18,0.85)'};
         color:${isUser ? '#0f172a' : 'var(--text-main,#f1f5f9)'};
         font-size:0.87rem; line-height:1.5; font-weight:${isUser ? '600' : '400'};
       ">${text}</div>
