@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stage Multiplayer Trivia Arena — {{ event.title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=8.0">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='toast.js') }}"></script>
+    <style>
+        :root {
+            --stage-bg: #0b0f19;
+            --tri-red: #ef4444;
+            --tri-blue: #0284c7;
+            --tri-yellow: #f59e0b;
+            --tri-green: #10b981;
+        }
+
+        body {
+            background-color: var(--stage-bg);
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .stage-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+        }
+
+        .arena-body {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 2.8fr 1.2fr;
+            gap: 2rem;
+            padding: 2rem 2.5rem;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 1080px) {
+            .arena-body {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .question-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.12);
+            border-radius: 24px;
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 480px;
+        }
+
+        .timer-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.4);
+            border: 4px solid #00d2ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #00d2ff;
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.2rem;
+            margin-top: 2rem;
+        }
+
+        .opt-card {
+            padding: 1.6rem;
+            border-radius: 16px;
+            font-weight: 800;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+            transition: transform 0.2s;
+        }
+
+        .opt-a { background: linear-gradient(135deg, #ef4444, #b91c1c); color: #fff; }
+        .opt-b { background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; }
+        .opt-c { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; }
+        .opt-d { background: linear-gradient(135deg, #10b981, #047857); color: #fff; }
+
+        .leaderboard-card {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 1.8rem;
+        }
+
+        .lead-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Stage Header -->
+    <div class="stage-header">
+        <div>
+            <span style="background: rgba(236, 72, 153, 0.2); color: #ec4899; border: 1px solid #ec4899; font-size: 0.75rem; font-weight: 800; padding: 4px 12px; border-radius: 20px; text-transform: uppercase;">Stage Projector View</span>
+            <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.6rem; margin: 4px 0 0;">{{ event.title }} — Live Trivia Arena</h2>
+        </div>
+        <div style="display: flex; align-items: center; gap: 1.5rem;">
+            <div style="background: rgba(0,0,0,0.6); padding: 8px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <span style="font-size: 0.7rem; color: #94a3b8; text-transform: uppercase;">Join on Phone:</span>
+                <strong style="color: #38bdf8; font-size: 1.1rem; display: block;">/event/{{ event.id }}/trivia-join</strong>
+            </div>
+            <a href="{{ url_for('event_detail', event_id=event.id) }}" class="back-btn-unified" style="margin: 0;">
+                <span class="arrow">←</span> Exit Stage
+            </a>
+        </div>
+    </div>
+
+    <!-- Arena Body -->
+    <div class="arena-body">
+        <!-- Question Screen -->
+        <div class="question-box">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <span id="questionNum" style="font-size: 1rem; color: #94a3b8; font-weight: 800; text-transform: uppercase;">Question 1 of {{ questions|length }}</span>
+                <div class="timer-circle" id="timerDisplay">20</div>
+            </div>
+
+            <h1 id="questionText" style="font-family: 'Outfit', sans-serif; font-size: 2.2rem; margin: 2rem 0; line-height: 1.35; color: #fff;">
+                {{ questions[0].question if questions else 'Waiting for host to launch stage trivia...' }}
+            </h1>
+
+            <!-- 4 Colored Options -->
+            <div class="options-grid" id="optionsContainer">
+                <div class="opt-card opt-a">
+                    <span style="font-size: 1.6rem;">🔺</span> <span id="optAText">{{ questions[0].a if questions else 'Option A' }}</span>
+                </div>
+                <div class="opt-card opt-b">
+                    <span style="font-size: 1.6rem;">🔷</span> <span id="optBText">{{ questions[0].b if questions else 'Option B' }}</span>
+                </div>
+                <div class="opt-card opt-c">
+                    <span style="font-size: 1.6rem;">🟡</span> <span id="optCText">{{ questions[0].c if questions else 'Option C' }}</span>
+                </div>
+                <div class="opt-card opt-d">
+                    <span style="font-size: 1.6rem;">🟩</span> <span id="optDText">{{ questions[0].d if questions else 'Option D' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Top 10 Leaderboard -->
+        <div class="leaderboard-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem;">
+                <h3 style="font-family: 'Outfit', sans-serif; margin: 0; color: #fff;">🏆 Stage Top 10</h3>
+                <span style="font-size: 0.8rem; color: #34d399; font-weight: 700;">● Live Stream</span>
+            </div>
+
+            <div id="leaderboardList">
+                {% for l in leaderboard %}
+                <div class="lead-row">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="color: #38bdf8; font-weight: 800; font-family: 'JetBrains Mono', monospace;">#{{ loop.index }}</span>
+                        <span>{{ l.username }}</span>
+                    </div>
+                    <strong style="color: #38bdf8; font-family: 'JetBrains Mono', monospace;">{{ l.score }} XP</strong>
+                </div>
+                {% else %}
+                <div style="color: #94a3b8; text-align: center; padding: 2rem;">Answers will appear live as delegates buzz in.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let timeLeft = 20;
+        const timerEl = document.getElementById('timerDisplay');
+
+        setInterval(() => {
+            if (timeLeft > 0) {
+                timeLeft--;
+                timerEl.textContent = timeLeft;
+                if (timeLeft <= 5) {
+                    timerEl.style.borderColor = '#ef4444';
+                    timerEl.style.color = '#ef4444';
+                }
+            } else {
+                timerEl.textContent = "⏱️";
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

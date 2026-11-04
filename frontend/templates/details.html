@@ -626,6 +626,22 @@
                                 <div style="font-size: 0.75rem; color: #10b981;">Multilingual AI Captions</div>
                             </div>
                         </a>
+
+                        <a href="{{ url_for('stage_trivia_view', event_id=event.id) }}" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 12px; text-decoration: none; color: #ffffff; display: flex; align-items: center; gap: 10px; transition: all 0.2s;" onmouseover="this.style.borderColor='#ec4899'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.transform='none'">
+                            <span style="font-size: 1.5rem;">🎮</span>
+                            <div>
+                                <div style="font-weight: 800; font-size: 0.9rem;">Live Stage Trivia</div>
+                                <div style="font-size: 0.75rem; color: #ec4899;">Multiplayer Kahoot Arena</div>
+                            </div>
+                        </a>
+
+                        <a href="{{ url_for('event_broadcast_page', event_id=event.id) }}" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 12px; text-decoration: none; color: #ffffff; display: flex; align-items: center; gap: 10px; transition: all 0.2s;" onmouseover="this.style.borderColor='#ef4444'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.transform='none'">
+                            <span style="font-size: 1.5rem;">🚨</span>
+                            <div>
+                                <div style="font-weight: 800; font-size: 0.9rem;">Urgent Broadcasts</div>
+                                <div style="font-size: 0.75rem; color: #f87171;">Omnichannel Host Alerts</div>
+                            </div>
+                        </a>
                     </div>
                 </div>
 

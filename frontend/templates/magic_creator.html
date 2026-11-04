@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Event Co-Pilot &amp; Magic Event Creator | Events Booking</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=8.0">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='toast.js') }}"></script>
+    <style>
+        :root {
+            --ai-bg: #070709;
+            --ai-card: rgba(15, 23, 42, 0.94);
+            --ai-border: rgba(255, 255, 255, 0.08);
+            --gemini-grad: linear-gradient(135deg, #a855f7 0%, #3b82f6 50%, #06b6d4 100%);
+        }
+
+        body {
+            background-color: var(--ai-bg);
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding-bottom: 5rem;
+        }
+
+        .ai-container {
+            max-width: 900px;
+            margin: 2.5rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .magic-card {
+            background: var(--ai-card);
+            border: 1px solid rgba(168, 85, 247, 0.35);
+            border-radius: 20px;
+            padding: 2.2rem;
+            box-shadow: 0 20px 50px rgba(168, 85, 247, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .prompt-textarea {
+            width: 100%;
+            height: 130px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1.5px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            color: #ffffff;
+            padding: 1rem;
+            font-size: 1.05rem;
+            font-family: inherit;
+            outline: none;
+            resize: none;
+            box-sizing: border-box;
+            transition: all 0.25s ease;
+        }
+
+        .prompt-textarea:focus {
+            border-color: #a855f7;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+        }
+
+        .preset-chip {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--ai-border);
+            color: #cbd5e1;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .preset-chip:hover {
+            background: rgba(168, 85, 247, 0.2);
+            border-color: #a855f7;
+            color: #fff;
+        }
+
+        .pulse-btn {
+            background: var(--gemini-grad);
+            border: none;
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 1.1rem;
+            padding: 16px 28px;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.5);
+            transition: transform 0.2s ease;
+        }
+
+        .pulse-btn:hover:not(:disabled) {
+            transform: scale(1.02);
+        }
+
+        .pulse-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ai-container">
+        <!-- Back Button -->
+        <a href="{{ url_for('dashboard') }}" class="back-btn-unified" style="margin-bottom: 1.5rem; display: inline-flex;">
+            <span class="arrow">←</span> Back to Dashboard
+        </a>
+
+        <div class="magic-card">
+            <!-- Header -->
+            <div style="margin-bottom: 1.5rem;">
+                <span style="background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid #c084fc; font-size: 0.75rem; font-weight: 800; padding: 4px 12px; border-radius: 20px; text-transform: uppercase;">Gemini AI 2.0 Co-Pilot</span>
+                <h1 style="font-family: 'Outfit', sans-serif; font-size: 2.2rem; margin: 0.6rem 0 0.3rem;">✨ 1-Prompt Magic Event Creator</h1>
+                <p style="color: #94a3b8; margin: 0; font-size: 0.95rem;">Describe your vision in plain English. The AI synthesizes title, multi-track agenda, keynote speakers, tiered pricing waves, and venue floorplans in seconds.</p>
+            </div>
+
+            <!-- Prompt Box Form -->
+            <form onsubmit="generateMagicEvent(event)">
+                <div style="margin-bottom: 1.2rem;">
+                    <textarea id="promptInput" class="prompt-textarea" placeholder="e.g. 2-Day Autonomous AI Agents &amp; Cloud Summit in Bangalore with hands-on coding clinics, hackathons, and ₹799 Early Bird tickets..."></textarea>
+                </div>
+
+                <!-- Prompt Presets -->
+                <div style="margin-bottom: 1.8rem;">
+                    <div style="font-size: 0.78rem; text-transform: uppercase; color: #94a3b8; font-weight: 700; margin-bottom: 8px;">Try a Quick Preset:</div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button type="button" class="preset-chip" onclick="applyPreset('Global Web3 &amp; Solana Hacker House with ₹0 Free student entry, mentor pitches, and ₹100k demo day prizes')">⚡ Web3 Hacker House</button>
+                        <button type="button" class="preset-chip" onclick="applyPreset('Bangalore GenAI &amp; LLM Builders Summit with 4 technical stages, model fine-tuning clinics, and ₹999 tickets')">🤖 GenAI Builders Summit</button>
+                        <button type="button" class="preset-chip" onclick="applyPreset('Cybersecurity Zero-Trust CTF Conference with hardware hacking lab, keynote auditoriums, and ₹499 passes')">🛡️ Cyber CTF Arena</button>
+                    </div>
+                </div>
+
+                <button type="submit" id="genBtn" class="pulse-btn">
+                    <span>✨</span> Generate Complete Event Ecosystem (1.2s)
+                </button>
+            </form>
+
+            <!-- Loading Spinner State -->
+            <div id="loaderState" style="display: none; text-align: center; margin-top: 2rem;">
+                <div style="font-size: 2.2rem; animation: spin 1s infinite linear;">🪄</div>
+                <div style="color: #c084fc; font-weight: 800; font-size: 1.1rem; margin-top: 10px;">Synthesizing Multi-Track Stages &amp; Floorplans...</div>
+                <div style="color: #94a3b8; font-size: 0.85rem; margin-top: 4px;">Assigning keynote speakers, calculating wave allocations &amp; seeding coupons</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function applyPreset(text) {
+            document.getElementById('promptInput').value = text;
+        }
+
+        async function generateMagicEvent(e) {
+            e.preventDefault();
+            const prompt = document.getElementById('promptInput').value.trim();
+            if (!prompt) {
+                if (window.showToast) window.showToast('Please type a prompt or select a preset', 'info', 3000);
+                return;
+            }
+
+            const btn = document.getElementById('genBtn');
+            const loader = document.getElementById('loaderState');
+
+            btn.disabled = true;
+            btn.style.display = 'none';
+            loader.style.display = 'block';
+
+            try {
+                const res = await fetch('/api/ai/magic-generate-event', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: prompt })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    if (window.showToast) window.showToast(data.message, 'success', 3500);
+                    setTimeout(() => {
+                        window.location.href = data.redirect_url;
+                    }, 1400);
+                } else {
+                    btn.disabled = false;
+                    btn.style.display = 'flex';
+                    loader.style.display = 'none';
+                    if (window.showToast) window.showToast(data.error || 'Generation failed', 'error', 3500);
+                }
+            } catch (err) {
+                console.error(err);
+                btn.disabled = false;
+                btn.style.display = 'flex';
+                loader.style.display = 'none';
+                if (window.showToast) window.showToast('Network error generating event', 'error', 3500);
+            }
+        }
+    </script>
+</body>
+</html>

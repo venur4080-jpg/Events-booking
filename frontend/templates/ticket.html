@@ -767,6 +767,9 @@
             <a href="{{ url_for('mobile_wallet_pass', ticket_number=reg.ticket_code) }}" target="_blank" class="t-btn" title="View Apple & Google Wallet Mobile Pass" style="border-color: #38bdf8; color: #38bdf8;">
                 <span>📱</span> Mobile Pass
             </a>
+            <a href="{{ url_for('ticket_whatsapp_redirect', ticket_code=reg.ticket_code) }}" target="_blank" class="t-btn" title="Send Official Ticket & Barcode to WhatsApp" style="border-color: #25d366; color: #25d366;">
+                <span>💬</span> WhatsApp Pass
+            </a>
             <a href="{{ url_for('download_gst_invoice', ticket_code=reg.ticket_code) }}" target="_blank" class="t-btn" title="View Official GST Tax Invoice" style="border-color: #10b981; color: #34d399;">
                 <span>🧾</span> GST Invoice
             </a>

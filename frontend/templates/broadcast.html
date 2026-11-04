@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urgent Broadcast Messenger — {{ event.title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=8.0">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='toast.js') }}"></script>
+    <style>
+        :root {
+            --bc-bg: #070709;
+            --bc-card: rgba(15, 23, 42, 0.94);
+            --bc-border: rgba(255, 255, 255, 0.08);
+            --red-glow: #ef4444;
+        }
+
+        body {
+            background-color: var(--bc-bg);
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding-bottom: 5rem;
+        }
+
+        .bc-container {
+            max-width: 900px;
+            margin: 2.5rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .bc-card {
+            background: var(--bc-card);
+            border: 1px solid var(--bc-border);
+            border-radius: 18px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .field-label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #94a3b8;
+            margin-bottom: 6px;
+        }
+
+        .input-box {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            color: #fff;
+            outline: none;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        .history-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--bc-border);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bc-container">
+        <!-- Back Button -->
+        <a href="{{ url_for('event_detail', event_id=event.id) }}" class="back-btn-unified" style="margin-bottom: 1.5rem; display: inline-flex;">
+            <span class="arrow">←</span> Back to Event Details
+        </a>
+
+        <!-- Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.8rem; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <span style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; font-size: 0.75rem; font-weight: 800; padding: 4px 12px; border-radius: 20px; text-transform: uppercase;">Real-Time Dispatch Node</span>
+                <h1 style="font-family: 'Outfit', sans-serif; font-size: 2.2rem; margin: 0.6rem 0 0; color: #fff;">Urgent Attendee Broadcast Messenger</h1>
+            </div>
+            <div style="background: rgba(0,0,0,0.5); padding: 10px 18px; border-radius: 12px; border: 1px solid var(--bc-border);">
+                <span style="font-size: 0.75rem; color: #94a3b8;">Active Reach:</span>
+                <strong style="color: #38bdf8; font-size: 1.1rem; display: block;">{{ total_attendees }} Checked-in / Registered</strong>
+            </div>
+        </div>
+
+        <!-- Form Card -->
+        <div class="bc-card">
+            <h3 style="font-family: 'Outfit', sans-serif; margin-top: 0; color: #fff;">Compose Urgent Alert</h3>
+            <p style="color: #94a3b8; font-size: 0.88rem; margin-bottom: 1.4rem;">Alerts appear instantly on attendees' mobile passes, in-app notifications, and WhatsApp cards.</p>
+
+            <form onsubmit="sendBroadcast(event)">
+                <div style="margin-bottom: 1rem;">
+                    <label class="field-label">Broadcast Channel</label>
+                    <select id="bcChannel" class="input-box">
+                        <option value="all">Omnichannel (Mobile Passes + In-App + WhatsApp)</option>
+                        <option value="mobile_passes">Mobile Wallet Passes Only</option>
+                        <option value="in_app">In-App Notification Drawer</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <label class="field-label">Alert Headline</label>
+                    <input type="text" id="bcHeadline" class="input-box" placeholder="e.g. Keynote Hall Relocated to Auditorium B" required>
+                </div>
+
+                <div style="margin-bottom: 1.4rem;">
+                    <label class="field-label">Detailed Message</label>
+                    <textarea id="bcBody" class="input-box" style="height: 100px; resize: none;" placeholder="e.g. Due to capacity demand, Dr. Elena's session has moved to Stage B. Doors open in 10 minutes. Follow the blue route tracer on your floorplan." required></textarea>
+                </div>
+
+                <button type="submit" id="bcBtn" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #ef4444, #dc2626); border: none; color: #fff; font-weight: 800; font-size: 1rem; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);">
+                    🚨 Dispatch Broadcast Alert Now
+                </button>
+            </form>
+        </div>
+
+        <!-- Past Broadcasts -->
+        <div>
+            <h3 style="font-family: 'Outfit', sans-serif; color: #fff; margin-bottom: 1rem;">Past Broadcast Logs ({{ broadcasts|length }})</h3>
+            {% for b in broadcasts %}
+            <div class="history-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <strong style="color: #f87171; font-size: 1rem;">{{ b.headline }}</strong>
+                    <span style="font-size: 0.75rem; color: #94a3b8;">{{ b.sent_at }}</span>
+                </div>
+                <p style="color: #cbd5e1; font-size: 0.88rem; margin: 0 0 8px;">{{ b.body }}</p>
+                <div style="font-size: 0.78rem; color: #38bdf8;">
+                    Delivered to <strong>{{ b.recipients }} attendees</strong> via {{ b.channel.upper() }}
+                </div>
+            </div>
+            {% else %}
+            <div style="color: #94a3b8; font-size: 0.9rem;">No broadcasts sent yet.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        async function sendBroadcast(e) {
+            e.preventDefault();
+            const channel = document.getElementById('bcChannel').value;
+            const headline = document.getElementById('bcHeadline').value.trim();
+            const body = document.getElementById('bcBody').value.trim();
+
+            const btn = document.getElementById('bcBtn');
+            btn.disabled = true;
+            btn.textContent = 'Dispatching alerts...';
+
+            try {
+                const res = await fetch('/api/event/{{ event.id }}/send-broadcast', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ channel: channel, headline: headline, message_body: body })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    if (window.showToast) window.showToast(data.message, 'success', 3500);
+                    setTimeout(() => location.reload(), 1400);
+                } else {
+                    btn.disabled = false;
+                    btn.textContent = '🚨 Dispatch Broadcast Alert Now';
+                    if (window.showToast) window.showToast(data.error || 'Failed to dispatch', 'error', 3500);
+                }
+            } catch (err) {
+                console.error(err);
+                btn.disabled = false;
+                btn.textContent = '🚨 Dispatch Broadcast Alert Now';
+                if (window.showToast) window.showToast('Network error sending broadcast', 'error', 3500);
+            }
+        }
+    </script>
+</body>
+</html>
