@@ -189,8 +189,10 @@
         <!-- Login Form -->
         <div class="login-card" id="login-card">
             <div style="text-align: center; margin-bottom: 1.5rem;">
-                <img src="{{ url_for('static', filename='logo.png') }}" alt="Events Booking Logo" style="height: 48px; border-radius: 12px; box-shadow: 0 0 15px rgba(0, 139, 227, 0.35); margin-bottom: 8px;">
-                <div class="logo" style="font-size: 1.6rem; letter-spacing: 0.5px;">Events <span>Booking</span></div>
+                <a href="{{ url_for('login') }}" style="text-decoration: none; color: inherit; display: inline-block;" title="Events Booking Home">
+                    <img src="{{ url_for('static', filename='logo.png') }}" alt="Events Booking Logo" style="height: 48px; border-radius: 12px; box-shadow: 0 0 15px rgba(0, 139, 227, 0.35); margin-bottom: 8px;">
+                    <div class="logo" style="font-size: 1.6rem; letter-spacing: 0.5px;">Events <span>Booking</span></div>
+                </a>
             </div>
             <h2 class="form-title">Welcome Back</h2>
             <form method="POST" action="">

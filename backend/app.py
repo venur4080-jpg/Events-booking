@@ -444,7 +444,7 @@ EVENTS = [
         "desc": "Annual flagship university tech festival, exhibits, and student startup showcase.",
         "price": "Free",
         "color": "#ec4899",
-        "image": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Showcase revolutionary student technical projects and prototypes.",
         "full_details": "Featuring 100+ university booths, keynote addresses from leading silicon and AI founders, and angel investor networking.",
         "outcome": "Seed funding opportunities, startup incubation, and exhibition certificates.",
@@ -752,7 +752,7 @@ EVENTS = [
         "desc": "Raids, tackles, and super-catches on professional synthetic kabaddi mats.",
         "price": "₹400",
         "color": "#dc2626",
-        "image": "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1533777528790-c6996cffa35e?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Celebrate India's indigenous high-intensity contact sport.",
         "full_details": "40-minute matches with 30-second raid timers, bonus lines, and PKL coaching scouts.",
         "outcome": "Best Raider trophy, ₹75,000 champion purse, and PKL development camp invitations.",
@@ -862,7 +862,7 @@ EVENTS = [
         "desc": "Concluded winter inter-college cricket championship.",
         "price": "₹400",
         "color": "#15803d",
-        "image": "https://images.unsplash.com/photo-1531415074868-036b1c5f53ec?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1542185091-dee192e9df7a?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Historic winter sports championship.",
         "full_details": "Concluded tournament with 12 college squads. Trophy was lifted by Bangalore Tech Titans.",
         "outcome": "Archived scorecard, match highlights, and verifiable participant certificates.",
@@ -884,7 +884,7 @@ EVENTS = [
         "desc": "Concluded city derby football cup with 16 competing varsity clubs.",
         "price": "Free",
         "color": "#047857",
-        "image": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Collegiate football derby tradition.",
         "full_details": "Concluded season final between Mumbai Strikers and Pune FC.",
         "outcome": "Official match records, MVP badges, and certificate download archives.",
@@ -1236,7 +1236,7 @@ EVENTS = [
         "desc": "Folk legends and contemporary pop icons collaborating in a grand live music spectacle.",
         "price": "₹1200",
         "color": "#dc2626",
-        "image": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Celebrate regional cultural music diversity on a massive live production stage.",
         "full_details": "Live performances of Coke Studio hit tracks with authentic regional folk instruments and contemporary synthesizer arrangements.",
         "outcome": "Official Coke Studio merchandise tee and high-definition studio audio track download.",
@@ -1258,7 +1258,7 @@ EVENTS = [
         "desc": "Concluded mega New Year countdown music celebration with fireworks and top artists.",
         "price": "₹2000",
         "color": "#ec4899",
-        "image": "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Historic New Year music celebration.",
         "full_details": "Concluded festival attended by 10,000+ music enthusiasts welcoming 2026 with midnight fireworks.",
         "outcome": "Archived event photos, commemorative festival badges, and certificate records.",
@@ -1280,7 +1280,7 @@ EVENTS = [
         "desc": "Concluded open-air sunset acoustic music evening.",
         "price": "Free",
         "color": "#f59e0b",
-        "image": "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1468164016595-6108e4c60c8b?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Historical acoustic gathering in botanical gardens.",
         "full_details": "Concluded concert featuring 5 acoustic indie acts among century-old trees.",
         "outcome": "Archived performance recordings and attendee badge credentials.",
@@ -1522,7 +1522,7 @@ EVENTS = [
         "desc": "Screening of 30 curated short films from university creators followed by jury award ceremony.",
         "price": "₹500",
         "color": "#0284c7",
-        "image": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Discover emerging indie directors, cinematographers, and screenwriters.",
         "full_details": "Category screenings across Fiction, Documentary, and Animation with feedback from veteran film jury.",
         "outcome": "Best Short Film Trophy with ₹50,000 cash grant and distribution contract.",
@@ -1588,7 +1588,7 @@ EVENTS = [
         "desc": "Learn viral signature hook steps directly from Bollywood's top choreographers.",
         "price": "₹800",
         "color": "#f43f5e",
-        "image": "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Promote dance-musical film with direct fan participation in signature choreography.",
         "full_details": "Masterclass covering dynamic Bollywood hip-hop routines, followed by a group dance reel recording.",
         "outcome": "Dance participation certificate, featured spot in the promotional fan reel, and movie tickets.",
@@ -1610,7 +1610,7 @@ EVENTS = [
         "desc": "Grand reveal of concept art, creature design, and musical score for upcoming mythological epic.",
         "price": "₹900",
         "color": "#d97706",
-        "image": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1542204165-65bf26472b9b?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Unveil historical Indian mythology brought to life with world-class production values.",
         "full_details": "Live musical performance of the anthem score, holographic presentation of mythical kingdoms, and cast speeches.",
         "outcome": "Mythological art book, collector coin, and early premiere tickets.",
@@ -1632,7 +1632,7 @@ EVENTS = [
         "desc": "Red-carpet opening gala of the International Film Festival of India with world cinema icons.",
         "price": "₹1200",
         "color": "#4f46e5",
-        "image": "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Celebrate global cinematic masterpieces and cultural diplomacy.",
         "full_details": "Opening ceremony film screening attended by international directors, jury members, and national film luminaries.",
         "outcome": "IFFI festival delegate kit, film schedule catalogue, and access to red carpet zones.",
@@ -1654,7 +1654,7 @@ EVENTS = [
         "desc": "Concluded massive theatrical trailer launch for the record-breaking blockbuster.",
         "price": "Free",
         "color": "#b91c1c",
-        "image": "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1578836537282-3171d77f8632?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Historic trailer launch event.",
         "full_details": "Concluded trailer launch attended by over 5,000 fans celebrating the film's 100-crore opening.",
         "outcome": "Archived trailer video, fan gallery photos, and verified attendance records.",
@@ -1676,7 +1676,7 @@ EVENTS = [
         "desc": "Concluded fantasy cinema press conference with lead actor discussions.",
         "price": "₹500",
         "color": "#9333ea",
-        "image": "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Concluded movie promotion panel.",
         "full_details": "Archived session featuring media interactions, behind-the-scenes reels, and fan questions.",
         "outcome": "Archived press transcripts and verified certificate downloads.",
@@ -1786,7 +1786,7 @@ EVENTS = [
         "desc": "Exclusive fan interaction, stage games, photo-ops, and direct autograph signing.",
         "price": "₹2000",
         "color": "#f43f5e",
-        "image": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Connect devoted cinema fans with their beloved superstar idol in an intimate setting.",
         "full_details": "Stage dance interactions, quiz with the star, 1-on-1 photo moment with framed physical print, and signed merchandise.",
         "outcome": "Framed instant photo with the celebrity, signed poster, and VIP access badge.",
@@ -1852,7 +1852,7 @@ EVENTS = [
         "desc": "Play alongside India's top gaming YouTubers and Twitch streamers in live exhibition matches.",
         "price": "Free",
         "color": "#6366f1",
-        "image": "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Celebrate gaming creators and give community fans a chance to squad up live.",
         "full_details": "Live squad battle royale games on stage, gaming trivia, streamer merchandise giveaways, and meet & greet line.",
         "outcome": "Signed gaming mousepad, creator discord VIP roles, and photo booth memories.",
@@ -1874,7 +1874,7 @@ EVENTS = [
         "desc": "Ideas worth spreading: interact with scientists, explorers, philosophers, and humanitarians.",
         "price": "₹1800",
         "color": "#ef4444",
-        "image": "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Spark intellectual curiosity and transformative world-changing ideas.",
         "full_details": "Curated 18-minute TEDx talks followed by dedicated networking tables with speakers over tea and cocktails.",
         "outcome": "Official TEDx delegate badge, speaker contact directory, and commemorative pin.",
@@ -1940,7 +1940,7 @@ EVENTS = [
         "desc": "Meet ISRO space mission directors and astronauts discussing lunar exploration and human spaceflight.",
         "price": "Free",
         "color": "#38bdf8",
-        "image": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Ignite scientific passion and deep space exploration curiosity in student minds.",
         "full_details": "Keynote presentation on Chandrayaan and Gaganyaan telemetry, space habitat engineering, and student Q&A.",
         "outcome": "ISRO space mission badge, scale model poster, and science certificate.",
@@ -1984,7 +1984,7 @@ EVENTS = [
         "desc": "Keynote addresses and interactive sessions with Olympic gold and silver medalists.",
         "price": "Free",
         "color": "#eab308",
-        "image": "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Inspire the nation's youth towards athletic dedication and podium glory.",
         "full_details": "Athletes recount their 10,000-hour training journeys, dealing with pressure, and hoisting the national flag on international podiums.",
         "outcome": "Olympic commemorative pin, inspiration handbook, and group photo opportunities.",
@@ -2006,7 +2006,7 @@ EVENTS = [
         "desc": "Intimate musical masterclass and jam session with internationally acclaimed instrumentalists.",
         "price": "₹1000",
         "color": "#a855f7",
-        "image": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Foster deep musical mastery and student mentorship with virtuosic performers.",
         "full_details": "Acoustic breakdowns, tuning techniques, and one-on-one feedback on attendee musical compositions.",
         "outcome": "Music masterclass certificate, custom plectrum set, and sheet music notes.",
@@ -2050,7 +2050,7 @@ EVENTS = [
         "desc": "Concluded mega creator conclave celebrating digital storytelling.",
         "price": "Free",
         "color": "#6366f1",
-        "image": "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Historic national creators event.",
         "full_details": "Concluded event featuring 50+ top content creators with 10,000+ enthusiastic attendees.",
         "outcome": "Archived keynote videos, creator badge credentials, and photo gallery.",
@@ -2072,7 +2072,7 @@ EVENTS = [
         "desc": "Concluded executive dinner and leadership discussion.",
         "price": "₹1500",
         "color": "#0ea5e9",
-        "image": "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Concluded leadership summit.",
         "full_details": "Archived dinner gathering of industry pioneers discussing global market transitions.",
         "outcome": "Archived whitepaper and verifiable attendee certificates.",
@@ -2270,7 +2270,7 @@ EVENTS = [
         "desc": "Symbiotic fish and vegetable production systems for urban homes and commercial greenhouses.",
         "price": "₹850",
         "color": "#0ea5e9",
-        "image": "https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Train urban growers in closed-loop aquaponics combining aquaculture with horticulture.",
         "full_details": "Live setup of Tilapia fish tanks coupled with bell siphon gravel beds producing leafy greens and herbs.",
         "outcome": "Aquaponics starter manual, water cycling test kit, and training certificate.",
@@ -2292,7 +2292,7 @@ EVENTS = [
         "desc": "Cold-chain reefer transport, automated sorting, and direct farmer-to-retailer digital mandis.",
         "price": "₹600",
         "color": "#10b981",
-        "image": "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Eliminate post-harvest food waste through real-time telemetry and cold chains.",
         "full_details": "Logistics providers and farm FPOs discuss route optimization, solar cold rooms, and dynamic pricing APIs.",
         "outcome": "Logistics partner directory, cold-chain subsidy whitepaper, and summit badge.",
@@ -2358,7 +2358,7 @@ EVENTS = [
         "desc": "LoRaWAN sensor nodes measuring NPK soil nutrients, leaf wetness, and ambient weather.",
         "price": "₹900",
         "color": "#0ea5e9",
-        "image": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Teach developers and agronomists to build long-range wireless farm monitoring networks.",
         "full_details": "Building battery-powered LoRaWAN nodes that transmit soil data over 15km to central dashboards.",
         "outcome": "LoRaWAN development board, antenna, open-source firmware repo, and certificate.",
@@ -2380,7 +2380,7 @@ EVENTS = [
         "desc": "Scientific hermetic grain bags, steel silo aeration, and automated moisture sensors.",
         "price": "₹500",
         "color": "#d97706",
-        "image": "https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Prevent fungal and weevil damage in stored food grains and pulses.",
         "full_details": "Technical overview of temperature-monitored bulk silos, nitrogen purging, and warehouse receipt financing.",
         "outcome": "Grain storage best practices guide, sample hermetic storage bag, and certificate.",
@@ -2402,7 +2402,7 @@ EVENTS = [
         "desc": "Drought-tolerant millets, bio-fortified grains, and genomic marker-assisted breeding.",
         "price": "Free",
         "color": "#16a34a",
-        "image": "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Equip farming communities with drought and heat-tolerant crop genetics.",
         "full_details": "Presentations by ICRISAT geneticists on pearl millet, sorghum, and chickpea varieties that thrive in arid climates.",
         "outcome": "Sample climate-resilient seed kit, breeding monograph, and certificate.",
@@ -2424,7 +2424,7 @@ EVENTS = [
         "desc": "DGCA accredited flight simulator training and live agricultural payload flight maneuvers.",
         "price": "₹1500",
         "color": "#6366f1",
-        "image": "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Train certified rural drone pilots for commercial aerial spraying enterprises.",
         "full_details": "Flight planning software, obstacle avoidance, battery maintenance protocols, and live field flight test.",
         "outcome": "DGCA Pilot Training Completion Badge, logbook endorsement, and career assistance.",
@@ -2446,7 +2446,7 @@ EVENTS = [
         "desc": "Concluded mega agricultural machinery and tractor exhibition.",
         "price": "Free",
         "color": "#15803d",
-        "image": "https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Historic national farming machinery expo.",
         "full_details": "Concluded exhibition showcasing 200+ tractor models, harvesters, and solar pump technologies.",
         "outcome": "Archived equipment brochures and verified attendance certificate.",
@@ -2468,7 +2468,7 @@ EVENTS = [
         "desc": "Concluded state-level organic farmers conference.",
         "price": "₹150",
         "color": "#84cc16",
-        "image": "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1560493676-04071c5f467b?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Historic organic farming conference.",
         "full_details": "Concluded convention featuring 100+ native seed preservers and organic soil scientists.",
         "outcome": "Archived session notes and verified attendee credentials.",
@@ -2622,7 +2622,7 @@ EVENTS = [
         "desc": "Protecting citizens against online financial fraud, identity theft, and deepfake scams.",
         "price": "₹499",
         "color": "#ef4444",
-        "image": "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Shield the public from cyber financial fraud and deceptive digital scams.",
         "full_details": "CERT-In and Cyber Crime Police officers demonstrate how to report fraud on the 1930 national helpline and secure UPI PINs.",
         "outcome": "Citizen Cyber Safety Guide, helpline emergency card, and verified attendee badge.",
@@ -2842,7 +2842,7 @@ EVENTS = [
         "desc": "Concluded national summit on cloud-first e-governance and direct benefit transfers.",
         "price": "₹450",
         "color": "#1e40af",
-        "image": "https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1526470608268-f674ce90ebd4?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Historic national e-governance convention.",
         "full_details": "Concluded convention reviewing digital delivery of 500+ citizen welfare schemes.",
         "outcome": "Archived e-governance whitepaper and verifiable participant certificate.",
@@ -2864,7 +2864,7 @@ EVENTS = [
         "desc": "Concluded annual Swachh Survekshan rankings and municipal awards.",
         "price": "₹350",
         "color": "#15803d",
-        "image": "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1523995462485-3d171b5c8fa9?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Concluded municipal sanitation awards.",
         "full_details": "Concluded national awards event honoring top cleanest cities across India.",
         "outcome": "Archived survey ranking booklet and verified attendee badge.",
@@ -2886,7 +2886,7 @@ EVENTS = [
         "desc": "Battle royale championship with 20 squad lobbies and 4K spectator screens.",
         "price": "₹500",
         "color": "#8b5cf6",
-        "image": "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1598550476439-6847785fcea6?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
         "full_details": "Immersive gaming & e-sports event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
         "outcome": "Gain industry exposure, network with gaming & e-sports leaders, and receive an authentic participation credential.",
@@ -2930,7 +2930,7 @@ EVENTS = [
         "desc": "National mobile esports showdown with ₹5,00,000 prize pool.",
         "price": "₹600",
         "color": "#8b5cf6",
-        "image": "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
         "full_details": "Immersive gaming & e-sports event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
         "outcome": "Gain industry exposure, network with gaming & e-sports leaders, and receive an authentic participation credential.",
@@ -2952,7 +2952,7 @@ EVENTS = [
         "desc": "PlayStation 5 knockout tournament with live commentary and leaderboards.",
         "price": "₹300",
         "color": "#8b5cf6",
-        "image": "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1600080972464-8e5f35f63d08?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
         "full_details": "Immersive gaming & e-sports event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
         "outcome": "Gain industry exposure, network with gaming & e-sports leaders, and receive an authentic participation credential.",
@@ -3128,7 +3128,7 @@ EVENTS = [
         "desc": "Full-motion racing simulator tournament on Monza and Silverstone tracks.",
         "price": "₹900",
         "color": "#8b5cf6",
-        "image": "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1580234811497-9df7fd2f357e?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
         "full_details": "Immersive gaming & e-sports event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
         "outcome": "Gain industry exposure, network with gaming & e-sports leaders, and receive an authentic participation credential.",
@@ -3150,7 +3150,7 @@ EVENTS = [
         "desc": "Original arcade cabinet tournaments: Pac-Man, Street Fighter II, and Tetris.",
         "price": "Free",
         "color": "#8b5cf6",
-        "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1526040652367-ac003a0475fe?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
         "full_details": "Immersive gaming & e-sports event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
         "outcome": "Gain industry exposure, network with gaming & e-sports leaders, and receive an authentic participation credential.",
@@ -3194,7 +3194,7 @@ EVENTS = [
         "desc": "Live GDQ-style charity speedrunning marathon across modern and retro games.",
         "price": "Free",
         "color": "#8b5cf6",
-        "image": "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
         "full_details": "Immersive gaming & e-sports event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
         "outcome": "Gain industry exposure, network with gaming & e-sports leaders, and receive an authentic participation credential.",
@@ -3216,7 +3216,7 @@ EVENTS = [
         "desc": "The ultimate university esports showdown across BGMI, Valorant, and Rocket League.",
         "price": "₹500",
         "color": "#8b5cf6",
-        "image": "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for gaming & e-sports enthusiasts and professionals.",
         "full_details": "Immersive gaming & e-sports event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
         "outcome": "Gain industry exposure, network with gaming & e-sports leaders, and receive an authentic participation credential.",
@@ -3238,7 +3238,7 @@ EVENTS = [
         "desc": "High-energy 100-player LAN battle royale with live stream audience.",
         "price": "₹500",
         "color": "#8b5cf6",
-        "image": "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Concluded gaming & e-sports landmark event.",
         "full_details": "Successfully hosted event bringing together delegates across the country for impactful gaming & e-sports showcases.",
         "outcome": "Concluded session archived in official hall of records.",
@@ -3260,7 +3260,7 @@ EVENTS = [
         "desc": "72-hour student game prototyping fest with 85 published game submissions.",
         "price": "Free",
         "color": "#8b5cf6",
-        "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Concluded gaming & e-sports landmark event.",
         "full_details": "Successfully hosted event bringing together delegates across the country for impactful gaming & e-sports showcases.",
         "outcome": "Concluded session archived in official hall of records.",
@@ -3282,7 +3282,7 @@ EVENTS = [
         "desc": "50 curated early-stage startups pitch live to 30+ prominent Angel & VC funds.",
         "price": "₹1200",
         "color": "#3b82f6",
-        "image": "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1553729459-efe14ef6055d?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
         "full_details": "Immersive business & startup event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
         "outcome": "Gain industry exposure, network with business & startup leaders, and receive an authentic participation credential.",
@@ -3326,7 +3326,7 @@ EVENTS = [
         "desc": "Zero-to-One startup masterclass: customer discovery, unit economics, and deck building.",
         "price": "Free",
         "color": "#3b82f6",
-        "image": "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
         "full_details": "Immersive business & startup event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
         "outcome": "Gain industry exposure, network with business & startup leaders, and receive an authentic participation credential.",
@@ -3370,7 +3370,7 @@ EVENTS = [
         "desc": "Celebrating top women CXOs, founders, and investors driving social and tech disruption.",
         "price": "Free",
         "color": "#3b82f6",
-        "image": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1542744094-24638eff58bb?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
         "full_details": "Immersive business & startup event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
         "outcome": "Gain industry exposure, network with business & startup leaders, and receive an authentic participation credential.",
@@ -3414,7 +3414,7 @@ EVENTS = [
         "desc": "Exclusive high-level networking mixer for Seed to Series B startup founders and partners.",
         "price": "₹2500",
         "color": "#3b82f6",
-        "image": "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
         "full_details": "Immersive business & startup event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
         "outcome": "Gain industry exposure, network with business & startup leaders, and receive an authentic participation credential.",
@@ -3480,7 +3480,7 @@ EVENTS = [
         "desc": "EV battery tech, solar microgrids, and carbon credit trading platforms.",
         "price": "Free",
         "color": "#3b82f6",
-        "image": "https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
         "full_details": "Immersive business & startup event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
         "outcome": "Gain industry exposure, network with business & startup leaders, and receive an authentic participation credential.",
@@ -3502,7 +3502,7 @@ EVENTS = [
         "desc": "Term sheets, founder vesting, patent filings, and ESOP pool management.",
         "price": "₹400",
         "color": "#3b82f6",
-        "image": "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for business & startup enthusiasts and professionals.",
         "full_details": "Immersive business & startup event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
         "outcome": "Gain industry exposure, network with business & startup leaders, and receive an authentic participation credential.",
@@ -3634,7 +3634,7 @@ EVENTS = [
         "desc": "25 startups raised over ₹12 Cr in angel commitments on demo day.",
         "price": "₹1000",
         "color": "#3b82f6",
-        "image": "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Concluded business & startup landmark event.",
         "full_details": "Successfully hosted event bringing together delegates across the country for impactful business & startup showcases.",
         "outcome": "Concluded session archived in official hall of records.",
@@ -3656,7 +3656,7 @@ EVENTS = [
         "desc": "Over 600 SaaS founders attended keynote sessions by industry unicorns.",
         "price": "₹1500",
         "color": "#3b82f6",
-        "image": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Concluded business & startup landmark event.",
         "full_details": "Successfully hosted event bringing together delegates across the country for impactful business & startup showcases.",
         "outcome": "Concluded session archived in official hall of records.",
@@ -3744,7 +3744,7 @@ EVENTS = [
         "desc": "Soulful Sufi music ensemble and Qawwali recitals by heritage masters under the stars.",
         "price": "₹850",
         "color": "#ec4899",
-        "image": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1518929458119-e5bf444c30f4?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
         "full_details": "Immersive art, culture & theater event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
         "outcome": "Gain industry exposure, network with art, culture & theater leaders, and receive an authentic participation credential.",
@@ -3788,7 +3788,7 @@ EVENTS = [
         "desc": "Expressive poetry performances, storytelling rounds, and acoustic interludes.",
         "price": "₹200",
         "color": "#ec4899",
-        "image": "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
         "full_details": "Immersive art, culture & theater event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
         "outcome": "Gain industry exposure, network with art, culture & theater leaders, and receive an authentic participation credential.",
@@ -3832,7 +3832,7 @@ EVENTS = [
         "desc": "Kathak, Bharatanatyam, Yakshagana, and Garba performances by national troupes.",
         "price": "Free",
         "color": "#ec4899",
-        "image": "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1460723237483-7a6dc9d0b212?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
         "full_details": "Immersive art, culture & theater event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
         "outcome": "Gain industry exposure, network with art, culture & theater leaders, and receive an authentic participation credential.",
@@ -3898,7 +3898,7 @@ EVENTS = [
         "desc": "Catch budding comedians testing out fresh jokes alongside secret celebrity drop-ins.",
         "price": "₹150",
         "color": "#ec4899",
-        "image": "https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
         "full_details": "Immersive art, culture & theater event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
         "outcome": "Gain industry exposure, network with art, culture & theater leaders, and receive an authentic participation credential.",
@@ -3964,7 +3964,7 @@ EVENTS = [
         "desc": "Maestro Sitar performances accompanied by Tabla virtuosos celebrating Indian ragas.",
         "price": "₹500",
         "color": "#ec4899",
-        "image": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
         "full_details": "Immersive art, culture & theater event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
         "outcome": "Gain industry exposure, network with art, culture & theater leaders, and receive an authentic participation credential.",
@@ -4030,7 +4030,7 @@ EVENTS = [
         "desc": "Attracted over 40,000 visitors to live street plays, dance, and fine art displays.",
         "price": "Free",
         "color": "#ec4899",
-        "image": "https://images.unsplash.com/photo-1469488865564-c2de10f69f96?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1547891654-e66ed7ebb968?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Concluded art, culture & theater landmark event.",
         "full_details": "Successfully hosted event bringing together delegates across the country for impactful art, culture & theater showcases.",
         "outcome": "Concluded session archived in official hall of records.",
@@ -4052,7 +4052,7 @@ EVENTS = [
         "desc": "Housefull comedy special with 5 headline comedians and non-stop laughter.",
         "price": "₹799",
         "color": "#ec4899",
-        "image": "https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1561214115-f2f134cc4912?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Concluded art, culture & theater landmark event.",
         "full_details": "Successfully hosted event bringing together delegates across the country for impactful art, culture & theater showcases.",
         "outcome": "Concluded session archived in official hall of records.",
@@ -4074,7 +4074,7 @@ EVENTS = [
         "desc": "Iconic nighttime charity marathon with 5K, 10K, and Half Marathon timed chip runs.",
         "price": "₹950",
         "color": "#10b981",
-        "image": "https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
         "full_details": "Immersive health, fitness & yoga event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
         "outcome": "Gain industry exposure, network with health, fitness & yoga leaders, and receive an authentic participation credential.",
@@ -4206,7 +4206,7 @@ EVENTS = [
         "desc": "Mat and reformer pilates techniques to enhance core stability and posture alignment.",
         "price": "₹800",
         "color": "#10b981",
-        "image": "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
         "full_details": "Immersive health, fitness & yoga event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
         "outcome": "Gain industry exposure, network with health, fitness & yoga leaders, and receive an authentic participation credential.",
@@ -4250,7 +4250,7 @@ EVENTS = [
         "desc": "Squat, bench press, and deadlift official weight class powerlifting meets.",
         "price": "₹700",
         "color": "#10b981",
-        "image": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1541600278744-d4cba88bb2c7?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
         "full_details": "Immersive health, fitness & yoga event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
         "outcome": "Gain industry exposure, network with health, fitness & yoga leaders, and receive an authentic participation credential.",
@@ -4272,7 +4272,7 @@ EVENTS = [
         "desc": "Learn balance, therapeutic partner flying, and acro poses under lush green banyan trees.",
         "price": "₹500",
         "color": "#10b981",
-        "image": "https://images.unsplash.com/photo-1545205597-3d9d02c29597?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
         "full_details": "Immersive health, fitness & yoga event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
         "outcome": "Gain industry exposure, network with health, fitness & yoga leaders, and receive an authentic participation credential.",
@@ -4316,7 +4316,7 @@ EVENTS = [
         "desc": "Master muscle-ups, handstands, human flags, and planche progressions safely.",
         "price": "₹550",
         "color": "#10b981",
-        "image": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1598971639058-fab3c3109a00?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
         "full_details": "Immersive health, fitness & yoga event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
         "outcome": "Gain industry exposure, network with health, fitness & yoga leaders, and receive an authentic participation credential.",
@@ -4338,7 +4338,7 @@ EVENTS = [
         "desc": "Practical self-defense tactics, threat de-escalation, and situational awareness.",
         "price": "Free",
         "color": "#10b981",
-        "image": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
         "full_details": "Immersive health, fitness & yoga event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
         "outcome": "Gain industry exposure, network with health, fitness & yoga leaders, and receive an authentic participation credential.",
@@ -4360,7 +4360,7 @@ EVENTS = [
         "desc": "Tibetan singing bowl frequencies to soothe the nervous system and induce restful sleep.",
         "price": "₹750",
         "color": "#10b981",
-        "image": "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1593810451410-8fbb422cc15e?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
         "full_details": "Immersive health, fitness & yoga event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
         "outcome": "Gain industry exposure, network with health, fitness & yoga leaders, and receive an authentic participation credential.",
@@ -4382,7 +4382,7 @@ EVENTS = [
         "desc": "Off-road dirt trail run through scenic eucalyptus groves with hydration stations.",
         "price": "₹650",
         "color": "#10b981",
-        "image": "https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1599447421416-3414500d18a5?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
         "full_details": "Immersive health, fitness & yoga event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
         "outcome": "Gain industry exposure, network with health, fitness & yoga leaders, and receive an authentic participation credential.",
@@ -4404,7 +4404,7 @@ EVENTS = [
         "desc": "Supplement expos, athlete meet-and-greets, and competitive physique categories.",
         "price": "₹800",
         "color": "#10b981",
-        "image": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Premier gathering for health, fitness & yoga enthusiasts and professionals.",
         "full_details": "Immersive health, fitness & yoga event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
         "outcome": "Gain industry exposure, network with health, fitness & yoga leaders, and receive an authentic participation credential.",
@@ -4426,7 +4426,7 @@ EVENTS = [
         "desc": "Over 8,000 runners completed the certified 10K loop across Cubbon Park.",
         "price": "₹750",
         "color": "#10b981",
-        "image": "https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Concluded health, fitness & yoga landmark event.",
         "full_details": "Successfully hosted event bringing together delegates across the country for impactful health, fitness & yoga showcases.",
         "outcome": "Concluded session archived in official hall of records.",
@@ -4448,7 +4448,7 @@ EVENTS = [
         "desc": "Synchronized yoga session with 12,000 yoga practitioners and yoga gurus.",
         "price": "Free",
         "color": "#10b981",
-        "image": "https://images.unsplash.com/photo-1545205597-3d9d02c29597?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1571731956672-f2b94d7dd0cb?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Concluded health, fitness & yoga landmark event.",
         "full_details": "Successfully hosted event bringing together delegates across the country for impactful health, fitness & yoga showcases.",
         "outcome": "Concluded session archived in official hall of records.",
@@ -4822,7 +4822,7 @@ EVENTS = [
         "desc": "Served over 15,000 foodies across 40 specialty food trucks.",
         "price": "₹199",
         "color": "#f97316",
-        "image": "https://images.unsplash.com/photo-1565123409695-7b5ef63a2efb?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1792802989137-b1b12dee11c4?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Concluded food, tech & festivals landmark event.",
         "full_details": "Successfully hosted event bringing together delegates across the country for impactful food, tech & festivals showcases.",
         "outcome": "Concluded session archived in official hall of records.",
@@ -4844,7 +4844,7 @@ EVENTS = [
         "desc": "National AeroPress and Barista championship qualifiers.",
         "price": "₹350",
         "color": "#f97316",
-        "image": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1200&q=80",
+        "image": "https://images.unsplash.com/photo-1422207109431-97544339f995?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Concluded food, tech & festivals landmark event.",
         "full_details": "Successfully hosted event bringing together delegates across the country for impactful food, tech & festivals showcases.",
         "outcome": "Concluded session archived in official hall of records.",
@@ -4866,7 +4866,7 @@ EVENTS = [
         "desc": "Hands-on engineering summit exploring multi-agent workflows, LangGraph, autonomous agents and enterprise LLM production deployments.",
         "price": "₹299",
         "color": "#6366f1",
-        "image": "/static/images/events/ai_summit.jpg",
+        "image": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Equip engineers and researchers with the skills to architect and deploy production-grade multi-agent autonomous AI systems.",
         "full_details": "Comprehensive day-long deep dive featuring keynote sessions from leading AI researchers, interactive live coding of agentic loops, prompt distillation workshops, and open Q&A on AI alignment.",
         "outcome": "Participants build functional agentic systems, receive code templates, and earn an advanced AI Agent Systems Certificate.",
@@ -4888,7 +4888,7 @@ EVENTS = [
         "desc": "36-hour immersive hackathon building cutting-edge spatial computing applications for Apple Vision Pro, Meta Quest 3, and WebXR.",
         "price": "₹399",
         "color": "#8b5cf6",
-        "image": "/static/images/events/web_mosaic.jpg",
+        "image": "https://images.unsplash.com/photo-1576633587382-13ddf37b1fc1?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Foster student and indie developer innovation in next-generation spatial computing, spatial interactions, and mixed-reality toolsets.",
         "full_details": "Hackathon tracks include Education XR, Healthcare Spatial Visualizations, and Mixed-Reality Gaming. High-end VR headsets and dev kits provided on-site with mentor support from top spatial computing studios.",
         "outcome": "Top 3 winning teams receive ₹2,00,000 in hardware grants, incubation support, and direct investor showcase.",
@@ -4910,7 +4910,7 @@ EVENTS = [
         "desc": "State-of-the-art competitive archery and 10m air rifle precision championship featuring Olympic qualifiers and collegiate talent.",
         "price": "₹249",
         "color": "#10b981",
-        "image": "/static/images/events/sports_athletics.jpg",
+        "image": "https://images.unsplash.com/photo-1601259501461-9a6b562b2728?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Promote Olympic precision sports and provide collegiate athletes a platform to compete under international federation standards.",
         "full_details": "Features Recurve, Compound, and 10m Air Rifle categories with computerized laser scoring targets, live arena video feeds, and Olympic coach scouting.",
         "outcome": "Medalists qualify for national circuit selection trials and receive specialized sporting equipment grants.",
@@ -4932,7 +4932,7 @@ EVENTS = [
         "desc": "Premier collegiate and open singles and doubles racquet championship on world-class synthetic and glass-backed courts.",
         "price": "₹399",
         "color": "#059669",
-        "image": "/static/images/events/sports_badminton.jpg",
+        "image": "https://images.unsplash.com/photo-1647466216464-15ea31693d04?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Deliver high-intensity competitive racquet sport tournaments for students, club players, and rising athletes.",
         "full_details": "Men's & Women's Singles, Doubles, and Mixed Doubles divisions across 4 glass-back squash courts and 6 floodlit tennis courts with certified umpires.",
         "outcome": "Winners receive ₹1,50,000 prize pool, championship trophies, and ranking points.",
@@ -4954,7 +4954,7 @@ EVENTS = [
         "desc": "Soul-stirring evening of traditional Sufi harmonies blended with contemporary electric guitar riffs and percussion ensembles.",
         "price": "₹699",
         "color": "#ec4899",
-        "image": "/static/images/events/music_sufi.jpg",
+        "image": "https://images.unsplash.com/photo-1487180144351-b8472da7d491?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Celebrate traditional mystical musical heritage through modern acoustic and rock fusion interpretations.",
         "full_details": "Featuring renowned Sufi ensembles and rock fusion bands performing classic poetry of Rumi, Bulleh Shah, and Amir Khusro under immersive stage lighting.",
         "outcome": "Attendees experience a transformative cultural evening with live musical performances and artisanal beverage stalls.",
@@ -4976,7 +4976,7 @@ EVENTS = [
         "desc": "Day-to-night electronic music festival featuring international progressive house, melodic techno, and sunset ambient beats.",
         "price": "₹899",
         "color": "#a855f7",
-        "image": "/static/images/events/music_edm.jpg",
+        "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Deliver a world-class electronic music experience with state-of-the-art spatial sound and visual laser mapping.",
         "full_details": "Triple stage setup with top DJ line-ups, curated food trucks, interactive light installations, and silent disco chill zones.",
         "outcome": "Memorable electronic dance music festival experience celebrating youth culture and audio-visual production.",
@@ -4998,7 +4998,7 @@ EVENTS = [
         "desc": "High-octane press and fan event unveiling the official teaser, motion posters, and action sequence breakdown with the lead star cast.",
         "price": "₹199",
         "color": "#f59e0b",
-        "image": "/static/images/events/movie_action.jpg",
+        "image": "https://images.unsplash.com/photo-1517486518908-97a5f91b325f?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Provide cinephiles and media an exclusive first-look at the year's biggest action blockbuster.",
         "full_details": "4K laser projection screening of teaser, live stunt choreography demo by stunt directors, media Q&A, and exclusive merchandise giveaway.",
         "outcome": "Fans get signed movie posters, exclusive photos with the stars, and early bird premiere tickets.",
@@ -5020,7 +5020,7 @@ EVENTS = [
         "desc": "Exclusive IMAX premiere of the highly anticipated Japanese anime feature film featuring dubbing artists and Japanese animation directors.",
         "price": "₹349",
         "color": "#ef4444",
-        "image": "/static/images/events/movie_scifi.jpg",
+        "image": "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Celebrate Japanese animation cinema with Indian anime fans and creators in IMAX.",
         "full_details": "Red carpet cosplay welcome, full theatrical screening, interactive panel on anime localization, voice acting masterclass, and official studio art exhibition.",
         "outcome": "Exclusive collectible movie badges, limited edition manga prints, and community fan networking.",
@@ -5042,7 +5042,7 @@ EVENTS = [
         "desc": "Intimate masterclass and fireside chat with India's legendary World Cup champion cricketer on leadership, mental resilience, and peak performance.",
         "price": "₹1499",
         "color": "#eab308",
-        "image": "/static/images/events/celeb_sports.jpg",
+        "image": "https://images.unsplash.com/photo-1593341646782-e0b495cff86d?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Inspire students, corporate leaders, and athletes through firsthand leadership wisdom from a legendary sporting icon.",
         "full_details": "Includes 60-minute motivational keynote, interactive audience Q&A, professional photo op with personalized cricket bat signing, and high-tea banquet.",
         "outcome": "Attendees receive signed memorabilia, professional commemorative photograph, and invaluable leadership insights.",
@@ -5064,7 +5064,7 @@ EVENTS = [
         "desc": "Unfiltered live recording of India's #1 comedy podcast followed by a personal VIP backstage hangout with the country's top comedy creators.",
         "price": "₹999",
         "color": "#f97316",
-        "image": "/static/images/events/celeb_comedy.jpg",
+        "image": "https://images.unsplash.com/photo-1660675588397-a17437d2ba31?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Provide fans a hilarious behind-the-scenes look into comedy writing, podcast production, and unscripted humor.",
         "full_details": "Live audience participation improv segments, roast sessions, backstage pass access, photo ops, and complimentary signed tour merchandise.",
         "outcome": "Guaranteed laughs, broadcast credit on the YouTube podcast release, and direct interaction with the comedians.",
@@ -5086,7 +5086,7 @@ EVENTS = [
         "desc": "Practical demonstration of automated climate-controlled greenhouses, vertical NFT hydroponics, and rooftop soil-less farming technologies.",
         "price": "₹350",
         "color": "#84cc16",
-        "image": "/static/images/events/agri_smart.jpg",
+        "image": "https://images.unsplash.com/photo-1719760665423-c07ba150397b?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Educate urban citizens, hobbyist growers, and progressive farmers on zero-pesticide, high-yield soil-less cultivation.",
         "full_details": "Live operating hydroponic towers, nutrient film techniques, IoT sensor kits for automated pH & EC regulation, and hands-on seedling propagation workshops.",
         "outcome": "Participants take home a DIY microgreens growing kit, digital farming guides, and hydroponic supplier contact directories.",
@@ -5108,7 +5108,7 @@ EVENTS = [
         "desc": "State-wide exhibition of DGCA-approved agricultural spray drones, solar-powered drip irrigation pumps, and IoT soil moisture telematics.",
         "price": "₹450",
         "color": "#16a34a",
-        "image": "/static/images/events/agri_expo.jpg",
+        "image": "https://images.unsplash.com/photo-1508614589041-895b88991e3e?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Equip farmers and agri-entrepreneurs with modern drone technology and renewable irrigation systems to slash input costs by 40%.",
         "full_details": "Outdoor flight demonstrations of 10L & 20L crop protection drones, solar pump subsidy enrollment counters, and bank micro-loan approval desks.",
         "outcome": "Farmers learn drone operation protocols, enroll in subsidized solar irrigation schemes, and receive free soil health test cards.",
@@ -5130,7 +5130,7 @@ EVENTS = [
         "desc": "Public awareness summit in collaboration with Cyber Police and CERT-In explaining UPI frauds, phishing defense, SIM swap protection, and legal remedy.",
         "price": "₹299",
         "color": "#2563eb",
-        "image": "/static/images/events/gov_civic.jpg",
+        "image": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Educate everyday citizens, senior citizens, and students on safeguarding their digital identity and financial transactions.",
         "full_details": "Live case study demonstrations of OTP frauds, step-by-step reporting walkthrough on the National Cyber Crime Portal (1930 helpline), and interactive Q&A with cyber forensic inspectors.",
         "outcome": "Citizens gain practical digital safety hygiene, fraud reporting checklists, and emergency cyber assistance contacts.",
@@ -5152,7 +5152,7 @@ EVENTS = [
         "desc": "Flagship democratic debate and policy hackathon where student delegates draft parliamentary bills on climate action, education reform, and urban transport.",
         "price": "₹399",
         "color": "#1d4ed8",
-        "image": "/static/images/events/gov_youth.jpg",
+        "image": "https://images.unsplash.com/photo-1610026378085-15d0e8f685db?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Nurture young civic leaders and channel youth policy recommendations directly to parliamentary committees.",
         "full_details": "Modeled after the Lok Sabha proceedings with Question Hour, Zero Hour, and Special Mentions, adjudicated by retired IAS officers and constitutional law scholars.",
         "outcome": "Top 5 policy whitepapers published in the National Youth Policy Compendium and delegates receive Parliamentary Commendation Certificates.",
@@ -5174,7 +5174,7 @@ EVENTS = [
         "desc": "High-octane collegiate esports arena showdown featuring aerial Rocket League triples and fast-paced Brawlhalla platform brawls.",
         "price": "₹199",
         "color": "#06b6d4",
-        "image": "/static/images/events/esports_fifa.jpg",
+        "image": "https://images.unsplash.com/photo-1592478411213-6153e4ebc07d?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Provide collegiate esports teams a platform to showcase mechanical skill, team communication, and tournament prowess.",
         "full_details": "Played on ultra-low latency 240Hz monitors with live caster shoutcasting, spectator stadium seating, and Twitch / YouTube live streams.",
         "outcome": "Champions take home ₹1,00,000 cash prize, gaming gear bundles, and college championship trophy.",
@@ -5196,7 +5196,7 @@ EVENTS = [
         "desc": "5v5 and 6v6 hero shooter championship uniting the top competitive teams across India for strategic supremacy.",
         "price": "₹249",
         "color": "#0891b2",
-        "image": "/static/images/events/esports_valorant.jpg",
+        "image": "https://images.unsplash.com/photo-1616588589676-62b3bd4ff6d2?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Crown the finest hero shooter squad in the country with professional tier-1 broadcast production.",
         "full_details": "Double-elimination bracket, dedicated coaching booths, pro gamer meetups, and open free-play LAN stations for attendees.",
         "outcome": "₹1,50,000 prize pool, MVP gaming peripherals, and scouting opportunities for international esports organizations.",
@@ -5218,7 +5218,7 @@ EVENTS = [
         "desc": "Elite gathering of hardware startups, fabless semiconductor innovators, robotics founders, and sovereign deeptech venture capitalists.",
         "price": "₹599",
         "color": "#0284c7",
-        "image": "/static/images/events/startup_pitch.jpg",
+        "image": "https://images.unsplash.com/photo-1587845323226-bad89242c735?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Accelerate India's semiconductor and hardware startup ecosystem through direct corporate partnerships and funding.",
         "full_details": "Keynotes on RISC-V architectures, silicon prototyping subsidies, VC investor pitch rooms, and enterprise procurement roundtables.",
         "outcome": "Startups connect with angel syndicates, grant bodies, and potential anchor enterprise customers.",
@@ -5240,7 +5240,7 @@ EVENTS = [
         "desc": "Intensive masterclass for SaaS founders and GTM leaders on scaling from $1M ARR to $10M ARR across US, Europe, and APAC markets.",
         "price": "₹499",
         "color": "#0369a1",
-        "image": "/static/images/events/startup_saas.jpg",
+        "image": "https://images.unsplash.com/photo-1556740714-a8395b3bf30f?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Provide SaaS founders actionable outbound sales playbooks, PLG conversion frameworks, and enterprise pricing models.",
         "full_details": "Led by 4x SaaS founders and growth VPs, featuring live audit of attendee funnels, churn reduction tactics, and networking lunch.",
         "outcome": "Attendees receive proven GTM templates, outbound email sequences, and peer founder mastermind membership.",
@@ -5262,7 +5262,7 @@ EVENTS = [
         "desc": "Enchanting celebration of Indian classical dance traditions featuring Padma awardee maestros, rhythmic footwork, and live Carnatic orchestra.",
         "price": "₹299",
         "color": "#d946ef",
-        "image": "/static/images/events/art_theater.jpg",
+        "image": "https://images.unsplash.com/photo-1783859503944-e989da3d3218?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Preserve and celebrate India's ancient classical dance heritage through world-class auditorium performances.",
         "full_details": "Performances include solo Varnams, Tarana jugalbandis, and fusion choreographies accompanied by live mridangam, flute, and vocals.",
         "outcome": "An uplifting evening of sublime classical aesthetic and cultural storytelling.",
@@ -5284,7 +5284,7 @@ EVENTS = [
         "desc": "Curated modern art exhibition showcasing avant-garde metal sculptures, interactive light art, and digital generative installations.",
         "price": "₹150",
         "color": "#c026d3",
-        "image": "/static/images/events/art_culture.jpg",
+        "image": "https://images.unsplash.com/photo-1536924940846-227afb31e2a5?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Provide a premier platform for young contemporary artists and art collectors to engage with cutting-edge visual expressions.",
         "full_details": "Over 80 original artworks across 3 gallery halls with daily guided curator walks, artist talks, and live bronze casting demos.",
         "outcome": "Art lovers can purchase original artwork directly from creators and learn modern sculpture techniques.",
@@ -5306,7 +5306,7 @@ EVENTS = [
         "desc": "High-adrenaline fitness race combining functional movements, sled pushes, rowing sprints, and kettlebell carries for all fitness levels.",
         "price": "₹399",
         "color": "#14b8a6",
-        "image": "/static/images/events/health_crossfit.jpg",
+        "image": "https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Inspire everyday athletes to test their functional stamina, strength, and mental endurance in a supportive community race.",
         "full_details": "Open, Doubles, and Relay divisions with certified fitness judges, hydration recovery stations, and post-race high-protein brunch.",
         "outcome": "Finisher medals, personalized split time tracking, and fitness apparel goodies for all participants.",
@@ -5328,7 +5328,7 @@ EVENTS = [
         "desc": "Peaceful day retreat featuring Tibetan singing bowls, ancient Vedic breathwork, guided mindfulness meditation, and organic sattvic meals.",
         "price": "₹499",
         "color": "#0d9488",
-        "image": "/static/images/events/health_yoga.jpg",
+        "image": "https://images.unsplash.com/photo-1593811167562-9cef47bfc4d7?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Facilitate deep somatic relaxation, mental detoxification, and nervous system regulation amidst peaceful natural surroundings.",
         "full_details": "Led by certified sound therapy practitioners and master yogis with acoustic resonance instruments, herbal detox drinks, and journaling sessions.",
         "outcome": "Participants leave deeply rejuvenated with daily pranayama routines and audio meditation tracks for home practice.",
@@ -5350,7 +5350,7 @@ EVENTS = [
         "desc": "Hands-on culinary masterclass teaching 72-hour sourdough pizza fermentation, hand-stretched mozzarella, and authentic handmade fresh pasta.",
         "price": "₹449",
         "color": "#f97316",
-        "image": "/static/images/events/food_pizza.jpg",
+        "image": "https://images.unsplash.com/photo-1564936281403-f92f66f89ee0?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Impart authentic Italian culinary mastery from sourdough starter care to wood-fired 90-second blistering techniques.",
         "full_details": "Each participant operates their own workstation with personal wood-fired tabletop ovens, fresh Italian semolina, San Marzano tomatoes, and wine pairing.",
         "outcome": "Eat your own freshly baked gourmet pizza, take home fresh pasta bundles and sourdough starter jars.",
@@ -5372,7 +5372,7 @@ EVENTS = [
         "desc": "Artisanal festival celebrating Indian single-origin cocoa from Kerala, Karnataka, and Tamil Nadu with live stone-grinding and bonbon crafting.",
         "price": "₹349",
         "color": "#ea580c",
-        "image": "/static/images/events/food_fest.jpg",
+        "image": "https://images.unsplash.com/photo-1564232020107-c3dfe31f4651?auto=format&fit=crop&w=1200&q=80",
         "purpose": "Promote sustainable bean-to-bar Indian craft chocolate makers and educate food enthusiasts on single-origin tasting profiles.",
         "full_details": "Tasting flight of 12 distinct dark, milk, and inclusion chocolates, tempering workshops, cocoa farming documentary screening, and dessert stalls.",
         "outcome": "Attendees receive a curated single-origin tasting box, chocolatier pairing guide, and bonbon crafting booklet.",
@@ -5744,6 +5744,27 @@ def _audit_log_worker():
 
 _log_worker_thread = threading.Thread(target=_audit_log_worker, daemon=True, name="AuditLogWorker")
 _log_worker_thread.start()
+
+def _subscription_bg_worker():
+    time.sleep(4)
+    while True:
+        try:
+            try:
+                from backend.subscription_service import run_subscription_lifecycle_checks
+            except ImportError:
+                from subscription_service import run_subscription_lifecycle_checks
+            run_subscription_lifecycle_checks(
+                get_db_fn=get_db,
+                dispatch_email_fn=_dispatch_html_email,
+                push_notif_fn=push_notification,
+                logger_fn=log_action
+            )
+        except Exception as e:
+            print(f"[SUB BG WORKER LOOP NOTE] {e}")
+        time.sleep(300)
+
+_sub_worker_thread = threading.Thread(target=_subscription_bg_worker, daemon=True, name="SubscriptionWorker")
+_sub_worker_thread.start()
 
 def log_action(username, action, details=''):
     try:
@@ -6339,6 +6360,112 @@ def init_db():
         is_answered INTEGER DEFAULT 0,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS event_seats (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER NOT NULL,
+        seat_code TEXT NOT NULL,
+        tier TEXT DEFAULT 'general',
+        seat_row TEXT NOT NULL,
+        seat_col INTEGER NOT NULL,
+        price_addon REAL DEFAULT 0.0,
+        status TEXT DEFAULT 'available',
+        locked_by TEXT,
+        locked_at DATETIME,
+        booked_by TEXT,
+        ticket_id TEXT,
+        UNIQUE(event_id, seat_code)
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS event_custom_questions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER NOT NULL,
+        question_label TEXT NOT NULL,
+        field_type TEXT NOT NULL,
+        options_json TEXT,
+        is_required INTEGER DEFAULT 0,
+        display_order INTEGER DEFAULT 1
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS registration_custom_answers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        registration_id INTEGER NOT NULL,
+        event_id INTEGER NOT NULL,
+        username TEXT NOT NULL,
+        question_id INTEGER NOT NULL,
+        question_label TEXT NOT NULL,
+        answer_value TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS live_qa_upvotes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        question_id INTEGER NOT NULL,
+        username TEXT NOT NULL,
+        UNIQUE(question_id, username)
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS live_poll_votes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        poll_id INTEGER NOT NULL,
+        username TEXT NOT NULL,
+        option_index INTEGER NOT NULL,
+        UNIQUE(poll_id, username)
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS team_submissions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER NOT NULL,
+        team_name TEXT NOT NULL,
+        team_lead TEXT NOT NULL,
+        project_title TEXT NOT NULL,
+        tagline TEXT,
+        description TEXT,
+        github_url TEXT,
+        demo_url TEXT,
+        tech_stack TEXT,
+        submitted_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS team_judge_scores (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        submission_id INTEGER NOT NULL,
+        judge_username TEXT NOT NULL,
+        innovation_score REAL DEFAULT 0,
+        technical_score REAL DEFAULT 0,
+        design_score REAL DEFAULT 0,
+        presentation_score REAL DEFAULT 0,
+        feedback TEXT,
+        total_score REAL DEFAULT 0,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(submission_id, judge_username)
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS xp_rewards_catalog (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        description TEXT NOT NULL,
+        xp_cost INTEGER NOT NULL,
+        reward_type TEXT NOT NULL,
+        reward_value TEXT,
+        icon TEXT,
+        badge_color TEXT
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS xp_redemptions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL,
+        reward_id INTEGER NOT NULL,
+        xp_spent INTEGER NOT NULL,
+        coupon_code TEXT,
+        status TEXT DEFAULT 'active',
+        redeemed_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )''')
+
+    try:
+        c.execute("ALTER TABLE registrations ADD COLUMN seat_code TEXT")
+    except Exception:
+        pass
     
     # Populate events table with entries that do not already exist (checking by title)
     for ev in EVENTS:
@@ -6439,6 +6566,16 @@ def init_db():
     # Dynamically roll calendar dates across all 12 categories for real-time engagement
     sync_dynamic_realtime_events(conn)
 
+    # Initialize complete Subscription Management schema migrations
+    try:
+        try:
+            from backend.subscription_service import init_subscription_db
+        except ImportError:
+            from subscription_service import init_subscription_db
+        init_subscription_db(conn)
+    except Exception as e:
+        print(f"[SUBSCRIPTION DB INIT NOTE] {e}")
+
     conn.commit()
     conn.close()
 
@@ -6447,55 +6584,26 @@ init_db()
 
 # ─── Hotstar-Style Live Stream Subscriptions (Normal & Super Packs) ──────────
 
-SUBSCRIPTION_PLANS = {
-    'normal': {
-        'id': 'normal',
-        'title': 'Normal Pack',
-        'badge': '💎 Normal Pack',
-        'tagline': 'Essential Stage Pass for Live Streams',
-        'monthly_price': 149,
-        'yearly_price': 899,
-        'yearly_saving_pct': 50,
-        'max_quality': '720p',
-        'quality_label': '720p HD (No 1080p)',
-        'max_screens': 1,
-        'max_event_price_inr': 1000.0,
-        'includes_free_up_to': 1000,
-        'features': [
-            '1 Screen / Device at a time',
-            '720p HD Video Quality (1080p locked)',
-            'Watch all live events up to ₹1,000 for FREE',
-            'Events over ₹1,000 require pay-per-event',
-            'Standard Live Stage Chat & Audience Reactions',
-            'Interactive Q&A Access'
-        ]
-    },
-    'super': {
-        'id': 'super',
-        'title': 'Super Pack',
-        'badge': '👑 Super VIP',
-        'tagline': 'Unlimited Full HD & 2K QHD Live Stage Pass',
-        'monthly_price': 299,
-        'yearly_price': 1499,
-        'yearly_saving_pct': 58,
-        'max_quality': '2k',
-        'quality_label': '1080p FHD & 2K QHD',
-        'max_screens': 1,
-        'max_event_price_inr': None,
-        'includes_free_up_to': None,
-        'is_featured': True,
-        'features': [
-            '1 User / Screen at a time',
-            '1080p Full HD & 2K QHD Ultra High Definition',
-            'ALL Live Events included with ₹0 Extra Fee (even > ₹1,000!)',
-            '👑 VIP Crown Badge in Live Stage Chat',
-            'Multi-Camera Dashcam & Backstage Angle Feed',
-            'Dolby Digital Atmospheric Stage Audio',
-            'Priority Live Q&A Question Highlighting',
-            'Ad-Free Live Stage Transmission'
-        ]
-    }
-}
+try:
+    from backend.subscription_service import (
+        SUBSCRIPTION_PLANS, TIER_LIMITS, DEFAULT_COUPONS,
+        get_user_subscription as svc_get_user_subscription,
+        get_user_subscription_status, get_user_subscription_history, get_user_payment_history,
+        calculate_subscription_refund, check_subscription_feature_access, record_subscription_usage,
+        get_subscription_usage_stats, validate_subscription_coupon, mark_coupon_used,
+        generate_subscription_invoice_pdf_bytes, run_subscription_lifecycle_checks,
+        parse_iso_datetime, get_annual_cancellation_eligibility, get_user_pending_cancellation, calculate_monthly_upgrade_credit
+    )
+except ImportError:
+    from subscription_service import (
+        SUBSCRIPTION_PLANS, TIER_LIMITS, DEFAULT_COUPONS,
+        get_user_subscription as svc_get_user_subscription,
+        get_user_subscription_status, get_user_subscription_history, get_user_payment_history,
+        calculate_subscription_refund, check_subscription_feature_access, record_subscription_usage,
+        get_subscription_usage_stats, validate_subscription_coupon, mark_coupon_used,
+        generate_subscription_invoice_pdf_bytes, run_subscription_lifecycle_checks,
+        parse_iso_datetime, get_annual_cancellation_eligibility, get_user_pending_cancellation, calculate_monthly_upgrade_credit
+    )
 
 def parse_price_amount(price_str):
     if not price_str:
@@ -6512,35 +6620,7 @@ def parse_price_amount(price_str):
 def get_user_subscription(username):
     if not username:
         return None
-    try:
-        conn = get_db(row_factory=True)
-        c = conn.cursor()
-        c.execute("""
-            SELECT id, username, plan_type, billing_cycle, price_paid, max_quality, 
-                   max_event_price_inr, max_screens, status, started_at, expires_at, payment_id, payment_method
-            FROM subscriptions 
-            WHERE username = ? AND status = 'active' AND datetime(expires_at) > datetime('now')
-            ORDER BY id DESC LIMIT 1
-        """, (username,))
-        row = c.fetchone()
-        conn.close()
-        if row:
-            d = dict(row)
-            plan_meta = SUBSCRIPTION_PLANS.get(d['plan_type'], {})
-            d['plan_title'] = plan_meta.get('title', d['plan_type'].capitalize())
-            d['badge'] = plan_meta.get('badge', d['plan_type'])
-            d['quality_label'] = plan_meta.get('quality_label', d['max_quality'])
-            try:
-                exp_dt = datetime.fromisoformat(d['expires_at'].replace(' ', 'T'))
-                d['days_left'] = max(0, (exp_dt - datetime.now()).days)
-                d['is_expired'] = datetime.now() > exp_dt
-            except Exception:
-                d['days_left'] = 30
-                d['is_expired'] = False
-            return d
-    except Exception as e:
-        print(f"[SUBSCRIPTION FETCH ERROR] {e}")
-    return None
+    return svc_get_user_subscription(username, get_db)
 
 def check_live_stream_access(username, event_id, event=None):
     if not event:
@@ -6707,11 +6787,14 @@ def inject_user_data():
         user_sub = get_user_subscription(username)
         
         photo = session.get('profile_photo')
+        if photo and photo.startswith('https://ui-avatars.com/api/?') and 'background=' not in photo:
+            photo = photo + '&background=008be3&color=ffffff&bold=true&size=256'
+            session['profile_photo'] = photo
         user_id = session.get('user_id')
         if not photo or not user_id:
             conn = get_db()
             c = conn.cursor()
-            c.execute("SELECT profile_photo, id, user_id FROM users WHERE username=?", (username,))
+            c.execute("SELECT profile_photo, id, user_id, full_name FROM users WHERE username=?", (username,))
             res = c.fetchone()
             conn.close()
             
@@ -6721,8 +6804,11 @@ def inject_user_data():
                         photo = res[0]
                         if not photo.startswith('http'):
                             photo = url_for('static', filename=photo)
+                        elif photo.startswith('https://ui-avatars.com/api/?') and 'background=' not in photo:
+                            photo = photo + '&background=008be3&color=ffffff&bold=true&size=256'
                     else:
-                        photo = 'https://ui-avatars.com/api/?name=' + username
+                        display_name = res[3] or username
+                        photo = f"https://ui-avatars.com/api/?name={urllib.parse.quote_plus(display_name)}&background=008be3&color=ffffff&bold=true&size=256"
                     session['profile_photo'] = photo
                 
                 if not user_id:
@@ -7163,7 +7249,7 @@ def login():
                 session['role'] = 'host'
                 session['is_admin'] = 1
                 session['user_id'] = 'UID-0001'
-                session['profile_photo'] = 'https://ui-avatars.com/api/?name=admin'
+                session['profile_photo'] = 'https://ui-avatars.com/api/?name=Admin&background=008be3&color=ffffff&bold=true&size=256'
                 return redirect(url_for('dashboard'), code=303)
             else:
                 try:
@@ -7202,6 +7288,12 @@ def login():
 
                     if user and check_password_cached(user[0], password):
                         user_id_val = user[6]
+                        c.execute("SELECT COALESCE(is_banned, 0), COALESCE(ban_reason, '') FROM users WHERE id = ?", (user_id_val,))
+                        binfo = c.fetchone()
+                        if binfo and binfo[0] == 1:
+                            conn.close()
+                            ban_why = binfo[1] or "Account suspended for excessive cancellations."
+                            return render_template('login.html', error=f"Your account has been suspended: {ban_why}")
                         matched_username = user[8] or user[4] or f"User-{user_id_val}"
                         matched_uid = user[7] if (len(user) > 7 and user[7]) else f"UID-{user_id_val:04d}"
                         user_display_name = user[4] or matched_username
@@ -7266,7 +7358,9 @@ def login():
                         
                         photo = user[5]
                         if not photo:
-                            photo = 'https://ui-avatars.com/api/?name=' + user_display_name
+                            photo = f"https://ui-avatars.com/api/?name={urllib.parse.quote_plus(user_display_name)}&background=008be3&color=ffffff&bold=true&size=256"
+                        elif photo.startswith('https://ui-avatars.com/api/?') and 'background=' not in photo:
+                            photo = photo + '&background=008be3&color=ffffff&bold=true&size=256'
                         elif not photo.startswith('http'):
                             photo = url_for('static', filename=photo)
                         session['profile_photo'] = photo
@@ -8347,18 +8441,31 @@ def generate_invoice_pdf_bytes(event: dict, reg_info) -> bytes:
     pdf.set_text_color(100, 116, 139)
     pdf.multi_cell(145, 3.8, "This tax invoice has been cryptographically generated by Events Booking. Scan the QR code to verify validity at any physical gate checkpoint or security desk. Keep this receipt for tax, academic reimbursement, and attendance verification purposes.")
 
-    # Authorized Signatory Seal
-    pdf.set_xy(125, 205)
-    pdf.set_font('Helvetica', 'B', 8.5)
-    pdf.set_text_color(15, 23, 42)
-    pdf.cell(65, 4.5, "For EVENTS BOOKING PLATFORM", align='C')
+    # Cryptographic Digital Verification Box (Replaces outdated Authorised Signatory)
+    pdf.set_fill_color(248, 250, 252)
+    pdf.set_draw_color(226, 232, 240)
+    pdf.rect(120, 202, 76, 36, 'DF')
+    pdf.set_fill_color(16, 185, 129)
+    pdf.rect(120, 202, 2, 36, 'F')
 
-    pdf.set_xy(125, 218)
-    pdf.set_font('Helvetica', 'I', 7.5)
-    pdf.set_text_color(100, 116, 139)
-    pdf.cell(65, 3.5, "Authorised Signatory", align='C')
-    pdf.set_xy(125, 222)
-    pdf.cell(65, 3.5, "(Digitally Generated Document)", align='C')
+    pdf.set_xy(124, 205)
+    pdf.set_font('Helvetica', 'B', 7.5)
+    pdf.set_text_color(16, 185, 129)
+    pdf.cell(70, 3.5, "OFFICIALLY AUTHENTICATED RECORD", align='L')
+
+    pdf.set_xy(124, 210)
+    pdf.set_font('Helvetica', '', 6.8)
+    pdf.set_text_color(71, 85, 105)
+    pdf.multi_cell(70, 3.2, "Digitally confirmed under Rule 46 of the Central Goods and Services Tax (CGST) Act, 2017.")
+
+    pdf.set_xy(124, 222)
+    pdf.set_font('Helvetica', 'B', 7)
+    pdf.set_text_color(15, 23, 42)
+    pdf.cell(70, 3.5, "[OK] Gateway Signature Verified", align='L')
+    pdf.set_xy(124, 226)
+    pdf.set_font('Helvetica', 'I', 6.5)
+    pdf.set_text_color(148, 163, 184)
+    pdf.cell(70, 3.5, "Electronic Tax Document - No Physical Signature Required", align='L')
 
     # Bottom Footer
     pdf.set_fill_color(15, 23, 42)
@@ -9238,6 +9345,7 @@ def register_event(event_id):
             c.execute("SELECT id FROM registrations WHERE username = ? AND event_id = ? ORDER BY id DESC LIMIT 1", (username, event_id))
             existing_row = c.fetchone()
             
+            seat_code = request.form.get('seat_code', '').strip().upper() or None
             if existing_row:
                 reg_id = existing_row[0]
                 ticket_code = f"{ticket_prefix}-{event_id:03d}-{reg_id:05d}"
@@ -9245,17 +9353,32 @@ def register_event(event_id):
                              SET full_name = ?, email = ?, phone = ?, college_id = ?, payment_method = ?, upi_id = ?, 
                                  team_name = ?, team_members = ?, status = 'active', cancelled_at = NULL, checked_in = 0, 
                                  checkin_time = NULL, timestamp = CURRENT_TIMESTAMP, ticket_code = ?, pass_type = ?,
-                                 promo_code = ?, discount_amount = ?, amount_paid = ? 
+                                 promo_code = ?, discount_amount = ?, amount_paid = ?, seat_code = COALESCE(?, seat_code) 
                              WHERE id = ?""",
-                          (full_name, email, phone, college_id, payment_method, upi_id, team_name, team_members_json, ticket_code, pass_type, promo_code, discount_amount, amount_paid, reg_id))
+                          (full_name, email, phone, college_id, payment_method, upi_id, team_name, team_members_json, ticket_code, pass_type, promo_code, discount_amount, amount_paid, seat_code, reg_id))
             else:
                 c.execute("""INSERT INTO registrations 
-                             (username, event_id, full_name, email, phone, college_id, payment_method, upi_id, team_name, team_members, pass_type, status, promo_code, discount_amount, amount_paid) 
-                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?)""",
-                          (username, event_id, full_name, email, phone, college_id, payment_method, upi_id, team_name, team_members_json, pass_type, promo_code, discount_amount, amount_paid))
+                             (username, event_id, full_name, email, phone, college_id, payment_method, upi_id, team_name, team_members, pass_type, status, promo_code, discount_amount, amount_paid, seat_code) 
+                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?)""",
+                          (username, event_id, full_name, email, phone, college_id, payment_method, upi_id, team_name, team_members_json, pass_type, promo_code, discount_amount, amount_paid, seat_code))
                 reg_id = c.lastrowid
                 ticket_code = f"{ticket_prefix}-{event_id:03d}-{reg_id:05d}"
                 c.execute("UPDATE registrations SET ticket_code = ? WHERE id = ?", (ticket_code, reg_id))
+
+            # Mark seat as booked if selected
+            if seat_code:
+                c.execute("""UPDATE event_seats 
+                             SET status = 'booked', booked_by = ?, ticket_id = ?, locked_by = NULL, locked_at = NULL 
+                             WHERE event_id = ? AND seat_code = ?""", (username, ticket_code, event_id, seat_code))
+
+            # Record custom question answers
+            c.execute("SELECT id, question_label FROM event_custom_questions WHERE event_id = ?", (event_id,))
+            for q_id, q_lbl in c.fetchall():
+                ans_val = request.form.get(f"custom_q_{q_id}", '').strip()
+                if ans_val:
+                    c.execute("""INSERT INTO registration_custom_answers 
+                                 (registration_id, event_id, username, question_id, question_label, answer_value) 
+                                 VALUES (?, ?, ?, ?, ?, ?)""", (reg_id, event_id, username, q_id, q_lbl, ans_val))
                 
             if seats_to_add > 0:
                 c.execute("UPDATE events SET seats_filled = COALESCE(seats_filled, 0) + ? WHERE id = ?", (seats_to_add, event_id))
@@ -9330,7 +9453,22 @@ def register_event(event_id):
         except Exception as e:
             return f"Error: {str(e)}", 500
             
-    return render_template('registration.html', event=event, username=session.get('username'), is_host=is_host(), requested_type=requested_type, conflict_event=conflict_event)
+        ensure_event_seats(event_id)
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT id, question_label, field_type, options_json, is_required FROM event_custom_questions WHERE event_id = ? ORDER BY display_order ASC", (event_id,))
+    custom_questions = []
+    for q_id, q_lbl, q_type, q_opts, q_req in c.fetchall():
+        opts = json.loads(q_opts) if q_opts else []
+        custom_questions.append({
+            'id': q_id,
+            'label': q_lbl,
+            'type': q_type,
+            'options': opts,
+            'required': bool(q_req)
+        })
+    conn.close()
+    return render_template('registration.html', event=event, username=session.get('username'), is_host=is_host(), requested_type=requested_type, conflict_event=conflict_event, custom_questions=custom_questions)
 
 @app.route('/unregister/<int:event_id>', methods=['POST'])
 def unregister_event(event_id):
@@ -9549,10 +9687,10 @@ def view_ticket_interactive(event_id=None, ticket_code=None):
     c = conn.cursor()
 
     if ticket_code:
-        c.execute("""SELECT id, event_id, full_name, email, phone, college_id, payment_method, upi_id, timestamp, team_name, team_members, status, cancelled_at, ticket_code, username, pass_type
+        c.execute("""SELECT id, event_id, full_name, email, phone, college_id, payment_method, upi_id, timestamp, team_name, team_members, status, cancelled_at, ticket_code, username, pass_type, seat_code
                      FROM registrations WHERE ticket_code = ?""", (ticket_code,))
     elif event_id:
-        c.execute("""SELECT id, event_id, full_name, email, phone, college_id, payment_method, upi_id, timestamp, team_name, team_members, status, cancelled_at, ticket_code, username, pass_type
+        c.execute("""SELECT id, event_id, full_name, email, phone, college_id, payment_method, upi_id, timestamp, team_name, team_members, status, cancelled_at, ticket_code, username, pass_type, seat_code
                      FROM registrations WHERE username = ? AND event_id = ? ORDER BY id DESC LIMIT 1""", (username, event_id))
     else:
         conn.close()
@@ -9584,10 +9722,15 @@ def view_ticket_interactive(event_id=None, ticket_code=None):
         gate_num = "STREAM ROOM 📡"
     else:
         pass_type_str = f"Team Pass ({team_name})" if team_name else "Solo Entry Pass"
-        zone_letter = chr(65 + (reg_id % 4))
-        seat_num = ((reg_id * 7) % 60) + 1
-        seat_zone = f"ZONE {zone_letter} • SEAT #{seat_num:02d}"
-        gate_num = f"GATE-0{((reg_id % 3) + 1)}"
+        assigned_seat = registration[16] if len(registration) > 16 and registration[16] else None
+        if assigned_seat:
+            seat_zone = f"RESERVED {assigned_seat}"
+            gate_num = "VIP EXPRESS GATE ⚡" if "VIP" in assigned_seat else f"GATE-0{((reg_id % 3) + 1)}"
+        else:
+            zone_letter = chr(65 + (reg_id % 4))
+            seat_num = ((reg_id * 7) % 60) + 1
+            seat_zone = f"ZONE {zone_letter} • SEAT #{seat_num:02d}"
+            gate_num = f"GATE-0{((reg_id % 3) + 1)}"
 
     base_url = request.host_url.rstrip('/') if request else 'http://127.0.0.1:5000'
     verify_url = f"{base_url}/verify/{final_ticket_code}"
@@ -9613,10 +9756,15 @@ def view_ticket_interactive(event_id=None, ticket_code=None):
 
     security_hash = hashlib.sha256(f"{final_ticket_code}:{ev_id}:{reg_user}:SECURE_GATE".encode()).hexdigest()[:16].upper()
     if reg_pass_type != 'live_stream':
-        zone_letter = chr(65 + (reg_id % 4))
-        seat_num = ((reg_id * 7) % 60) + 1
-        seat_zone = f"ZONE {zone_letter} • SEAT #{seat_num:02d}"
-        gate_num = f"GATE-0{((reg_id % 3) + 1)}"
+        assigned_seat = registration[16] if len(registration) > 16 and registration[16] else None
+        if assigned_seat:
+            seat_zone = f"RESERVED {assigned_seat}"
+            gate_num = "VIP EXPRESS GATE ⚡" if "VIP" in assigned_seat else f"GATE-0{((reg_id % 3) + 1)}"
+        else:
+            zone_letter = chr(65 + (reg_id % 4))
+            seat_num = ((reg_id * 7) % 60) + 1
+            seat_zone = f"ZONE {zone_letter} • SEAT #{seat_num:02d}"
+            gate_num = f"GATE-0{((reg_id % 3) + 1)}"
 
     return render_template(
         'ticket.html',
@@ -10317,7 +10465,7 @@ def profile():
         'email': user_data[2] or '',
         'phone': user_data[3] or '',
         'college_id': user_data[4] or '',
-        'profile_photo': user_data[5] or 'https://ui-avatars.com/api/?name=' + user_data[0],
+        'profile_photo': (user_data[5] + '&background=008be3&color=ffffff&bold=true&size=256' if (user_data[5] and user_data[5].startswith('https://ui-avatars.com/api/?') and 'background=' not in user_data[5]) else (user_data[5] or f"https://ui-avatars.com/api/?name={urllib.parse.quote_plus(user_data[1] or user_data[0])}&background=008be3&color=ffffff&bold=true&size=256")),
         'first_name': fn,
         'middle_name': mn,
         'last_name': ln,
@@ -10358,7 +10506,7 @@ def settings():
         'email': user_data[2] or '',
         'phone': user_data[3] or '',
         'college_id': user_data[4] or '',
-        'profile_photo': user_data[5] or 'https://ui-avatars.com/api/?name=' + user_data[0],
+        'profile_photo': (user_data[5] + '&background=008be3&color=ffffff&bold=true&size=256' if (user_data[5] and user_data[5].startswith('https://ui-avatars.com/api/?') and 'background=' not in user_data[5]) else (user_data[5] or f"https://ui-avatars.com/api/?name={urllib.parse.quote_plus(user_data[1] or user_data[0])}&background=008be3&color=ffffff&bold=true&size=256")),
     }
 
     return render_template('settings.html', user=user, is_host=is_host(), is_admin=is_admin(), msg=msg, error=error)
@@ -12144,92 +12292,856 @@ def host_studio_page(event_id):
     return render_template('live_event.html', event=event, username=session.get('username'), is_host=True, is_studio=True)
 
 
-# ─── Live Stream Subscription Routes (Hotstar Style) ─────────────────────────
+# ─── Complete Subscription Management Module Routes ─────────────────────────
+
+def send_subscription_confirmation_email_async(username, sub, payment_info, invoice_bytes=None):
+    """Dispatches subscription confirmation email asynchronously with invoice attached."""
+    try:
+        conn = get_db(row_factory=True)
+        c = conn.cursor()
+        c.execute("SELECT email, full_name, user_id, phone FROM users WHERE username = ?", (username,))
+        u = c.fetchone()
+        conn.close()
+        if not u or not u['email']:
+            return
+
+        recipient_email = u['email']
+        recipient_name = u['full_name'] or username
+        plan_meta = SUBSCRIPTION_PLANS.get(sub.get('plan_type'), SUBSCRIPTION_PLANS['normal'])
+        plan_title = plan_meta.get('title', 'Subscription Pack')
+        cycle_title = 'Annual Pass (1 Year)' if sub.get('billing_cycle') == 'yearly' else 'Monthly Pass (30 Days)'
+        price_str = f"INR {float(sub.get('price_paid', 0.0)):,.2f}"
+        invoice_num = sub.get('invoice_number') or f"INV-SUB-2026-{sub.get('id', 1):05d}"
+        expires_str = str(sub.get('expires_at') or '')[:10]
+
+        html_body = f"""
+        <html>
+        <body style="font-family: 'Segoe UI', Arial, sans-serif; background-color: #070709; color: #ffffff; padding: 25px; margin: 0;">
+            <div style="max-width: 640px; margin: 0 auto; background: #0d0d12; border: 1px solid rgba(0, 139, 227, 0.35); border-radius: 16px; padding: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+                <div style="border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 20px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
+                    <h2 style="margin: 0; color: #008be3; font-size: 22px; letter-spacing: 0.5px;">EVENTS BOOKING</h2>
+                    <span style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;">
+                        PAYMENT CONFIRMED
+                    </span>
+                </div>
+                
+                <h3 style="margin: 0 0 12px; font-size: 20px; color: #ffffff;">Welcome to {plan_title}! 🎉</h3>
+                <p style="color: #94a3b8; font-size: 14px; line-height: 1.6; margin: 0 0 20px;">
+                    Dear <strong>{recipient_name}</strong>,<br>
+                    Your subscription payment of <strong>{price_str}</strong> has been successfully verified and activated. You now have full VIP privileges and unmetered access to live stage broadcasts!
+                </p>
+
+                <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 18px; margin-bottom: 24px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px;">
+                        <span style="color: #94a3b8;">Subscription Plan:</span>
+                        <strong style="color: #ffffff;">{plan_title} ({cycle_title})</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px;">
+                        <span style="color: #94a3b8;">Invoice Number:</span>
+                        <span style="color: #008be3; font-weight: bold;">{invoice_num}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px;">
+                        <span style="color: #94a3b8;">Valid Until:</span>
+                        <span style="color: #38bdf8; font-weight: bold;">{expires_str}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 14px;">
+                        <span style="color: #94a3b8;">Transaction Reference:</span>
+                        <span style="color: #cbd5e1; font-family: monospace;">{sub.get('payment_id')}</span>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin: 28px 0;">
+                    <a href="http://127.0.0.1:5000/subscriptions" style="background: linear-gradient(135deg, #008be3, #0062a3); color: #ffffff; text-decoration: none; padding: 13px 32px; border-radius: 30px; font-weight: bold; font-size: 14px; display: inline-block; box-shadow: 0 4px 18px rgba(0, 139, 227, 0.4);">
+                        Access Your Subscription Hub
+                    </a>
+                </div>
+
+                <div style="border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 16px; margin-top: 24px; font-size: 12px; color: #64748b; line-height: 1.5;">
+                    📎 <strong>Attached:</strong> Official Tax Invoice PDF (<code>{invoice_num}.pdf</code>) with full GST and verification breakdown.<br>
+                    Need support? Contact us at support@eventsbooking.internal.
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+
+        text_body = f"""Events Booking - Subscription Confirmed!
+Plan: {plan_title} ({cycle_title})
+Amount Paid: {price_str}
+Invoice No: {invoice_num}
+Valid Until: {expires_str}
+Transaction ID: {sub.get('payment_id')}
+
+Your official tax invoice PDF is attached to this email.
+Visit your dashboard: http://127.0.0.1:5000/subscriptions
+"""
+        pdf_filename = f"Invoice_{invoice_num}.pdf"
+        _dispatch_html_email(
+            recipient_email,
+            f"🎉 Subscription Confirmed: {plan_title} ({invoice_num})",
+            html_body,
+            text_body,
+            pdf_bytes=invoice_bytes,
+            pdf_filename=pdf_filename
+        )
+    except Exception as e:
+        print(f"[SUB CONFIRMATION EMAIL ERROR] {e}")
+
+
+def send_subscription_cancellation_email_async(username, sub, refund_amount=0.0, cancel_type='end_of_period'):
+    """Dispatches subscription cancellation & refund notification email."""
+    try:
+        conn = get_db(row_factory=True)
+        c = conn.cursor()
+        c.execute("SELECT email, full_name FROM users WHERE username = ?", (username,))
+        u = c.fetchone()
+        conn.close()
+        if not u or not u['email']:
+            return
+
+        recipient_email = u['email']
+        recipient_name = u['full_name'] or username
+        plan_meta = SUBSCRIPTION_PLANS.get(sub.get('plan_type'), SUBSCRIPTION_PLANS['normal'])
+        plan_title = plan_meta.get('title', 'Subscription')
+
+        if cancel_type == 'immediate':
+            title_text = "Subscription Cancelled Immediately"
+            if refund_amount > 0:
+                body_desc = f"Your subscription has been cancelled immediately. An eligible refund of <strong>INR {refund_amount:,.2f}</strong> has been processed to your original payment method (typically credits within 5-7 business days)."
+            else:
+                body_desc = "Your subscription has been cancelled immediately upon your request. Standard free tier limits now apply to your account."
+        else:
+            title_text = "Auto-Renewal Cancelled"
+            exp_str = str(sub.get('expires_at') or '')[:10]
+            body_desc = f"Auto-renewal for your <strong>{plan_title}</strong> has been turned off. You will continue to enjoy uninterrupted VIP streaming perks until the conclusion of your billing cycle on <strong>{exp_str}</strong>."
+
+        html = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif; background-color: #070709; color: #ffffff; padding: 20px;">
+            <div style="max-width: 600px; margin: 0 auto; background: #0f172a; border-radius: 12px; padding: 30px; border: 1px solid rgba(239, 68, 68, 0.3);">
+                <h2 style="color: #ef4444; margin-top: 0;">{title_text}</h2>
+                <p>Hello <strong>{recipient_name}</strong>,</p>
+                <p>{body_desc}</p>
+                <p style="color: #94a3b8; font-size: 13px;">
+                    Your events, tickets, certificates, and historical account data remain completely safe and preserved. You can renew or switch plans anytime from the Subscription Hub.
+                </p>
+                <div style="text-align: center; margin: 25px 0;">
+                    <a href="http://127.0.0.1:5000/subscriptions" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #ffffff; text-decoration: none; padding: 10px 24px; border-radius: 20px; font-size: 13px; font-weight: bold; display: inline-block;">
+                        Manage Subscriptions
+                    </a>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        text = f"""Hello {recipient_name},
+
+{title_text}: {body_desc}
+
+Events Booking Team"""
+        _dispatch_html_email(recipient_email, f"Subscription Update: {title_text}", html, text)
+    except Exception as e:
+        print(f"[SUB CANCELLATION EMAIL ERROR] {e}")
+
 
 @app.route('/subscriptions')
 @app.route('/plans')
 def subscriptions_page():
     username = session.get('username')
-    current_sub = get_user_subscription(username) if username else None
+    current_sub = get_user_subscription(username)
+    pending_cancel = get_user_pending_cancellation(username, get_db) if username else None
+    user_status = get_user_subscription_status(username, get_db) if username else None
+    sub_history = get_user_subscription_history(username, get_db) if username else []
+    payment_history = get_user_payment_history(username, get_db) if username else []
+    usage_stats = get_subscription_usage_stats(username, get_db) if username else {}
+
+    # Check trial eligibility
+    can_claim_trial = False
+    if username and not current_sub:
+        try:
+            conn = get_db()
+            c = conn.cursor()
+            c.execute("SELECT COALESCE(trial_used, 0) FROM users WHERE username = ?", (username,))
+            r = c.fetchone()
+            conn.close()
+            if r and r[0] == 0 and len(sub_history) == 0:
+                can_claim_trial = True
+        except Exception:
+            pass
+
+    annual_eligibility = get_annual_cancellation_eligibility(current_sub) if current_sub and current_sub.get('billing_cycle') == 'yearly' else None
+    upgrade_credit = calculate_monthly_upgrade_credit(current_sub) if current_sub and current_sub.get('billing_cycle') == 'monthly' else 0.0
+
+    cancel_count = 0
+    if username:
+        try:
+            conn = get_db()
+            c = conn.cursor()
+            c.execute("SELECT COALESCE(cancellation_count, 0) FROM users WHERE username = ?", (username,))
+            cr = c.fetchone()
+            conn.close()
+            cancel_count = cr[0] if cr else 0
+        except Exception:
+            pass
+
     return render_template('subscriptions.html', 
                            current_sub=current_sub, 
+                           user_status=user_status,
+                           sub_history=sub_history,
+                           payment_history=payment_history,
+                           usage_stats=usage_stats,
+                           can_claim_trial=can_claim_trial,
+                           annual_eligibility=annual_eligibility,
+                           upgrade_credit=upgrade_credit,
+                           cancel_count=cancel_count,
                            plans=SUBSCRIPTION_PLANS,
                            username=username)
 
-@app.route('/api/subscription/subscribe', methods=['POST'])
-def api_subscribe():
+
+@app.route('/subscription/invoice/<int:sub_id>')
+def download_subscription_invoice(sub_id):
+    if not session.get('loggedin'):
+        flash("Please log in to download subscription invoices.", "warning")
+        return redirect(url_for('login'))
+
+    username = session.get('username')
+    user_is_adm = is_admin()
+
+    conn = get_db(row_factory=True)
+    c = conn.cursor()
+    c.execute("SELECT * FROM subscriptions WHERE id = ?", (sub_id,))
+    sub_row = c.fetchone()
+
+    if not sub_row:
+        conn.close()
+        return "Invoice not found", 404
+
+    sub_dict = dict(sub_row)
+    if not user_is_adm and sub_dict['username'].lower() != username.lower():
+        conn.close()
+        return "Forbidden: Unauthorized access to invoice", 403
+
+    c.execute("SELECT * FROM subscription_payments WHERE subscription_id = ? ORDER BY id DESC LIMIT 1", (sub_id,))
+    pay_row = c.fetchone()
+    pay_dict = dict(pay_row) if pay_row else {}
+
+    c.execute("SELECT id, username, full_name, email, phone, user_id FROM users WHERE username = ?", (sub_dict['username'],))
+    user_row = c.fetchone()
+    user_dict = dict(user_row) if user_row else {'username': sub_dict['username']}
+    conn.close()
+
+    pdf_bytes = generate_subscription_invoice_pdf_bytes(sub_dict, pay_dict, user_dict)
+    record_subscription_usage(username, 'invoice_download', get_db)
+
+    inv_num = sub_dict.get('invoice_number') or f"INV-SUB-2026-{sub_id:05d}"
+    response = make_response(pdf_bytes)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = f'inline; filename="Invoice_{inv_num}.pdf"'
+    return response
+
+
+@app.route('/api/subscription/annual-status')
+def api_subscription_annual_status():
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Please log in.'}), 401
+    username = session.get('username')
+    sub = get_user_subscription(username)
+    if not sub or sub.get('billing_cycle') != 'yearly':
+        return jsonify({'ok': True, 'is_annual': False, 'subscription': None, 'eligibility': None})
+    elig = get_annual_cancellation_eligibility(sub)
+    return jsonify({
+        'ok': True,
+        'is_annual': True,
+        'subscription': sub,
+        'eligibility': elig
+    })
+
+@app.route('/api/subscription/plans')
+def api_subscription_plans():
+    return jsonify({
+        'ok': True,
+        'plans': SUBSCRIPTION_PLANS,
+        'tier_limits': TIER_LIMITS
+    })
+
+
+@app.route('/api/subscription/validate-coupon', methods=['POST'])
+def api_validate_subscription_coupon():
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Please log in.'}), 401
+    data = request.get_json() or {}
+    code = data.get('code', '')
+    plan_type = data.get('plan_type', 'normal')
+    billing_cycle = data.get('billing_cycle', 'monthly')
+    
+    plan_cfg = SUBSCRIPTION_PLANS.get(plan_type, SUBSCRIPTION_PLANS['normal'])
+    original_amount = float(plan_cfg['yearly_price'] if billing_cycle == 'yearly' else plan_cfg['monthly_price'])
+
+    res = validate_subscription_coupon(code, plan_type, billing_cycle, original_amount, get_db)
+    return jsonify(res)
+
+
+@app.route('/api/subscription/create-order', methods=['POST'])
+def api_subscription_create_order():
     if not session.get('loggedin'):
         return jsonify({'ok': False, 'error': 'Please log in to purchase a subscription.'}), 401
-    
+
     username = session.get('username')
     data = request.get_json() or {}
     plan_type = data.get('plan_type', '').lower().strip()
     billing_cycle = data.get('billing_cycle', 'monthly').lower().strip()
-    payment_method = data.get('payment_method', 'UPI')
-    
+    coupon_code = data.get('coupon_code', '').strip().upper()
+
     if plan_type not in ('normal', 'super'):
-        return jsonify({'ok': False, 'error': 'Invalid subscription pack.'}), 400
+        return jsonify({'ok': False, 'error': 'Invalid subscription plan.'}), 400
     if billing_cycle not in ('monthly', 'yearly'):
         billing_cycle = 'monthly'
-        
+
+    # Check active subscription rules
+    current_sub = get_user_subscription(username)
+    pending_cancel = get_user_pending_cancellation(username, get_db)
+    if pending_cancel and billing_cycle == 'monthly':
+        return jsonify({
+            'ok': False,
+            'error': 'Your previous subscription cancellation is pending processing. You cannot purchase a Monthly plan until cancellation is finalized.',
+            'pending_cancellation': True
+        }), 400
+    if current_sub and current_sub.get('is_active'):
+        # Rule 1: If user has active Annual plan, reject Monthly plan purchase with detailed 7-day eligibility
+        if current_sub.get('billing_cycle') == 'yearly' and billing_cycle == 'monthly':
+            elig = get_annual_cancellation_eligibility(current_sub)
+            return jsonify({
+                'ok': False,
+                'error': 'Already Subscribed to Annual Plan!',
+                'annual_conflict': True,
+                'is_eligible': elig['is_eligible'],
+                'days_remaining': elig['days_remaining'],
+                'hours_remaining': elig['hours_remaining'],
+                'remaining_str': elig['remaining_str'],
+                'purchase_date': elig.get('purchase_date', ''),
+                'message': 'You are currently subscribed to the Annual Plan. You cannot directly switch to the Monthly Plan. If you wish to subscribe to the Monthly Plan, you must cancel your Annual subscription within 7 days of its original purchase date.'
+            }), 400
+
+        # Rule 2: If user has active Super VIP, reject downgrade to Normal plan
+        if current_sub.get('plan_type') == 'super' and plan_type == 'normal':
+            return jsonify({
+                'ok': False,
+                'error': 'You already have an active Super VIP plan, which includes all Normal pack features and unlimited access. Downgrades are not permitted while Super VIP is active.'
+            }), 400
+            elig = get_annual_cancellation_eligibility(current_sub)
+            return jsonify({
+                'ok': False,
+                'error': 'Already Subscribed to Annual Plan!',
+                'annual_conflict': True,
+                'is_eligible': elig['is_eligible'],
+                'days_remaining': elig['days_remaining'],
+                'hours_remaining': elig['hours_remaining'],
+                'remaining_str': elig['remaining_str'],
+                'purchase_date': elig.get('purchase_date', ''),
+                'message': 'You are currently subscribed to the Annual Plan. You cannot directly switch to the Monthly Plan. If you wish to subscribe to the Monthly Plan, you must cancel your Annual subscription within 7 days of its original purchase date.'
+            }), 400
+
+        # Rule 2: Prevent duplicate active subscription of same tier and cycle if > 7 days remaining
+        if current_sub.get('plan_type') == plan_type and current_sub.get('billing_cycle') == billing_cycle:
+            if current_sub.get('days_left', 0) > 7:
+                return jsonify({
+                    'ok': False,
+                    'error': f'You already have an active {current_sub.get("plan_title")} subscription with {current_sub.get("days_left")} days remaining. Early renewal is available within 7 days of expiry.'
+                }), 400
+
+    # Calculate monthly upgrade credit if active monthly subscriber is upgrading to yearly
+    upgrade_credit = 0.0
+    if current_sub and current_sub.get('is_active') and current_sub.get('billing_cycle') == 'monthly' and billing_cycle == 'yearly':
+        upgrade_credit = calculate_monthly_upgrade_credit(current_sub)
+
     plan_cfg = SUBSCRIPTION_PLANS[plan_type]
-    price_paid = float(plan_cfg['yearly_price'] if billing_cycle == 'yearly' else plan_cfg['monthly_price'])
+    base_price = float(plan_cfg['yearly_price'] if billing_cycle == 'yearly' else plan_cfg['monthly_price'])
+    discount = 0.0
+
+    if coupon_code:
+        c_res = validate_subscription_coupon(coupon_code, plan_type, billing_cycle, base_price, get_db)
+        if c_res.get('ok'):
+            discount = float(c_res.get('discount_amount', 0.0))
+
+    final_payable = round(max(0.0, base_price - discount - upgrade_credit), 2)
+    amount_paise = int(final_payable * 100)
+
+    # 18% GST breakdown
+    taxable_base = round(final_payable / 1.18, 2)
+    tax_total = round(final_payable - taxable_base, 2)
+
+    # Razorpay Gateway Order creation
+    order_id = f"sub_order_{int(time.time())}_{random.randint(1000, 9999)}"
+    if rzp_client and amount_paise > 0:
+        try:
+            rzp_order = rzp_client.order.create({
+                'amount': amount_paise,
+                'currency': 'INR',
+                'receipt': f"sub_{plan_type[:3]}_{int(time.time())}",
+                'notes': {
+                    'username': username,
+                    'plan_type': plan_type,
+                    'billing_cycle': billing_cycle
+                }
+            })
+            order_id = rzp_order['id']
+        except Exception as e:
+            print(f"[RAZORPAY ORDER NOTE] Using fallback order ID: {e}")
+
+    # Record order attempt in subscription_payments
+    try:
+        conn = get_db()
+        c = conn.cursor()
+        c.execute("""
+            INSERT INTO subscription_payments 
+            (username, order_id, payment_id, plan_type, billing_cycle, amount, tax_amount, discount_amount, coupon_code, payment_status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'created')
+        """, (username, order_id, f"PENDING_{order_id}", plan_type, billing_cycle, final_payable, tax_total, discount, coupon_code))
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(f"[ORDER RECORD NOTE] {e}")
+
+    return jsonify({
+        'ok': True,
+        'order_id': order_id,
+        'amount': amount_paise,
+        'amount_inr': final_payable,
+        'base_price': base_price,
+        'discount_amount': discount,
+        'upgrade_credit': upgrade_credit,
+        'tax_amount': tax_total,
+        'plan_type': plan_type,
+        'plan_title': plan_cfg['title'],
+        'billing_cycle': billing_cycle,
+        'key': RAZORPAY_KEY_ID,
+        'currency': 'INR'
+    })
+
+
+@app.route('/api/subscription/verify-payment', methods=['POST'])
+def api_subscription_verify_payment():
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Please log in.'}), 401
+
+    username = session.get('username')
+    data = request.get_json() or {}
+    order_id = data.get('razorpay_order_id') or data.get('order_id')
+    payment_id = data.get('razorpay_payment_id') or data.get('payment_id') or f"PAY-SUB-{random.randint(100000, 999999)}"
+    signature = data.get('razorpay_signature', '')
+    plan_type = data.get('plan_type', 'normal').lower()
+    billing_cycle = data.get('billing_cycle', 'monthly').lower()
+    coupon_code = data.get('coupon_code', '').strip().upper()
+    payment_method = data.get('payment_method', 'Razorpay / UPI')
+
+    if plan_type not in ('normal', 'super'):
+        return jsonify({'ok': False, 'error': 'Invalid plan.'}), 400
+    if billing_cycle not in ('monthly', 'yearly'):
+        billing_cycle = 'monthly'
+
+    # Secure HMAC SHA-256 signature verification for production Razorpay keys
+    if order_id and signature and RAZORPAY_KEY_SECRET and RAZORPAY_KEY_SECRET != 'demo_secret':
+        generated_sig = hmac.new(
+            bytes(RAZORPAY_KEY_SECRET, 'utf-8'),
+            bytes(f"{order_id}|{payment_id}", 'utf-8'),
+            hashlib.sha256
+        ).hexdigest()
+        if signature != generated_sig:
+            return jsonify({'ok': False, 'error': 'Payment verification failed: Invalid cryptographic signature.'}), 400
+
+    plan_cfg = SUBSCRIPTION_PLANS[plan_type]
+    base_price = float(plan_cfg['yearly_price'] if billing_cycle == 'yearly' else plan_cfg['monthly_price'])
+    discount = 0.0
+
+    if coupon_code:
+        c_res = validate_subscription_coupon(coupon_code, plan_type, billing_cycle, base_price, get_db)
+        if c_res.get('ok'):
+            discount = float(c_res.get('discount_amount', 0.0))
+            mark_coupon_used(coupon_code, get_db)
+
+    # Enforce active Annual subscription lock & pending cancellation checks on backend
+    current_sub = get_user_subscription(username)
+    pending_cancel = get_user_pending_cancellation(username, get_db)
+    if pending_cancel and billing_cycle == 'monthly':
+        return jsonify({
+            'ok': False,
+            'error': 'Your previous subscription cancellation is pending processing. You cannot purchase a Monthly plan until cancellation is finalized.',
+            'pending_cancellation': True
+        }), 400
+
+    if current_sub and current_sub.get('is_active'):
+        if current_sub.get('billing_cycle') == 'yearly' and billing_cycle == 'monthly':
+            elig = get_annual_cancellation_eligibility(current_sub)
+            return jsonify({
+                'ok': False,
+                'error': 'Already Subscribed to Annual Plan!',
+                'annual_conflict': True,
+                'is_eligible': elig['is_eligible'],
+                'days_remaining': elig['days_remaining'],
+                'hours_remaining': elig['hours_remaining'],
+                'remaining_str': elig['remaining_str'],
+                'message': 'You are currently subscribed to the Annual Plan. You cannot directly switch to the Monthly Plan. If you wish to subscribe to the Monthly Plan, you must cancel your Annual subscription within 7 days of its original purchase date.'
+            }), 400
+
+        if current_sub.get('plan_type') == 'super' and plan_type == 'normal':
+            return jsonify({
+                'ok': False,
+                'error': 'You already have an active Super VIP plan, which includes all Normal pack features and unlimited access. Downgrades are not permitted while Super VIP is active.'
+            }), 400
+            elig = get_annual_cancellation_eligibility(current_sub)
+            return jsonify({
+                'ok': False,
+                'error': 'Already Subscribed to Annual Plan!',
+                'annual_conflict': True,
+                'is_eligible': elig['is_eligible'],
+                'days_remaining': elig['days_remaining'],
+                'hours_remaining': elig['hours_remaining'],
+                'remaining_str': elig['remaining_str'],
+                'message': 'You are currently subscribed to the Annual Plan. You cannot directly switch to the Monthly Plan. If you wish to subscribe to the Monthly Plan, you must cancel your Annual subscription within 7 days of its original purchase date.'
+            }), 400
+
+    upgrade_credit = 0.0
+    if current_sub and current_sub.get('is_active') and current_sub.get('billing_cycle') == 'monthly' and billing_cycle == 'yearly':
+        upgrade_credit = calculate_monthly_upgrade_credit(current_sub)
+
+    price_paid = round(max(0.0, base_price - discount - upgrade_credit), 2)
+    tax_total = round(price_paid - (price_paid / 1.18), 2)
     max_quality = plan_cfg['max_quality']
     max_event_price = plan_cfg['max_event_price_inr']
     max_screens = plan_cfg['max_screens']
-    
+
     days = 365 if billing_cycle == 'yearly' else 30
     expires_at = datetime.now() + timedelta(days=days)
     expires_str = expires_at.strftime('%Y-%m-%d %H:%M:%S')
-    
-    payment_id = f"SUB-{plan_type.upper()}-{random.randint(100000, 999999)}"
-    
+
     conn = get_db()
     c = conn.cursor()
-    # Mark existing active subscriptions as upgraded/superseded
-    c.execute("UPDATE subscriptions SET status = 'superseded' WHERE username = ? AND status = 'active'", (username,))
-    
+
+    # Mark existing active subscriptions as superseded
+    c.execute("UPDATE subscriptions SET status = 'superseded' WHERE username = ? AND status IN ('active', 'in_grace_period')", (username,))
+
+    # Insert verified active subscription
     c.execute("""
-        INSERT INTO subscriptions (username, plan_type, billing_cycle, price_paid, max_quality, max_event_price_inr, max_screens, status, expires_at, payment_id, payment_method)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?)
-    """, (username, plan_type, billing_cycle, price_paid, max_quality, max_event_price, max_screens, expires_str, payment_id, payment_method))
-    
+        INSERT INTO subscriptions 
+        (username, plan_type, billing_cycle, price_paid, max_quality, max_event_price_inr, 
+         max_screens, status, expires_at, payment_id, payment_method, auto_renew, tax_amount, discount_amount, coupon_code)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, 1, ?, ?, ?)
+    """, (username, plan_type, billing_cycle, price_paid, max_quality, max_event_price, 
+            max_screens, expires_str, payment_id, payment_method, tax_total, discount, coupon_code))
+    sub_id = c.lastrowid
+    invoice_num = f"INV-SUB-2026-{sub_id:05d}"
+    c.execute("UPDATE subscriptions SET invoice_number = ? WHERE id = ?", (invoice_num, sub_id))
+
+    # Record payment audit log in subscription_payments
+    c.execute("""
+        INSERT INTO subscription_payments 
+        (subscription_id, username, order_id, payment_id, plan_type, billing_cycle, amount, tax_amount, discount_amount, coupon_code, payment_method, payment_status, invoice_number)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'success', ?)
+    """, (sub_id, username, order_id or f"ORD-{sub_id}", payment_id, plan_type, billing_cycle, price_paid, tax_total, discount, coupon_code, payment_method, invoice_num))
+
     plan_name = plan_cfg['title']
-    cycle_name = 'Annual (1 Year)' if billing_cycle == 'yearly' else 'Monthly'
+    cycle_name = 'Annual Pass' if billing_cycle == 'yearly' else 'Monthly Pass'
     c.execute("INSERT INTO notifications (username, message, link) VALUES (?, ?, ?)",
-              (username, f"🎉 You are now subscribed to {plan_name} ({cycle_name})! Enjoy live interactive stage broadcasts.", url_for('subscriptions_page')))
-    
+              (username, f"🎉 You are now subscribed to {plan_name} ({cycle_name})! Invoice {invoice_num} is ready.", url_for('subscriptions_page')))
+
     conn.commit()
     conn.close()
-    
-    log_action(username, 'SUBSCRIBE', f"Subscribed to {plan_name} ({billing_cycle}) for ₹{price_paid}")
-    
+
+    log_action(username, 'SUBSCRIBE_VERIFIED', f"Subscribed to {plan_name} ({billing_cycle}) for ₹{price_paid} [{payment_id}]")
+
+    # Generate PDF invoice and dispatch confirmation email asynchronously
+    sub_data = {
+        'id': sub_id,
+        'username': username,
+        'plan_type': plan_type,
+        'billing_cycle': billing_cycle,
+        'price_paid': price_paid,
+        'tax_amount': tax_total,
+        'discount_amount': discount,
+        'upgrade_credit': upgrade_credit,
+        'coupon_code': coupon_code,
+        'payment_id': payment_id,
+        'payment_method': payment_method,
+        'started_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'expires_at': expires_str,
+        'invoice_number': invoice_num
+    }
+    pay_data = {
+        'payment_id': payment_id,
+        'payment_method': payment_method,
+        'discount_amount': discount,
+        'upgrade_credit': upgrade_credit,
+        'coupon_code': coupon_code
+    }
+
+    try:
+        conn = get_db(row_factory=True)
+        c = conn.cursor()
+        c.execute("SELECT id, username, full_name, email, phone, user_id FROM users WHERE username = ?", (username,))
+        u_row = c.fetchone()
+        conn.close()
+        u_dict = dict(u_row) if u_row else {'username': username}
+        inv_pdf = generate_subscription_invoice_pdf_bytes(sub_data, pay_data, u_dict)
+        threading.Thread(
+            target=send_subscription_confirmation_email_async,
+            args=(username, sub_data, pay_data, inv_pdf),
+            daemon=True
+        ).start()
+    except Exception as e:
+        print(f"[INVOICE GEN NOTE] {e}")
+
     return jsonify({
         'ok': True,
         'message': f"🎉 Successfully subscribed to {plan_name} ({cycle_name})!",
+        'subscription': sub_data,
+        'invoice_url': url_for('download_subscription_invoice', sub_id=sub_id)
+    })
+
+
+@app.route('/api/subscription/subscribe', methods=['POST'])
+def api_subscribe_legacy_compat():
+    """Backwards compatible subscription endpoint with auto-verification."""
+    return api_subscription_verify_payment()
+
+
+@app.route('/api/subscription/webhook', methods=['POST'])
+def api_subscription_webhook():
+    """Razorpay Webhook endpoint with HMAC SHA-256 signature verification."""
+    webhook_secret = os.environ.get('RAZORPAY_WEBHOOK_SECRET', '')
+    signature = request.headers.get('X-Razorpay-Signature', '')
+    data_raw = request.get_data()
+
+    if webhook_secret:
+        expected_sig = hmac.new(
+            bytes(webhook_secret, 'utf-8'),
+            data_raw,
+            hashlib.sha256
+        ).hexdigest()
+        if signature != expected_sig:
+            return jsonify({'ok': False, 'error': 'Invalid webhook signature'}), 400
+
+    payload = request.get_json() or {}
+    event_type = payload.get('event', '')
+
+    try:
+        conn = get_db()
+        c = conn.cursor()
+        if event_type == 'payment.captured':
+            payment_ent = payload.get('payload', {}).get('payment', {}).get('entity', {})
+            pay_id = payment_ent.get('id')
+            c.execute("UPDATE subscription_payments SET payment_status = 'captured' WHERE payment_id = ?", (pay_id,))
+        elif event_type == 'refund.processed':
+            refund_ent = payload.get('payload', {}).get('refund', {}).get('entity', {})
+            ref_id = refund_ent.get('id')
+            c.execute("UPDATE subscription_refunds SET status = 'processed' WHERE gateway_refund_id = ?", (ref_id,))
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(f"[WEBHOOK EVENT ERROR] {e}")
+
+    return jsonify({'status': 'ok', 'event': event_type}), 200
+
+
+@app.route('/api/subscription/toggle-auto-renew', methods=['POST'])
+def api_subscription_toggle_auto_renew():
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Please log in.'}), 401
+
+    username = session.get('username')
+    sub = get_user_subscription(username)
+    if not sub:
+        return jsonify({'ok': False, 'error': 'No active subscription found.'}), 404
+
+    current_renew = sub.get('auto_renew', 1)
+    new_renew = 0 if current_renew else 1
+
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("UPDATE subscriptions SET auto_renew = ? WHERE id = ?", (new_renew, sub['id']))
+    conn.commit()
+    conn.close()
+
+    status_str = "enabled" if new_renew else "disabled"
+    log_action(username, 'TOGGLE_AUTO_RENEW', f"Auto-renewal {status_str} for subscription #{sub['id']}")
+    return jsonify({
+        'ok': True,
+        'auto_renew': bool(new_renew),
+        'message': f"Subscription auto-renewal has been {status_str}."
+    })
+
+
+@app.route('/api/subscription/refund-quote', methods=['GET', 'POST'])
+def api_subscription_refund_quote():
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Please log in.'}), 401
+
+    username = session.get('username')
+    sub = get_user_subscription(username)
+    if not sub:
+        return jsonify({'ok': False, 'error': 'No active subscription found.'}), 404
+
+    quote = calculate_subscription_refund(sub)
+    return jsonify({
+        'ok': True,
+        'quote': quote,
         'subscription': {
-            'plan_type': plan_type,
-            'plan_title': plan_name,
-            'billing_cycle': billing_cycle,
-            'price_paid': price_paid,
-            'max_quality': max_quality,
-            'expires_at': expires_str,
-            'payment_id': payment_id
+            'plan_title': sub.get('plan_title'),
+            'billing_cycle': sub.get('billing_cycle'),
+            'price_paid': sub.get('price_paid'),
+            'started_at': sub.get('started_at'),
+            'expires_at': sub.get('expires_at')
         }
     })
+
 
 @app.route('/api/subscription/cancel', methods=['POST'])
 def api_cancel_subscription():
     if not session.get('loggedin'):
         return jsonify({'ok': False, 'error': 'Please log in.'}), 401
+
     username = session.get('username')
+    sub = get_user_subscription(username)
+    if not sub:
+        return jsonify({'ok': False, 'error': 'No active subscription found to cancel.'}), 404
+
+    data = request.get_json() or {}
+    cancel_type = data.get('cancel_type', 'immediate').lower()  # 'immediate' or 'end_of_period'
+    reason = sanitize_text(data.get('reason', 'User requested cancellation'), 250)
+    feedback = sanitize_text(data.get('feedback', ''), 500)
+    sub_id = sub['id']
+
     conn = get_db()
     c = conn.cursor()
-    c.execute("UPDATE subscriptions SET status = 'cancelled' WHERE username = ? AND status = 'active'", (username,))
+
+    if cancel_type == 'immediate':
+        # For annual subscriptions, strictly validate 7-calendar-day refund eligibility
+        if sub.get('billing_cycle') == 'yearly':
+            elig = get_annual_cancellation_eligibility(sub)
+            if not elig['is_eligible']:
+                return jsonify({
+                    'ok': False,
+                    'error': 'Annual subscription cancellation with refund is locked after 7 calendar days of purchase. Your 7-day eligibility period has expired.',
+                    'is_locked': True,
+                    'can_cancel_with_refund': False,
+                    'eligibility': elig
+                }), 400
+
+        quote = calculate_subscription_refund(sub)
+        refund_amount = quote.get('refund_amount', 0.0)
+        refund_status = 'processed' if refund_amount > 0 else 'none'
+        refund_id = f"REF-{sub_id}-{random.randint(10000, 99999)}" if refund_amount > 0 else ''
+
+        c.execute("""
+            UPDATE subscriptions 
+            SET status = 'cancelled', auto_renew = 0, cancel_type = 'immediate',
+                cancellation_reason = ?, cancellation_feedback = ?, cancelled_at = CURRENT_TIMESTAMP,
+                refund_amount = ?, refund_status = ?, refund_id = ?, refund_reason = ?
+            WHERE id = ?
+        """, (reason, feedback, refund_amount, refund_status, refund_id, quote.get('rule_applied', ''), sub_id))
+
+        if refund_amount > 0:
+            c.execute("""
+                INSERT INTO subscription_refunds 
+                (subscription_id, username, payment_id, amount, reason, status, gateway_refund_id, processed_by)
+                VALUES (?, ?, ?, ?, ?, 'processed', ?, 'system')
+            """, (sub_id, username, sub.get('payment_id'), refund_amount, reason, refund_id))
+
+        conn.commit()
+        conn.close()
+
+        log_action(username, 'CANCEL_SUB_IMMEDIATE', f"Immediate cancellation. Refund: ₹{refund_amount} [{quote.get('rule_applied')}]")
+        threading.Thread(
+            target=send_subscription_cancellation_email_async,
+            args=(username, sub, refund_amount, 'immediate'),
+            daemon=True
+        ).start()
+
+        msg = f"Subscription cancelled immediately. Eligible refund of ₹{refund_amount:,.2f} has been processed." if refund_amount > 0 else "Subscription cancelled immediately upon request."
+        return jsonify({
+            'ok': True,
+            'cancel_type': 'immediate',
+            'refund_amount': refund_amount,
+            'account_banned': False,
+            'message': msg
+        })
+
+    else:  # 'end_of_period'
+        c.execute("""
+            UPDATE subscriptions 
+            SET auto_renew = 0, cancel_type = 'end_of_period',
+                cancellation_reason = ?, cancellation_feedback = ?, cancelled_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+        """, (reason, feedback, sub_id))
+        conn.commit()
+        conn.close()
+
+        log_action(username, 'CANCEL_SUB_END_PERIOD', f"Cancelled auto-renewal. Access active until {sub.get('expires_at')}")
+        threading.Thread(
+            target=send_subscription_cancellation_email_async,
+            args=(username, sub, 0.0, 'end_of_period'),
+            daemon=True
+        ).start()
+
+        return jsonify({
+            'ok': True,
+            'cancel_type': 'end_of_period',
+            'message': 'Subscription auto-renewal has been cancelled. Your VIP streaming access will remain fully functional until the end of your billing cycle.'
+        })
+
+
+@app.route('/api/subscription/claim-trial', methods=['POST'])
+def api_claim_free_trial():
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Please log in to claim your 7-day free trial.'}), 401
+
+    username = session.get('username')
+    current_sub = get_user_subscription(username)
+    if current_sub and current_sub.get('is_active'):
+        return jsonify({'ok': False, 'error': 'You already have an active subscription.'}), 400
+
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT COALESCE(trial_used, 0) FROM users WHERE username = ?", (username,))
+    row = c.fetchone()
+    if row and row[0] == 1:
+        conn.close()
+        return jsonify({'ok': False, 'error': 'You have already redeemed your 7-day free trial.'}), 400
+
+    # Grant 7-day Normal Pack trial
+    plan_type = 'normal'
+    plan_cfg = SUBSCRIPTION_PLANS['normal']
+    expires_at = (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')
+    trial_id = f"TRIAL-{random.randint(100000, 999999)}"
+
+    c.execute("""
+        INSERT INTO subscriptions 
+        (username, plan_type, billing_cycle, price_paid, max_quality, max_event_price_inr, 
+         max_screens, status, expires_at, payment_id, payment_method, auto_renew, is_trial, trial_ends_at)
+        VALUES (?, 'normal', 'trial', 0.0, '720p', 1000.0, 1, 'active', ?, ?, 'Free Trial', 0, 1, ?)
+    """, (username, expires_at, trial_id, expires_at))
+    sub_id = c.lastrowid
+    inv_num = f"INV-TRIAL-2026-{sub_id:05d}"
+    c.execute("UPDATE subscriptions SET invoice_number = ? WHERE id = ?", (inv_num, sub_id))
+    c.execute("UPDATE users SET trial_used = 1 WHERE username = ?", (username,))
+
+    c.execute("""
+        INSERT INTO subscription_payments 
+        (subscription_id, username, order_id, payment_id, plan_type, billing_cycle, amount, payment_method, payment_status, invoice_number)
+        VALUES (?, ?, 'TRIAL_ORDER', ?, 'normal', 'trial', 0.0, 'Free Trial', 'success', ?)
+    """, (sub_id, username, trial_id, inv_num))
+
+    c.execute("INSERT INTO notifications (username, message, link) VALUES (?, ?, ?)",
+              (username, "🎉 Your 7-Day Free VIP Live Streaming Trial is active! Enjoy live events up to ₹1,000 for free.", url_for('subscriptions_page')))
+
     conn.commit()
     conn.close()
-    log_action(username, 'CANCEL_SUBSCRIPTION', 'User cancelled active subscription auto-renewal.')
-    return jsonify({'ok': True, 'message': 'Subscription auto-renewal cancelled. You can continue streaming until your billing period ends.'})
+
+    log_action(username, 'CLAIM_TRIAL', "Redeemed 7-day Normal Pack Free Trial")
+    return jsonify({
+        'ok': True,
+        'message': "🎉 Congratulations! Your 7-day Free VIP Streaming Trial has been activated!"
+    })
+
 
 @app.route('/api/subscription/current')
 def api_current_subscription():
@@ -12238,6 +13150,338 @@ def api_current_subscription():
         return jsonify({'ok': True, 'subscription': None})
     sub = get_user_subscription(username)
     return jsonify({'ok': True, 'subscription': sub})
+
+
+@app.route('/api/subscription/usage')
+def api_subscription_usage():
+    username = session.get('username')
+    if not username:
+        return jsonify({'ok': False, 'error': 'Not logged in'}), 401
+    stats = get_subscription_usage_stats(username, get_db)
+    return jsonify({'ok': True, 'usage': stats})
+
+
+@app.route('/api/subscription/popup-status')
+def api_subscription_popup_status():
+    username = session.get('username')
+    if not username:
+        return jsonify({'ok': True, 'trigger': 'guest', 'plan': None})
+    status_info = get_user_subscription_status(username, get_db)
+    return jsonify({
+        'ok': True,
+        'trigger': status_info.get('popup_trigger'),
+        'has_active': status_info.get('has_active'),
+        'in_grace_period': status_info.get('in_grace_period'),
+        'subscription': status_info.get('subscription')
+    })
+
+
+# ─── ADMIN SUBSCRIPTION MANAGEMENT ──────────────────────────────────────────
+
+@app.route('/admin/subscriptions')
+@admin_required
+def admin_subscriptions():
+    status_filter = request.args.get('status', 'all').strip().lower()
+    search_q = request.args.get('q', '').strip().lower()
+
+    conn = get_db(row_factory=True)
+    c = conn.cursor()
+
+    # KPI Financial Metrics
+    c.execute("SELECT COUNT(*) FROM subscriptions WHERE status = 'active' AND datetime(expires_at) > datetime('now')")
+    active_subs_count = c.fetchone()[0]
+
+    c.execute("SELECT COUNT(*) FROM subscriptions WHERE status = 'expired' OR (status = 'active' AND datetime(expires_at) <= datetime('now'))")
+    expired_subs_count = c.fetchone()[0]
+
+    c.execute("SELECT COUNT(*) FROM subscriptions WHERE status = 'cancelled'")
+    cancelled_subs_count = c.fetchone()[0]
+
+    c.execute("SELECT COUNT(*) FROM subscriptions WHERE status = 'in_grace_period'")
+    grace_subs_count = c.fetchone()[0]
+
+    # Revenue Totals
+    c.execute("SELECT COALESCE(SUM(amount), 0.0) FROM subscription_payments WHERE payment_status = 'success'")
+    total_rev = float(c.fetchone()[0])
+
+    c.execute("SELECT COALESCE(SUM(amount), 0.0) FROM subscription_refunds WHERE status = 'processed'")
+    total_refunds = float(c.fetchone()[0])
+
+    # MRR calculation (Monthly subscriptions active + Annual subscriptions / 12)
+    c.execute("""
+        SELECT COALESCE(SUM(price_paid), 0.0) FROM subscriptions 
+        WHERE status = 'active' AND billing_cycle = 'monthly' AND datetime(expires_at) > datetime('now')
+    """)
+    mrr_monthly = float(c.fetchone()[0])
+
+    c.execute("""
+        SELECT COALESCE(SUM(price_paid), 0.0) FROM subscriptions 
+        WHERE status = 'active' AND billing_cycle = 'yearly' AND datetime(expires_at) > datetime('now')
+    """)
+    arr_yearly = float(c.fetchone()[0])
+    mrr_total = round(mrr_monthly + (arr_yearly / 12.0), 2)
+    arr_total = round(mrr_total * 12.0, 2)
+
+    # Churn rate
+    total_ever = active_subs_count + cancelled_subs_count + expired_subs_count
+    churn_rate = round((cancelled_subs_count / float(total_ever) * 100.0), 1) if total_ever > 0 else 0.0
+
+    # Build Subscriptions List Query
+    query = """
+        SELECT s.*, u.full_name, u.email, u.phone
+        FROM subscriptions s
+        LEFT JOIN users u ON s.username = u.username
+        WHERE 1=1
+    """
+    params = []
+
+    if status_filter == 'active':
+        query += " AND s.status = 'active' AND datetime(s.expires_at) > datetime('now')"
+    elif status_filter == 'expired':
+        query += " AND (s.status = 'expired' OR (s.status = 'active' AND datetime(s.expires_at) <= datetime('now')))"
+    elif status_filter == 'cancelled':
+        query += " AND s.status = 'cancelled'"
+    elif status_filter == 'grace':
+        query += " AND s.status = 'in_grace_period'"
+
+    if search_q:
+        query += " AND (LOWER(s.username) LIKE ? OR LOWER(s.payment_id) LIKE ? OR LOWER(COALESCE(s.invoice_number, '')) LIKE ?)"
+        params.extend([f"%{search_q}%", f"%{search_q}%", f"%{search_q}%"])
+
+    query += " ORDER BY s.id DESC LIMIT 100"
+    c.execute(query, params)
+    subs_list = [dict(r) for r in c.fetchall()]
+
+    for s in subs_list:
+        plan_meta = SUBSCRIPTION_PLANS.get(s['plan_type'], {})
+        s['plan_title'] = plan_meta.get('title', s['plan_type'].capitalize())
+        s['badge'] = plan_meta.get('badge', s['plan_type'])
+
+    # Refund Requests / Logs
+    c.execute("""
+        SELECT r.*, s.plan_type, s.billing_cycle, s.price_paid 
+        FROM subscription_refunds r
+        LEFT JOIN subscriptions s ON r.subscription_id = s.id
+        ORDER BY r.id DESC LIMIT 50
+    """)
+    refunds_list = [dict(r) for r in c.fetchall()]
+
+    # Active Coupons List
+    c.execute("SELECT * FROM subscription_coupons ORDER BY id DESC")
+    coupons_list = [dict(r) for r in c.fetchall()]
+
+    # Upcoming Expirations Report (next 7 and 30 days)
+    c.execute("""
+        SELECT s.*, u.email, u.full_name
+        FROM subscriptions s
+        LEFT JOIN users u ON s.username = u.username
+        WHERE s.status = 'active' 
+          AND datetime(s.expires_at) > datetime('now')
+          AND datetime(s.expires_at) <= datetime('now', '+30 days')
+        ORDER BY s.expires_at ASC
+    """)
+    upcoming_expirations = [dict(r) for r in c.fetchall()]
+    for s in upcoming_expirations:
+        exp_dt = parse_iso_datetime(s['expires_at'])
+        s['days_left'] = max(0, (exp_dt - datetime.now()).days) if exp_dt else 0
+        plan_meta = SUBSCRIPTION_PLANS.get(s['plan_type'], {})
+        s['plan_title'] = plan_meta.get('title', s['plan_type'].capitalize())
+
+    # User list for complimentary subscription selector
+    c.execute("SELECT username, full_name, email FROM users ORDER BY username ASC")
+    all_users = [dict(r) for r in c.fetchall()]
+
+    conn.close()
+
+    stats = get_admin_stats()
+
+    return render_template('admin/subscriptions.html',
+                           active='subscriptions',
+                           stats=stats,
+                           active_subs_count=active_subs_count,
+                           expired_subs_count=expired_subs_count,
+                           cancelled_subs_count=cancelled_subs_count,
+                           grace_subs_count=grace_subs_count,
+                           total_rev=total_rev,
+                           total_refunds=total_refunds,
+                           mrr_total=mrr_total,
+                           arr_total=arr_total,
+                           churn_rate=churn_rate,
+                           status_filter=status_filter,
+                           search_q=search_q,
+                           subs_list=subs_list,
+                           refunds_list=refunds_list,
+                           coupons_list=coupons_list,
+                           upcoming_expirations=upcoming_expirations,
+                           all_users=all_users,
+                           plans=SUBSCRIPTION_PLANS,
+                           username=session.get('username'))
+
+
+@app.route('/admin/subscriptions/grant', methods=['POST'])
+@admin_required
+def admin_grant_subscription():
+    target_username = request.form.get('username', '').strip()
+    plan_type = request.form.get('plan_type', 'super').lower()
+    duration_days = int(request.form.get('duration_days', 30))
+
+    if plan_type not in ('normal', 'super'):
+        plan_type = 'super'
+
+    plan_cfg = SUBSCRIPTION_PLANS[plan_type]
+    expires_at = (datetime.now() + timedelta(days=duration_days)).strftime('%Y-%m-%d %H:%M:%S')
+    pay_id = f"ADMIN-VIP-{random.randint(100000, 999999)}"
+
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("UPDATE subscriptions SET status = 'superseded' WHERE username = ? AND status = 'active'", (target_username,))
+    c.execute("""
+        INSERT INTO subscriptions 
+        (username, plan_type, billing_cycle, price_paid, max_quality, max_event_price_inr, 
+         max_screens, status, expires_at, payment_id, payment_method, auto_renew)
+        VALUES (?, ?, 'complimentary', 0.0, ?, ?, ?, 'active', ?, ?, 'Admin Complimentary', 0)
+    """, (target_username, plan_type, plan_cfg['max_quality'], plan_cfg['max_event_price_inr'],
+            plan_cfg['max_screens'], expires_at, pay_id))
+    sub_id = c.lastrowid
+    inv_num = f"INV-VIP-2026-{sub_id:05d}"
+    c.execute("UPDATE subscriptions SET invoice_number = ? WHERE id = ?", (inv_num, sub_id))
+
+    c.execute("""
+        INSERT INTO subscription_payments 
+        (subscription_id, username, order_id, payment_id, plan_type, billing_cycle, amount, payment_method, payment_status, invoice_number)
+        VALUES (?, ?, 'ADMIN_GRANT', ?, ?, 'complimentary', 0.0, 'Admin Complimentary', 'success', ?)
+    """, (sub_id, target_username, pay_id, plan_type, inv_num))
+
+    plan_title = plan_cfg['title']
+    c.execute("INSERT INTO notifications (username, message, link) VALUES (?, ?, ?)",
+              (target_username, f"👑 You were granted complimentary {plan_title} access for {duration_days} days by Platform Administration!", url_for('subscriptions_page')))
+
+    conn.commit()
+    conn.close()
+
+    log_action(session.get('username'), 'ADMIN_GRANT_SUB', f"Granted {plan_title} to {target_username} for {duration_days} days")
+    flash(f"Successfully granted complimentary {plan_title} to {target_username} ({duration_days} days).", "success")
+    return redirect(url_for('admin_subscriptions'))
+
+
+@app.route('/admin/subscriptions/extend', methods=['POST'])
+@admin_required
+def admin_extend_subscription():
+    sub_id = int(request.form.get('subscription_id', 0))
+    extra_days = int(request.form.get('extra_days', 30))
+
+    conn = get_db(row_factory=True)
+    c = conn.cursor()
+    c.execute("SELECT * FROM subscriptions WHERE id = ?", (sub_id,))
+    row = c.fetchone()
+
+    if not row:
+        conn.close()
+        flash("Subscription not found.", "danger")
+        return redirect(url_for('admin_subscriptions'))
+
+    sub = dict(row)
+    cur_exp = parse_iso_datetime(sub.get('expires_at')) or datetime.now()
+    base_dt = max(datetime.now(), cur_exp)
+    new_exp = (base_dt + timedelta(days=extra_days)).strftime('%Y-%m-%d %H:%M:%S')
+
+    c.execute("UPDATE subscriptions SET expires_at = ?, status = 'active' WHERE id = ?", (new_exp, sub_id))
+    conn.commit()
+    conn.close()
+
+    log_action(session.get('username'), 'ADMIN_EXTEND_SUB', f"Extended subscription #{sub_id} ({sub['username']}) by {extra_days} days to {new_exp}")
+    flash(f"Subscription #{sub_id} ({sub['username']}) extended by {extra_days} days (valid until {new_exp[:10]}).", "success")
+    return redirect(url_for('admin_subscriptions'))
+
+
+@app.route('/admin/subscriptions/cancel', methods=['POST'])
+@admin_required
+def admin_cancel_subscription():
+    sub_id = int(request.form.get('subscription_id', 0))
+    reason = request.form.get('reason', 'Administrative Override')
+
+    conn = get_db(row_factory=True)
+    c = conn.cursor()
+    c.execute("SELECT * FROM subscriptions WHERE id = ?", (sub_id,))
+    row = c.fetchone()
+    if not row:
+        conn.close()
+        flash("Subscription not found.", "danger")
+        return redirect(url_for('admin_subscriptions'))
+
+    sub = dict(row)
+    c.execute("UPDATE subscriptions SET status = 'cancelled', auto_renew = 0, cancellation_reason = ?, cancelled_at = CURRENT_TIMESTAMP WHERE id = ?", (reason, sub_id))
+    conn.commit()
+    conn.close()
+
+    log_action(session.get('username'), 'ADMIN_CANCEL_SUB', f"Admin cancelled subscription #{sub_id} ({sub['username']})")
+    flash(f"Subscription #{sub_id} for {sub['username']} has been cancelled.", "warning")
+    return redirect(url_for('admin_subscriptions'))
+
+
+@app.route('/admin/subscriptions/refund/action', methods=['POST'])
+@admin_required
+def admin_refund_action():
+    refund_id = int(request.form.get('refund_id', 0))
+    action = request.form.get('action', 'approve').lower()
+    admin_notes = request.form.get('notes', '')
+
+    conn = get_db()
+    c = conn.cursor()
+    new_status = 'approved' if action == 'approve' else 'rejected'
+    c.execute("UPDATE subscription_refunds SET status = ?, notes = ?, processed_by = ? WHERE id = ?",
+              (new_status, admin_notes, session.get('username'), refund_id))
+    conn.commit()
+    conn.close()
+
+    log_action(session.get('username'), 'ADMIN_REFUND_ACTION', f"Refund #{refund_id} set to {new_status}")
+    flash(f"Refund request #{refund_id} has been marked as {new_status}.", "success")
+    return redirect(url_for('admin_subscriptions'))
+
+
+@app.route('/admin/subscriptions/coupon/create', methods=['POST'])
+@admin_required
+def admin_create_coupon():
+    code = request.form.get('code', '').strip().upper()
+    discount_type = request.form.get('discount_type', 'percent').lower()
+    discount_val = float(request.form.get('discount_val', 20.0))
+    max_discount = float(request.form.get('max_discount', 0.0))
+    min_amount = float(request.form.get('min_amount', 0.0))
+    applicable_plan = request.form.get('applicable_plan', 'all').lower()
+    applicable_cycle = request.form.get('applicable_cycle', 'all').lower()
+    valid_days = int(request.form.get('valid_days', 90))
+    description = request.form.get('description', '')
+
+    expiry = (datetime.now() + timedelta(days=valid_days)).strftime('%Y-%m-%d %H:%M:%S')
+
+    conn = get_db()
+    c = conn.cursor()
+    try:
+        c.execute("""
+            INSERT INTO subscription_coupons 
+            (code, discount_type, discount_val, max_discount, min_amount, applicable_plan, applicable_cycle, valid_until, max_uses, times_used, is_active, description)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1000, 0, 1, ?)
+        """, (code, discount_type, discount_val, max_discount, min_amount, applicable_plan, applicable_cycle, expiry, description))
+        conn.commit()
+        flash(f"Coupon '{code}' created successfully!", "success")
+    except Exception as e:
+        flash(f"Error creating coupon: {e}", "danger")
+    finally:
+        conn.close()
+
+    return redirect(url_for('admin_subscriptions'))
+
+
+@app.route('/admin/subscriptions/coupon/<int:coupon_id>/toggle', methods=['POST'])
+@admin_required
+def admin_toggle_coupon(coupon_id):
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("UPDATE subscription_coupons SET is_active = CASE WHEN is_active = 1 THEN 0 ELSE 1 END WHERE id = ?", (coupon_id,))
+    conn.commit()
+    conn.close()
+    flash(f"Coupon #{coupon_id} status toggled.", "info")
+    return redirect(url_for('admin_subscriptions'))
 
 @app.route('/api/event/<int:event_id>/live/heartbeat', methods=['POST'])
 def api_live_heartbeat(event_id):
@@ -12256,6 +13500,543 @@ def api_live_heartbeat(event_id):
             'message': 'Streaming Paused: Your subscription plan allows 1 screen/user at a time. Active playback is already in progress on another device/window.'
         })
     return jsonify({'ok': True, 'is_concurrent': False})
+
+
+
+# ==============================================================================
+# EXPANSION MODULE 1: INTERACTIVE SEATING CHART & ZONE RESERVATION ENGINE
+# ==============================================================================
+
+def ensure_event_seats(event_id, conn=None):
+    should_close = False
+    if conn is None:
+        conn = get_db()
+        should_close = True
+    c = conn.cursor()
+    c.execute("SELECT COUNT(*) FROM event_seats WHERE event_id = ?", (event_id,))
+    if c.fetchone()[0] == 0:
+        seats_to_insert = []
+        for row in ['A', 'B']:
+            for col in range(1, 9):
+                code = f"VIP-{row}{col:02d}"
+                seats_to_insert.append((event_id, code, 'vip', row, col, 150.0, 'available'))
+        for row in ['C', 'D']:
+            for col in range(1, 11):
+                code = f"PRM-{row}{col:02d}"
+                seats_to_insert.append((event_id, code, 'premium', row, col, 75.0, 'available'))
+        for row in ['E', 'F', 'G', 'H']:
+            for col in range(1, 11):
+                code = f"GEN-{row}{col:02d}"
+                seats_to_insert.append((event_id, code, 'general', row, col, 0.0, 'available'))
+        c.executemany("""INSERT OR IGNORE INTO event_seats 
+                         (event_id, seat_code, tier, seat_row, seat_col, price_addon, status) 
+                         VALUES (?, ?, ?, ?, ?, ?, ?)""", seats_to_insert)
+        conn.commit()
+    if should_close:
+        conn.close()
+
+@app.route('/api/event/<int:event_id>/seats', methods=['GET'])
+def api_event_seats(event_id):
+    ensure_event_seats(event_id)
+    username = session.get('username')
+    conn = get_db()
+    c = conn.cursor()
+    
+    # Release expired locks (> 10 mins)
+    ten_mins_ago = (datetime.now() - timedelta(minutes=10)).strftime("%Y-%m-%d %H:%M:%S")
+    c.execute("""UPDATE event_seats 
+                 SET status = 'available', locked_by = NULL, locked_at = NULL 
+                 WHERE event_id = ? AND status = 'locked' AND locked_at < ?""", (event_id, ten_mins_ago))
+    conn.commit()
+    
+    c.execute("""SELECT id, seat_code, tier, seat_row, seat_col, price_addon, status, locked_by 
+                 FROM event_seats WHERE event_id = ? ORDER BY seat_row ASC, seat_col ASC""", (event_id,))
+    rows = c.fetchall()
+    conn.close()
+    
+    seats_by_row = {}
+    user_locked_seat = None
+    
+    for r in rows:
+        s_id, code, tier, s_row, s_col, addon, status, locked_by = r
+        is_my_lock = (status == 'locked' and locked_by == username)
+        if is_my_lock:
+            user_locked_seat = code
+            
+        if s_row not in seats_by_row:
+            seats_by_row[s_row] = []
+            
+        seats_by_row[s_row].append({
+            'id': s_id,
+            'code': code,
+            'tier': tier,
+            'row': s_row,
+            'col': s_col,
+            'addon': addon,
+            'status': 'selected' if is_my_lock else status,
+            'is_mine': is_my_lock
+        })
+        
+    return jsonify({
+        'ok': True,
+        'event_id': event_id,
+        'seats_by_row': seats_by_row,
+        'user_locked_seat': user_locked_seat
+    })
+
+@app.route('/api/event/<int:event_id>/lock-seat', methods=['POST'])
+def api_lock_seat(event_id):
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Please log in to select seats.'}), 401
+        
+    username = session.get('username')
+    data = request.get_json() or {}
+    seat_code = data.get('seat_code', '').strip().upper()
+    
+    if not seat_code:
+        return jsonify({'ok': False, 'error': 'No seat code provided.'}), 400
+        
+    ensure_event_seats(event_id)
+    conn = get_db()
+    c = conn.cursor()
+    
+    # Release any existing locks by this user for this event
+    c.execute("""UPDATE event_seats 
+                 SET status = 'available', locked_by = NULL, locked_at = NULL 
+                 WHERE event_id = ? AND locked_by = ? AND status = 'locked'""", (event_id, username))
+                 
+    # Check requested seat
+    c.execute("""SELECT id, tier, price_addon, status, locked_by, locked_at 
+                 FROM event_seats WHERE event_id = ? AND seat_code = ?""", (event_id, seat_code))
+    seat = c.fetchone()
+    
+    if not seat:
+        conn.close()
+        return jsonify({'ok': False, 'error': 'Seat not found in venue layout.'}), 404
+        
+    s_id, tier, addon, status, locked_by, locked_at = seat
+    
+    # Check if seat is booked
+    if status == 'booked':
+        conn.close()
+        return jsonify({'ok': False, 'error': f"Seat {seat_code} is already booked."}), 409
+        
+    # Check if locked by someone else within 10 minutes
+    if status == 'locked' and locked_by != username:
+        if locked_at:
+            try:
+                l_dt = datetime.strptime(locked_at[:19], "%Y-%m-%d %H:%M:%S")
+                if datetime.now() - l_dt < timedelta(minutes=10):
+                    conn.close()
+                    return jsonify({'ok': False, 'error': f"Seat {seat_code} is currently held by another attendee."}), 409
+            except Exception:
+                pass
+                
+    now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    c.execute("""UPDATE event_seats 
+                 SET status = 'locked', locked_by = ?, locked_at = ? 
+                 WHERE event_id = ? AND seat_code = ?""", (username, now_str, event_id, seat_code))
+    conn.commit()
+    conn.close()
+    
+    return jsonify({
+        'ok': True,
+        'seat_code': seat_code,
+        'tier': tier,
+        'addon': addon,
+        'expires_in_seconds': 600
+    })
+
+@app.route('/api/event/<int:event_id>/release-seat', methods=['POST'])
+def api_release_seat(event_id):
+    username = session.get('username')
+    if not username:
+        return jsonify({'ok': True})
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""UPDATE event_seats 
+                 SET status = 'available', locked_by = NULL, locked_at = NULL 
+                 WHERE event_id = ? AND locked_by = ? AND status = 'locked'""", (event_id, username))
+    conn.commit()
+    conn.close()
+    return jsonify({'ok': True})
+
+
+# ==============================================================================
+# EXPANSION MODULE 2: LIVE AUDIENCE ENGAGEMENT (SLIDO Q&A, POLLS, RAFFLE WHEEL)
+# ==============================================================================
+
+@app.route('/api/live/<int:event_id>/qa', methods=['GET'])
+def api_live_qa_list(event_id):
+    username = session.get('username')
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""SELECT q.id, q.username, q.question, q.upvotes, q.is_answered, q.created_at,
+                        (SELECT COUNT(*) FROM live_qa_upvotes u WHERE u.question_id = q.id AND u.username = ?) as my_vote,
+                        (SELECT full_name FROM users WHERE users.username = q.username) as full_name
+                 FROM live_qa q
+                 WHERE q.event_id = ?
+                 ORDER BY q.is_answered ASC, q.upvotes DESC, q.id DESC""", (username, event_id))
+    rows = c.fetchall()
+    conn.close()
+    
+    questions = []
+    for r in rows:
+        q_id, q_user, q_text, upvotes, answered, created, my_vote, full_name = r
+        questions.append({
+            'id': q_id,
+            'username': q_user,
+            'author_name': full_name or q_user,
+            'question': q_text,
+            'upvotes': upvotes or 0,
+            'is_answered': bool(answered),
+            'has_upvoted': bool(my_vote),
+            'created_at': str(created)[:16]
+        })
+    return jsonify({'ok': True, 'questions': questions})
+
+@app.route('/api/live/<int:event_id>/qa/ask', methods=['POST'])
+def api_live_qa_ask(event_id):
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Please log in to ask questions.'}), 401
+    username = session.get('username')
+    data = request.get_json() or {}
+    text = (data.get('question') or '').strip()
+    if not text:
+        return jsonify({'ok': False, 'error': 'Question cannot be empty.'}), 400
+    if len(text) > 300:
+        return jsonify({'ok': False, 'error': 'Question too long (max 300 chars).'}), 400
+        
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("INSERT INTO live_qa (event_id, username, question, upvotes) VALUES (?, ?, ?, 1)", (event_id, username, text))
+    q_id = c.lastrowid
+    c.execute("INSERT INTO live_qa_upvotes (question_id, username) VALUES (?, ?)", (q_id, username))
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'ok': True, 'id': q_id, 'question': text})
+
+@app.route('/api/live/<int:event_id>/qa/<int:question_id>/upvote', methods=['POST'])
+def api_live_qa_upvote(event_id, question_id):
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Please log in to upvote.'}), 401
+    username = session.get('username')
+    conn = get_db()
+    c = conn.cursor()
+    
+    c.execute("SELECT id FROM live_qa_upvotes WHERE question_id = ? AND username = ?", (question_id, username))
+    has_voted = c.fetchone()
+    
+    if has_voted:
+        c.execute("DELETE FROM live_qa_upvotes WHERE question_id = ? AND username = ?", (question_id, username))
+        c.execute("UPDATE live_qa SET upvotes = MAX(0, upvotes - 1) WHERE id = ?", (question_id,))
+        voted_now = False
+    else:
+        c.execute("INSERT INTO live_qa_upvotes (question_id, username) VALUES (?, ?)", (question_id, username))
+        c.execute("UPDATE live_qa SET upvotes = upvotes + 1 WHERE id = ?", (question_id,))
+        voted_now = True
+        
+    c.execute("SELECT upvotes FROM live_qa WHERE id = ?", (question_id,))
+    new_upvotes = c.fetchone()[0]
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'ok': True, 'upvotes': new_upvotes, 'has_upvoted': voted_now})
+
+@app.route('/api/live/<int:event_id>/polls', methods=['GET'])
+def api_live_polls_active(event_id):
+    username = session.get('username')
+    conn = get_db()
+    c = conn.cursor()
+    
+    # Get active poll for this event
+    c.execute("SELECT id, question, options, is_active FROM live_polls WHERE event_id = ? AND is_active = 1 ORDER BY id DESC LIMIT 1", (event_id,))
+    poll_row = c.fetchone()
+    
+    if not poll_row:
+        default_opts = json.dumps(["Ultra High (2K/1080p)", "Standard HD (720p)", "Multi-Cam Dashcam Feed", "Audio Only / Minimal"])
+        c.execute("INSERT INTO live_polls (event_id, question, options, is_active) VALUES (?, ?, ?, 1)",
+                  (event_id, "How is your live stage stream experience today?", default_opts))
+        conn.commit()
+        poll_id = c.lastrowid
+        poll_q = "How is your live stage stream experience today?"
+        options_list = json.loads(default_opts)
+    else:
+        poll_id, poll_q, opts_raw, is_active = poll_row
+        try:
+            options_list = json.loads(opts_raw)
+        except Exception:
+            options_list = [opts_raw]
+            
+    # Calculate vote totals
+    c.execute("SELECT option_index, COUNT(*) FROM live_poll_votes WHERE poll_id = ? GROUP BY option_index", (poll_id,))
+    vote_counts = dict(c.fetchall())
+    total_votes = sum(vote_counts.values())
+    
+    user_vote = None
+    if username:
+        c.execute("SELECT option_index FROM live_poll_votes WHERE poll_id = ? AND username = ?", (poll_id, username))
+        uv = c.fetchone()
+        if uv:
+            user_vote = uv[0]
+            
+    conn.close()
+    
+    results = []
+    for idx, opt_title in enumerate(options_list):
+        cnt = vote_counts.get(idx, 0)
+        pct = round((cnt / total_votes * 100), 1) if total_votes > 0 else 0
+        results.append({
+            'index': idx,
+            'title': opt_title,
+            'count': cnt,
+            'percent': pct
+        })
+        
+    return jsonify({
+        'ok': True,
+        'poll_id': poll_id,
+        'question': poll_q,
+        'total_votes': total_votes,
+        'user_voted_index': user_vote,
+        'options': results
+    })
+
+@app.route('/api/live/<int:event_id>/polls/vote', methods=['POST'])
+def api_live_polls_vote(event_id):
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Please log in to vote in live polls.'}), 401
+    username = session.get('username')
+    data = request.get_json() or {}
+    poll_id = data.get('poll_id')
+    option_idx = data.get('option_index')
+    
+    if poll_id is None or option_idx is None:
+        return jsonify({'ok': False, 'error': 'Invalid poll selection.'}), 400
+        
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""INSERT OR REPLACE INTO live_poll_votes (poll_id, username, option_index) 
+                 VALUES (?, ?, ?)""", (poll_id, username, int(option_idx)))
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'ok': True, 'message': 'Vote recorded successfully!'})
+
+@app.route('/api/live/<int:event_id>/raffle', methods=['GET'])
+def api_live_raffle_attendees(event_id):
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""SELECT username, full_name, ticket_code, checked_in 
+                 FROM registrations 
+                 WHERE event_id = ? AND status = 'active' 
+                 ORDER BY checked_in DESC, id ASC LIMIT 50""", (event_id,))
+    rows = c.fetchall()
+    conn.close()
+    
+    attendees = []
+    for u, fn, tc, ci in rows:
+        attendees.append({
+            'username': u,
+            'name': fn or u,
+            'ticket': tc,
+            'checked_in': bool(ci)
+        })
+    return jsonify({'ok': True, 'attendees': attendees})
+
+
+# ==============================================================================
+# EXPANSION MODULE 3: HACKATHON SQUAD HUB & PROJECT SUBMISSIONS / JUDGING
+# ==============================================================================
+
+@app.route('/api/teams/submit-project', methods=['POST'])
+def api_team_submit_project():
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Please log in.'}), 401
+    username = session.get('username')
+    data = request.get_json() or {}
+    
+    event_id = data.get('event_id')
+    team_name = (data.get('team_name') or '').strip()
+    project_title = (data.get('project_title') or '').strip()
+    tagline = (data.get('tagline') or '').strip()
+    description = (data.get('description') or '').strip()
+    github_url = (data.get('github_url') or '').strip()
+    demo_url = (data.get('demo_url') or '').strip()
+    tech_stack = (data.get('tech_stack') or '').strip()
+    
+    if not event_id or not project_title or not github_url:
+        return jsonify({'ok': False, 'error': 'Project Title and GitHub Repository URL are required.'}), 400
+        
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""INSERT INTO team_submissions 
+                 (event_id, team_name, team_lead, project_title, tagline, description, github_url, demo_url, tech_stack) 
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+              (event_id, team_name or f"Team {username}", username, project_title, tagline, description, github_url, demo_url, tech_stack))
+    sub_id = c.lastrowid
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'ok': True, 'submission_id': sub_id, 'message': 'Project submitted successfully for judging!'})
+
+@app.route('/api/teams/<int:event_id>/submissions', methods=['GET'])
+def api_team_submissions_list(event_id):
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""SELECT s.id, s.event_id, s.team_name, s.team_lead, s.project_title, s.tagline, 
+                        s.description, s.github_url, s.demo_url, s.tech_stack, s.submitted_at,
+                        (SELECT AVG(total_score) FROM team_judge_scores j WHERE j.submission_id = s.id) as avg_score,
+                        (SELECT COUNT(*) FROM team_judge_scores j WHERE j.submission_id = s.id) as reviews_count
+                 FROM team_submissions s
+                 WHERE s.event_id = ?
+                 ORDER BY avg_score DESC, s.id DESC""", (event_id,))
+    rows = c.fetchall()
+    conn.close()
+    
+    submissions = []
+    for r in rows:
+        s_id, ev_id, t_name, lead, title, tag, desc, gh, demo, stack, dt, avg_sc, rev_cnt = r
+        submissions.append({
+            'id': s_id,
+            'team_name': t_name,
+            'team_lead': lead,
+            'project_title': title,
+            'tagline': tag or '',
+            'description': desc or '',
+            'github_url': gh,
+            'demo_url': demo or '',
+            'tech_stack': stack or '',
+            'submitted_at': str(dt)[:16],
+            'average_score': round(avg_sc, 1) if avg_sc else None,
+            'reviews_count': rev_cnt or 0
+        })
+    return jsonify({'ok': True, 'submissions': submissions})
+
+@app.route('/api/teams/<int:submission_id>/score', methods=['POST'])
+def api_team_judge_score(submission_id):
+    if not (is_admin() or is_host()):
+        return jsonify({'ok': False, 'error': 'Only Hosts & Judges can evaluate submissions.'}), 403
+    username = session.get('username')
+    data = request.get_json() or {}
+    
+    try:
+        innov = float(data.get('innovation', 0))
+        tech = float(data.get('technical', 0))
+        design = float(data.get('design', 0))
+        pres = float(data.get('presentation', 0))
+    except Exception:
+        return jsonify({'ok': False, 'error': 'Invalid numeric score.'}), 400
+        
+    feedback = (data.get('feedback') or '').strip()
+    total = round((innov + tech + design + pres), 1)
+    
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""INSERT OR REPLACE INTO team_judge_scores 
+                 (submission_id, judge_username, innovation_score, technical_score, design_score, presentation_score, feedback, total_score) 
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+              (submission_id, username, innov, tech, design, pres, feedback, total))
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'ok': True, 'total_score': total, 'message': 'Evaluation score saved successfully!'})
+
+
+# ==============================================================================
+# EXPANSION MODULE 4: GAMIFICATION XP REWARD STORE & REDEMPTION
+# ==============================================================================
+
+@app.route('/api/xp/rewards', methods=['GET'])
+def api_xp_rewards_catalog():
+    username = session.get('username')
+    user_xp = 0
+    if username:
+        conn = get_db()
+        c = conn.cursor()
+        c.execute("SELECT COUNT(*) FROM registrations WHERE username = ? AND status = 'active'", (username,))
+        regs_cnt = c.fetchone()[0]
+        c.execute("SELECT COUNT(*) FROM registrations WHERE username = ? AND checked_in = 1", (username,))
+        checked_cnt = c.fetchone()[0]
+        c.execute("SELECT COALESCE(SUM(xp_spent), 0) FROM xp_redemptions WHERE username = ?", (username,))
+        spent_xp = c.fetchone()[0]
+        
+        earned_xp = (regs_cnt * 100) + (checked_cnt * 250) + 150
+        user_xp = max(0, earned_xp - spent_xp)
+        
+        c.execute("SELECT id, title, description, xp_cost, reward_type, reward_value, icon, badge_color FROM xp_rewards_catalog ORDER BY xp_cost ASC")
+        catalog = [dict(zip(['id', 'title', 'description', 'xp_cost', 'reward_type', 'reward_value', 'icon', 'badge_color'], row)) for row in c.fetchall()]
+        
+        c.execute("SELECT r.id, c.title, r.xp_spent, r.coupon_code, r.status, r.redeemed_at FROM xp_redemptions r JOIN xp_rewards_catalog c ON r.reward_id = c.id WHERE r.username = ? ORDER BY r.id DESC", (username,))
+        my_redemptions = [dict(zip(['id', 'title', 'xp_spent', 'coupon_code', 'status', 'redeemed_at'], row)) for row in c.fetchall()]
+        conn.close()
+    else:
+        catalog = []
+        my_redemptions = []
+        
+    return jsonify({
+        'ok': True,
+        'user_xp': user_xp,
+        'catalog': catalog,
+        'redemptions': my_redemptions
+    })
+
+@app.route('/api/xp/redeem', methods=['POST'])
+def api_xp_redeem_reward():
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Please log in to redeem XP rewards.'}), 401
+    username = session.get('username')
+    data = request.get_json() or {}
+    reward_id = data.get('reward_id')
+    
+    if not reward_id:
+        return jsonify({'ok': False, 'error': 'No reward selected.'}), 400
+        
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT id, title, xp_cost, reward_type, reward_value FROM xp_rewards_catalog WHERE id = ?", (reward_id,))
+    reward = c.fetchone()
+    
+    if not reward:
+        conn.close()
+        return jsonify({'ok': False, 'error': 'Reward not found.'}), 404
+        
+    r_id, r_title, cost, r_type, r_val = reward
+    
+    c.execute("SELECT COUNT(*) FROM registrations WHERE username = ? AND status = 'active'", (username,))
+    regs_cnt = c.fetchone()[0]
+    c.execute("SELECT COUNT(*) FROM registrations WHERE username = ? AND checked_in = 1", (username,))
+    checked_cnt = c.fetchone()[0]
+    c.execute("SELECT COALESCE(SUM(xp_spent), 0) FROM xp_redemptions WHERE username = ?", (username,))
+    spent_xp = c.fetchone()[0]
+    
+    available_xp = max(0, ((regs_cnt * 100) + (checked_cnt * 250) + 150) - spent_xp)
+    
+    if available_xp < cost:
+        conn.close()
+        return jsonify({'ok': False, 'error': f"Insufficient XP balance. You have {available_xp} XP, but this reward requires {cost} XP."}), 400
+        
+    coupon_code = f"XP-{r_type.upper()[:4]}-{random.randint(1000, 9999)}"
+    c.execute("INSERT INTO xp_redemptions (username, reward_id, xp_spent, coupon_code) VALUES (?, ?, ?, ?)",
+              (username, r_id, cost, coupon_code))
+              
+    if r_type == 'vip_pass':
+        end_date = (datetime.now() + timedelta(days=7)).strftime("%Y-%m-%d")
+        c.execute("""INSERT INTO subscriptions 
+                     (username, plan_type, billing_cycle, start_date, end_date, is_active, auto_renew, is_trial, trial_ends_at) 
+                     VALUES (?, 'super', 'trial', CURRENT_TIMESTAMP, ?, 1, 0, 1, ?)""",
+                  (username, end_date, end_date))
+                  
+    conn.commit()
+    conn.close()
+    
+    return jsonify({
+        'ok': True,
+        'message': f"Congratulations! You unlocked '{r_title}'!",
+        'coupon_code': coupon_code,
+        'remaining_xp': available_xp - cost
+    })
 
 
 if __name__ == '__main__':

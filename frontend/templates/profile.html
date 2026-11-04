@@ -4,12 +4,81 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile | Events Booking</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=5.0">
-    <script src="{{ url_for('static', filename='themes.js') }}?v=5.0"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=8.0">
+    <script src="{{ url_for('static', filename='themes.js') }}?v=8.0"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
     <style>
+        /* Profile Avatar & Edit Button Clearance - Zero Overlap Guaranteed */
+        .profile-pic-wrapper {
+            position: relative !important;
+            width: 140px !important;
+            height: 140px !important;
+            margin: 0 auto 1.8rem auto !important;
+            display: block !important;
+        }
+        .profile-pic {
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 50% !important;
+            object-fit: cover !important;
+            border: 3.5px solid #008be3 !important;
+            padding: 3px !important;
+            background: linear-gradient(135deg, #008be3 0%, #004c82 100%) !important;
+            box-shadow: 0 0 25px rgba(0, 139, 227, 0.45), 0 8px 24px rgba(0, 0, 0, 0.6) !important;
+            display: block !important;
+        }
+        .pic-edit-btn {
+            position: absolute !important;
+            bottom: 4px !important;
+            right: 4px !important;
+            left: auto !important;
+            top: auto !important;
+            background: linear-gradient(135deg, #008be3 0%, #00b4d8 100%) !important;
+            width: 38px !important;
+            height: 38px !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: #ffffff !important;
+            cursor: pointer !important;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), 0 0 12px rgba(0, 139, 227, 0.6) !important;
+            border: 3px solid #0b0f19 !important;
+            z-index: 10 !important;
+            transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease !important;
+        }
+        .pic-edit-btn:hover {
+            transform: scale(1.12) !important;
+            box-shadow: 0 0 20px rgba(0, 139, 227, 0.8), 0 6px 18px rgba(0, 0, 0, 0.7) !important;
+        }
+        .pic-delete-btn {
+            position: absolute !important;
+            bottom: 4px !important;
+            left: 4px !important;
+            right: auto !important;
+            top: auto !important;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+            width: 38px !important;
+            height: 38px !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: #ffffff !important;
+            cursor: pointer !important;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), 0 0 10px rgba(239, 68, 68, 0.5) !important;
+            border: 3px solid #0b0f19 !important;
+            z-index: 10 !important;
+            transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease !important;
+        }
+        .pic-delete-btn:hover {
+            transform: scale(1.12) !important;
+            background: linear-gradient(135deg, #f87171 0%, #ef4444 100%) !important;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.8), 0 6px 18px rgba(0, 0, 0, 0.7) !important;
+        }
+
         .profile-section-heading {
             font-size: 0.9rem;
             text-transform: uppercase;
@@ -409,7 +478,7 @@
         <div class="nav-container">
             <div style="display: flex; align-items: center;">
                 <div class="hamburger" id="hamburger">☰</div>
-                <div class="logo">Events <span>Booking</span></div>
+                <a href="{{ url_for('dashboard') }}" class="logo" title="Events Booking Home">Events <span>Booking</span></a>
             </div>
             <div class="nav-links" style="display: flex; align-items: center; gap: 12px;">
                 <a href="{{ url_for('dashboard') }}" class="nav-btn-dash">🏠 Dashboard</a>
@@ -421,11 +490,12 @@
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-logo">Events <span>Booking</span></div>
+            <a href="{{ url_for('dashboard') }}" class="sidebar-logo" title="Events Booking Home">Events <span>Booking</span></a>
             <div class="close-btn" id="closeSidebar">&times;</div>
         </div>
         <ul class="sidebar-links">
             <li><a href="{{ url_for('dashboard') }}">🏠 Dashboard</a></li>
+            <li><a href="{{ url_for('subscriptions_page') }}" style="color: #38bdf8; font-weight: 700;">💳 Subscriptions & Plans</a></li>
             <li><a href="{{ url_for('profile') }}" class="active">👤 My Profile</a></li>
             <li><a href="{{ url_for('history') }}">📋 My Bookings</a></li>
             <li><a href="{{ url_for('settings') }}">⚙️ Settings</a></li>
@@ -472,14 +542,28 @@
             <form id="main-profile-form" action="{{ url_for('profile') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateProfileForm()">
                 <div class="profile-header">
                     <div class="profile-pic-wrapper">
-                        <img src="{{ url_for('static', filename=user.profile_photo) if not user.profile_photo.startswith('http') else user.profile_photo }}" alt="Profile" class="profile-pic" id="profilePreview">
-                        <label for="photoUpload" class="pic-edit-btn" title="Upload Photo">✎</label>
-                        <button type="button" class="pic-delete-btn {% if user.profile_photo.startswith('http') %}is-hidden{% endif %}" id="deletePicBtn" title="Delete Profile Photo">🗑</button>
+                        <img src="{{ url_for('static', filename=user.profile_photo) if (user.profile_photo and not user.profile_photo.startswith('http')) else ((user.profile_photo + ('&background=008be3&color=ffffff&bold=true&size=256' if ('ui-avatars.com' in user.profile_photo and 'background=' not in user.profile_photo) else '')) if user.profile_photo else ('https://ui-avatars.com/api/?name=' ~ (user.full_name or user.username or 'User')|urlencode ~ '&background=008be3&color=ffffff&bold=true&size=256')) }}" 
+                             alt="Profile" 
+                             class="profile-pic" 
+                             id="profilePreview"
+                             onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ (user.full_name or user.username or 'User') | urlencode }}&background=008be3&color=ffffff&bold=true&size=256';">
+                        <label for="photoUpload" class="pic-edit-btn" title="Upload or Change Photo">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 20h9"></path>
+                                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                            </svg>
+                        </label>
+                        <button type="button" class="pic-delete-btn {% if not user.profile_photo or user.profile_photo.startswith('http') %}is-hidden{% endif %}" id="deletePicBtn" title="Delete Profile Photo">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                        </button>
                         <input type="file" id="photoUpload" name="profile_photo" hidden accept="image/*" onchange="previewImage(this)">
                         <input type="hidden" name="cropped_image_data" id="croppedImageData">
                         <input type="hidden" name="delete_profile_photo" id="deleteProfilePhoto" value="false">
                     </div>
-                    <h2 class="hero-title" style="font-size: 2.2rem; margin-bottom: 0.3rem;">{{ user.full_name or user.username }}</h2>
+                    <h2 class="hero-title" style="font-size: 2.2rem; margin-top: 1.6rem !important; margin-bottom: 0.35rem; position: relative; z-index: 1;">{{ user.full_name or user.username }}</h2>
                     <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 0.5rem; flex-wrap: wrap;">
                         <span class="user-id-pill" title="Unique System User ID">🆔 <strong>ID:</strong> {{ user.user_id }}</span>
                         <span class="username-pill" title="Account Handle">👤 @{{ user.username }}</span>
@@ -676,7 +760,7 @@
 
         deletePicBtn.onclick = () => {
             deleteProfilePhoto.value = 'true';
-            profilePreview.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent('{{ user.username }}');
+            profilePreview.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent('{{ user.full_name or user.username }}') + '&background=008be3&color=ffffff&bold=true&size=256';
             document.getElementById('photoUpload').value = '';
             croppedImageData.value = '';
             deletePicBtn.style.display = 'none';
@@ -841,6 +925,6 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/motion@latest/dist/motion.js"></script>
     <script src="{{ url_for('static', filename='animations.js') }}"></script>
-    <script src="{{ url_for('static', filename='chatbot.js') }}?v=5.0"></script>
+    <script src="{{ url_for('static', filename='chatbot.js') }}?v=8.0"></script>
 </body>
 </html>

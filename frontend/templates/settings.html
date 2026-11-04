@@ -389,13 +389,13 @@
         <div class="nav-container">
             <div style="display: flex; align-items: center;">
                 <div class="hamburger" id="hamburger">☰</div>
-                <div class="logo">Events <span>Booking</span></div>
+                <a href="{{ url_for('dashboard') }}" class="logo" title="Events Booking Home">Events <span>Booking</span></a>
             </div>
             <div class="nav-links" style="display: flex; align-items: center; gap: 12px;">
                 <a href="{{ url_for('dashboard') }}" class="nav-btn-dash">🏠 Dashboard</a>
                 {% if user_subscription and user_subscription.is_active %}
                 <a href="{{ url_for('subscriptions_page') }}" style="background: linear-gradient(135deg, rgba(255,19,137,0.2), rgba(0,139,227,0.2)); border: 1px solid var(--neon-rose, #ff1389); color: #fff; padding: 5px 12px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
-                    👑 {{ user_subscription.plan_title }}
+                    <span>{{ '👑' if user_subscription.plan_type == 'super' else '💎' }}</span> My Plan
                 </a>
                 {% else %}
                 <a href="{{ url_for('subscriptions_page') }}" style="background: rgba(0, 139, 227, 0.15); border: 1px solid rgba(0, 139, 227, 0.4); color: var(--primary); padding: 5px 12px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
@@ -410,12 +410,12 @@
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-logo">Events <span>Booking</span></div>
+            <a href="{{ url_for('dashboard') }}" class="sidebar-logo" title="Events Booking Home">Events <span>Booking</span></a>
             <div class="close-btn" id="closeSidebar">&times;</div>
         </div>
         <ul class="sidebar-links">
             <li><a href="{{ url_for('dashboard') }}">🏠 Dashboard</a></li>
-            <li><a href="{{ url_for('subscriptions_page') }}" style="color: #ff1389; font-weight: 700;">👑 Live Stage Pass (Hotstar)</a></li>
+            <li><a href="{{ url_for('subscriptions_page') }}" style="color: #38bdf8; font-weight: 700; display: flex; align-items: center; justify-content: space-between;"><span>💳 Subscriptions & Plans</span>{% if user_subscription and user_subscription.is_active %}<span style="background: rgba(0,139,227,0.2); color: #38bdf8; font-size: 0.7rem; font-weight: 800; padding: 2px 8px; border-radius: 999px;">My Plan</span>{% endif %}</a></li>
             <li><a href="{{ url_for('profile') }}">👤 My Profile</a></li>
             <li><a href="{{ url_for('history') }}">📋 My Bookings</a></li>
             <li><a href="{{ url_for('settings') }}" class="active">⚙️ Settings</a></li>
@@ -489,7 +489,7 @@
                         <div>
                             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
                                 <span style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; color: #fff;">
-                                    {{ user_subscription.plan_title }}
+                                    My Plan
                                 </span>
                                 <span style="background: linear-gradient(135deg, #ff1389, #008be3); color: #fff; font-size: 0.72rem; font-weight: 800; padding: 3px 10px; border-radius: 999px; text-transform: uppercase;">
                                     Active Pass

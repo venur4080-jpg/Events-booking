@@ -298,7 +298,7 @@
         <div class="nav-container">
             <div style="display: flex; align-items: center;">
                 <div class="hamburger" id="hamburger">☰</div>
-                <div class="logo">Events <span>Booking</span></div>
+                <a href="{{ url_for('dashboard') }}" class="logo" title="Events Booking Home">Events <span>Booking</span></a>
             </div>
             <div class="nav-links" style="display: flex; align-items: center; gap: 12px;">
                 <a href="{{ url_for('dashboard') }}" class="nav-btn-dash">🏠 Dashboard</a>
@@ -310,11 +310,12 @@
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-logo">Events <span>Booking</span></div>
+            <a href="{{ url_for('dashboard') }}" class="sidebar-logo" title="Events Booking Home">Events <span>Booking</span></a>
             <div class="close-btn" id="closeSidebar">&times;</div>
         </div>
         <ul class="sidebar-links">
             <li><a href="{{ url_for('dashboard') }}">🏠 Dashboard</a></li>
+            <li><a href="{{ url_for('subscriptions_page') }}" style="color: #38bdf8; font-weight: 700;">💳 Subscriptions & Plans</a></li>
             <li><a href="{{ url_for('category_events', category_name='all') }}">🎪 Explore Categories</a></li>
             <li><a href="{{ url_for('passport_page') }}">🛂 Event Passport & XP</a></li>
             <li><a href="{{ url_for('teams_page') }}">🤝 AI Team Matcher</a></li>
@@ -757,6 +758,8 @@
             if (modal && e.target === modal) {
                 closeUnregisterModal();
             }
+        });
+
         // Offline Pass Sync Engine
         document.addEventListener('DOMContentLoaded', () => {
             try {

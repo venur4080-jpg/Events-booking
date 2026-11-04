@@ -107,7 +107,7 @@
     </script>
     <nav class="navbar">
         <div class="nav-container">
-            <div class="logo">Events <span>Booking</span></div>
+            <a href="{{ url_for('dashboard') }}" class="logo" title="Events Booking Home">Events <span>Booking</span></a>
             <div class="nav-links" style="display: flex; align-items: center; gap: 12px;">
                 <a href="{{ url_for('dashboard') }}" class="nav-btn-dash">🏠 Dashboard</a>
                 <a href="{{ url_for('logout') }}" class="logout-btn-unique">⏻ Logout</a>

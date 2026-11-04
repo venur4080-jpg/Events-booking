@@ -85,7 +85,7 @@
         <div class="nav-container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
             <div style="display: flex; align-items: center; gap: 10px;">
                 <div class="hamburger" id="hamburger">☰</div>
-                <div class="logo">Events <span>Booking</span></div>
+                <a href="{{ url_for('dashboard') }}" class="logo" title="Events Booking Home">Events <span>Booking</span></a>
                 <span style="background: rgba(0, 139, 227,0.15); color: var(--primary); font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 50px; border: 1px solid var(--primary); text-transform: uppercase;">Check-in History</span>
                 <span id="telemetryBadge" style="display: inline-flex; align-items: center; gap: 6px; background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 50px; border: 1px solid rgba(16, 185, 129, 0.4); text-transform: uppercase;">
                     <span style="width: 7px; height: 7px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981; animation: pulseGlow 1.5s infinite alternate;"></span>
@@ -103,7 +103,7 @@
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-logo">Events <span>Booking</span></div>
+            <a href="{{ url_for('dashboard') }}" class="sidebar-logo" title="Events Booking Home">Events <span>Booking</span></a>
             <div class="close-btn" id="closeSidebar">&times;</div>
         </div>
         <ul class="sidebar-links">

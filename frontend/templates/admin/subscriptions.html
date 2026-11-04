@@ -1,0 +1,573 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="admin-header">
+    <div>
+        <h1>💳 Subscription <span>Management</span></h1>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">
+            Oversee active subscribers, MRR, automated expiry lifecycles, refund policies, and promotional discount codes.
+        </p>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <button type="button" class="action-btn btn-warning" onclick="openGrantModal()" style="font-weight: 700; padding: 0.6rem 1.2rem; border-radius: 50px;">
+            👑 Grant VIP Subscription
+        </button>
+        <button type="button" class="action-btn btn-success" onclick="openCouponModal()" style="font-weight: 700; padding: 0.6rem 1.2rem; border-radius: 50px;">
+            🎟️ Create Coupon
+        </button>
+    </div>
+</div>
+
+<!-- KPI Financial Metrics Grid -->
+<div class="stat-grid" style="grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));">
+    <div class="stat-card">
+        <div class="stat-label">Active Subscribers</div>
+        <div class="stat-value" style="color: #38bdf8;">{{ active_subs_count }}</div>
+        <div class="stat-sub">
+            <span style="color: #10b981;">● Active</span> &bull; {{ grace_subs_count }} in grace period
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Monthly Recurring (MRR)</div>
+        <div class="stat-value" style="color: #10b981;">₹{{ '{:,.0f}'.format(mrr_total) }}</div>
+        <div class="stat-sub">Annual run rate: ₹{{ '{:,.0f}'.format(arr_total) }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Total Sub Revenue</div>
+        <div class="stat-value" style="color: #f59e0b;">₹{{ '{:,.0f}'.format(total_rev) }}</div>
+        <div class="stat-sub">Gross lifetime subscription billing</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Total Refunds Issued</div>
+        <div class="stat-value" style="color: #fca5a5;">₹{{ '{:,.0f}'.format(total_refunds) }}</div>
+        <div class="stat-sub">Processed policy returns</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Churn Rate</div>
+        <div class="stat-value" style="color: #ec4899;">{{ churn_rate }}%</div>
+        <div class="stat-sub">{{ cancelled_subs_count }} cancelled &bull; {{ expired_subs_count }} expired</div>
+    </div>
+</div>
+
+<!-- Tab Navigation -->
+<div style="display: flex; gap: 8px; margin-bottom: 1.5rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; overflow-x: auto;">
+    <button type="button" class="admin-tab-btn active" id="tabBtnSubs" onclick="switchAdminTab('subs')">
+        👥 All Subscriptions ({{ subs_list|length }})
+    </button>
+    <button type="button" class="admin-tab-btn" id="tabBtnRefunds" onclick="switchAdminTab('refunds')">
+        💸 Refund Requests ({{ refunds_list|length }})
+    </button>
+    <button type="button" class="admin-tab-btn" id="tabBtnCoupons" onclick="switchAdminTab('coupons')">
+        🏷️ Discount Coupons ({{ coupons_list|length }})
+    </button>
+    <button type="button" class="admin-tab-btn" id="tabBtnExpiry" onclick="switchAdminTab('expiry')">
+        ⏳ 30-Day Expiry Report ({{ upcoming_expirations|length }})
+    </button>
+</div>
+
+<!-- TAB 1: ALL SUBSCRIPTIONS -->
+<div id="tabContentSubs" class="tab-pane active">
+    <div class="panel-section">
+        <div class="panel-section-header" style="flex-wrap: wrap; gap: 1rem;">
+            <!-- Status Filter Pills -->
+            <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                <a href="{{ url_for('admin_subscriptions', status='all', q=search_q) }}" 
+                   class="quick-pill {% if status_filter=='all' %}active{% endif %}">All</a>
+                <a href="{{ url_for('admin_subscriptions', status='active', q=search_q) }}" 
+                   class="quick-pill {% if status_filter=='active' %}active{% endif %}">Active</a>
+                <a href="{{ url_for('admin_subscriptions', status='grace', q=search_q) }}" 
+                   class="quick-pill {% if status_filter=='grace' %}active{% endif %}">In Grace Period</a>
+                <a href="{{ url_for('admin_subscriptions', status='cancelled', q=search_q) }}" 
+                   class="quick-pill {% if status_filter=='cancelled' %}active{% endif %}">Cancelled</a>
+                <a href="{{ url_for('admin_subscriptions', status='expired', q=search_q) }}" 
+                   class="quick-pill {% if status_filter=='expired' %}active{% endif %}">Expired</a>
+            </div>
+
+            <!-- Search Form -->
+            <form method="GET" action="{{ url_for('admin_subscriptions') }}" style="display: flex; gap: 6px;">
+                <input type="hidden" name="status" value="{{ status_filter }}">
+                <input type="text" name="q" value="{{ search_q }}" placeholder="Search username or invoice..." class="search-admin" style="width: 240px;">
+                {% if search_q %}
+                <a href="{{ url_for('admin_subscriptions', status=status_filter) }}" class="action-btn btn-warning" style="display: flex; align-items: center;">✕</a>
+                {% endif %}
+            </form>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Subscriber</th>
+                        <th>Plan & Cycle</th>
+                        <th>Price Paid</th>
+                        <th>Expires / Renews</th>
+                        <th>Status</th>
+                        <th>Auto-Renew</th>
+                        <th>Invoice</th>
+                        <th>Admin Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in subs_list %}
+                    <tr>
+                        <td>
+                            <strong style="color: #ffffff;">{{ s.username }}</strong>
+                            <div style="font-size: 0.76rem; color: var(--text-muted);">{{ s.email or 'N/A' }}</div>
+                        </td>
+                        <td>
+                            <span class="badge" style="{% if s.plan_type=='super' %}background: rgba(255,19,137,0.15); color: #ff5eb0; border: 1px solid rgba(255,19,137,0.3);{% else %}background: rgba(0,139,227,0.15); color: #008be3; border: 1px solid rgba(0,139,227,0.3);{% endif %}">
+                                {{ s.plan_title }}
+                            </span>
+                            <div style="font-size: 0.74rem; color: #94a3b8; margin-top: 3px;">
+                                {{ s.billing_cycle | capitalize }}
+                            </div>
+                        </td>
+                        <td>
+                            <strong style="color: #10b981;">₹{{ '{:,.0f}'.format(s.price_paid) }}</strong>
+                            {% if s.payment_method %}
+                            <div style="font-size: 0.72rem; color: var(--text-muted);">{{ s.payment_method }}</div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div style="color: #cbd5e1; font-weight: 600;">{{ s.expires_at[:10] }}</div>
+                            <div style="font-size: 0.74rem; color: var(--text-muted);">{{ s.expires_at[11:16] }}</div>
+                        </td>
+                        <td>
+                            {% if s.status == 'active' %}
+                            <span class="badge badge-active">● Active</span>
+                            {% elif s.status == 'in_grace_period' %}
+                            <span class="badge" style="background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid rgba(245,158,11,0.4);">⏳ Grace Period</span>
+                            {% elif s.status == 'cancelled' %}
+                            <span class="badge" style="background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3);">✕ Cancelled</span>
+                            {% else %}
+                            <span class="badge badge-user">{{ s.status | capitalize }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if s.auto_renew %}
+                            <span style="color: #34d399; font-weight: 700; font-size: 0.8rem;">✓ On</span>
+                            {% else %}
+                            <span style="color: #94a3b8; font-size: 0.8rem;">Off</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if s.id %}
+                            <a href="{{ url_for('download_subscription_invoice', sub_id=s.id) }}" target="_blank" class="action-btn btn-warning" style="text-decoration: none; display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; font-size: 0.75rem;">
+                                📄 PDF
+                            </a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 6px; align-items: center;">
+                                <form method="POST" action="{{ url_for('admin_extend_subscription') }}" style="display: inline;">
+                                    <input type="hidden" name="subscription_id" value="{{ s.id }}">
+                                    <input type="hidden" name="extra_days" value="30">
+                                    <button type="submit" class="action-btn btn-success" title="Extend by 30 Days" onclick="return confirm('Extend this subscription by +30 days?')">
+                                        +30d
+                                    </button>
+                                </form>
+                                {% if s.status == 'active' or s.status == 'in_grace_period' %}
+                                <form method="POST" action="{{ url_for('admin_cancel_subscription') }}" style="display: inline;">
+                                    <input type="hidden" name="subscription_id" value="{{ s.id }}">
+                                    <button type="submit" class="action-btn btn-danger" title="Cancel Subscription" onclick="return confirm('Cancel this user subscription immediately?')">
+                                        Cancel
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+                            No subscriptions found matching the selected filter.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- TAB 2: REFUND REQUESTS & HISTORY -->
+<div id="tabContentRefunds" class="tab-pane" style="display: none;">
+    <div class="panel-section">
+        <div class="panel-section-header">
+            <h3>💸 Subscription Refund Records</h3>
+            <span style="font-size: 0.82rem; color: var(--text-muted);">Automatic & Administrator Processed Policy Returns</span>
+        </div>
+        <div style="overflow-x: auto;">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Subscriber</th>
+                        <th>Plan & Amount</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+                        <th>Processed By</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in refunds_list %}
+                    <tr>
+                        <td>
+                            <strong style="color: #ffffff;">{{ r.username }}</strong>
+                        </td>
+                        <td>
+                            <strong style="color: #f87171;">₹{{ '{:,.2f}'.format(r.amount) }}</strong>
+                            <div style="font-size: 0.74rem; color: var(--text-muted);">{{ r.plan_type | capitalize if r.plan_type else 'Subscription' }}</div>
+                        </td>
+                        <td>
+                            <div style="max-width: 280px; word-break: break-word; color: #cbd5e1; font-size: 0.84rem;">
+                                {{ r.reason or 'User requested cancellation' }}
+                            </div>
+                        </td>
+                        <td>
+                            {% if r.status == 'processed' or r.status == 'approved' %}
+                            <span class="badge badge-active">✓ {{ r.status | capitalize }}</span>
+                            {% elif r.status == 'pending' %}
+                            <span class="badge" style="background: rgba(245,158,11,0.2); color: #fbbf24;">⏳ Pending</span>
+                            {% else %}
+                            <span class="badge badge-user">{{ r.status | capitalize }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">{{ r.processed_by }}</span>
+                        </td>
+                        <td>
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">{{ r.created_at[:16] }}</span>
+                        </td>
+                        <td>
+                            {% if r.status == 'pending' %}
+                            <div style="display: flex; gap: 6px;">
+                                <form method="POST" action="{{ url_for('admin_refund_action') }}">
+                                    <input type="hidden" name="refund_id" value="{{ r.id }}">
+                                    <input type="hidden" name="action" value="approve">
+                                    <button type="submit" class="action-btn btn-success">Approve</button>
+                                </form>
+                                <form method="POST" action="{{ url_for('admin_refund_action') }}">
+                                    <input type="hidden" name="refund_id" value="{{ r.id }}">
+                                    <input type="hidden" name="action" value="reject">
+                                    <button type="submit" class="action-btn btn-danger">Reject</button>
+                                </form>
+                            </div>
+                            {% else %}
+                            <span style="font-size: 0.8rem; color: #64748b;">Completed</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                            No refund requests or cancellation returns logged yet.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- TAB 3: DISCOUNT COUPONS -->
+<div id="tabContentCoupons" class="tab-pane" style="display: none;">
+    <div class="panel-section">
+        <div class="panel-section-header">
+            <h3>🏷️ Promotional Coupons & Discounts</h3>
+            <button type="button" class="action-btn btn-success" onclick="openCouponModal()">+ New Coupon</button>
+        </div>
+        <div style="overflow-x: auto;">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Discount Value</th>
+                        <th>Scope (Plan / Cycle)</th>
+                        <th>Usage Limit</th>
+                        <th>Valid Until</th>
+                        <th>Status</th>
+                        <th>Toggle</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cp in coupons_list %}
+                    <tr>
+                        <td>
+                            <strong style="color: #008be3; font-family: monospace; font-size: 1rem;">{{ cp.code }}</strong>
+                            {% if cp.description %}
+                            <div style="font-size: 0.74rem; color: var(--text-muted);">{{ cp.description }}</div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <strong style="color: #10b981;">
+                                {% if cp.discount_type == 'percent' %}
+                                {{ cp.discount_val }}% OFF
+                                {% else %}
+                                ₹{{ '{:,.0f}'.format(cp.discount_val) }} Flat
+                                {% endif %}
+                            </strong>
+                        </td>
+                        <td>
+                            <span style="color: #cbd5e1; font-size: 0.84rem;">
+                                {{ cp.applicable_plan | capitalize }} &bull; {{ cp.applicable_cycle | capitalize }}
+                            </span>
+                        </td>
+                        <td>
+                            <span style="font-weight: 700; color: #ffffff;">{{ cp.times_used }}</span> / {{ cp.max_uses }}
+                        </td>
+                        <td>
+                            <span style="color: var(--text-muted); font-size: 0.82rem;">{{ cp.valid_until[:10] if cp.valid_until else 'Never' }}</span>
+                        </td>
+                        <td>
+                            {% if cp.is_active %}
+                            <span class="badge badge-active">Active</span>
+                            {% else %}
+                            <span class="badge badge-user">Disabled</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form method="POST" action="{{ url_for('admin_toggle_coupon', coupon_id=cp.id) }}">
+                                <button type="submit" class="action-btn {% if cp.is_active %}btn-danger{% else %}btn-success{% endif %}">
+                                    {{ 'Disable' if cp.is_active else 'Enable' }}
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- TAB 4: 30-DAY EXPIRY REPORT -->
+<div id="tabContentExpiry" class="tab-pane" style="display: none;">
+    <div class="panel-section">
+        <div class="panel-section-header">
+            <h3>⏳ Subscribers Expiring Within 30 Days</h3>
+            <span style="font-size: 0.82rem; color: #38bdf8;">{{ upcoming_expirations|length }} upcoming renewals</span>
+        </div>
+        <div style="overflow-x: auto;">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Plan</th>
+                        <th>Expires Date</th>
+                        <th>Days Left</th>
+                        <th>Auto-Renew</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for exp in upcoming_expirations %}
+                    <tr>
+                        <td>
+                            <strong style="color: #ffffff;">{{ exp.username }}</strong>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">{{ exp.email }}</div>
+                        </td>
+                        <td>
+                            <span class="badge badge-host">{{ exp.plan_title }}</span>
+                        </td>
+                        <td>
+                            <span style="color: #cbd5e1; font-weight: 600;">{{ exp.expires_at[:10] }}</span>
+                        </td>
+                        <td>
+                            <span style="font-weight: 800; {% if exp.days_left <= 3 %}color: #ef4444;{% elif exp.days_left <= 7 %}color: #f59e0b;{% else %}color: #10b981;{% endif %}">
+                                {{ exp.days_left }} day{% if exp.days_left != 1 %}s{% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            {{ '✓ Enabled' if exp.auto_renew else '✕ Disabled' }}
+                        </td>
+                        <td>
+                            <form method="POST" action="{{ url_for('admin_extend_subscription') }}">
+                                <input type="hidden" name="subscription_id" value="{{ exp.id }}">
+                                <input type="hidden" name="extra_days" value="30">
+                                <button type="submit" class="action-btn btn-success">+30 Days Extension</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                            No active subscriptions expiring within the next 30 days.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 1: Grant Complimentary VIP Subscription -->
+<div class="custom-modal" id="grantModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center;">
+    <div class="glass-panel" style="max-width: 480px; width: 90%; padding: 2rem; border-radius: 20px; border: 1px solid rgba(245,158,11,0.3); background: #0f172a;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3 style="margin: 0; color: #f59e0b; font-size: 1.3rem;">👑 Grant VIP Subscription</h3>
+            <button type="button" onclick="closeGrantModal()" style="background: none; border: none; color: #94a3b8; font-size: 1.4rem; cursor: pointer;">✕</button>
+        </div>
+        <form method="POST" action="{{ url_for('admin_grant_subscription') }}">
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Select User:</label>
+                <select name="username" class="search-admin" style="width: 100%; border-radius: 10px; padding: 8px 12px;" required>
+                    <option value="">-- Choose User --</option>
+                    {% for u in all_users %}
+                    <option value="{{ u.username }}">{{ u.username }} ({{ u.full_name or u.email }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Subscription Pack:</label>
+                <select name="plan_type" class="search-admin" style="width: 100%; border-radius: 10px; padding: 8px 12px;">
+                    <option value="super">👑 Super Pack (VIP Crown & All 2K Live Streams Included)</option>
+                    <option value="normal">💎 Normal Pack (720p HD Pass)</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Access Duration:</label>
+                <select name="duration_days" class="search-admin" style="width: 100%; border-radius: 10px; padding: 8px 12px;">
+                    <option value="30">30 Days (1 Month)</option>
+                    <option value="90">90 Days (1 Quarter)</option>
+                    <option value="365" selected>365 Days (1 Full Year)</option>
+                </select>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="action-btn" onclick="closeGrantModal()">Cancel</button>
+                <button type="submit" class="action-btn btn-warning" style="font-weight: 700;">Grant VIP Access</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal 2: Create Discount Coupon -->
+<div class="custom-modal" id="couponModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center;">
+    <div class="glass-panel" style="max-width: 480px; width: 90%; padding: 2rem; border-radius: 20px; border: 1px solid rgba(16,185,129,0.3); background: #0f172a;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3 style="margin: 0; color: #10b981; font-size: 1.3rem;">🎟️ Create Promo Coupon</h3>
+            <button type="button" onclick="closeCouponModal()" style="background: none; border: none; color: #94a3b8; font-size: 1.4rem; cursor: pointer;">✕</button>
+        </div>
+        <form method="POST" action="{{ url_for('admin_create_coupon') }}">
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Coupon Code:</label>
+                <input type="text" name="code" placeholder="e.g. SUMMER30" class="search-admin" style="width: 100%; text-transform: uppercase;" required>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem;">
+                <div>
+                    <label style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Discount Type:</label>
+                    <select name="discount_type" class="search-admin" style="width: 100%;">
+                        <option value="percent">Percentage (%)</option>
+                        <option value="flat">Flat Amount (₹)</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Value:</label>
+                    <input type="number" step="0.1" name="discount_val" placeholder="20" class="search-admin" style="width: 100%;" required>
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem;">
+                <div>
+                    <label style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Target Plan:</label>
+                    <select name="applicable_plan" class="search-admin" style="width: 100%;">
+                        <option value="all">All Plans</option>
+                        <option value="super">Super Pack Only</option>
+                        <option value="normal">Normal Pack Only</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Target Cycle:</label>
+                    <select name="applicable_cycle" class="search-admin" style="width: 100%;">
+                        <option value="all">All Cycles</option>
+                        <option value="yearly">Yearly Only</option>
+                        <option value="monthly">Monthly Only</option>
+                    </select>
+                </div>
+            </div>
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Description:</label>
+                <input type="text" name="description" placeholder="e.g. Summer special 30% off" class="search-admin" style="width: 100%;">
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="action-btn" onclick="closeCouponModal()">Cancel</button>
+                <button type="submit" class="action-btn btn-success" style="font-weight: 700;">Save Coupon</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.admin-tab-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.admin-tab-btn.active {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--admin-accent);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.quick-pill {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    transition: all 0.2s;
+}
+.quick-pill:hover, .quick-pill.active {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--admin-accent);
+    border-color: rgba(245, 158, 11, 0.4);
+}
+</style>
+
+<script>
+function switchAdminTab(tabName) {
+    document.querySelectorAll('.tab-pane').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.admin-tab-btn').forEach(btn => btn.classList.remove('active'));
+
+    if (tabName === 'subs') {
+        document.getElementById('tabContentSubs').style.display = 'block';
+        document.getElementById('tabBtnSubs').classList.add('active');
+    } else if (tabName === 'refunds') {
+        document.getElementById('tabContentRefunds').style.display = 'block';
+        document.getElementById('tabBtnRefunds').classList.add('active');
+    } else if (tabName === 'coupons') {
+        document.getElementById('tabContentCoupons').style.display = 'block';
+        document.getElementById('tabBtnCoupons').classList.add('active');
+    } else if (tabName === 'expiry') {
+        document.getElementById('tabContentExpiry').style.display = 'block';
+        document.getElementById('tabBtnExpiry').classList.add('active');
+    }
+}
+
+function openGrantModal() {
+    document.getElementById('grantModal').style.display = 'flex';
+}
+function closeGrantModal() {
+    document.getElementById('grantModal').style.display = 'none';
+}
+
+function openCouponModal() {
+    document.getElementById('couponModal').style.display = 'flex';
+}
+function closeCouponModal() {
+    document.getElementById('couponModal').style.display = 'none';
+}
+</script>
+{% endblock %}
+

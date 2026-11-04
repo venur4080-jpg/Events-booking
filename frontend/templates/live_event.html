@@ -379,7 +379,83 @@
         }
 
         /* Right Q&A and Chat Panel */
-        .live-qa-box {
+        .eng-tab-btn {
+            flex: 1;
+            padding: 6px 10px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            background: transparent;
+            color: var(--text-muted);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .eng-tab-btn.active {
+            background: var(--primary, #008be3);
+            color: #ffffff;
+            box-shadow: 0 0 12px rgba(0, 139, 227, 0.4);
+        }
+
+        .qa-upvote-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #cbd5e1;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+
+        .qa-upvote-btn.voted {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: #10b981;
+            color: #34d399;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+        }
+
+        .poll-opt-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px 14px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.2s;
+            margin-bottom: 8px;
+        }
+
+        .poll-opt-card:hover {
+            border-color: var(--primary, #008be3);
+        }
+
+        .poll-opt-card.voted {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.08);
+        }
+
+        .poll-opt-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, rgba(0, 139, 227, 0.25), rgba(56, 189, 248, 0.15));
+            z-index: 1;
+            transition: width 0.4s ease;
+        }
+        
+        .live-qa-box { 
             background: var(--live-panel);
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 24px;
@@ -922,31 +998,77 @@
                 </div>
             </div>
 
-            <!-- Right: Interactive Q&A Panel (FIXED LAYOUT) -->
+            <!-- Right: Interactive Audience Engagement Suite -->
             <div class="live-qa-box">
                 <div class="qa-header-row">
-                    <h3 style="color: #ffffff; font-size: 1.15rem; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px;">
-                        <span>💬</span> Live Q&A & Chat
+                    <h3 style="color: #ffffff; font-size: 1.1rem; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px;">
+                        <span>⚡</span> Audience Engagement Hub
                     </h3>
-                    <span style="font-size: 0.75rem; background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; color: #34d399; padding: 3px 10px; border-radius: 12px; font-weight: 700;">Active</span>
+                    <span style="font-size: 0.72rem; background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; color: #34d399; padding: 2px 8px; border-radius: 12px; font-weight: 700;">LIVE</span>
                 </div>
 
-                <!-- Chat Message List -->
-                <div class="qa-list-scroll" id="qaList">
-                    <div class="qa-item">
-                        <strong style="color: var(--live-cyan);">Host Team:</strong>
-                        <p style="color: #e2e8f0; margin: 4px 0 0 0; line-height: 1.45;">Welcome everyone to {{ event.title }}! Post your questions below and our speakers will answer during the live stream.</p>
+                <!-- Engagement Tab Switcher -->
+                <div class="engagement-tab-bar" style="display: flex; gap: 4px; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 12px; margin-top: 10px; border: 1px solid rgba(255,255,255,0.08);">
+                    <button type="button" class="eng-tab-btn active" onclick="switchEngTab('chat')" id="engTabChat">💬 Chat</button>
+                    <button type="button" class="eng-tab-btn" onclick="switchEngTab('slido')" id="engTabSlido">🙋 Slido Q&A</button>
+                    <button type="button" class="eng-tab-btn" onclick="switchEngTab('poll')" id="engTabPoll">📊 Polls</button>
+                    <button type="button" class="eng-tab-btn" onclick="switchEngTab('raffle')" id="engTabRaffle">🎉 Raffle</button>
+                </div>
+
+                <!-- 1. Live Chat Panel -->
+                <div id="panelChat" style="display: flex; flex-direction: column; flex: 1; min-height: 0;">
+                    <div class="qa-list-scroll" id="qaList">
+                        <div class="qa-item">
+                            <strong style="color: var(--live-cyan);">Host Team:</strong>
+                            <p style="color: #e2e8f0; margin: 4px 0 0 0; line-height: 1.45;">Welcome to {{ event.title }}! Feel free to chat with fellow attendees or switch to Slido Q&A tab to ask questions for speakers.</p>
+                        </div>
                     </div>
+                    <form id="qaForm" onsubmit="return submitQuestion(event)" class="qa-form-container">
+                        <input type="text" id="qaInput" class="qa-input-field" placeholder="Chat with audience..." autocomplete="off" required>
+                        <button type="submit" class="qa-send-btn" id="qaSendBtn">
+                            <span>Send</span>
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        </button>
+                    </form>
                 </div>
 
-                <!-- Fixed Bottom Input & Send Button -->
-                <form id="qaForm" onsubmit="return submitQuestion(event)" class="qa-form-container">
-                    <input type="text" id="qaInput" class="qa-input-field" placeholder="Ask a question or share thoughts..." autocomplete="off" required>
-                    <button type="submit" class="qa-send-btn" id="qaSendBtn">
-                        <span>Send</span>
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                <!-- 2. Slido Upvoted Q&A Panel -->
+                <div id="panelSlido" style="display: none; flex-direction: column; flex: 1; min-height: 0;">
+                    <div style="font-size: 0.78rem; color: #94a3b8; margin: 8px 0 4px; display: flex; justify-content: space-between;">
+                        <span>Most upvoted questions rise to the top:</span>
+                        <button type="button" onclick="loadSlidoQA()" style="background:none; border:none; color: var(--primary); cursor:pointer; font-size:0.75rem; font-weight:700;">🔄 Refresh</button>
+                    </div>
+                    <div class="qa-list-scroll" id="slidoList" style="flex: 1;">
+                        <div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 2rem;">Loading Slido questions...</div>
+                    </div>
+                    <form onsubmit="return submitSlidoQuestion(event)" class="qa-form-container">
+                        <input type="text" id="slidoInput" class="qa-input-field" placeholder="Ask speaker a question to be upvoted..." autocomplete="off" required>
+                        <button type="submit" class="qa-send-btn" style="background: linear-gradient(135deg, #008be3, #00d2ff);">
+                            <span>Ask</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- 3. Live Polls Panel -->
+                <div id="panelPoll" style="display: none; flex-direction: column; flex: 1; min-height: 0; padding-top: 10px;">
+                    <div style="background: rgba(0, 139, 227, 0.08); border: 1px solid rgba(0, 139, 227, 0.2); border-radius: 12px; padding: 12px; margin-bottom: 12px;">
+                        <span style="font-size: 0.72rem; color: #38bdf8; font-weight: 800; text-transform: uppercase;">Active Stage Poll</span>
+                        <h4 id="pollQuestionText" style="color: #ffffff; font-size: 0.95rem; margin: 4px 0 0; font-family: var(--font-heading);">Loading live poll...</h4>
+                    </div>
+                    <div id="pollOptionsContainer" style="flex: 1; overflow-y: auto;"></div>
+                    <div id="pollStatusMsg" style="font-size: 0.75rem; color: #94a3b8; text-align: center; margin-top: 6px;"></div>
+                </div>
+
+                <!-- 4. Stage Giveaway Raffle Wheel Panel -->
+                <div id="panelRaffle" style="display: none; flex-direction: column; flex: 1; min-height: 0; align-items: center; justify-content: center; text-align: center; padding: 10px;">
+                    <h4 style="color: #ffffff; font-size: 0.95rem; margin: 0 0 6px;">🎉 Stage Giveaway Wheel</h4>
+                    <p style="color: var(--text-muted); font-size: 0.78rem; margin: 0 0 12px;">Random lucky draw among checked-in attendees</p>
+                    <canvas id="raffleWheelCanvas" width="260" height="260" style="max-width: 100%; border-radius: 50%; box-shadow: 0 0 25px rgba(0, 139, 227, 0.35); border: 3px solid #008be3; margin-bottom: 14px;"></canvas>
+                    <div id="raffleWinnerBox" style="display: none; font-size: 1.05rem; font-weight: 800; color: #10b981; margin-bottom: 10px; animation: pulseGlow 1s infinite alternate;"></div>
+                    <button type="button" id="spinRaffleBtn" onclick="spinRaffleWheel()" class="btn-primary" style="margin: 0; width: auto; padding: 8px 24px; font-weight: 800; font-size: 0.85rem; border-radius: 20px;">
+                        🎲 Spin Lucky Draw Wheel
                     </button>
-                </form>
+                </div>
             </div>
 
         </div>
@@ -1613,7 +1735,7 @@
         let stageWs = null;
 
         function initStageWebSocket() {
-            const eventId = {{ event.id }};
+            const eventId = Number("{{ event.id }}");
             const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             try {
                 stageWs = new WebSocket(`${wsProtocol}//${window.location.host}/ws/live/${eventId}`);
@@ -1785,10 +1907,11 @@
             if (window.showToast) window.showToast('▶️ Resumed live playback on this screen', 'success', 2500);
         }
 
-        {% if access_info.has_access %}
-        setInterval(() => sendStreamHeartbeat(false), 12000);
-        sendStreamHeartbeat(false);
-        {% endif %}
+        const userHasAccess = "{{ 'true' if access_info.has_access else 'false' }}" === "true";
+        if (userHasAccess) {
+            setInterval(() => sendStreamHeartbeat(false), 12000);
+            sendStreamHeartbeat(false);
+        }
 
         // Initialize cameras & WebSocket stage on page load
         document.addEventListener('DOMContentLoaded', () => {
@@ -1823,6 +1946,279 @@
             </div>
         </div>
     </div>
+    <script src="{{ url_for('static', filename='subscription_popup.js') }}?v=1.0"></script>
+
+    <!-- Live Engagement Suite JS (Slido Q&A, Polls, Raffle) -->
+    <script>
+        const liveEventId = {{ event.id }};
+        let currentPollId = null;
+        let raffleAttendees = [];
+        let wheelAngle = 0;
+        let isSpinning = false;
+
+        function switchEngTab(tab) {
+            document.querySelectorAll('.eng-tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('panelChat').style.display = 'none';
+            document.getElementById('panelSlido').style.display = 'none';
+            document.getElementById('panelPoll').style.display = 'none';
+            document.getElementById('panelRaffle').style.display = 'none';
+
+            if (tab === 'chat') {
+                document.getElementById('engTabChat').classList.add('active');
+                document.getElementById('panelChat').style.display = 'flex';
+            } else if (tab === 'slido') {
+                document.getElementById('engTabSlido').classList.add('active');
+                document.getElementById('panelSlido').style.display = 'flex';
+                loadSlidoQA();
+            } else if (tab === 'poll') {
+                document.getElementById('engTabPoll').classList.add('active');
+                document.getElementById('panelPoll').style.display = 'flex';
+                loadLivePoll();
+            } else if (tab === 'raffle') {
+                document.getElementById('engTabRaffle').classList.add('active');
+                document.getElementById('panelRaffle').style.display = 'flex';
+                loadRaffleWheel();
+            }
+        }
+
+        // Slido Q&A
+        async function loadSlidoQA() {
+            const listEl = document.getElementById('slidoList');
+            try {
+                const res = await fetch(`/api/live/${liveEventId}/qa`);
+                const data = await res.json();
+                if (!data.ok) return;
+
+                if (data.questions.length === 0) {
+                    listEl.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 2rem;">No questions yet. Be the first to ask!</div>';
+                    return;
+                }
+
+                listEl.innerHTML = '';
+                data.questions.forEach(q => {
+                    const item = document.createElement('div');
+                    item.className = 'qa-item';
+                    item.style.display = 'flex';
+                    item.style.justifyContent = 'space-between';
+                    item.style.alignItems = 'flex-start';
+                    item.style.gap = '10px';
+
+                    const contentWrap = document.createElement('div');
+                    contentWrap.style.flex = '1';
+                    contentWrap.innerHTML = `
+                        <div style="font-size: 0.78rem; color: #38bdf8; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+                            <span>👤</span> ${q.author_name}
+                            ${q.is_answered ? '<span style="background: rgba(16, 185, 129, 0.2); color: #34d399; font-size: 0.65rem; padding: 1px 6px; border-radius: 4px;">ANSWERED</span>' : ''}
+                        </div>
+                        <p style="color: #ffffff; margin: 4px 0 0; font-size: 0.88rem; line-height: 1.4;">${q.question}</p>
+                    `;
+
+                    const upvoteBtn = document.createElement('button');
+                    upvoteBtn.type = 'button';
+                    upvoteBtn.className = `qa-upvote-btn ${q.has_upvoted ? 'voted' : ''}`;
+                    upvoteBtn.innerHTML = `▲ <span>${q.upvotes}</span>`;
+                    upvoteBtn.onclick = () => toggleQAUpvote(q.id);
+
+                    item.appendChild(contentWrap);
+                    item.appendChild(upvoteBtn);
+                    listEl.appendChild(item);
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function submitSlidoQuestion(e) {
+            e.preventDefault();
+            const input = document.getElementById('slidoInput');
+            const q = input.value.trim();
+            if (!q) return;
+
+            try {
+                const res = await fetch(`/api/live/${liveEventId}/qa/ask`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question: q })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    input.value = '';
+                    loadSlidoQA();
+                    if (window.showToast) showToast('Question submitted to speaker queue!', 'success');
+                } else {
+                    alert(data.error || 'Failed to submit question.');
+                }
+            } catch (err) {
+                alert('Connection error.');
+            }
+        }
+
+        async function toggleQAUpvote(qId) {
+            try {
+                const res = await fetch(`/api/live/${liveEventId}/qa/${qId}/upvote`, { method: 'POST' });
+                const data = await res.json();
+                if (data.ok) {
+                    loadSlidoQA();
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // Live Polls
+        async function loadLivePoll() {
+            const container = document.getElementById('pollOptionsContainer');
+            try {
+                const res = await fetch(`/api/live/${liveEventId}/polls`);
+                const data = await res.json();
+                if (!data.ok) return;
+
+                currentPollId = data.poll_id;
+                document.getElementById('pollQuestionText').textContent = data.question;
+                document.getElementById('pollStatusMsg').textContent = `Total Live Votes: ${data.total_votes}`;
+
+                container.innerHTML = '';
+                data.options.forEach(opt => {
+                    const card = document.createElement('div');
+                    card.className = `poll-opt-card ${data.user_voted_index === opt.index ? 'voted' : ''}`;
+                    card.innerHTML = `
+                        <div class="poll-opt-bar" style="width: ${opt.percent}%;"></div>
+                        <div style="position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
+                            <span style="color: #ffffff; font-weight: 600;">${opt.title}</span>
+                            <span style="font-weight: 800; color: #38bdf8;">${opt.percent}% (${opt.count})</span>
+                        </div>
+                    `;
+                    card.onclick = () => castPollVote(opt.index);
+                    container.appendChild(card);
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function castPollVote(optIdx) {
+            if (!currentPollId) return;
+            try {
+                const res = await fetch(`/api/live/${liveEventId}/polls/vote`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ poll_id: currentPollId, option_index: optIdx })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    loadLivePoll();
+                    if (window.showToast) showToast('Vote recorded live!', 'success');
+                } else {
+                    alert(data.error || 'Failed to vote.');
+                }
+            } catch (err) {
+                alert('Connection error.');
+            }
+        }
+
+        // Stage Raffle Wheel
+        async function loadRaffleWheel() {
+            try {
+                const res = await fetch(`/api/live/${liveEventId}/raffle`);
+                const data = await res.json();
+                if (data.ok && data.attendees.length > 0) {
+                    raffleAttendees = data.attendees.map(a => a.name);
+                } else {
+                    raffleAttendees = ['Alex M', 'Priya K', 'Rahul V', 'Sarah T', 'Venu R', 'Jordan B', 'David L', 'Anita G'];
+                }
+                drawWheel();
+            } catch (err) {
+                raffleAttendees = ['Alex M', 'Priya K', 'Rahul V', 'Sarah T', 'Venu R', 'Jordan B', 'David L', 'Anita G'];
+                drawWheel();
+            }
+        }
+
+        function drawWheel() {
+            const canvas = document.getElementById('raffleWheelCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const num = raffleAttendees.length;
+            const arc = (2 * Math.PI) / num;
+            const radius = canvas.width / 2;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const colors = ['#008be3', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4', '#3b82f6', '#6366f1'];
+
+            raffleAttendees.forEach((name, i) => {
+                const angle = wheelAngle + i * arc;
+                ctx.beginPath();
+                ctx.fillStyle = colors[i % colors.length];
+                ctx.moveTo(radius, radius);
+                ctx.arc(radius, radius, radius - 6, angle, angle + arc);
+                ctx.lineTo(radius, radius);
+                ctx.fill();
+                ctx.stroke();
+
+                // Text
+                ctx.save();
+                ctx.translate(radius, radius);
+                ctx.rotate(angle + arc / 2);
+                ctx.textAlign = 'right';
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 11px Inter, sans-serif';
+                ctx.fillText(name.substring(0, 10), radius - 18, 4);
+                ctx.restore();
+            });
+
+            // Center Pin
+            ctx.beginPath();
+            ctx.arc(radius, radius, 16, 0, 2 * Math.PI);
+            ctx.fillStyle = '#070709';
+            ctx.fill();
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#008be3';
+            ctx.stroke();
+
+            // Pointer arrow at top
+            ctx.beginPath();
+            ctx.moveTo(radius, 4);
+            ctx.lineTo(radius - 10, 22);
+            ctx.lineTo(radius + 10, 22);
+            ctx.closePath();
+            ctx.fillStyle = '#f59e0b';
+            ctx.fill();
+        }
+
+        function spinRaffleWheel() {
+            if (isSpinning) return;
+            isSpinning = true;
+            document.getElementById('spinRaffleBtn').disabled = true;
+            document.getElementById('raffleWinnerBox').style.display = 'none';
+
+            let speed = Math.random() * 0.25 + 0.35;
+            const decel = 0.0025;
+
+            function animate() {
+                speed -= decel;
+                wheelAngle += speed;
+                drawWheel();
+
+                if (speed > 0) {
+                    requestAnimationFrame(animate);
+                } else {
+                    isSpinning = false;
+                    document.getElementById('spinRaffleBtn').disabled = false;
+                    const num = raffleAttendees.length;
+                    const arc = (2 * Math.PI) / num;
+                    const normalized = (2 * Math.PI - (wheelAngle % (2 * Math.PI))) % (2 * Math.PI);
+                    const winnerIndex = Math.floor(normalized / arc);
+                    const winnerName = raffleAttendees[winnerIndex] || 'Winner';
+
+                    const winBox = document.getElementById('raffleWinnerBox');
+                    winBox.style.display = 'block';
+                    winBox.innerHTML = `🏆 WINNER: ${winnerName}!`;
+                    if (window.launchConfetti) window.launchConfetti(4000);
+                }
+            }
+            animate();
+        }
+    </script>
+
 </body>
 
 </html>

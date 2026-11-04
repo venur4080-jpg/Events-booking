@@ -264,7 +264,7 @@
         <div class="nav-container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
             <div style="display: flex; align-items: center;">
                 <div class="hamburger" id="hamburger">☰</div>
-                <div class="logo">Events <span>Booking</span></div>
+                <a href="{{ url_for('dashboard') }}" class="logo" title="Events Booking Home">Events <span>Booking</span></a>
             </div>
             <div class="nav-links" style="display: flex; align-items: center; gap: 12px;">
                 <a href="{{ url_for('dashboard') }}" class="nav-btn-dash">🏠 Dashboard</a>
@@ -276,11 +276,12 @@
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-logo">Events <span>Booking</span></div>
+            <a href="{{ url_for('dashboard') }}" class="sidebar-logo" title="Events Booking Home">Events <span>Booking</span></a>
             <div class="close-btn" id="closeSidebar">&times;</div>
         </div>
         <ul class="sidebar-links">
             <li><a href="{{ url_for('dashboard') }}">🏠 Dashboard</a></li>
+            <li><a href="{{ url_for('subscriptions_page') }}" style="color: #38bdf8; font-weight: 700;">💳 Subscriptions & Plans</a></li>
             <li><a href="{{ url_for('profile') }}">👤 My Profile</a></li>
             <li><a href="{{ url_for('history') }}">📋 My Bookings</a></li>
             <li><a href="{{ url_for('settings') }}">⚙️ Settings</a></li>
@@ -1152,7 +1153,7 @@
         // REAL-TIME WEBSOCKET SEAT SYNC & LIVE COUNTDOWN
         // ============================================================================
         (function initRealtimeDetails() {
-            const eventId = {{ event.id }};
+            const eventId = Number("{{ event.id }}");
             const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             let ws = null;
             let reconnectTimer = null;
@@ -1217,7 +1218,7 @@
             }
 
             // Real-time ticking countdown for today's cutoff
-            const cutoffSeconds = {{ event.time_until_cutoff_seconds or 0 }};
+            const cutoffSeconds = Number("{{ event.time_until_cutoff_seconds or 0 }}");
             const countdownBadge = document.getElementById('liveCountdownBadge');
             if (countdownBadge && cutoffSeconds > 0) {
                 let remaining = cutoffSeconds;
@@ -1282,6 +1283,7 @@
         <div data-flash="{{ msg }}" data-flash-type="{{ category }}"></div>
       {% endfor %}
     {% endwith %}
+    <script src="{{ url_for('static', filename='subscription_popup.js') }}?v=1.0"></script>
 </body>
 </html>
 

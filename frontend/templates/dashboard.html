@@ -617,10 +617,10 @@
                 </div>
 
                 <!-- Live Stream Subscription Badge / Button -->
-                {% if user_subscription %}
+                {% if user_subscription and user_subscription.is_active %}
                 <a href="{{ url_for('subscriptions_page') }}" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 20px; font-size: 0.76rem; font-weight: 800; white-space: nowrap; {% if user_subscription.plan_type == 'super' %}background: linear-gradient(135deg, rgba(255, 19, 137, 0.2), rgba(0, 139, 227, 0.2)); border: 1px solid #ff1389; color: #ff5eb0; box-shadow: 0 0 12px rgba(255,19,137,0.35);{% else %}background: rgba(0, 139, 227, 0.15); border: 1px solid #008be3; color: #008be3;{% endif %}" title="{{ user_subscription.plan_title }} Active">
                     <span>{{ '👑' if user_subscription.plan_type == 'super' else '💎' }}</span>
-                    <span>{{ user_subscription.plan_title }}</span>
+                    <span>My Plan</span>
                 </a>
                 {% else %}
                 <a href="{{ url_for('subscriptions_page') }}" class="card-btn-action" style="height: 32px; padding: 0 12px; font-size: 0.76rem; background: linear-gradient(135deg, #008be3, #0062a3); color: #ffffff; text-decoration: none; border-radius: 20px; box-shadow: 0 0 12px rgba(0, 139, 227, 0.35);" title="Hotstar Stage Pass Subscriptions">
@@ -653,7 +653,7 @@
 
         <ul class="sidebar-links" role="list">
             <li><a href="{{ url_for('dashboard') }}" class="active" aria-current="page">🏠 Dashboard</a></li>
-            <li><a href="{{ url_for('subscriptions_page') }}" style="color: #008be3; font-weight: 700;">👑 Live Stage Pass (Hotstar)</a></li>
+            <li><a href="{{ url_for('subscriptions_page') }}" style="color: #38bdf8; font-weight: 700; display: flex; align-items: center; justify-content: space-between;"><span>💳 Subscriptions & Plans</span>{% if user_subscription and user_subscription.is_active %}<span style="background: rgba(0,139,227,0.2); color: #38bdf8; font-size: 0.7rem; font-weight: 800; padding: 2px 8px; border-radius: 999px;">My Plan</span>{% endif %}</a></li>
             <li><a href="{{ url_for('category_events', category_name='all') }}">🎪 Browse All Categories</a></li>
             <li><a href="{{ url_for('passport_page') }}">🛂 Event Passport & XP</a></li>
             <li><a href="{{ url_for('teams_page') }}">🤝 AI Team Matcher</a></li>
@@ -1405,6 +1405,7 @@
     <div data-flash="{{ msg }}" data-flash-type="{{ category }}"></div>
     {% endfor %}
     {% endwith %}
+    <script src="{{ url_for('static', filename='subscription_popup.js') }}?v=1.0"></script>
 </body>
 
 </html>

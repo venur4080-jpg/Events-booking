@@ -738,8 +738,8 @@
     <!-- Top Action Toolbar -->
     <div class="ticket-toolbar">
         <div class="toolbar-group">
-            <a href="{{ url_for('dashboard') }}" class="t-btn">
-                <span>←</span> Dashboard
+            <a href="{{ url_for('dashboard') }}" class="t-btn" title="Return to Dashboard">
+                <span>←</span> Back to Dashboard
             </a>
             <button onclick="toggleCardFlip()" class="t-btn" id="flipBtn" title="Flip pass to view guidelines and Wi-Fi credentials">
                 <span>🔄</span> Flip Pass
@@ -796,10 +796,10 @@
                     <div>
                         <!-- Brand & Pass Status -->
                         <div class="brand-header-row">
-                            <div class="brand-badge">
+                            <a href="{{ url_for('dashboard') }}" class="brand-badge" title="Events Booking Home" style="text-decoration: none; color: inherit; cursor: pointer;">
                                 <img src="{{ url_for('static', filename='logo.png') }}" alt="Events Booking Logo" style="height: 40px; border-radius: 10px; box-shadow: 0 0 15px rgba(0, 139, 227, 0.4);">
                                 <div>Events <span>Booking</span></div>
-                            </div>
+                            </a>
 
                             <div style="display: flex; gap: 8px; align-items: center;">
                                 <div class="pass-tier-badge">

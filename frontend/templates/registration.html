@@ -149,7 +149,7 @@
         <div class="nav-container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
             <div style="display: flex; align-items: center;">
                 <div class="hamburger" id="hamburger">☰</div>
-                <div class="logo">Events <span>Booking</span></div>
+                <a href="{{ url_for('dashboard') }}" class="logo" title="Events Booking Home">Events <span>Booking</span></a>
             </div>
             <div class="nav-links" style="display: flex; align-items: center; gap: 12px;">
                 <a href="{{ url_for('event_detail', event_id=event.id if event else 1) }}" class="nav-btn-dash">🏠 Event Details</a>
@@ -161,7 +161,7 @@
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-logo">Events <span>Booking</span></div>
+            <a href="{{ url_for('dashboard') }}" class="sidebar-logo" title="Events Booking Home">Events <span>Booking</span></a>
             <div class="close-btn" id="closeSidebar">&times;</div>
         </div>
         <ul class="sidebar-links">
@@ -357,6 +357,28 @@
                 </div>
 
                 <!-- Primary / Leader Information -->
+                                <!-- Interactive Venue Seating Selector (For In-Person Passes) -->
+                <div id="seatingSelectorContainer" style="margin-bottom: 1.5rem; background: rgba(13, 13, 18, 0.7); border: 1px solid rgba(0, 139, 227, 0.25); border-radius: 14px; padding: 1.2rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+                        <label style="color: var(--primary); font-weight: 700; font-size: 0.88rem; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; margin: 0;">
+                            <span>💺</span> Reserve Your Seat
+                        </label>
+                        <span id="selectedSeatBadge" style="display: none; background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #34d399; font-size: 0.75rem; font-weight: 800; padding: 3px 10px; border-radius: 999px;">
+                            Seat: <strong id="selectedSeatText">-</strong>
+                        </span>
+                    </div>
+
+                    <div style="background: rgba(0,0,0,0.4); border-radius: 10px; padding: 12px; text-align: center; border: 1px dashed rgba(255,255,255,0.15);">
+                        <div style="margin-bottom: 8px; font-size: 0.82rem; color: #94a3b8;">
+                            Pick your exact seat in the auditorium (VIP front rows, Premium, or General Admission):
+                        </div>
+                        <button type="button" class="btn-primary" onclick="openSeatingModal()" style="display: inline-flex; align-items: center; gap: 8px; font-size: 0.84rem; padding: 7px 18px; width: auto; border-radius: 8px; margin: 0;">
+                            🗺️ Open Interactive Seating Chart
+                        </button>
+                    </div>
+                    <input type="hidden" name="seat_code" id="seatCodeInput" value="">
+                </div>
+
                 <h4 id="primaryInfoTitle" style="color: white; font-size: 0.95rem; margin-bottom: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;">Attendee Information</h4>
                 <div class="input-group">
                     <label>Full Name *</label>
@@ -380,6 +402,32 @@
                     <label>College/Student ID *</label>
                     <input type="text" name="college_id" class="input-field" placeholder="BCA-2026-X1" required>
                 </div>
+
+                <!-- Custom Registration Questions (Configured per Event) -->
+                {% if custom_questions %}
+                <div id="customQuestionsSection" style="margin-top: 1.5rem; background: rgba(0, 139, 227, 0.04); border: 1px solid rgba(0, 139, 227, 0.2); border-radius: 14px; padding: 1.2rem;">
+                    <h4 style="color: var(--primary); font-size: 0.95rem; margin-bottom: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px;">
+                        <span>📋</span> Attendee Requirements & Survey
+                    </h4>
+                    {% for q in custom_questions %}
+                    <div class="input-group" style="margin-bottom: 1rem;">
+                        <label>{{ q.label }} {% if q.required %}<span style="color: #ef4444;">*</span>{% endif %}</label>
+                        {% if q.type == 'select' %}
+                        <select name="custom_q_{{ q.id }}" class="input-field" {% if q.required %}required{% endif %}>
+                            <option value="">-- Select {{ q.label }} --</option>
+                            {% for opt in q.options %}
+                            <option value="{{ opt }}">{{ opt }}</option>
+                            {% endfor %}
+                        </select>
+                        {% elif q.type == 'url' %}
+                        <input type="url" name="custom_q_{{ q.id }}" class="input-field" placeholder="https://github.com/your-username" {% if q.required %}required{% endif %}>
+                        {% else %}
+                        <input type="text" name="custom_q_{{ q.id }}" class="input-field" placeholder="Enter {{ q.label }}" {% if q.required %}required{% endif %}>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
 
                 <!-- Dynamic Teammate Fields -->
                 <div id="teammatesContainer" style="display: none; margin-top: 1.5rem;"></div>
@@ -792,6 +840,196 @@
             }
         });
     </script>
+
+    <!-- Interactive Seating Chart Modal -->
+    <div id="seatingModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(14px); z-index: 10000; align-items: center; justify-content: center; padding: 1rem;">
+        <div style="background: #0d0d14; border: 1px solid rgba(0, 139, 227, 0.35); border-radius: 20px; max-width: 720px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 1.8rem; box-shadow: 0 10px 40px rgba(0,0,0,0.8);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.8rem;">
+                <div>
+                    <h3 style="font-family: var(--font-heading); color: #ffffff; margin: 0; font-size: 1.3rem; display: flex; align-items: center; gap: 8px;">
+                        <span>💺</span> Interactive Venue Seating Chart
+                    </h3>
+                    <p style="color: var(--text-muted); font-size: 0.82rem; margin: 4px 0 0;">Select your seat • Holds for 10 minutes</p>
+                </div>
+                <button type="button" onclick="closeSeatingModal()" style="background: rgba(255,255,255,0.1); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; font-size: 1.2rem; cursor: pointer;">&times;</button>
+            </div>
+
+            <!-- Stage indicator -->
+            <div style="background: linear-gradient(180deg, rgba(0, 139, 227, 0.35), rgba(0, 139, 227, 0.05)); border: 1px solid rgba(0, 139, 227, 0.5); border-radius: 8px; padding: 10px; text-align: center; margin-bottom: 1.8rem; color: #38bdf8; font-weight: 800; font-size: 0.82rem; letter-spacing: 2px;">
+                🎭 MAIN STAGE & PROJECTION SCREEN
+            </div>
+
+            <!-- Legend -->
+            <div style="display: flex; justify-content: center; gap: 16px; margin-bottom: 1.5rem; flex-wrap: wrap; font-size: 0.78rem;">
+                <span style="display: inline-flex; align-items: center; gap: 6px;">
+                    <span style="width: 14px; height: 14px; border-radius: 4px; background: #f59e0b; display: inline-block;"></span> VIP (+₹150)
+                </span>
+                <span style="display: inline-flex; align-items: center; gap: 6px;">
+                    <span style="width: 14px; height: 14px; border-radius: 4px; background: #008be3; display: inline-block;"></span> Premium (+₹75)
+                </span>
+                <span style="display: inline-flex; align-items: center; gap: 6px;">
+                    <span style="width: 14px; height: 14px; border-radius: 4px; background: #334155; display: inline-block;"></span> General (₹0)
+                </span>
+                <span style="display: inline-flex; align-items: center; gap: 6px;">
+                    <span style="width: 14px; height: 14px; border-radius: 4px; background: #10b981; display: inline-block;"></span> Selected
+                </span>
+                <span style="display: inline-flex; align-items: center; gap: 6px;">
+                    <span style="width: 14px; height: 14px; border-radius: 4px; background: #ef4444; opacity: 0.4; display: inline-block;"></span> Booked
+                </span>
+            </div>
+
+            <!-- Seat grid container -->
+            <div id="seatingGridContainer" style="display: flex; flex-direction: column; gap: 10px; align-items: center; margin-bottom: 1.5rem;">
+                <div style="color: var(--text-muted); font-size: 0.85rem;">Loading live auditorium seats...</div>
+            </div>
+
+            <!-- Selected info & Confirm -->
+            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); border-radius: 12px; padding: 12px 16px; border: 1px solid rgba(255,255,255,0.08);">
+                <div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Chosen Seat:</div>
+                    <div id="modalChosenSeatText" style="font-size: 1.05rem; font-weight: 800; color: #38bdf8;">None Selected</div>
+                </div>
+                <button type="button" onclick="confirmSeatSelection()" class="btn-primary" style="margin: 0; width: auto; padding: 8px 24px; font-weight: 700;">
+                    ✓ Confirm Seat
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const eventIdVal = {{ event.id }};
+        let currentTempSeat = null;
+
+        function openSeatingModal() {
+            const modal = document.getElementById('seatingModal');
+            modal.style.display = 'flex';
+            loadSeatingGrid();
+        }
+
+        function closeSeatingModal() {
+            document.getElementById('seatingModal').style.display = 'none';
+        }
+
+        async function loadSeatingGrid() {
+            const container = document.getElementById('seatingGridContainer');
+            try {
+                const res = await fetch(`/api/event/${eventIdVal}/seats`);
+                const data = await res.json();
+                if (!data.ok) throw new Error(data.error || 'Failed to load seats');
+
+                container.innerHTML = '';
+                const rows = data.seats_by_row;
+
+                Object.keys(rows).sort().forEach(rowKey => {
+                    const rowDiv = document.createElement('div');
+                    rowDiv.style.display = 'flex';
+                    rowDiv.style.alignItems = 'center';
+                    rowDiv.style.gap = '8px';
+
+                    const rowLabel = document.createElement('span');
+                    rowLabel.style.width = '24px';
+                    rowLabel.style.fontWeight = '800';
+                    rowLabel.style.fontSize = '0.8rem';
+                    rowLabel.style.color = '#94a3b8';
+                    rowLabel.textContent = rowKey;
+                    rowDiv.appendChild(rowLabel);
+
+                    const seatsWrap = document.createElement('div');
+                    seatsWrap.style.display = 'flex';
+                    seatsWrap.style.gap = '6px';
+
+                    rows[rowKey].forEach(seat => {
+                        const seatBtn = document.createElement('button');
+                        seatBtn.type = 'button';
+                        seatBtn.title = `${seat.code} (${seat.tier.toUpperCase()}) - ${seat.status}`;
+                        seatBtn.style.width = '34px';
+                        seatBtn.style.height = '34px';
+                        seatBtn.style.borderRadius = '6px';
+                        seatBtn.style.border = 'none';
+                        seatBtn.style.fontSize = '0.68rem';
+                        seatBtn.style.fontWeight = '700';
+                        seatBtn.style.cursor = 'pointer';
+                        seatBtn.style.transition = 'all 0.2s';
+                        seatBtn.textContent = seat.col;
+
+                        if (seat.status === 'booked') {
+                            seatBtn.style.background = '#1e293b';
+                            seatBtn.style.color = '#64748b';
+                            seatBtn.style.opacity = '0.35';
+                            seatBtn.style.cursor = 'not-allowed';
+                            seatBtn.disabled = true;
+                        } else if (seat.status === 'selected' || (currentTempSeat && currentTempSeat === seat.code)) {
+                            seatBtn.style.background = '#10b981';
+                            seatBtn.style.color = '#ffffff';
+                            seatBtn.style.boxShadow = '0 0 10px #10b981';
+                        } else {
+                            if (seat.tier === 'vip') {
+                                seatBtn.style.background = 'rgba(245, 158, 11, 0.25)';
+                                seatBtn.style.border = '1px solid #f59e0b';
+                                seatBtn.style.color = '#fbbf24';
+                            } else if (seat.tier === 'premium') {
+                                seatBtn.style.background = 'rgba(0, 139, 227, 0.25)';
+                                seatBtn.style.border = '1px solid #008be3';
+                                seatBtn.style.color = '#38bdf8';
+                            } else {
+                                seatBtn.style.background = 'rgba(255, 255, 255, 0.08)';
+                                seatBtn.style.border = '1px solid rgba(255, 255, 255, 0.15)';
+                                seatBtn.style.color = '#cbd5e1';
+                            }
+
+                            seatBtn.onclick = () => selectSeatOption(seat.code, seat.tier, seat.addon);
+                        }
+
+                        seatsWrap.appendChild(seatBtn);
+                    });
+
+                    rowDiv.appendChild(seatsWrap);
+                    container.appendChild(rowDiv);
+                });
+
+                if (data.user_locked_seat) {
+                    currentTempSeat = data.user_locked_seat;
+                    document.getElementById('modalChosenSeatText').textContent = data.user_locked_seat;
+                }
+            } catch (err) {
+                container.innerHTML = `<div style="color: #ef4444; font-size: 0.85rem;">Error loading seats: ${err.message}</div>`;
+            }
+        }
+
+        async function selectSeatOption(code, tier, addon) {
+            try {
+                const res = await fetch(`/api/event/${eventIdVal}/lock-seat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ seat_code: code })
+                });
+                const data = await res.json();
+                if (!data.ok) {
+                    alert(data.error || 'Seat could not be locked.');
+                    return;
+                }
+
+                currentTempSeat = code;
+                document.getElementById('modalChosenSeatText').textContent = `${code} (${tier.toUpperCase()})`;
+                loadSeatingGrid(); // re-render colors
+            } catch (err) {
+                alert('Connection error while holding seat.');
+            }
+        }
+
+        function confirmSeatSelection() {
+            if (currentTempSeat) {
+                document.getElementById('seatCodeInput').value = currentTempSeat;
+                document.getElementById('selectedSeatText').textContent = currentTempSeat;
+                document.getElementById('selectedSeatBadge').style.display = 'inline-flex';
+                closeSeatingModal();
+                if (window.showToast) showToast(`Seat ${currentTempSeat} reserved!`, 'success');
+            } else {
+                closeSeatingModal();
+            }
+        }
+    </script>
 </body>
+
 </html>
 

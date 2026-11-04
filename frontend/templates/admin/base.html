@@ -146,6 +146,9 @@
         <a href="{{ url_for('admin_events') }}" class="admin-nav-item {% if active=='events' %}active{% endif %}">
             🗓️ Events ({{ stats.total_events }})
         </a>
+        <a href="{{ url_for('admin_subscriptions') }}" class="admin-nav-item {% if active=='subscriptions' %}active{% endif %}">
+            💳 Subscriptions
+        </a>
         <a href="{{ url_for('admin_audit') }}" class="admin-nav-item {% if active=='audit' %}active{% endif %}">
             📋 Audit Log
         </a>
