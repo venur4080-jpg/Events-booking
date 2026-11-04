@@ -767,6 +767,12 @@
             <a href="{{ url_for('mobile_wallet_pass', ticket_number=reg.ticket_code) }}" target="_blank" class="t-btn" title="View Apple & Google Wallet Mobile Pass" style="border-color: #38bdf8; color: #38bdf8;">
                 <span>📱</span> Mobile Pass
             </a>
+            <a href="{{ url_for('download_gst_invoice', ticket_code=reg.ticket_code) }}" target="_blank" class="t-btn" title="View Official GST Tax Invoice" style="border-color: #10b981; color: #34d399;">
+                <span>🧾</span> GST Invoice
+            </a>
+            <a href="{{ url_for('event_floorplan', event_id=event.id) }}?seat={{ reg.seat_code or 'A-01' }}" target="_blank" class="t-btn" title="Find My Seat on Floorplan" style="border-color: #f59e0b; color: #fbbf24;">
+                <span>🗺️</span> Seat Route
+            </a>
             <a href="{{ url_for('download_ticket', event_id=event.id) }}" class="t-btn t-btn-primary" target="_blank" title="Download Official PDF E-Ticket">
                 <span>📥</span> PDF Pass
             </a>

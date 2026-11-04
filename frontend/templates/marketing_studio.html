@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Marketing & Growth Studio — {{ event.title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=8.0">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='toast.js') }}"></script>
+    <style>
+        :root {
+            --mkt-bg: #070709;
+            --mkt-card: rgba(15, 23, 42, 0.94);
+            --mkt-border: rgba(255, 255, 255, 0.08);
+            --neon-pink: #ec4899;
+            --neon-blue: #00d2ff;
+        }
+
+        body {
+            background-color: var(--mkt-bg);
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding-bottom: 5rem;
+        }
+
+        .mkt-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .mkt-hero {
+            background: radial-gradient(circle at top right, rgba(236, 72, 153, 0.15), rgba(0, 210, 255, 0.08), transparent 70%);
+            border: 1px solid var(--mkt-border);
+            border-radius: 20px;
+            padding: 2.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .tabs-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--mkt-border);
+            padding-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--mkt-border);
+            color: #cbd5e1;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.92rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active, .tab-btn:hover {
+            background: linear-gradient(135deg, #0284c7, #00d2ff);
+            color: #0b0f19;
+            border-color: #00d2ff;
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.4);
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        .canvas-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 880px) {
+            .canvas-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .preview-box {
+            background: #0f172a;
+            border: 1px solid var(--mkt-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        #flyerCanvas {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+        }
+
+        .form-card {
+            background: var(--mkt-card);
+            border: 1px solid var(--mkt-border);
+            border-radius: 16px;
+            padding: 1.8rem;
+        }
+
+        .field-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .field-group label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #94a3b8;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .field-group input, .field-group select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            color: #fff;
+            outline: none;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .leaderboard-table th, .leaderboard-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--mkt-border);
+        }
+
+        .leaderboard-table th {
+            color: #94a3b8;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mkt-container">
+        <!-- Back Button -->
+        <a href="{{ url_for('event_detail', event_id=event.id) }}" class="back-btn-unified" style="margin-bottom: 1.5rem; display: inline-flex;">
+            <span class="arrow">←</span> Back to Event Details
+        </a>
+
+        <!-- Hero Header -->
+        <div class="mkt-hero">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <span style="background: rgba(236, 72, 153, 0.2); color: var(--neon-pink); border: 1px solid var(--neon-pink); font-size: 0.78rem; font-weight: 800; padding: 4px 12px; border-radius: 20px; text-transform: uppercase;">Host Growth Suite</span>
+                    <h1 style="font-family: 'Outfit', sans-serif; font-size: 2.2rem; margin: 0.6rem 0 0.4rem; color: #ffffff;">AI Marketing &amp; Viral Promo Studio</h1>
+                    <p style="color: #94a3b8; margin: 0; font-size: 0.95rem;">Generate high-conversion social flyers, automate marketing drip emails, and track referral ambassadors.</p>
+                </div>
+                <div style="background: rgba(0,0,0,0.5); padding: 12px 18px; border-radius: 12px; border: 1px solid var(--mkt-border);">
+                    <div style="font-size: 0.75rem; color: #94a3b8;">Selected Event:</div>
+                    <strong style="color: #38bdf8; font-size: 1.1rem;">{{ event.title }}</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="tabs-row">
+            <button class="tab-btn active" onclick="switchTab('flyerTab', this)">🎨 AI Social Flyer Studio</button>
+            <button class="tab-btn" onclick="switchTab('dripTab', this)">✉️ Drip Email Sequences</button>
+            <button class="tab-btn" onclick="switchTab('referralTab', this)">🏆 Ambassador Referrals</button>
+            <button class="tab-btn" onclick="switchTab('couponTab', this)">🎟️ Promo Coupons</button>
+        </div>
+
+        <!-- Tab 1: AI Social Flyer Studio -->
+        <div id="flyerTab" class="tab-pane active">
+            <div class="canvas-grid">
+                <!-- Controls Form -->
+                <div class="form-card">
+                    <h3 style="font-family: 'Outfit', sans-serif; margin-top: 0; color: #38bdf8;">Visual Asset Customizer</h3>
+                    <div class="field-group">
+                        <label>Asset Format</label>
+                        <select id="formatSelect" onchange="renderFlyer()">
+                            <option value="square">Instagram Square (1080 × 1080)</option>
+                            <option value="landscape">Twitter &amp; LinkedIn (1200 × 675)</option>
+                            <option value="story">WhatsApp &amp; Instagram Story (1080 × 1920)</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label>Headline Tagline</label>
+                        <input type="text" id="flyerTagline" value="JOIN THE PREMIER TECH CONFERENCE" oninput="renderFlyer()">
+                    </div>
+                    <div class="field-group">
+                        <label>Keynote Speaker / Highlight</label>
+                        <input type="text" id="flyerSpeaker" value="Featuring Top Industry Leaders" oninput="renderFlyer()">
+                    </div>
+                    <div class="field-group">
+                        <label>Color Theme</label>
+                        <select id="colorSelect" onchange="renderFlyer()">
+                            <option value="cyber">Cyber Blue &amp; Neon Cyan</option>
+                            <option value="purple">Cosmic Purple &amp; Fuchsia</option>
+                            <option value="dark">Midnight Stealth &amp; Gold</option>
+                        </select>
+                    </div>
+                    <button type="button" onclick="downloadFlyerPNG()" class="btn-primary" style="width: 100%; padding: 14px; font-weight: 800; font-size: 1rem; border-radius: 10px; background: linear-gradient(135deg, #0284c7, #00d2ff); color: #0b0f19;">
+                        ⚡ Download High-Res PNG Card
+                    </button>
+                </div>
+
+                <!-- Live Preview Box -->
+                <div class="preview-box">
+                    <canvas id="flyerCanvas" width="1080" height="1080"></canvas>
+                    <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 10px;">Live rendering with dynamic ticket QR code</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Drip Email Sequences -->
+        <div id="dripTab" class="tab-pane">
+            <div class="form-card" style="margin-bottom: 1.5rem;">
+                <h3 style="font-family: 'Outfit', sans-serif; margin-top: 0; color: #38bdf8;">Automated Drip Campaign Dispatcher</h3>
+                <p style="color: #cbd5e1; font-size: 0.9rem;">Automate high-engagement email touchpoints to boost show-up rates and collect post-event feedback.</p>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+                    <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--mkt-border); border-radius: 12px; padding: 1.2rem;">
+                        <span style="font-size: 0.75rem; color: #38bdf8; font-weight: 800; text-transform: uppercase;">Trigger 1: T - 7 Days</span>
+                        <h4 style="margin: 0.5rem 0; color: #fff;">Agenda &amp; Speaker Reveal</h4>
+                        <p style="color: #94a3b8; font-size: 0.85rem;">Sends personalized track bookmarks and session slide deck previews.</p>
+                        <button type="button" onclick="simulateDripEmail('Agenda Preview')" style="background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #38bdf8; padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer;">
+                            Send Test Dispatch
+                        </button>
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--mkt-border); border-radius: 12px; padding: 1.2rem;">
+                        <span style="font-size: 0.75rem; color: #f59e0b; font-weight: 800; text-transform: uppercase;">Trigger 2: T - 24 Hours</span>
+                        <h4 style="margin: 0.5rem 0; color: #fff;">Venue Turnstile &amp; Seat Pass</h4>
+                        <p style="color: #94a3b8; font-size: 0.85rem;">Sends offline mobile wallet barcode and gate turnstile instructions.</p>
+                        <button type="button" onclick="simulateDripEmail('Gate Arrival Briefing')" style="background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; color: #f59e0b; padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer;">
+                            Send Test Dispatch
+                        </button>
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--mkt-border); border-radius: 12px; padding: 1.2rem;">
+                        <span style="font-size: 0.75rem; color: #10b981; font-weight: 800; text-transform: uppercase;">Trigger 3: T + 1 Day</span>
+                        <h4 style="margin: 0.5rem 0; color: #fff;">POAP Claim &amp; NPS Feedback</h4>
+                        <p style="color: #94a3b8; font-size: 0.85rem;">Dispatches cryptographic attendance certificate &amp; 1-click star rating.</p>
+                        <button type="button" onclick="simulateDripEmail('POAP & Certificate Claim')" style="background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; color: #10b981; padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer;">
+                            Send Test Dispatch
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Ambassador Referrals -->
+        <div id="referralTab" class="tab-pane">
+            <div class="form-card">
+                <h3 style="font-family: 'Outfit', sans-serif; margin-top: 0; color: #38bdf8;">Attendee Referral Leaderboard</h3>
+                <p style="color: #cbd5e1; font-size: 0.9rem;">Empower your community to invite friends with automated perks and VIP upgrades.</p>
+
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Ambassador</th>
+                            <th>Friends Referred</th>
+                            <th>Unlocked Perk</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in referrals %}
+                        <tr>
+                            <td><strong style="color: #38bdf8;">#{{ loop.index }}</strong></td>
+                            <td style="color: #fff; font-weight: 700;">{{ r.username }}</td>
+                            <td><span style="background: rgba(16, 185, 129, 0.2); color: #10b981; font-weight: 800; padding: 4px 10px; border-radius: 20px;">{{ r.count }} bookings</span></td>
+                            <td style="color: #cbd5e1;">{{ r.reward }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: #94a3b8; padding: 2rem;">No referrals recorded yet for this event.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab 4: Promo Coupons -->
+        <div id="couponTab" class="tab-pane">
+            <div class="form-card">
+                <h3 style="font-family: 'Outfit', sans-serif; margin-top: 0; color: #38bdf8;">Active Promotional Coupons</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                    {% for c in coupons %}
+                    <div style="background: rgba(255, 255, 255, 0.03); border: 1px dashed var(--neon-blue); border-radius: 12px; padding: 1.2rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <strong style="font-family: 'JetBrains Mono', monospace; font-size: 1.2rem; color: #38bdf8;">{{ c.code }}</strong>
+                            <span style="background: rgba(16, 185, 129, 0.2); color: #10b981; font-size: 0.75rem; font-weight: 800; padding: 3px 8px; border-radius: 20px;">
+                                {% if c.type == 'percent' %}{{ c.value }}% OFF{% else %}₹{{ c.value }} FLAT{% endif %}
+                            </span>
+                        </div>
+                        <div style="font-size: 0.82rem; color: #94a3b8;">Redeemed: {{ c.used }} / {{ c.max }} passes</div>
+                    </div>
+                    {% else %}
+                    <div style="color: #94a3b8;">No coupons created yet.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        const eventTitle = "{{ event.title }}";
+        const eventDate = "{{ event.date }}";
+        const eventVenue = "{{ event.venue }}";
+        const eventCategory = "{{ event.category }}";
+
+        function renderFlyer() {
+            const canvas = document.getElementById('flyerCanvas');
+            const ctx = canvas.getContext('2d');
+            const fmt = document.getElementById('formatSelect').value;
+            const theme = document.getElementById('colorSelect').value;
+            const tagline = document.getElementById('flyerTagline').value.toUpperCase();
+            const speaker = document.getElementById('flyerSpeaker').value;
+
+            if (fmt === 'square') { canvas.width = 1080; canvas.height = 1080; }
+            else if (fmt === 'landscape') { canvas.width = 1200; canvas.height = 675; }
+            else if (fmt === 'story') { canvas.width = 1080; canvas.height = 1920; }
+
+            const W = canvas.width;
+            const H = canvas.height;
+
+            // Background Gradient
+            let grad = ctx.createLinearGradient(0, 0, W, H);
+            if (theme === 'cyber') {
+                grad.addColorStop(0, '#0b1329');
+                grad.addColorStop(0.5, '#0284c7');
+                grad.addColorStop(1, '#00d2ff');
+            } else if (theme === 'purple') {
+                grad.addColorStop(0, '#180d2b');
+                grad.addColorStop(0.5, '#7c3aed');
+                grad.addColorStop(1, '#ec4899');
+            } else {
+                grad.addColorStop(0, '#0a0a0a');
+                grad.addColorStop(0.5, '#1e293b');
+                grad.addColorStop(1, '#f59e0b');
+            }
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, W, H);
+
+            // Subtle dark overlay container
+            ctx.fillStyle = 'rgba(7, 10, 19, 0.85)';
+            ctx.roundRect(40, 40, W - 80, H - 80, 24);
+            ctx.fill();
+
+            // Border Glow
+            ctx.strokeStyle = (theme === 'purple') ? '#ec4899' : ((theme === 'dark') ? '#f59e0b' : '#00d2ff');
+            ctx.lineWidth = 4;
+            ctx.roundRect(40, 40, W - 80, H - 80, 24);
+            ctx.stroke();
+
+            // Tagline
+            ctx.fillStyle = (theme === 'purple') ? '#ec4899' : ((theme === 'dark') ? '#f59e0b' : '#38bdf8');
+            ctx.font = '800 24px "Inter", sans-serif';
+            ctx.letterSpacing = '3px';
+            ctx.fillText(tagline, 80, 110);
+
+            // Title
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '900 52px "Outfit", sans-serif';
+            ctx.fillText(eventTitle, 80, 180);
+
+            // Highlight line
+            ctx.font = '600 28px "Inter", sans-serif';
+            ctx.fillStyle = '#cbd5e1';
+            ctx.fillText("🌟 " + speaker, 80, 240);
+
+            // Details Badges
+            ctx.font = '700 24px "Inter", sans-serif';
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillText("📅 " + eventDate + "   |   📍 " + eventVenue, 80, 310);
+
+            // Simulated QR Stamp
+            const qrSize = (fmt === 'story') ? 240 : 180;
+            const qrx = W - qrSize - 90;
+            const qry = H - qrSize - 90;
+            ctx.fillStyle = '#ffffff';
+            ctx.roundRect(qrx, qry, qrSize, qrSize, 14);
+            ctx.fill();
+
+            // QR Pattern Mock
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(qrx + 15, qry + 15, qrSize - 30, qrSize - 30);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '800 16px "JetBrains Mono", monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText("SCAN TO BOOK", qrx + (qrSize / 2), qry + (qrSize / 2) + 6);
+            ctx.textAlign = 'left';
+
+            // Brand Footer
+            ctx.fillStyle = '#64748b';
+            ctx.font = '700 20px "Outfit", sans-serif';
+            ctx.fillText("Verified Admission Pass • Powered by Events Booking Platform", 80, H - 90);
+        }
+
+        function downloadFlyerPNG() {
+            const canvas = document.getElementById('flyerCanvas');
+            const a = document.createElement('a');
+            a.download = `Event-Flyer-${eventTitle.replace(/[^a-zA-Z0-9]/g, '-')}.png`;
+            a.href = canvas.toDataURL('image/png');
+            a.click();
+            if (window.showToast) window.showToast('High-Res Flyer downloaded successfully!', 'success', 3000);
+        }
+
+        function simulateDripEmail(title) {
+            if (window.showToast) window.showToast(`Test dispatch "${title}" delivered to host inbox!`, 'success', 3500);
+        }
+
+        window.addEventListener('load', renderFlyer);
+    </script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organization Team &amp; Permissions | Events Booking</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=8.0">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='toast.js') }}"></script>
+    <style>
+        :root {
+            --team-bg: #070709;
+            --team-card: rgba(15, 23, 42, 0.94);
+            --team-border: rgba(255, 255, 255, 0.08);
+            --indigo-glow: #6366f1;
+        }
+
+        body {
+            background-color: var(--team-bg);
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding-bottom: 5rem;
+        }
+
+        .team-container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .team-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .team-table th, .team-table td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--team-border);
+        }
+
+        .team-table th {
+            color: #94a3b8;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .role-chip {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .role-co_host { background: rgba(147, 51, 234, 0.2); color: #c084fc; border: 1px solid #c084fc; }
+        .role-scanner { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #34d399; }
+        .role-moderator { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #38bdf8; }
+        .role-finance_viewer { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #fbbf24; }
+    </style>
+</head>
+<body>
+
+    <div class="team-container">
+        <!-- Back Button -->
+        <a href="{{ url_for('dashboard') }}" class="back-btn-unified" style="margin-bottom: 1.5rem; display: inline-flex;">
+            <span class="arrow">←</span> Back to Dashboard
+        </a>
+
+        <!-- Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <span style="background: rgba(99, 102, 241, 0.2); color: #818cf8; border: 1px solid #818cf8; font-size: 0.78rem; font-weight: 800; padding: 4px 12px; border-radius: 20px; text-transform: uppercase;">Team &amp; Access Control</span>
+                <h1 style="font-family: 'Outfit', sans-serif; font-size: 2.2rem; margin: 0.6rem 0 0; color: #fff;">Organization Staff &amp; Role Management</h1>
+            </div>
+            <button type="button" onclick="openInviteModal()" style="background: linear-gradient(135deg, #6366f1, #4f46e5); border: none; color: #fff; font-weight: 800; padding: 12px 24px; border-radius: 10px; font-size: 0.95rem; cursor: pointer; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);">
+                + Invite Team Member
+            </button>
+        </div>
+
+        <!-- Role Legend Card -->
+        <div style="background: var(--team-card); border: 1px solid var(--team-border); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem;">
+            <h4 style="font-family: 'Outfit', sans-serif; margin: 0 0 1rem; color: #fff;">Role Capabilities Breakdown</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+                <div style="background: rgba(255,255,255,0.03); border-radius: 10px; padding: 1rem; border: 1px solid var(--team-border);">
+                    <span class="role-chip role-co_host">CO-HOST</span>
+                    <p style="color: #cbd5e1; font-size: 0.82rem; margin: 8px 0 0;">Full event edit rights, agenda scheduling &amp; sponsor portal.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.03); border-radius: 10px; padding: 1rem; border: 1px solid var(--team-border);">
+                    <span class="role-chip role-scanner">GATE SCANNER</span>
+                    <p style="color: #cbd5e1; font-size: 0.82rem; margin: 8px 0 0;">Camera QR ticket scanning at turnstiles &amp; badge reprint kiosk.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.03); border-radius: 10px; padding: 1rem; border: 1px solid var(--team-border);">
+                    <span class="role-chip role-moderator">MODERATOR</span>
+                    <p style="color: #cbd5e1; font-size: 0.82rem; margin: 8px 0 0;">Slido stage Q&amp;A question approval &amp; live chat management.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.03); border-radius: 10px; padding: 1rem; border: 1px solid var(--team-border);">
+                    <span class="role-chip role-finance_viewer">FINANCE</span>
+                    <p style="color: #cbd5e1; font-size: 0.82rem; margin: 8px 0 0;">Read-only treasury ledger, GST tax reports &amp; revenue splits.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Members Table -->
+        <div style="background: var(--team-card); border: 1px solid var(--team-border); border-radius: 16px; padding: 1.8rem;">
+            <h3 style="font-family: 'Outfit', sans-serif; margin-top: 0; color: #fff;">Active Staff Members ({{ members|length }})</h3>
+            <table class="team-table">
+                <thead>
+                    <tr>
+                        <th>Staff Member</th>
+                        <th>Email Address</th>
+                        <th>Assigned Role</th>
+                        <th>Invited Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in members %}
+                    <tr>
+                        <td><strong style="color: #fff;">@{{ m.username }}</strong></td>
+                        <td style="color: #cbd5e1;">{{ m.email }}</td>
+                        <td><span class="role-chip role-{{ m.role }}">{{ m.role.replace('_', ' ') }}</span></td>
+                        <td style="color: #94a3b8; font-size: 0.85rem;">{{ m.invited_at }}</td>
+                        <td><span style="color: #10b981; font-weight: 700; font-size: 0.82rem;">● Active</span></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #94a3b8; padding: 2rem;">No staff members invited yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Invite Modal Dialog -->
+    <div id="inviteModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 18px; padding: 2rem; max-width: 440px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.8);">
+            <h3 style="font-family: 'Outfit', sans-serif; margin-top: 0; color: #fff;">Invite Staff Member</h3>
+            <p style="color: #94a3b8; font-size: 0.88rem; margin-bottom: 1.2rem;">Invited members receive secure role-based dashboard access.</p>
+
+            <form onsubmit="submitInvite(event)">
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; font-size: 0.8rem; color: #cbd5e1; font-weight: 700; margin-bottom: 6px;">Staff Email Address</label>
+                    <input type="email" id="inviteEmail" placeholder="colleague@organization.com" required style="width: 100%; padding: 12px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: #fff; box-sizing: border-box; outline: none;">
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-size: 0.8rem; color: #cbd5e1; font-weight: 700; margin-bottom: 6px;">Access Role</label>
+                    <select id="inviteRole" style="width: 100%; padding: 12px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: #fff; box-sizing: border-box; outline: none;">
+                        <option value="scanner">Gate Scanner / Check-in Staff</option>
+                        <option value="co_host">Co-Host / Event Organizer</option>
+                        <option value="moderator">Stage Q&amp;A Moderator</option>
+                        <option value="finance_viewer">Finance &amp; Treasury Viewer</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" onclick="closeInviteModal()" style="flex: 1; padding: 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px; cursor: pointer; font-weight: 700;">Cancel</button>
+                    <button type="submit" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #6366f1, #4f46e5); border: none; color: #fff; border-radius: 8px; cursor: pointer; font-weight: 800;">Send Invite ➔</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openInviteModal() {
+            document.getElementById('inviteModal').style.display = 'flex';
+        }
+
+        function closeInviteModal() {
+            document.getElementById('inviteModal').style.display = 'none';
+        }
+
+        async function submitInvite(e) {
+            e.preventDefault();
+            const email = document.getElementById('inviteEmail').value;
+            const role = document.getElementById('inviteRole').value;
+
+            try {
+                const res = await fetch('/api/host/team/invite', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email, role: role })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    if (window.showToast) window.showToast(data.message, 'success', 3500);
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    if (window.showToast) window.showToast(data.error || 'Failed to send invite', 'error', 3500);
+                }
+            } catch (err) {
+                console.error(err);
+                if (window.showToast) window.showToast('Server error sending invite', 'error', 3500);
+            }
+        }
+    </script>
+</body>
+</html>

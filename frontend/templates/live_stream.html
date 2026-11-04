@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hybrid Live Stream &amp; Multilingual AI Subtitles — {{ event.title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=8.0">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='toast.js') }}"></script>
+    <style>
+        :root {
+            --live-bg: #070709;
+            --live-card: rgba(15, 23, 42, 0.94);
+            --live-border: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            background-color: var(--live-bg);
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding-bottom: 4rem;
+        }
+
+        .stream-grid {
+            display: grid;
+            grid-template-columns: 2.4fr 1fr;
+            gap: 1.5rem;
+            max-width: 1400px;
+            margin: 1.5rem auto;
+            padding: 0 1.5rem;
+        }
+
+        @media (max-width: 980px) {
+            .stream-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .video-wrapper {
+            position: relative;
+            background: #000;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--live-border);
+            aspect-ratio: 16 / 9;
+        }
+
+        .video-wrapper iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .captions-dock {
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 14px;
+            padding: 1.2rem;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .chat-sidebar {
+            background: var(--live-card);
+            border: 1px solid var(--live-border);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 120px);
+            min-height: 520px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chat-msg {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-size: 0.88rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div style="max-width: 1400px; margin: 1.5rem auto 0; padding: 0 1.5rem;">
+        <a href="{{ url_for('event_detail', event_id=event.id) }}" class="back-btn-unified" style="display: inline-flex;">
+            <span class="arrow">←</span> Back to Event Details
+        </a>
+    </div>
+
+    <div class="stream-grid">
+        <!-- Main Stage Stream Area -->
+        <div>
+            <div class="video-wrapper">
+                <iframe src="{{ stream.url }}?autoplay=1&mute=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+
+            <!-- Multilingual AI Subtitles Dock -->
+            <div class="captions-dock">
+                <div style="flex: 1; min-width: 260px;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                        <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+                        <strong style="color: #38bdf8; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 1px;">Live AI Speech Translation</strong>
+                    </div>
+                    <div id="subtitleText" style="font-size: 1.05rem; font-weight: 600; color: #ffffff; min-height: 28px;">
+                        "Welcome delegates to the Main Stage keynote. Please adjust your audio volume."
+                    </div>
+                </div>
+
+                <!-- Language Selector -->
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 700;">Subtitles:</label>
+                    <select id="langSelect" onchange="changeSubtitleLang()" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 6px 12px; border-radius: 8px; outline: none; font-size: 0.88rem; cursor: pointer;">
+                        <option value="en">English (Default)</option>
+                        <option value="hi">हिंदी (Hindi)</option>
+                        <option value="es">Español (Spanish)</option>
+                        <option value="fr">Français (French)</option>
+                        <option value="de">Deutsch (German)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Event Details Banner -->
+            <div style="margin-top: 1.2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.8rem; margin: 0 0 4px;">{{ event.title }}</h2>
+                    <span style="color: #94a3b8; font-size: 0.9rem;">📅 {{ event.date }} • {{ event.time }}</span>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <span style="background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; font-weight: 800; padding: 6px 14px; border-radius: 20px; font-size: 0.8rem;">● BROADCASTING LIVE</span>
+                    <span style="background: rgba(255,255,255,0.06); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; color: #cbd5e1;">👥 284 Online Viewers</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Audience Q&A / Backchannel Chat -->
+        <div class="chat-sidebar">
+            <div style="padding: 1rem 1.2rem; border-bottom: 1px solid var(--live-border); display: flex; justify-content: space-between; align-items: center;">
+                <strong style="font-size: 0.95rem; color: #fff;">Stage Audience Chat</strong>
+                <span style="font-size: 0.75rem; color: #34d399; font-weight: 700;">🟢 Fast Mode</span>
+            </div>
+
+            <div class="chat-messages" id="chatList">
+                <div class="chat-msg">
+                    <strong style="color: #38bdf8;">Karthik Rao:</strong>
+                    <span style="color: #cbd5e1;"> Brilliant slide deck on multi-agent LLM systems!</span>
+                </div>
+                <div class="chat-msg">
+                    <strong style="color: #ec4899;">Priya Sen:</strong>
+                    <span style="color: #cbd5e1;"> Will the recorded video replay be uploaded to the passport store?</span>
+                </div>
+                <div class="chat-msg">
+                    <strong style="color: #10b981;">Host Moderator:</strong>
+                    <span style="color: #cbd5e1;"> Yes Priya, 4K recording will be available in 2 hours.</span>
+                </div>
+            </div>
+
+            <form onsubmit="sendChatMessage(event)" style="padding: 1rem; border-top: 1px solid var(--live-border); display: flex; gap: 8px;">
+                <input type="text" id="chatInput" placeholder="Send question to stage..." required style="flex: 1; padding: 10px 14px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #fff; outline: none; font-size: 0.88rem;">
+                <button type="submit" style="background: linear-gradient(135deg, #0284c7, #00d2ff); border: none; color: #0b0f19; font-weight: 800; padding: 0 16px; border-radius: 8px; cursor: pointer;">Send</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const sampleSubtitles = {
+            'en': [
+                "Now exploring modern event architectures with distributed cloud nodes.",
+                "Thank you to our Diamond sponsors Google Cloud and Razorpay.",
+                "Let's move to live audience questions on upvoted Slido topics."
+            ],
+            'hi': [
+                "अब वितरित क्लाउड नोड्स के साथ आधुनिक इवेंट आर्किटेक्चर की खोज कर रहे हैं।",
+                "हमारे डायमंड प्रायोजकों गूगल क्लाउड और रेज़रपे को विशेष धन्यवाद।",
+                "आइए अब सीधे दर्शकों के लाइव सवालों की ओर बढ़ते हैं।"
+            ],
+            'es': [
+                "Ahora explorando arquitecturas modernas de eventos en la nube.",
+                "Gracias a nuestros patrocinadores Diamante Google Cloud y Razorpay.",
+                "Pasemos a las preguntas en vivo de la audiencia."
+            ],
+            'fr': [
+                "Exploration des architectures d'événements cloud distribuées.",
+                "Merci à nos sponsors diamant Google Cloud et Razorpay.",
+                "Passons maintenant aux questions en direct du public."
+            ],
+            'de': [
+                "Erkundung moderner Event-Architekturen mit Cloud-Knoten.",
+                "Vielen Dank an unsere Diamond-Sponsoren Google Cloud und Razorpay.",
+                "Kommen wir nun zu den Live-Fragen des Publikums."
+            ]
+        };
+
+        let subIndex = 0;
+        function updateCaptions() {
+            const lang = document.getElementById('langSelect').value;
+            const lines = sampleSubtitles[lang] || sampleSubtitles['en'];
+            document.getElementById('subtitleText').textContent = `"${lines[subIndex % lines.length]}"`;
+            subIndex++;
+        }
+
+        function changeSubtitleLang() {
+            subIndex = 0;
+            updateCaptions();
+            const langName = document.getElementById('langSelect').selectedOptions[0].text;
+            if (window.showToast) window.showToast(`Subtitles switched to ${langName}`, 'info', 2500);
+        }
+
+        setInterval(updateCaptions, 5000);
+
+        function sendChatMessage(e) {
+            e.preventDefault();
+            const input = document.getElementById('chatInput');
+            const val = input.value.trim();
+            if (!val) return;
+
+            const div = document.createElement('div');
+            div.className = 'chat-msg';
+            div.innerHTML = `<strong style="color: #38bdf8;">You:</strong> <span style="color: #fff;">${val}</span>`;
+            document.getElementById('chatList').appendChild(div);
+            input.value = '';
+            document.getElementById('chatList').scrollTop = document.getElementById('chatList').scrollHeight;
+        }
+    </script>
+</body>
+</html>

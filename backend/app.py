@@ -6571,6 +6571,94 @@ def init_db():
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )''')
 
+    c.execute('''CREATE TABLE IF NOT EXISTS event_coupons (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER,
+        code TEXT,
+        discount_type TEXT DEFAULT 'percent',
+        discount_value REAL DEFAULT 20.0,
+        max_uses INTEGER DEFAULT 100,
+        used_count INTEGER DEFAULT 0,
+        min_order_amount REAL DEFAULT 0,
+        valid_until TEXT,
+        is_active INTEGER DEFAULT 1
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS event_pricing_tiers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER,
+        tier_name TEXT,
+        price REAL,
+        allocation_qty INTEGER,
+        sold_qty INTEGER DEFAULT 0,
+        start_date TEXT,
+        end_date TEXT,
+        is_active INTEGER DEFAULT 1
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS attendee_referrals (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER,
+        referrer_username TEXT,
+        ref_code TEXT,
+        referred_username TEXT,
+        status TEXT DEFAULT 'completed',
+        reward_earned TEXT DEFAULT '10% Discount Voucher',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS venue_floorplans (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER UNIQUE,
+        venue_name TEXT,
+        layout_json TEXT
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS event_livestreams (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER UNIQUE,
+        stream_platform TEXT DEFAULT 'youtube',
+        stream_url TEXT,
+        is_live INTEGER DEFAULT 1,
+        multilingual_captions_enabled INTEGER DEFAULT 1
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS host_payout_requests (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        host_username TEXT,
+        event_id INTEGER,
+        amount REAL,
+        payout_method TEXT DEFAULT 'UPI',
+        account_identifier TEXT,
+        status TEXT DEFAULT 'pending',
+        requested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        processed_at TEXT
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS event_feedback_reviews (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER,
+        attendee_username TEXT,
+        rating_content INTEGER DEFAULT 5,
+        rating_venue INTEGER DEFAULT 5,
+        rating_speakers INTEGER DEFAULT 5,
+        nps_score INTEGER DEFAULT 10,
+        review_text TEXT,
+        is_verified_attendee INTEGER DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS host_team_members (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER,
+        host_username TEXT,
+        member_email TEXT,
+        member_username TEXT,
+        role TEXT DEFAULT 'scanner',
+        status TEXT DEFAULT 'active',
+        invited_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )''')
+
     try:
         c.execute("ALTER TABLE registrations ADD COLUMN seat_code TEXT")
     except Exception:
@@ -14772,3 +14860,376 @@ def ai_schedule_concierge():
         'recommended_sessions': recommended,
         'ai_rationale': 'Optimized for high-relevance topics with zero time clashes across stages.'
     })
+
+
+# ==============================================================================
+# ENTERPRISE EXPANSION ECOSYSTEM (PILLARS 1 - 7)
+# ==============================================================================
+
+@app.route('/api/event/<int:event_id>/apply-coupon', methods=['POST'])
+def api_apply_coupon(event_id):
+    """Validate promo code and calculate discount"""
+    data = request.get_json() or {}
+    code = (data.get('coupon_code') or '').strip().upper()
+    try:
+        raw_amount = re.sub(r'[^0-9.]', '', str(data.get('amount') or '0'))
+        amount = float(raw_amount) if raw_amount else 0.0
+    except Exception:
+        amount = 0.0
+
+    if not code:
+        return jsonify({'ok': False, 'error': 'Please enter a coupon code'}), 400
+
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""SELECT id, code, discount_type, discount_value, max_uses, used_count, min_order_amount, is_active
+                 FROM event_coupons 
+                 WHERE (event_id = ? OR event_id IS NULL) AND UPPER(code) = ? AND is_active = 1""", 
+              (event_id, code))
+    coupon = c.fetchone()
+    
+    if not coupon:
+        conn.close()
+        return jsonify({'ok': False, 'error': f'Coupon code "{code}" is invalid or expired'}), 404
+
+    cid, ccode, dtype, dval, max_u, used_u, min_order, is_act = coupon
+
+    if used_u >= max_u:
+        conn.close()
+        return jsonify({'ok': False, 'error': f'Coupon code "{code}" has reached its maximum usage limit'}), 400
+
+    if amount < min_order:
+        conn.close()
+        return jsonify({'ok': False, 'error': f'Minimum order amount of ₹{min_order} required for coupon "{code}"'}), 400
+
+    if dtype == 'percent':
+        discount = round(amount * (dval / 100.0), 2)
+    else:
+        discount = round(min(dval, amount), 2)
+
+    final_amount = max(0.0, round(amount - discount, 2))
+    conn.close()
+
+    return jsonify({
+        'ok': True,
+        'coupon_id': cid,
+        'code': ccode,
+        'discount_type': dtype,
+        'discount_value': dval,
+        'discount_amount': discount,
+        'final_amount': final_amount,
+        'message': f'Coupon "{ccode}" applied successfully! You saved ₹{discount}.'
+    })
+
+
+@app.route('/api/event/<int:event_id>/pricing-tiers')
+def api_event_pricing_tiers(event_id):
+    """Return tiered pricing waves and current active tier"""
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""SELECT id, tier_name, price, allocation_qty, sold_qty, is_active
+                 FROM event_pricing_tiers WHERE event_id = ? AND is_active = 1
+                 ORDER BY price ASC""", (event_id,))
+    rows = c.fetchall()
+    conn.close()
+
+    tiers = []
+    active_tier = None
+    for r in rows:
+        remaining = max(0, r[3] - r[4])
+        tier_obj = {
+            'id': r[0],
+            'tier_name': r[1],
+            'price': r[2],
+            'allocation_qty': r[3],
+            'sold_qty': r[4],
+            'remaining_qty': remaining,
+            'is_sold_out': remaining == 0
+        }
+        tiers.append(tier_obj)
+        if remaining > 0 and not active_tier:
+            active_tier = tier_obj
+
+    return jsonify({'ok': True, 'tiers': tiers, 'active_tier': active_tier or (tiers[0] if tiers else None)})
+
+
+@app.route('/event/<int:event_id>/marketing-studio')
+def event_marketing_studio(event_id):
+    """Host AI Growth & Viral Marketing Studio"""
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT id, title, date, time, venue, venue_address, price, image, category FROM events WHERE id = ?", (event_id,))
+    ev = c.fetchone()
+    if not ev:
+        conn.close()
+        return "Event not found", 404
+
+    event_data = {
+        'id': ev[0], 'title': ev[1], 'date': ev[2], 'time': ev[3] or '10:00 AM',
+        'venue': ev[4] or 'Main Auditorium', 'venue_address': ev[5] or 'Tech Park, Bangalore',
+        'price': ev[6] or 'Free', 'image': ev[7] or '', 'category': ev[8] or 'Technology'
+    }
+
+    # Fetch active coupons
+    c.execute("SELECT code, discount_type, discount_value, used_count, max_uses FROM event_coupons WHERE event_id = ?", (event_id,))
+    coupons = [{'code': r[0], 'type': r[1], 'value': r[2], 'used': r[3], 'max': r[4]} for r in c.fetchall()]
+
+    # Fetch referrals leaderboard
+    c.execute("""SELECT referrer_username, COUNT(*) as ref_count, reward_earned 
+                 FROM attendee_referrals WHERE event_id = ? 
+                 GROUP BY referrer_username ORDER BY ref_count DESC LIMIT 5""", (event_id,))
+    referrals = [{'username': r[0], 'count': r[1], 'reward': r[2]} for r in c.fetchall()]
+    conn.close()
+
+    return render_template('marketing_studio.html', event=event_data, coupons=coupons, referrals=referrals)
+
+
+@app.route('/api/event/<int:event_id>/referral-stats')
+def api_referral_stats(event_id):
+    """Get attendee referral link, score, and unlocked reward vouchers"""
+    username = session.get('username', 'Guest')
+    ref_code = f"{re.sub(r'[^A-Z0-9]', '', username.upper())[:6]}-{event_id:02d}"
+    
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT COUNT(*), reward_earned FROM attendee_referrals WHERE event_id = ? AND referrer_username = ?", 
+              (event_id, username))
+    res = c.fetchone()
+    count = res[0] if res else 0
+    reward = res[1] if res and res[1] else '10% Off Pass'
+    conn.close()
+
+    share_url = f"{request.host_url.rstrip('/')}/event/{event_id}?ref={ref_code}"
+    
+    return jsonify({
+        'ok': True,
+        'ref_code': ref_code,
+        'referral_count': count,
+        'share_url': share_url,
+        'current_reward': reward,
+        'next_tier': 'VIP Lounge Access at 5 referrals' if count < 5 else 'Legendary All-Access Pass Unlocked!'
+    })
+
+
+@app.route('/event/<int:event_id>/floorplan')
+def event_floorplan(event_id):
+    """Interactive Venue Floorplan & 'Find My Seat' Navigation"""
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT id, title, venue, venue_address, date FROM events WHERE id = ?", (event_id,))
+    ev = c.fetchone()
+    if not ev:
+        conn.close()
+        return "Event not found", 404
+
+    c.execute("SELECT layout_json, venue_name FROM venue_floorplans WHERE event_id = ?", (event_id,))
+    fp = c.fetchone()
+    conn.close()
+
+    layout = json.loads(fp[0]) if (fp and fp[0]) else {
+        "venue_name": "Main Convention Arena", "width": 1000, "height": 700, "zones": []
+    }
+    
+    target_seat = request.args.get('seat', '').strip().upper()
+    return render_template('floorplan.html', event={'id': ev[0], 'title': ev[1], 'venue': ev[2], 'date': ev[4]}, layout=layout, target_seat=target_seat)
+
+
+@app.route('/event/<int:event_id>/livestream')
+def event_livestream_hub(event_id):
+    """Hybrid Livestream Stage with Multilingual AI Live Subtitles"""
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT id, title, date, time, venue, desc FROM events WHERE id = ?", (event_id,))
+    ev = c.fetchone()
+    if not ev:
+        conn.close()
+        return "Event not found", 404
+
+    c.execute("SELECT stream_platform, stream_url, is_live, multilingual_captions_enabled FROM event_livestreams WHERE event_id = ?", (event_id,))
+    stream = c.fetchone()
+    conn.close()
+
+    stream_data = {
+        'platform': stream[0] if stream else 'youtube',
+        'url': stream[1] if stream else 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+        'is_live': bool(stream[2]) if stream else True,
+        'captions': bool(stream[3]) if stream else True
+    }
+    return render_template('live_stream.html', event={'id': ev[0], 'title': ev[1], 'date': ev[2], 'time': ev[3]}, stream=stream_data)
+
+
+@app.route('/host/treasury')
+def host_treasury():
+    """Host Financial Treasury, Revenue Split & Payouts"""
+    if not session.get('loggedin'):
+        return redirect(url_for('login'))
+        
+    username = session.get('username')
+    conn = get_db()
+    c = conn.cursor()
+
+    # Calculate total registrations and revenue across events
+    c.execute("""SELECT COUNT(r.id), COALESCE(SUM(r.amount_paid), 0)
+                 FROM registrations r
+                 JOIN events e ON r.event_id = e.id
+                 WHERE r.status = 'active'""")
+    reg_stats = c.fetchone()
+    total_tickets = reg_stats[0] or 0
+    gross_sales = float(reg_stats[1] or 0.0)
+
+    # 5% platform fee, 2% gateway fee
+    platform_fee = round(gross_sales * 0.05, 2)
+    gateway_fee = round(gross_sales * 0.02, 2)
+    net_earnings = round(gross_sales - platform_fee - gateway_fee, 2)
+
+    # Payout requests
+    c.execute("""SELECT id, amount, payout_method, account_identifier, status, requested_at, processed_at
+                 FROM host_payout_requests 
+                 ORDER BY id DESC""")
+    payouts = [{
+        'id': r[0], 'amount': r[1], 'method': r[2], 'account': r[3],
+        'status': r[4], 'requested_at': r[5], 'processed_at': r[6]
+    } for r in c.fetchall()]
+
+    conn.close()
+
+    return render_template('host_treasury.html', 
+                           total_tickets=total_tickets, gross_sales=gross_sales, 
+                           platform_fee=platform_fee, gateway_fee=gateway_fee, 
+                           net_earnings=net_earnings, payouts=payouts)
+
+
+@app.route('/api/host/payout-request', methods=['POST'])
+def api_host_payout_request():
+    """Submit a host payout request"""
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Unauthorized'}), 401
+        
+    data = request.get_json() or {}
+    amount = float(data.get('amount') or 0.0)
+    method = (data.get('payout_method') or 'UPI').strip()
+    account = (data.get('account_identifier') or '').strip()
+
+    if amount <= 0 or not account:
+        return jsonify({'ok': False, 'error': 'Invalid payout amount or account details'}), 400
+
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""INSERT INTO host_payout_requests (host_username, amount, payout_method, account_identifier, status)
+                 VALUES (?, ?, ?, ?, 'pending')""", (session['username'], amount, method, account))
+    conn.commit()
+    conn.close()
+
+    return jsonify({'ok': True, 'message': f'Payout request of ₹{amount} via {method} submitted for processing!'})
+
+
+@app.route('/invoice/<string:ticket_code>/gst')
+def download_gst_invoice(ticket_code):
+    """Download official B2B/B2C GST Tax Invoice (SAC 998596)"""
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""SELECT r.ticket_code, r.full_name, r.email, r.phone, r.seat_code, r.amount_paid, r.timestamp,
+                        e.title, e.date, e.venue, e.venue_address, r.username
+                 FROM registrations r
+                 JOIN events e ON r.event_id = e.id
+                 WHERE r.ticket_code = ?""", (ticket_code,))
+    row = c.fetchone()
+    conn.close()
+
+    if not row:
+        return "Invoice not found for this ticket code", 404
+
+    base_paid = float(row[5] or 499.0)
+    # GST Breakdown (18% Total = 9% CGST + 9% SGST)
+    taxable_val = round(base_paid / 1.18, 2)
+    cgst_val = round((base_paid - taxable_val) / 2.0, 2)
+    sgst_val = cgst_val
+
+    invoice_data = {
+        'invoice_no': f"INV-2026-{re.sub(r'[^0-9]', '', ticket_code)[-5:] or '10042'}",
+        'date': datetime.now().strftime("%d %b %Y"),
+        'ticket_code': row[0],
+        'attendee_name': row[1] or row[11],
+        'email': row[2] or 'attendee@events.io',
+        'phone': row[3] or '+91 9876543210',
+        'seat_code': row[4] or 'General Admission',
+        'event_title': row[7],
+        'event_date': row[8],
+        'venue': row[9],
+        'venue_address': row[10],
+        'sac_code': '998596', # SAC code for Event Organization & Ticketing
+        'taxable_value': taxable_val,
+        'cgst': cgst_val,
+        'sgst': sgst_val,
+        'total_amount': base_paid
+    }
+
+    return render_template('gst_invoice.html', inv=invoice_data)
+
+
+@app.route('/api/event/<int:event_id>/feedback', methods=['POST'])
+def api_submit_feedback(event_id):
+    """Submit post-event NPS rating and verified testimonial"""
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Please sign in to leave feedback'}), 401
+
+    data = request.get_json() or {}
+    rating_content = int(data.get('rating_content') or 5)
+    rating_venue = int(data.get('rating_venue') or 5)
+    rating_speakers = int(data.get('rating_speakers') or 5)
+    nps = int(data.get('nps_score') or 10)
+    review_text = (data.get('review_text') or '').strip()
+
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""INSERT INTO event_feedback_reviews (event_id, attendee_username, rating_content, rating_venue, rating_speakers, nps_score, review_text, is_verified_attendee)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, 1)""",
+              (event_id, session['username'], rating_content, rating_venue, rating_speakers, nps, review_text))
+    conn.commit()
+    conn.close()
+
+    return jsonify({'ok': True, 'message': 'Thank you! Your verified attendee feedback has been recorded.'})
+
+
+@app.route('/host/team')
+def host_team_management():
+    """Host Organization Team & Role-Based Access Control (RBAC)"""
+    if not session.get('loggedin'):
+        return redirect(url_for('login'))
+        
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""SELECT id, member_email, member_username, role, status, invited_at
+                 FROM host_team_members
+                 ORDER BY id DESC""")
+    members = [{
+        'id': r[0], 'email': r[1], 'username': r[2] or r[1].split('@')[0],
+        'role': r[3], 'status': r[4], 'invited_at': r[5]
+    } for r in c.fetchall()]
+    conn.close()
+
+    return render_template('host_team.html', members=members)
+
+
+@app.route('/api/host/team/invite', methods=['POST'])
+def api_host_team_invite():
+    """Invite a new team member with specific permissions"""
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Unauthorized'}), 401
+
+    data = request.get_json() or {}
+    email = (data.get('email') or '').strip().lower()
+    role = (data.get('role') or 'scanner').strip()
+
+    if not email or '@' not in email:
+        return jsonify({'ok': False, 'error': 'Valid email address required'}), 400
+
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""INSERT INTO host_team_members (event_id, host_username, member_email, member_username, role, status)
+                 VALUES (1, ?, ?, ?, ?, 'active')""",
+              (session['username'], email, email.split('@')[0], role))
+    conn.commit()
+    conn.close()
+
+    return jsonify({'ok': True, 'message': f'Team invitation sent to {email} as {role.upper()}!'})

@@ -602,6 +602,30 @@
                                 <div style="font-size: 0.75rem; color: #38bdf8;">Scan & Print Lanyard Pass</div>
                             </div>
                         </a>
+
+                        <a href="{{ url_for('event_floorplan', event_id=event.id) }}" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 12px; text-decoration: none; color: #ffffff; display: flex; align-items: center; gap: 10px; transition: all 0.2s;" onmouseover="this.style.borderColor='#00d2ff'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.transform='none'">
+                            <span style="font-size: 1.5rem;">🗺️</span>
+                            <div>
+                                <div style="font-weight: 800; font-size: 0.9rem;">Venue Floorplan</div>
+                                <div style="font-size: 0.75rem; color: #38bdf8;">Find My Seat & Hall Map</div>
+                            </div>
+                        </a>
+
+                        <a href="{{ url_for('event_marketing_studio', event_id=event.id) }}" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 12px; text-decoration: none; color: #ffffff; display: flex; align-items: center; gap: 10px; transition: all 0.2s;" onmouseover="this.style.borderColor='#ec4899'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.transform='none'">
+                            <span style="font-size: 1.5rem;">📣</span>
+                            <div>
+                                <div style="font-weight: 800; font-size: 0.9rem;">Growth Studio</div>
+                                <div style="font-size: 0.75rem; color: #ec4899;">AI Social Flyers & Referrals</div>
+                            </div>
+                        </a>
+
+                        <a href="{{ url_for('event_livestream_hub', event_id=event.id) }}" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 12px; text-decoration: none; color: #ffffff; display: flex; align-items: center; gap: 10px; transition: all 0.2s;" onmouseover="this.style.borderColor='#10b981'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.transform='none'">
+                            <span style="font-size: 1.5rem;">🎙️</span>
+                            <div>
+                                <div style="font-weight: 800; font-size: 0.9rem;">Live Stream Stage</div>
+                                <div style="font-size: 0.75rem; color: #10b981;">Multilingual AI Captions</div>
+                            </div>
+                        </a>
                     </div>
                 </div>
 

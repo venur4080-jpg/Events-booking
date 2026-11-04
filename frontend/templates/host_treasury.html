@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Host Financial Treasury &amp; Payouts | Events Booking</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=8.0">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='toast.js') }}"></script>
+    <style>
+        :root {
+            --tr-bg: #070709;
+            --tr-card: rgba(15, 23, 42, 0.94);
+            --tr-border: rgba(255, 255, 255, 0.08);
+            --emerald-glow: #10b981;
+        }
+
+        body {
+            background-color: var(--tr-bg);
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding-bottom: 5rem;
+        }
+
+        .tr-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: var(--tr-card);
+            border: 1px solid var(--tr-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: #94a3b8;
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.9rem;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .history-table th, .history-table td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--tr-border);
+        }
+
+        .history-table th {
+            color: #94a3b8;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="tr-container">
+        <!-- Back Button -->
+        <a href="{{ url_for('dashboard') }}" class="back-btn-unified" style="margin-bottom: 1.5rem; display: inline-flex;">
+            <span class="arrow">←</span> Back to Dashboard
+        </a>
+
+        <!-- Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <span style="background: rgba(16, 185, 129, 0.2); color: var(--emerald-glow); border: 1px solid var(--emerald-glow); font-size: 0.78rem; font-weight: 800; padding: 4px 12px; border-radius: 20px; text-transform: uppercase;">Finance &amp; Treasury</span>
+                <h1 style="font-family: 'Outfit', sans-serif; font-size: 2.2rem; margin: 0.6rem 0 0; color: #fff;">Host Revenue &amp; Instant Payouts</h1>
+            </div>
+            <button type="button" onclick="openPayoutModal()" style="background: linear-gradient(135deg, #10b981, #059669); border: none; color: #fff; font-weight: 800; padding: 12px 24px; border-radius: 10px; font-size: 0.95rem; cursor: pointer; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);">
+                ⚡ Request Instant Payout
+            </button>
+        </div>
+
+        <!-- Metric Cards Grid -->
+        <div class="metric-grid">
+            <div class="metric-card">
+                <div class="metric-label">Gross Ticket Sales</div>
+                <div class="metric-val" style="color: #38bdf8;">₹{{ "%.2f"|format(gross_sales) }}</div>
+                <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 6px;">{{ total_tickets }} Passes Sold</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">Platform Fee (5%)</div>
+                <div class="metric-val" style="color: #f59e0b;">- ₹{{ "%.2f"|format(platform_fee) }}</div>
+                <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 6px;">Host SaaS Service Fee</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">Gateway Processing (2%)</div>
+                <div class="metric-val" style="color: #ef4444;">- ₹{{ "%.2f"|format(gateway_fee) }}</div>
+                <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 6px;">Razorpay &amp; Banking Node</div>
+            </div>
+
+            <div class="metric-card" style="border-color: rgba(16, 185, 129, 0.4); background: radial-gradient(circle at top right, rgba(16, 185, 129, 0.15), var(--tr-card));">
+                <div class="metric-label" style="color: #34d399;">Net Available Balance</div>
+                <div class="metric-val" style="color: #34d399;">₹{{ "%.2f"|format(net_earnings) }}</div>
+                <div style="font-size: 0.8rem; color: #10b981; margin-top: 6px;">Eligible for withdrawal</div>
+            </div>
+        </div>
+
+        <!-- Payout Ledger Table -->
+        <div style="background: var(--tr-card); border: 1px solid var(--tr-border); border-radius: 16px; padding: 1.8rem;">
+            <h3 style="font-family: 'Outfit', sans-serif; margin-top: 0; color: #fff;">Payout &amp; Settlement History</h3>
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Payout ID</th>
+                        <th>Amount</th>
+                        <th>Settlement Method</th>
+                        <th>Recipient Account</th>
+                        <th>Requested Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in payouts %}
+                    <tr>
+                        <td style="font-family: 'JetBrains Mono', monospace; color: #38bdf8;">PAY-{{ p.id }}</td>
+                        <td><strong style="color: #fff;">₹{{ "%.2f"|format(p.amount) }}</strong></td>
+                        <td><span style="background: rgba(255,255,255,0.06); padding: 3px 8px; border-radius: 6px; font-size: 0.8rem;">{{ p.method }}</span></td>
+                        <td style="color: #cbd5e1; font-family: 'JetBrains Mono', monospace;">{{ p.account }}</td>
+                        <td style="color: #94a3b8; font-size: 0.85rem;">{{ p.requested_at }}</td>
+                        <td>
+                            {% if p.status == 'approved' or p.status == 'paid' %}
+                            <span style="color: #10b981; font-weight: 800; font-size: 0.82rem;">✓ SETTLED</span>
+                            {% else %}
+                            <span style="color: #f59e0b; font-weight: 800; font-size: 0.82rem;">⏳ PROCESSING</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: #94a3b8; padding: 2rem;">No payout requests submitted yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Payout Modal Dialog -->
+    <div id="payoutModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 18px; padding: 2rem; max-width: 440px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.8);">
+            <h3 style="font-family: 'Outfit', sans-serif; margin-top: 0; color: #fff;">Request Host Withdrawal</h3>
+            <p style="color: #94a3b8; font-size: 0.88rem; margin-bottom: 1.2rem;">Funds will be settled to your registered bank account or UPI ID within 24 hours.</p>
+
+            <form onsubmit="submitPayout(event)">
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; font-size: 0.8rem; color: #cbd5e1; font-weight: 700; margin-bottom: 6px;">Withdrawal Amount (₹)</label>
+                    <input type="number" id="payoutAmount" value="{{ net_earnings }}" min="100" max="{{ net_earnings }}" required style="width: 100%; padding: 12px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; box-sizing: border-box; outline: none;">
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; font-size: 0.8rem; color: #cbd5e1; font-weight: 700; margin-bottom: 6px;">Payout Channel</label>
+                    <select id="payoutMethod" style="width: 100%; padding: 12px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: #fff; box-sizing: border-box; outline: none;">
+                        <option value="UPI">Instant UPI (VPA)</option>
+                        <option value="NEFT/IMPS">Direct Bank Account (NEFT / IMPS)</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-size: 0.8rem; color: #cbd5e1; font-weight: 700; margin-bottom: 6px;">UPI ID or Account / IFSC</label>
+                    <input type="text" id="payoutAccount" placeholder="e.g. host@okaxis or 919876543210@paytm" required style="width: 100%; padding: 12px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: #fff; box-sizing: border-box; outline: none;">
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" onclick="closePayoutModal()" style="flex: 1; padding: 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px; cursor: pointer; font-weight: 700;">Cancel</button>
+                    <button type="submit" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #10b981, #059669); border: none; color: #fff; border-radius: 8px; cursor: pointer; font-weight: 800;">Confirm Payout ➔</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openPayoutModal() {
+            document.getElementById('payoutModal').style.display = 'flex';
+        }
+
+        function closePayoutModal() {
+            document.getElementById('payoutModal').style.display = 'none';
+        }
+
+        async function submitPayout(e) {
+            e.preventDefault();
+            const amt = document.getElementById('payoutAmount').value;
+            const method = document.getElementById('payoutMethod').value;
+            const acc = document.getElementById('payoutAccount').value;
+
+            try {
+                const res = await fetch('/api/host/payout-request', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: amt, payout_method: method, account_identifier: acc })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    if (window.showToast) window.showToast(data.message, 'success', 3500);
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    if (window.showToast) window.showToast(data.error || 'Failed to submit payout', 'error', 3500);
+                }
+            } catch (err) {
+                console.error(err);
+                if (window.showToast) window.showToast('Server error processing withdrawal', 'error', 3500);
+            }
+        }
+    </script>
+</body>
+</html>
