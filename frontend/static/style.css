@@ -1124,7 +1124,7 @@ main {
     position: relative !important;
     width: 140px !important;
     height: 140px !important;
-    margin: 0 auto 1.8rem auto !important;
+    margin: 0 auto 2.8rem auto !important;
     display: block !important;
 }
 
@@ -1133,66 +1133,66 @@ main {
     height: 100% !important;
     border-radius: 50% !important;
     object-fit: cover !important;
-    border: 3.5px solid #008be3 !important;
+    border: 3.5px solid #00d2ff !important;
     padding: 3px !important;
-    background: linear-gradient(135deg, #008be3 0%, #004c82 100%) !important;
-    box-shadow: 0 0 25px rgba(0, 139, 227, 0.45), 0 8px 24px rgba(0, 0, 0, 0.6) !important;
+    background: linear-gradient(135deg, #0b1329 0%, #0284c7 50%, #38bdf8 100%) !important;
+    box-shadow: 0 0 30px rgba(0, 210, 255, 0.45), 0 8px 25px rgba(0, 0, 0, 0.7) !important;
     display: block !important;
 }
 
 .pic-edit-btn {
     position: absolute !important;
-    bottom: 4px !important;
-    right: 4px !important;
+    bottom: 6px !important;
+    right: 8px !important;
     left: auto !important;
     top: auto !important;
-    background: linear-gradient(135deg, #008be3 0%, #00b4d8 100%) !important;
-    width: 38px !important;
-    height: 38px !important;
+    background: linear-gradient(135deg, #008be3 0%, #00d2ff 100%) !important;
+    width: 40px !important;
+    height: 40px !important;
     border-radius: 50% !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     color: #ffffff !important;
     cursor: pointer !important;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), 0 0 12px rgba(0, 139, 227, 0.6) !important;
-    border: 3px solid #0b0f19 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7), 0 0 14px rgba(0, 210, 255, 0.6) !important;
+    border: 3.5px solid #070709 !important;
     z-index: 10 !important;
     transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease, filter 0.22s ease !important;
 }
 
 .pic-edit-btn:hover {
-    transform: scale(1.12) !important;
+    transform: scale(1.15) !important;
     filter: brightness(1.2) !important;
-    box-shadow: 0 0 20px rgba(0, 139, 227, 0.8), 0 6px 18px rgba(0, 0, 0, 0.7) !important;
+    box-shadow: 0 0 24px rgba(0, 210, 255, 0.85), 0 6px 20px rgba(0, 0, 0, 0.8) !important;
 }
 
 .pic-delete-btn {
     position: absolute !important;
-    bottom: 4px !important;
-    left: 4px !important;
+    bottom: 6px !important;
+    left: 8px !important;
     right: auto !important;
     top: auto !important;
     background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
-    width: 38px !important;
-    height: 38px !important;
+    width: 40px !important;
+    height: 40px !important;
     border-radius: 50% !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     color: #ffffff !important;
     cursor: pointer !important;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), 0 0 10px rgba(239, 68, 68, 0.5) !important;
-    border: 3px solid #0b0f19 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7), 0 0 12px rgba(239, 68, 68, 0.6) !important;
+    border: 3.5px solid #070709 !important;
     z-index: 10 !important;
     transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease, filter 0.22s ease !important;
 }
 
 .pic-delete-btn:hover {
-    transform: scale(1.12) !important;
+    transform: scale(1.15) !important;
     filter: brightness(1.2) !important;
     background: linear-gradient(135deg, #f87171 0%, #ef4444 100%) !important;
-    box-shadow: 0 0 20px rgba(239, 68, 68, 0.8), 0 6px 18px rgba(0, 0, 0, 0.7) !important;
+    box-shadow: 0 0 24px rgba(239, 68, 68, 0.85), 0 6px 20px rgba(0, 0, 0, 0.8) !important;
 }
 
 .profile-grid {

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Venue Self Check-in Kiosk | {{ event.title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=8.0">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="{{ url_for('static', filename='toast.js') }}"></script>
+    <style>
+        :root {
+            --kiosk-bg: #06080e;
+            --kiosk-accent: #008be3;
+            --kiosk-card: rgba(15, 23, 42, 0.95);
+        }
+
+        body {
+            background-color: var(--kiosk-bg);
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .kiosk-nav {
+            padding: 1.2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(16px);
+        }
+
+        .kiosk-badge-status {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid #10b981;
+            color: #34d399;
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kiosk-hero-box {
+            text-align: center;
+            padding: 2.5rem 1.5rem 1.5rem;
+        }
+
+        .kiosk-layout {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 0 1.5rem 3rem;
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 860px) {
+            .kiosk-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .kiosk-scanner-card {
+            background: var(--kiosk-card);
+            border: 1.5px solid rgba(0, 139, 227, 0.4);
+            border-radius: 24px;
+            padding: 1.8rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 35px rgba(0, 139, 227, 0.15);
+            text-align: center;
+        }
+
+        .kiosk-manual-card {
+            background: var(--kiosk-card);
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 1.8rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+        }
+
+        .kiosk-qr-viewport {
+            width: 100%;
+            height: 280px;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #000;
+            border: 2px dashed rgba(0, 139, 227, 0.5);
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Success Attendee Badge Modal / Banner */
+        .checkin-success-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(12px);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .checkin-success-modal.active {
+            display: flex;
+        }
+
+        .attendee-badge-print-preview {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border: 2px solid #008be3;
+            border-radius: 20px;
+            padding: 2.2rem;
+            width: 100%;
+            max-width: 440px;
+            text-align: center;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 40px rgba(0, 139, 227, 0.3);
+            animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="kiosk-nav">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <a href="{{ url_for('dashboard') }}" class="logo">Events <span>Booking</span></a>
+            <span class="kiosk-badge-status">⚡ On-Site Kiosk Mode</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <a href="{{ url_for('event_detail', event_id=event.id) }}" style="color: #94a3b8; font-size: 0.88rem; text-decoration: none;">Exit Kiosk</a>
+        </div>
+    </nav>
+
+    <div class="kiosk-hero-box">
+        <h1 style="font-family: 'Outfit', sans-serif; font-size: 2.5rem; font-weight: 900; margin: 0 0 6px; color: #ffffff;">
+            Welcome to {{ event.title }}
+        </h1>
+        <p style="color: #38bdf8; font-size: 1.1rem; font-weight: 700; margin: 0;">
+            Fast Venue Self Check-in &amp; Instant Lanyard Badge Printing
+        </p>
+    </div>
+
+    <div class="kiosk-layout">
+
+        <!-- 1. Scanner Camera Mode -->
+        <div class="kiosk-scanner-card">
+            <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.4rem; margin: 0 0 6px; color: #ffffff;">
+                📷 Scan Ticket QR Code
+            </h2>
+            <p style="color: #94a3b8; font-size: 0.88rem; margin: 0;">
+                Hold your digital pass, PDF ticket, or mobile wallet pass in front of the lens.
+            </p>
+
+            <div class="kiosk-qr-viewport" id="kioskReader">
+                <span id="cameraPlaceholderText" style="color: #64748b; font-size: 0.9rem;">Starting Gate Camera...</span>
+            </div>
+
+            <button type="button" class="btn-primary" id="btnRestartCam" onclick="startScanner()" style="width: auto; padding: 10px 24px; font-size: 0.88rem; border-radius: 50px;">
+                🔄 Reset Camera
+            </button>
+        </div>
+
+        <!-- 2. Manual Phone / Email Search Mode -->
+        <div class="kiosk-manual-card">
+            <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.4rem; margin: 0 0 6px; color: #ffffff;">
+                ⌨️ Manual Self Check-in
+            </h2>
+            <p style="color: #94a3b8; font-size: 0.88rem; margin: 0 0 1.5rem;">
+                No phone with you? Check in instantly using your registered phone number, email, or Ticket ID.
+            </p>
+
+            <form id="kioskManualForm" onsubmit="handleManualCheckin(event)">
+                <div style="margin-bottom: 1.2rem;">
+                    <label style="display: block; font-size: 0.85rem; font-weight: 700; color: #cbd5e1; margin-bottom: 6px;">
+                        Ticket Number / Phone / Email:
+                    </label>
+                    <input type="text" id="kioskQueryInput" placeholder="e.g. TKT-001-12345 or 9876543210" required
+                           style="width: 100%; box-sizing: border-box; background: rgba(0, 0, 0, 0.4); border: 1.5px solid rgba(255, 255, 255, 0.15); color: #fff; padding: 14px 16px; border-radius: 12px; font-size: 1.05rem; font-family: 'JetBrains Mono', monospace; outline: none;">
+                </div>
+
+                <button type="submit" class="btn-primary" style="width: 100%; padding: 14px; font-size: 1rem; font-weight: 800; border-radius: 12px; background: linear-gradient(135deg, #008be3, #005691);">
+                    Confirm Check-in &amp; Print Badge ➔
+                </button>
+            </form>
+
+            <div style="margin-top: 2rem; padding: 1rem; border-radius: 12px; background: rgba(0, 139, 227, 0.08); border: 1px solid rgba(0, 139, 227, 0.2); font-size: 0.82rem; color: #94a3b8;">
+                ℹ️ <strong>Venue Staff Notice:</strong> All prints are cryptographically verified and checked-in logs are written to SQLite in real time.
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Check-in Success Modal & Instant Badge Print Trigger -->
+    <div class="checkin-success-modal" id="checkinSuccessModal">
+        <div class="attendee-badge-print-preview">
+            <div style="font-size: 3rem; margin-bottom: 6px;">🎉</div>
+            <span style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; font-size: 0.75rem; font-weight: 800; padding: 4px 12px; border-radius: 50px; text-transform: uppercase;">
+                Checked In Successfully
+            </span>
+
+            <h2 id="attendeeNameDisplay" style="font-family: 'Outfit', sans-serif; font-size: 1.8rem; margin: 12px 0 4px; color: #ffffff;">
+                Attendee Name
+            </h2>
+            <div id="attendeeSeatBadge" style="display: inline-block; background: rgba(0, 139, 227, 0.15); border: 1px solid #008be3; color: #38bdf8; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; font-weight: 800; padding: 4px 14px; border-radius: 8px; margin-bottom: 1.2rem;">
+                Row A • Seat 04
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button type="button" class="btn-primary" id="btnPrintBadgeLink" onclick="printBadgeSheet()" style="flex: 1; padding: 12px; font-weight: 800; border-radius: 10px;">
+                    🖨️ Print Badge
+                </button>
+                <button type="button" onclick="closeSuccessModal()" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #ffffff; padding: 12px 18px; border-radius: 10px; cursor: pointer; font-weight: 700;">
+                    Next ➔
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let html5QrCode = null;
+        let lastBadgeUrl = '';
+
+        function playSuccessSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+                osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1); // A5
+                gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.35);
+            } catch (e) {
+                console.log(e);
+            }
+        }
+
+        async function verifyTicketPayload(queryVal) {
+            try {
+                const res = await fetch('/api/kiosk/checkin-and-print', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ event_id: {{ event.id }}, query: queryVal })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    playSuccessSound();
+                    lastBadgeUrl = data.attendee.badge_url;
+                    document.getElementById('attendeeNameDisplay').textContent = data.attendee.name;
+                    document.getElementById('attendeeSeatBadge').textContent = 'Seat: ' + data.attendee.seat_code;
+                    document.getElementById('checkinSuccessModal').classList.add('active');
+                } else {
+                    if (window.showToast) window.showToast(data.error || 'Verification failed', 'error', 3500);
+                }
+            } catch (err) {
+                console.error(err);
+                if (window.showToast) window.showToast('Server connection error.', 'error', 3500);
+            }
+        }
+
+        function handleManualCheckin(e) {
+            e.preventDefault();
+            const val = document.getElementById('kioskQueryInput').value.trim();
+            if (val) verifyTicketPayload(val);
+        }
+
+        function printBadgeSheet() {
+            if (lastBadgeUrl) {
+                window.open(lastBadgeUrl, '_blank');
+            }
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('checkinSuccessModal').classList.remove('active');
+            document.getElementById('kioskQueryInput').value = '';
+        }
+
+        function startScanner() {
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => initCamera()).catch(() => initCamera());
+            } else {
+                initCamera();
+            }
+        }
+
+        function initCamera() {
+            html5QrCode = new Html5Qrcode("kioskReader");
+            html5QrCode.start(
+                { facingMode: "user" },
+                { fps: 10, qrbox: { width: 220, height: 220 } },
+                (decodedText) => {
+                    html5QrCode.stop();
+                    verifyTicketPayload(decodedText);
+                },
+                (errorMessage) => {}
+            ).catch(err => {
+                document.getElementById('kioskReader').innerHTML = '<div style="color: #ef4444; padding: 1rem; font-size: 0.85rem;">Camera permission denied or not available. Please use manual entry.</div>';
+            });
+        }
+
+        window.addEventListener('load', () => {
+            initCamera();
+        });
+    </script>
+
+</body>
+</html>

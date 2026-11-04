@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ event.title }} — Virtual Expo Hall &amp; Sponsors | Events Booking</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=8.0">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='themes.js') }}?v=8.0"></script>
+    <script src="{{ url_for('static', filename='toast.js') }}"></script>
+    <style>
+        :root {
+            --expo-bg: #070709;
+            --expo-card: rgba(15, 23, 42, 0.88);
+            --expo-border: rgba(255, 255, 255, 0.08);
+            --tier-plat: #e2e8f0;
+            --tier-gold: #f59e0b;
+            --tier-silver: #94a3b8;
+        }
+
+        body {
+            background-color: var(--expo-bg);
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding-bottom: 5rem;
+        }
+
+        .expo-header-banner {
+            background: linear-gradient(180deg, rgba(245, 158, 11, 0.12) 0%, rgba(7, 7, 9, 0.98) 100%),
+                        radial-gradient(circle at 50% 0%, rgba(0, 139, 227, 0.2), transparent 70%);
+            border-bottom: 1px solid var(--expo-border);
+            padding: 3rem 1.5rem 2.2rem;
+            text-align: center;
+        }
+
+        .expo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .tier-section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.45rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 2.5rem 0 1.2rem;
+            border-bottom: 1px solid var(--expo-border);
+            padding-bottom: 8px;
+        }
+
+        .booth-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .booth-card {
+            background: var(--expo-card);
+            border: 1.5px solid var(--expo-border);
+            border-radius: 20px;
+            padding: 1.8rem;
+            backdrop-filter: blur(14px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+
+        .booth-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.7);
+        }
+
+        .booth-card.platinum {
+            border-color: rgba(226, 232, 240, 0.4);
+            box-shadow: 0 0 25px rgba(226, 232, 240, 0.1);
+        }
+
+        .booth-card.gold {
+            border-color: rgba(245, 158, 11, 0.4);
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.1);
+        }
+
+        .booth-logo {
+            width: 52px;
+            height: 52px;
+            object-fit: contain;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .promo-pill {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px dashed #10b981;
+            color: #34d399;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <div style="display: flex; align-items: center;">
+                <a href="{{ url_for('dashboard') }}" class="logo">Events <span>Booking</span></a>
+            </div>
+            <div class="nav-links" style="display: flex; align-items: center; gap: 12px;">
+                <a href="{{ url_for('event_detail', event_id=event.id) }}" class="nav-btn-dash">← Back to Event Details</a>
+                <a href="{{ url_for('sponsor_leads_portal') }}" class="nav-btn-dash" style="color: #f59e0b; border-color: rgba(245, 158, 11, 0.4);">
+                    💼 Exhibitor Lead Portal
+                </a>
+                <a href="{{ url_for('dashboard') }}" class="nav-btn-dash">🏠 Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="expo-header-banner">
+        <div class="expo-container">
+            <span style="background: rgba(245, 158, 11, 0.18); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); font-size: 0.76rem; font-weight: 800; padding: 4px 14px; border-radius: 50px; text-transform: uppercase; letter-spacing: 0.5px;">
+                Virtual Exhibition Floor
+            </span>
+            <h1 style="font-family: 'Outfit', sans-serif; font-size: 2.5rem; font-weight: 900; margin: 0.6rem 0 0.4rem; color: #ffffff;">
+                {{ event.title }} — Expo Hall
+            </h1>
+            <p style="color: #94a3b8; font-size: 0.95rem; margin: 0 auto; max-width: 650px;">
+                Connect with leading technology partners, explore developer tools, claim exclusive swag promo codes, and discover open career opportunities.
+            </p>
+        </div>
+    </div>
+
+    <div class="expo-container">
+
+        <!-- Sponsors Grid -->
+        <div class="tier-section-title" style="color: #ffffff;">
+            <span>💎</span> Featured Exhibitor Booths
+        </div>
+
+        <div class="booth-grid">
+            {% for s in sponsors %}
+            <div class="booth-card {{ s.tier.lower() }}">
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                        <img src="{{ s.logo }}" alt="{{ s.name }}" class="booth-logo">
+                        <span style="font-size: 0.72rem; font-weight: 800; padding: 3px 10px; border-radius: 50px; text-transform: uppercase;
+                            {% if s.tier == 'Platinum' %}background: rgba(226, 232, 240, 0.2); color: #e2e8f0; border: 1px solid #e2e8f0;
+                            {% elif s.tier == 'Gold' %}background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b;
+                            {% else %}background: rgba(148, 163, 184, 0.2); color: #cbd5e1; border: 1px solid #94a3b8;{% endif %}">
+                            {{ s.tier }} Tier &bull; {{ s.booth }}
+                        </span>
+                    </div>
+
+                    <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.35rem; font-weight: 800; margin: 0 0 6px; color: #ffffff;">
+                        {{ s.name }}
+                    </h3>
+                    <p style="color: #94a3b8; font-size: 0.88rem; line-height: 1.5; margin: 0 0 1rem;">
+                        {{ s.tagline }}
+                    </p>
+
+                    {% if s.promo_code %}
+                    <div class="promo-pill" onclick="copyPromo('{{ s.promo_code }}')" title="Click to copy coupon code">
+                        <span>🎟️ Code: <strong>{{ s.promo_code }}</strong> ({{ s.discount }}% OFF)</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div style="display: flex; gap: 8px; margin-top: 1.5rem; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.06); flex-wrap: wrap;">
+                    <a href="{{ s.website }}" target="_blank" class="btn-primary" style="flex: 1; padding: 10px; font-size: 0.82rem; text-decoration: none; text-align: center; border-radius: 10px; font-weight: 700;">
+                        🌐 Visit Booth
+                    </a>
+                    {% if s.hiring %}
+                    <a href="{{ s.hiring }}" target="_blank" style="flex: 1; padding: 10px; font-size: 0.82rem; text-decoration: none; text-align: center; border-radius: 10px; font-weight: 700; background: rgba(0, 139, 227, 0.15); border: 1px solid #008be3; color: #38bdf8;">
+                        💼 We're Hiring!
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+    <script>
+        function copyPromo(code) {
+            navigator.clipboard.writeText(code).then(() => {
+                if (window.showToast) window.showToast(`Copied coupon code: ${code}! Apply at checkout for discount.`, 'success', 3000);
+            });
+        }
+    </script>
+
+</body>
+</html>

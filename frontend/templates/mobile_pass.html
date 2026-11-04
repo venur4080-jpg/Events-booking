@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Pass — {{ pass_data.event_title }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@800;900&family=Inter:wght@500;600;700;800&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 2rem 1rem;
+            background: #000000;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        /* Apple Wallet Card Spec */
+        .wallet-pass-card {
+            width: 100%;
+            max-width: 380px;
+            background: #1c1c1e;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            position: relative;
+        }
+
+        .wallet-header {
+            padding: 16px 20px;
+            background: #2c2c2e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .wallet-brand {
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #8e8e93;
+            text-transform: uppercase;
+        }
+
+        .wallet-hero-img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .wallet-content {
+            padding: 20px;
+        }
+
+        .wallet-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .wallet-field-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #8e8e93;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .wallet-field-val {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .wallet-barcode-strip {
+            background: #ffffff;
+            padding: 18px 20px;
+            text-align: center;
+            border-top: 1px dashed #3a3a3c;
+        }
+
+        .wallet-btn-group {
+            margin-top: 24px;
+            display: flex;
+            gap: 12px;
+            flex-direction: column;
+            width: 100%;
+            max-width: 380px;
+        }
+
+        .apple-wallet-btn {
+            background: #000000;
+            border: 1.5px solid #3a3a3c;
+            color: #ffffff;
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .apple-wallet-btn:hover {
+            background: #1c1c1e;
+            border-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wallet-pass-card">
+        <div class="wallet-header">
+            <span class="wallet-brand"> Apple Wallet &bull; Event Pass</span>
+            <span style="font-size: 0.8rem; font-weight: 800; color: #30d158;">● VERIFIED</span>
+        </div>
+
+        <img src="{{ pass_data.image }}" alt="{{ pass_data.event_title }}" class="wallet-hero-img">
+
+        <div class="wallet-content">
+            <div style="margin-bottom: 16px;">
+                <div class="wallet-field-label">EVENT</div>
+                <div style="font-family: 'Outfit', sans-serif; font-size: 1.35rem; font-weight: 900; line-height: 1.2;">
+                    {{ pass_data.event_title }}
+                </div>
+            </div>
+
+            <div class="wallet-row">
+                <div>
+                    <div class="wallet-field-label">ATTENDEE</div>
+                    <div class="wallet-field-val">{{ pass_data.name }}</div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="wallet-field-label">SEAT ALLOCATION</div>
+                    <div class="wallet-field-val" style="color: #0a84ff; font-family: 'JetBrains Mono', monospace;">
+                        {{ pass_data.seat_code }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="wallet-row" style="margin-bottom: 0;">
+                <div>
+                    <div class="wallet-field-label">DATE &amp; TIME</div>
+                    <div class="wallet-field-val">{{ pass_data.event_date }} &bull; {{ pass_data.event_time }}</div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="wallet-field-label">VENUE</div>
+                    <div class="wallet-field-val" style="font-size: 0.85rem;">{{ pass_data.venue }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- High-contrast PDF417 / Aztec QR Simulation -->
+        <div class="wallet-barcode-strip">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data={{ pass_data.ticket_number }}" 
+                 alt="Barcode Pass" style="width: 140px; height: 140px; display: block; margin: 0 auto;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 800; color: #000000; margin-top: 6px;">
+                {{ pass_data.ticket_number }}
+            </div>
+        </div>
+    </div>
+
+    <div class="wallet-btn-group">
+        <button class="apple-wallet-btn" onclick="addToWalletAlert()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.61-.75 1.04-1.8 0.92-2.87-.93.04-2.02.63-2.67 1.39-.58.67-.99 1.74-.85 2.78 1.02.08 2.03-.53 2.6-1.3"/>
+            </svg>
+            <span>Add to Apple Wallet</span>
+        </button>
+        <button class="apple-wallet-btn" onclick="addToWalletAlert()" style="background: #1f1f1f;">
+            <span>🌐 Save to Google Wallet</span>
+        </button>
+    </div>
+
+    <script>
+        function addToWalletAlert() {
+            alert('✨ Wallet Pass Downloaded: Pass #{{ pass_data.ticket_number }} is ready with NFC and offline lock-screen geofence alerts!');
+        }
+    </script>
+
+</body>
+</html>

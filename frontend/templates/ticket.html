@@ -764,6 +764,9 @@
             <button onclick="window.print()" class="t-btn" title="Print High-Contrast Pass">
                 <span>🖨️</span> Print
             </button>
+            <a href="{{ url_for('mobile_wallet_pass', ticket_number=reg.ticket_code) }}" target="_blank" class="t-btn" title="View Apple & Google Wallet Mobile Pass" style="border-color: #38bdf8; color: #38bdf8;">
+                <span>📱</span> Mobile Pass
+            </a>
             <a href="{{ url_for('download_ticket', event_id=event.id) }}" class="t-btn t-btn-primary" target="_blank" title="Download Official PDF E-Ticket">
                 <span>📥</span> PDF Pass
             </a>

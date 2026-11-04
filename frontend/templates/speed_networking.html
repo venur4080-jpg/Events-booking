@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speed Networking Lounge | {{ event.title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=8.0">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='toast.js') }}"></script>
+    <style>
+        :root {
+            --speed-bg: #070709;
+            --speed-card: rgba(15, 23, 42, 0.95);
+        }
+
+        body {
+            background-color: var(--speed-bg);
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .video-lounge-grid {
+            max-width: 1100px;
+            margin: 1.5rem auto;
+            padding: 0 1.5rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 768px) {
+            .video-lounge-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .video-box {
+            background: #000;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            height: 380px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 1.2rem;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-box.active-call {
+            border-color: #10b981;
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
+        }
+
+        .timer-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            font-weight: 800;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            color: #fca5a5;
+            padding: 6px 14px;
+            border-radius: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <div style="display: flex; align-items: center;">
+                <a href="{{ url_for('dashboard') }}" class="logo">Events <span>Booking</span></a>
+            </div>
+            <div class="nav-links" style="display: flex; align-items: center; gap: 12px;">
+                <a href="{{ url_for('event_networking_hub', event_id=event.id) }}" class="nav-btn-dash">← Exit Lounge</a>
+            </div>
+        </div>
+    </nav>
+
+    <div style="text-align: center; padding: 2rem 1.5rem 0.5rem;">
+        <span style="background: rgba(255, 19, 137, 0.2); color: #ff5eb0; border: 1px solid #ff1389; font-size: 0.76rem; font-weight: 800; padding: 4px 14px; border-radius: 50px; text-transform: uppercase;">
+            Live 1-on-1 Speed Match
+        </span>
+        <h1 style="font-family: 'Outfit', sans-serif; font-size: 2.2rem; font-weight: 900; margin: 8px 0 4px; color: #ffffff;">
+            Virtual Speed Networking Lounge
+        </h1>
+        <p style="color: #94a3b8; font-size: 0.92rem; margin: 0 auto; max-width: 600px;">
+            Matched with fellow developers for 3-minute quick intro chats. Introduce yourself, swap GitHubs, and collaborate!
+        </p>
+    </div>
+
+    <div class="video-lounge-grid">
+        <!-- Self Video Feed -->
+        <div class="video-box">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="background: rgba(0,0,0,0.6); padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700;">
+                    You (@{{ session.get('username') or 'Guest' }})
+                </span>
+                <span style="color: #34d399; font-size: 0.78rem;">● Camera Active</span>
+            </div>
+
+            <!-- Cam Simulation / Video Viewport -->
+            <div style="text-align: center; margin: auto;">
+                <div style="width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg, #008be3, #005691); margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; border: 3px solid #00f2fe;">
+                    📹
+                </div>
+                <div style="font-size: 0.82rem; color: #94a3b8;">Local WebRTC Feed Ready</div>
+            </div>
+
+            <div style="display: flex; justify-content: center; gap: 10px;">
+                <button type="button" class="btn-primary" style="width: auto; padding: 8px 16px; font-size: 0.8rem; border-radius: 50px;">
+                    🎙️ Mute
+                </button>
+                <button type="button" class="btn-primary" style="width: auto; padding: 8px 16px; font-size: 0.8rem; border-radius: 50px; background: rgba(255,255,255,0.1);">
+                    📷 Stop Video
+                </button>
+            </div>
+        </div>
+
+        <!-- Matched Peer Video Feed -->
+        <div class="video-box active-call" id="peerVideoBox">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="background: rgba(0,0,0,0.6); padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; color: #38bdf8;">
+                    Peer: @neha_codes (UI Architect)
+                </span>
+                <span class="timer-badge" id="speedCountdown">02:45</span>
+            </div>
+
+            <div style="text-align: center; margin: auto;">
+                <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150" alt="Peer" 
+                     style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid #10b981; object-fit: cover; margin-bottom: 8px; box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);">
+                <div style="font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.25rem;">Neha Sharma</div>
+                <div style="font-size: 0.82rem; color: #a78bfa;">Passionate about React, UI design, &amp; Hackathons</div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <button type="button" class="btn-primary" onclick="swapNextPeer()" style="width: auto; padding: 8px 18px; font-size: 0.85rem; border-radius: 50px; background: linear-gradient(135deg, #10b981, #059669);">
+                    🤝 Swap Contact / GitHub
+                </button>
+                <button type="button" onclick="nextPeer()" style="background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5; padding: 8px 18px; border-radius: 50px; cursor: pointer; font-weight: 700; font-size: 0.82rem;">
+                    Next Match ➔
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Icebreaker Topic Card -->
+    <div style="max-width: 700px; margin: 0 auto; text-align: center; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); padding: 14px 20px; border-radius: 14px; font-size: 0.9rem; color: #cbd5e1;">
+        💡 <strong>Quick Icebreaker:</strong> <em>"What is the coolest side-project you've built recently using AI or WebSockets?"</em>
+    </div>
+
+    <script>
+        let seconds = 165;
+        const timerEl = document.getElementById('speedCountdown');
+
+        const timerInterval = setInterval(() => {
+            seconds--;
+            if (seconds <= 0) {
+                clearInterval(timerInterval);
+                timerEl.textContent = '00:00';
+                if (window.showToast) window.showToast('Time expired! Matching you with your next peer...', 'info', 3000);
+            } else {
+                const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+                const s = (seconds % 60).toString().padStart(2, '0');
+                timerEl.textContent = `${m}:${s}`;
+            }
+        }, 1000);
+
+        function swapNextPeer() {
+            if (window.showToast) window.showToast('✨ Digital Business Card & GitHub sent to @neha_codes!', 'success', 3500);
+        }
+
+        function nextPeer() {
+            if (window.showToast) window.showToast('Searching for next available peer...', 'info', 2000);
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        }
+    </script>
+
+</body>
+</html>

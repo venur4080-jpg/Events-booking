@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exhibitor Lead Retrieval Portal | Events Booking</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=8.0">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="{{ url_for('static', filename='toast.js') }}"></script>
+    <style>
+        :root {
+            --portal-bg: #070709;
+            --portal-card: rgba(15, 23, 42, 0.9);
+            --portal-border: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            background-color: var(--portal-bg);
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding-bottom: 5rem;
+        }
+
+        .portal-container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .scanner-lead-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 860px) {
+            .scanner-lead-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .lead-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+            margin-top: 1rem;
+        }
+
+        .lead-table th {
+            text-align: left;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.04);
+            color: #94a3b8;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--portal-border);
+        }
+
+        .lead-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: #cbd5e1;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <div style="display: flex; align-items: center;">
+                <a href="{{ url_for('dashboard') }}" class="logo">Events <span>Booking</span></a>
+            </div>
+            <div class="nav-links" style="display: flex; align-items: center; gap: 12px;">
+                <a href="{{ url_for('dashboard') }}" class="nav-btn-dash">🏠 Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="portal-container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <span style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; font-size: 0.72rem; font-weight: 800; padding: 4px 12px; border-radius: 50px; text-transform: uppercase;">
+                    Sponsor Lead Scanner
+                </span>
+                <h1 style="font-family: 'Outfit', sans-serif; font-size: 2.2rem; font-weight: 900; margin: 6px 0 2px; color: #ffffff;">
+                    Exhibitor Lead Retrieval
+                </h1>
+                <p style="color: #94a3b8; font-size: 0.9rem; margin: 0;">
+                    Scan attendee badge QR codes to automatically capture contact details and conversation notes.
+                </p>
+            </div>
+
+            <a href="/api/sponsor/leads/export" class="btn-primary" style="padding: 10px 20px; font-size: 0.88rem; border-radius: 50px; text-decoration: none; font-weight: 700; width: auto; background: linear-gradient(135deg, #10b981, #059669);">
+                📥 Export Leads to CSV
+            </a>
+        </div>
+
+        <div class="scanner-lead-grid">
+
+            <!-- Scanner & Note Input Card -->
+            <div style="background: var(--portal-card); border: 1px solid var(--portal-border); border-radius: 20px; padding: 1.8rem;">
+                <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.3rem; margin: 0 0 10px; color: #ffffff;">
+                    📷 Scan Attendee Badge
+                </h2>
+                <div id="leadScannerViewport" style="width: 100%; height: 240px; border-radius: 14px; overflow: hidden; background: #000; border: 2px dashed rgba(245, 158, 11, 0.4); display: flex; align-items: center; justify-content: center;">
+                    <span style="color: #64748b; font-size: 0.85rem;">Initializing Badge Scanner...</span>
+                </div>
+
+                <form id="leadCaptureForm" onsubmit="submitLeadCapture(event)" style="margin-top: 1.2rem;">
+                    <div style="margin-bottom: 1rem;">
+                        <label style="font-size: 0.8rem; font-weight: 700; color: #94a3b8; display: block; margin-bottom: 4px;">Ticket Number:</label>
+                        <input type="text" id="leadTicketInput" placeholder="Scan or enter TKT-..." required
+                               style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 10px 12px; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; outline: none;">
+                    </div>
+                    <div style="margin-bottom: 1.2rem;">
+                        <label style="font-size: 0.8rem; font-weight: 700; color: #94a3b8; display: block; margin-bottom: 4px;">Booth Notes / Follow-up:</label>
+                        <textarea id="leadNotesInput" rows="2" placeholder="e.g. Interested in cloud credits, senior backend dev"
+                                  style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 10px 12px; border-radius: 8px; font-family: inherit; font-size: 0.88rem; outline: none;"></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary" style="width: 100%; padding: 12px; font-weight: 800; border-radius: 10px; background: linear-gradient(135deg, #f59e0b, #d97706);">
+                        Save Lead ✨
+                    </button>
+                </form>
+            </div>
+
+            <!-- Leads History Card -->
+            <div style="background: var(--portal-card); border: 1px solid var(--portal-border); border-radius: 20px; padding: 1.8rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.3rem; margin: 0; color: #ffffff;">
+                        📋 Captured Leads ({{ leads|length }})
+                    </h2>
+                </div>
+
+                {% if leads %}
+                <table class="lead-table">
+                    <thead>
+                        <tr>
+                            <th>Attendee</th>
+                            <th>Contact</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for l in leads %}
+                        <tr>
+                            <td>
+                                <strong style="color: #ffffff;">{{ l.name }}</strong>
+                                <div style="font-size: 0.74rem; color: #94a3b8;">{{ l.date[:16] }}</div>
+                            </td>
+                            <td>
+                                <div>{{ l.email }}</div>
+                                <div style="font-size: 0.75rem; color: #38bdf8;">{{ l.phone }}</div>
+                            </td>
+                            <td style="font-size: 0.82rem; color: #fbbf24;">
+                                {{ l.notes or 'No notes' }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div style="text-align: center; padding: 3rem 1rem; color: #64748b; font-size: 0.9rem;">
+                    No leads captured yet. Scan attendee badges to populate your list.
+                </div>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let qrScanner = null;
+
+        function initLeadScanner() {
+            qrScanner = new Html5Qrcode("leadScannerViewport");
+            qrScanner.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: 200 },
+                (decoded) => {
+                    document.getElementById('leadTicketInput').value = decoded;
+                    if (window.showToast) window.showToast('Badge scanned: ' + decoded, 'info', 2000);
+                },
+                (err) => {}
+            ).catch(() => {
+                document.getElementById('leadScannerViewport').innerHTML = '<div style="color: #94a3b8; font-size: 0.85rem; padding: 1rem; text-align: center;">Camera scanner idle. Ready for manual input.</div>';
+            });
+        }
+
+        async function submitLeadCapture(e) {
+            e.preventDefault();
+            const ticket = document.getElementById('leadTicketInput').value.trim();
+            const notes = document.getElementById('leadNotesInput').value.trim();
+
+            try {
+                const res = await fetch('/api/sponsor/lead-capture', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ticket_number: ticket, notes: notes })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    if (window.showToast) window.showToast(data.message, 'success', 3000);
+                    setTimeout(() => location.reload(), 1200);
+                } else {
+                    if (window.showToast) window.showToast(data.error, 'error', 3000);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        window.addEventListener('load', initLeadScanner);
+    </script>
+
+</body>
+</html>

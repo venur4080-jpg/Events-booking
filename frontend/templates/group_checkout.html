@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Squad &amp; Group Booking — {{ event.title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=8.0">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='toast.js') }}"></script>
+    <style>
+        :root {
+            --grp-bg: #070709;
+            --grp-card: rgba(15, 23, 42, 0.92);
+            --grp-border: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            background-color: var(--grp-bg);
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding-bottom: 5rem;
+        }
+
+        .grp-container {
+            max-width: 900px;
+            margin: 2.5rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .attendee-form-row {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--grp-border);
+            border-radius: 14px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .price-summary-card {
+            background: linear-gradient(135deg, rgba(0, 139, 227, 0.12) 0%, rgba(16, 185, 129, 0.12) 100%);
+            border: 1.5px solid rgba(0, 139, 227, 0.35);
+            border-radius: 20px;
+            padding: 1.8rem;
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <div style="display: flex; align-items: center;">
+                <a href="{{ url_for('dashboard') }}" class="logo">Events <span>Booking</span></a>
+            </div>
+            <div class="nav-links" style="display: flex; align-items: center; gap: 12px;">
+                <a href="{{ url_for('event_detail', event_id=event.id) }}" class="nav-btn-dash">← Back to Event Details</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="grp-container">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <span style="background: rgba(16, 185, 129, 0.18); color: #34d399; border: 1px solid #10b981; font-size: 0.75rem; font-weight: 800; padding: 4px 14px; border-radius: 50px; text-transform: uppercase;">
+                Squad Discount Active
+            </span>
+            <h1 style="font-family: 'Outfit', sans-serif; font-size: 2.4rem; font-weight: 900; margin: 8px 0 4px; color: #ffffff;">
+                Squad &amp; Group Booking
+            </h1>
+            <p style="color: #94a3b8; font-size: 0.95rem;">
+                Register 3 or more teammates for <strong>{{ event.title }}</strong> to automatically unlock up to <strong>20% Squad Discount</strong> with adjacent seating!
+            </p>
+        </div>
+
+        <form id="groupCheckoutForm" onsubmit="submitGroupOrder(event)">
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 700; color: #cbd5e1; margin-bottom: 6px;">
+                    Squad / Team Name:
+                </label>
+                <input type="text" id="groupNameInput" value="Dev Squad Alpha" required
+                       style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.4); border: 1.5px solid rgba(255,255,255,0.15); color: #fff; padding: 12px 14px; border-radius: 10px; font-size: 1rem; outline: none;">
+            </div>
+
+            <!-- Attendees Container -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 800; margin: 0; color: #ffffff;">
+                    Teammate Details (<span id="attendeeCountLabel">3</span>)
+                </h3>
+                <button type="button" onclick="addAttendeeRow()" style="background: rgba(0, 139, 227, 0.15); border: 1px solid #008be3; color: #38bdf8; padding: 6px 14px; border-radius: 50px; font-weight: 700; font-size: 0.8rem; cursor: pointer;">
+                    + Add Another Teammate
+                </button>
+            </div>
+
+            <div id="attendeesList">
+                <!-- Member 1 -->
+                <div class="attendee-form-row">
+                    <strong style="display: block; margin-bottom: 8px; font-size: 0.9rem; color: #38bdf8;">Teammate 1 (Squad Lead)</strong>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                        <input type="text" placeholder="Full Name" class="att-name" value="{{ session.get('username') or '' }}" required style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px; border-radius: 8px; outline: none;">
+                        <input type="email" placeholder="Email Address" class="att-email" required style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px; border-radius: 8px; outline: none;">
+                        <input type="tel" placeholder="Phone Number" class="att-phone" required style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px; border-radius: 8px; outline: none;">
+                    </div>
+                </div>
+
+                <!-- Member 2 -->
+                <div class="attendee-form-row">
+                    <strong style="display: block; margin-bottom: 8px; font-size: 0.9rem; color: #cbd5e1;">Teammate 2</strong>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                        <input type="text" placeholder="Full Name" class="att-name" required style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px; border-radius: 8px; outline: none;">
+                        <input type="email" placeholder="Email Address" class="att-email" required style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px; border-radius: 8px; outline: none;">
+                        <input type="tel" placeholder="Phone Number" class="att-phone" required style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px; border-radius: 8px; outline: none;">
+                    </div>
+                </div>
+
+                <!-- Member 3 -->
+                <div class="attendee-form-row">
+                    <strong style="display: block; margin-bottom: 8px; font-size: 0.9rem; color: #cbd5e1;">Teammate 3</strong>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                        <input type="text" placeholder="Full Name" class="att-name" required style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px; border-radius: 8px; outline: none;">
+                        <input type="email" placeholder="Email Address" class="att-email" required style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px; border-radius: 8px; outline: none;">
+                        <input type="tel" placeholder="Phone Number" class="att-phone" required style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px; border-radius: 8px; outline: none;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Price & Discount Calculation Card -->
+            <div class="price-summary-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.92rem;">
+                    <span style="color: #cbd5e1;">Base Price per Pass:</span>
+                    <strong style="color: #ffffff;">{% if event.price and event.price != 'Free' and not event.price.startswith('₹') %}₹{% endif %}{{ event.price or 'Free' }}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.92rem;">
+                    <span style="color: #34d399;">Squad Volume Discount:</span>
+                    <strong style="color: #34d399;" id="discountPctDisplay">15% OFF (Saved)</strong>
+                </div>
+                <div style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 12px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 800; color: #ffffff;">Total Squad Amount:</span>
+                    <strong style="font-family: 'JetBrains Mono', monospace; font-size: 1.6rem; color: #38bdf8;" id="totalAmountDisplay">₹0</strong>
+                </div>
+
+                <button type="submit" class="btn-primary" style="width: 100%; padding: 14px; margin-top: 1.2rem; font-weight: 800; font-size: 1.05rem; border-radius: 12px; background: linear-gradient(135deg, #10b981, #008be3);">
+                    Confirm Squad Passes &amp; Reserve Seats ➔
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const rawPrice = "{{ event.price or 0 }}";
+        const unitPrice = parseFloat(rawPrice.replace(/[^0-9.]/g, '')) || 0;
+
+        function recalculate() {
+            const rows = document.querySelectorAll('.attendee-form-row');
+            const qty = rows.length;
+            document.getElementById('attendeeCountLabel').textContent = qty;
+
+            const discount = (qty >= 5) ? 0.20 : ((qty >= 3) ? 0.15 : 0.10);
+            const total = (unitPrice * qty * (1.0 - discount)).toFixed(2);
+
+            document.getElementById('discountPctDisplay').textContent = `${(discount * 100).toFixed(0)}% OFF`;
+            document.getElementById('totalAmountDisplay').textContent = `₹${total}`;
+        }
+
+        function addAttendeeRow() {
+            const list = document.getElementById('attendeesList');
+            const count = list.children.length + 1;
+            if (count > 10) {
+                alert('Maximum 10 attendees per squad booking.');
+                return;
+            }
+            const div = document.createElement('div');
+            div.className = 'attendee-form-row';
+            div.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <strong style="font-size: 0.9rem; color: #cbd5e1;">Teammate ${count}</strong>
+                    <button type="button" onclick="this.closest('.attendee-form-row').remove(); recalculate();" style="background: none; border: none; color: #ef4444; font-size: 0.75rem; cursor: pointer; font-weight: 700;">✕ Remove</button>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                    <input type="text" placeholder="Full Name" class="att-name" required style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px; border-radius: 8px; outline: none;">
+                    <input type="email" placeholder="Email Address" class="att-email" required style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px; border-radius: 8px; outline: none;">
+                    <input type="tel" placeholder="Phone Number" class="att-phone" required style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px; border-radius: 8px; outline: none;">
+                </div>
+            `;
+            list.appendChild(div);
+            recalculate();
+        }
+
+        async function submitGroupOrder(e) {
+            e.preventDefault();
+            const groupName = document.getElementById('groupNameInput').value.trim();
+            const rows = document.querySelectorAll('.attendee-form-row');
+            const attendees = [];
+
+            rows.forEach(r => {
+                attendees.push({
+                    name: r.querySelector('.att-name').value.trim(),
+                    email: r.querySelector('.att-email').value.trim(),
+                    phone: r.querySelector('.att-phone').value.trim()
+                });
+            });
+
+            try {
+                const res = await fetch(`/api/event/{{ event.id }}/group-register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ group_name: groupName, attendees: attendees })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    if (window.showToast) window.showToast(data.message, 'success', 3500);
+                    setTimeout(() => {
+                        window.location.href = "{{ url_for('history') }}";
+                    }, 1500);
+                } else {
+                    if (window.showToast) window.showToast(data.error || 'Failed to complete squad booking', 'error', 3500);
+                }
+            } catch (err) {
+                console.error(err);
+                if (window.showToast) window.showToast('Server error processing squad booking', 'error', 3500);
+            }
+        }
+
+        window.addEventListener('load', recalculate);
+    </script>
+
+</body>
+</html>

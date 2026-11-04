@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ event.title }} — Conference Agenda & Stages | Events Booking</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=8.0">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='themes.js') }}?v=8.0"></script>
+    <script src="{{ url_for('static', filename='toast.js') }}"></script>
+    <style>
+        :root {
+            --agenda-bg: #070709;
+            --agenda-card: rgba(15, 23, 42, 0.85);
+            --agenda-border: rgba(255, 255, 255, 0.08);
+            --agenda-cyan: #008be3;
+        }
+
+        body {
+            background-color: var(--agenda-bg);
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding-bottom: 5rem;
+        }
+
+        .agenda-header-banner {
+            background: linear-gradient(180deg, rgba(0, 139, 227, 0.15) 0%, rgba(7, 7, 9, 0.95) 100%),
+                        radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.25), transparent 60%);
+            border-bottom: 1px solid var(--agenda-border);
+            padding: 2.5rem 1.5rem 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .agenda-container {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Track Filter Pills */
+        .track-tabs-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 1.5rem 0 2.5rem;
+        }
+
+        .track-tab-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1.5px solid var(--agenda-border);
+            color: #94a3b8;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 700;
+            padding: 8px 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .track-tab-btn:hover {
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .track-tab-btn.active {
+            background: linear-gradient(135deg, #008be3 0%, #005691 100%);
+            color: #ffffff;
+            border-color: #008be3;
+            box-shadow: 0 4px 18px rgba(0, 139, 227, 0.4);
+        }
+
+        /* AI Concierge Box */
+        .ai-concierge-card {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.12) 0%, rgba(0, 139, 227, 0.12) 100%);
+            border: 1.5px solid rgba(124, 58, 237, 0.35);
+            border-radius: 18px;
+            padding: 1.25rem 1.75rem;
+            margin-bottom: 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        /* Timeline Session Card */
+        .session-card {
+            background: var(--agenda-card);
+            border: 1px solid var(--agenda-border);
+            border-radius: 18px;
+            padding: 1.6rem;
+            margin-bottom: 1.2rem;
+            backdrop-filter: blur(12px);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .session-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(0, 139, 227, 0.4);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 139, 227, 0.15);
+        }
+
+        .session-card.keynote {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .session-time-pill {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: #38bdf8;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 700;
+        }
+
+        .speaker-avatar-thumb {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .save-session-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #cbd5e1;
+            padding: 8px 14px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.82rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .save-session-btn.saved {
+            background: rgba(16, 185, 129, 0.18);
+            border-color: #10b981;
+            color: #34d399;
+        }
+
+        .save-session-btn:hover {
+            transform: scale(1.04);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <div style="display: flex; align-items: center;">
+                <a href="{{ url_for('dashboard') }}" class="logo">Events <span>Booking</span></a>
+            </div>
+            <div class="nav-links" style="display: flex; align-items: center; gap: 12px;">
+                <a href="{{ url_for('event_detail', event_id=event.id) }}" class="nav-btn-dash">← Back to Event Details</a>
+                <a href="{{ url_for('dashboard') }}" class="nav-btn-dash">🏠 Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="agenda-header-banner">
+        <div class="agenda-container">
+            <span style="background: rgba(0, 139, 227, 0.18); color: #38bdf8; border: 1px solid rgba(0, 139, 227, 0.4); font-size: 0.76rem; font-weight: 800; padding: 4px 14px; border-radius: 50px; text-transform: uppercase; letter-spacing: 0.5px;">
+                Multi-Stage Schedule &amp; Tracks
+            </span>
+            <h1 style="font-family: 'Outfit', sans-serif; font-size: 2.4rem; font-weight: 900; margin: 0.6rem 0 0.4rem; color: #ffffff;">
+                {{ event.title }}
+            </h1>
+            <p style="color: #94a3b8; font-size: 0.95rem; margin: 0 auto; max-width: 650px;">
+                📍 {{ event.venue }} • 🗓️ {{ event.date }} • ⏰ {{ event.time }}
+            </p>
+        </div>
+    </div>
+
+    <div class="agenda-container" style="margin-top: 2rem;">
+
+        <!-- 🤖 AI Conference Concierge -->
+        <div class="ai-concierge-card">
+            <div>
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                    <span style="font-size: 1.4rem;">✨</span>
+                    <strong style="color: #ffffff; font-family: 'Outfit', sans-serif; font-size: 1.15rem;">AI Schedule Concierge</strong>
+                    <span style="background: #7c3aed; color: #fff; font-size: 0.68rem; font-weight: 800; padding: 2px 8px; border-radius: 20px;">GEMINI POWERED</span>
+                </div>
+                <p style="color: #cbd5e1; font-size: 0.85rem; margin: 0;">
+                    Tell us what you want to learn (e.g. <em>Distributed Systems, LLMs, Security</em>), and AI will craft a clash-free personalized daily plan.
+                </p>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <input type="text" id="aiInterestsInput" placeholder="Enter topics e.g. AI, Cloud, Python" 
+                       style="background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; padding: 8px 14px; border-radius: 50px; font-size: 0.82rem; width: 220px; outline: none;">
+                <button type="button" class="btn-primary" onclick="runAIScheduleConcierge()" style="padding: 8px 16px; font-size: 0.82rem; border-radius: 50px; width: auto; font-weight: 700;">
+                    Generate Plan ✨
+                </button>
+            </div>
+        </div>
+
+        <!-- Track Filter Tabs -->
+        <div class="track-tabs-bar">
+            <button type="button" class="track-tab-btn active" onclick="filterTrack('all', this)">
+                <span>🌐 All Tracks</span>
+            </button>
+            {% for t in tracks %}
+            <button type="button" class="track-tab-btn" onclick="filterTrack('{{ t.id }}', this)">
+                <span style="width: 8px; height: 8px; border-radius: 50%; background: {{ t.color }};"></span>
+                <span>{{ t.name }} ({{ t.room }})</span>
+            </button>
+            {% endfor %}
+            <button type="button" class="track-tab-btn" onclick="filterTrack('my-plan', this)" style="border-color: #10b981; color: #34d399;">
+                <span>⭐ My Day Plan</span>
+            </button>
+        </div>
+
+        <!-- Sessions Timeline List -->
+        <div id="sessionsList">
+            {% for s in sessions %}
+            <div class="session-card {% if s.is_keynote %}keynote{% endif %}" data-track-id="{{ s.track_id }}" data-session-id="{{ s.id }}">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap;">
+                            <span class="session-time-pill">{{ s.start_time }} – {{ s.end_time }}</span>
+                            {% if s.is_keynote %}
+                            <span style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); font-size: 0.72rem; font-weight: 800; padding: 2px 10px; border-radius: 999px;">
+                                👑 KEYNOTE ADDRESS
+                            </span>
+                            {% endif %}
+                        </div>
+                        <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 800; margin: 0 0 6px; color: #ffffff;">
+                            {{ s.title }}
+                        </h3>
+                        <p style="color: #94a3b8; font-size: 0.88rem; line-height: 1.5; margin: 0 0 12px; max-width: 780px;">
+                            {{ s.desc }}
+                        </p>
+                    </div>
+
+                    <!-- Bookmark Action -->
+                    <div>
+                        <button type="button" class="save-session-btn {% if s.id in saved_ids %}saved{% endif %}" onclick="toggleSaveSession({{ s.id }}, this)">
+                            <span>{{ '✓ In Day Plan' if s.id in saved_ids else '+ Add to My Day' }}</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Speaker Bio & Slide Deck Footer -->
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.05); flex-wrap: wrap; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <img src="{{ s.speaker_avatar }}" alt="{{ s.speaker_name }}" class="speaker-avatar-thumb">
+                        <div>
+                            <div style="font-weight: 700; font-size: 0.88rem; color: #ffffff;">{{ s.speaker_name }}</div>
+                            <div style="font-size: 0.78rem; color: #38bdf8;">{{ s.speaker_role }}</div>
+                        </div>
+                    </div>
+
+                    {% if s.slide_deck_url %}
+                    <a href="{{ s.slide_deck_url }}" target="_blank" style="font-size: 0.8rem; color: #a78bfa; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; font-weight: 600;">
+                        <span>📥 Download Slide Deck (PDF)</span>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+    <script>
+        let currentFilter = 'all';
+
+        function filterTrack(trackId, btn) {
+            document.querySelectorAll('.track-tab-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            currentFilter = trackId;
+
+            const cards = document.querySelectorAll('.session-card');
+            cards.forEach(card => {
+                if (trackId === 'all') {
+                    card.style.display = 'block';
+                } else if (trackId === 'my-plan') {
+                    const isSaved = card.querySelector('.save-session-btn.saved');
+                    card.style.display = isSaved ? 'block' : 'none';
+                } else {
+                    card.style.display = (card.dataset.trackId === trackId) ? 'block' : 'none';
+                }
+            });
+        }
+
+        async function toggleSaveSession(sessionId, btn) {
+            try {
+                const res = await fetch(`/api/agenda/${sessionId}/toggle-save`, { method: 'POST' });
+                const data = await res.json();
+                if (data.ok) {
+                    if (data.saved) {
+                        btn.classList.add('saved');
+                        btn.innerHTML = '<span>✓ In Day Plan</span>';
+                    } else {
+                        btn.classList.remove('saved');
+                        btn.innerHTML = '<span>+ Add to My Day</span>';
+                    }
+                    if (window.showToast) window.showToast(data.message, 'success', 2500);
+                } else {
+                    if (window.showToast) window.showToast(data.error, 'error', 3000);
+                }
+            } catch (err) {
+                console.error(err);
+                if (window.showToast) window.showToast('Error saving session.', 'error', 3000);
+            }
+        }
+
+        async function runAIScheduleConcierge() {
+            const interests = document.getElementById('aiInterestsInput').value.trim();
+            if (!interests) {
+                if (window.showToast) window.showToast('Please enter your topics of interest first.', 'info', 3000);
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/ai/schedule-concierge', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ event_id: {{ event.id }}, interests: interests })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    const recIds = new Set(data.recommended_sessions.map(s => String(s.id)));
+                    const cards = document.querySelectorAll('.session-card');
+                    let count = 0;
+                    cards.forEach(c => {
+                        if (recIds.has(c.dataset.sessionId)) {
+                            c.style.display = 'block';
+                            c.style.borderColor = '#7c3aed';
+                            count++;
+                        } else {
+                            c.style.display = 'none';
+                        }
+                    });
+                    if (window.showToast) window.showToast(`✨ Generated ${count} non-clashing recommended sessions!`, 'success', 4000);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    </script>
+
+</body>
+</html>

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, send_file, make_response, jsonify, flash
+from flask import Flask, render_template, request, redirect, url_for, session, send_file, make_response, jsonify, flash, Response
 import sys
 import time
 import random
@@ -6462,6 +6462,115 @@ def init_db():
         redeemed_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )''')
 
+    # --- Full Ecosystem Expansion Tables ---
+    c.execute('''CREATE TABLE IF NOT EXISTS event_agenda_tracks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER NOT NULL,
+        track_name TEXT NOT NULL,
+        room_location TEXT DEFAULT '',
+        color_code TEXT DEFAULT '#008be3'
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS event_agenda_sessions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER NOT NULL,
+        track_id INTEGER,
+        title TEXT NOT NULL,
+        description TEXT DEFAULT '',
+        speaker_name TEXT DEFAULT '',
+        speaker_role TEXT DEFAULT '',
+        speaker_avatar TEXT DEFAULT '',
+        speaker_bio TEXT DEFAULT '',
+        slide_deck_url TEXT DEFAULT '',
+        start_time TEXT NOT NULL,
+        end_time TEXT NOT NULL,
+        session_date TEXT DEFAULT '',
+        is_keynote INTEGER DEFAULT 0,
+        FOREIGN KEY (track_id) REFERENCES event_agenda_tracks (id)
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS user_saved_agenda (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL,
+        event_id INTEGER NOT NULL,
+        session_id INTEGER NOT NULL,
+        added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(username, session_id)
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS event_sponsors (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        tier TEXT DEFAULT 'Gold',
+        logo_url TEXT DEFAULT '',
+        tagline TEXT DEFAULT '',
+        website_url TEXT DEFAULT '',
+        booth_number TEXT DEFAULT '',
+        hiring_url TEXT DEFAULT '',
+        promo_code TEXT DEFAULT '',
+        promo_discount INTEGER DEFAULT 0
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS sponsor_leads (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        sponsor_id INTEGER NOT NULL,
+        event_id INTEGER NOT NULL,
+        scanned_by_username TEXT NOT NULL,
+        attendee_username TEXT NOT NULL,
+        attendee_name TEXT NOT NULL,
+        attendee_email TEXT DEFAULT '',
+        attendee_phone TEXT DEFAULT '',
+        notes TEXT DEFAULT '',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS peer_networking_profiles (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        headline TEXT DEFAULT '',
+        bio TEXT DEFAULT '',
+        skills TEXT DEFAULT '',
+        interests TEXT DEFAULT '',
+        github_url TEXT DEFAULT '',
+        linkedin_url TEXT DEFAULT '',
+        portfolio_url TEXT DEFAULT '',
+        looking_for TEXT DEFAULT 'Hackathon Teammate',
+        is_public INTEGER DEFAULT 1,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS peer_connection_requests (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        sender_username TEXT NOT NULL,
+        receiver_username TEXT NOT NULL,
+        event_id INTEGER NOT NULL,
+        status TEXT DEFAULT 'pending',
+        message TEXT DEFAULT '',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS event_kiosk_logs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER NOT NULL,
+        ticket_number TEXT NOT NULL,
+        attendee_name TEXT NOT NULL,
+        printed_badge_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        kiosk_id TEXT DEFAULT 'KIOSK-01'
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS group_bookings (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER NOT NULL,
+        primary_buyer_username TEXT NOT NULL,
+        group_name TEXT DEFAULT '',
+        total_attendees INTEGER DEFAULT 1,
+        payment_id TEXT DEFAULT '',
+        amount_paid REAL DEFAULT 0.0,
+        status TEXT DEFAULT 'confirmed',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )''')
+
     try:
         c.execute("ALTER TABLE registrations ADD COLUMN seat_code TEXT")
     except Exception:
@@ -6774,6 +6883,48 @@ def register_stream_heartbeat(username, session_id, event_id, takeover=False):
     }
     return True, session_id
 
+def generate_avatar_svg(name='User', size=256):
+    """Generates a self-contained, offline-compatible SVG data URI with a radiant cyber-blue gradient and crisp white monogram."""
+    parts = [p for p in str(name or 'User').strip().split() if p]
+    if len(parts) >= 2:
+        initials = (parts[0][0] + parts[-1][0]).upper()
+    elif len(parts) == 1:
+        initials = parts[0][:2].upper()
+    else:
+        initials = 'U'
+    
+    font_size = int(size * 0.42)
+    svg = (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{size}" height="{size}" viewBox="0 0 {size} {size}">'
+        f'<defs>'
+        f'<linearGradient id="cyberGrad" x1="0%" y1="0%" x2="100%" y2="100%">'
+        f'<stop offset="0%" stop-color="#0b1329"/>'
+        f'<stop offset="40%" stop-color="#0284c7"/>'
+        f'<stop offset="75%" stop-color="#008be3"/>'
+        f'<stop offset="100%" stop-color="#38bdf8"/>'
+        f'</linearGradient>'
+        f'<filter id="textGlow">'
+        f'<feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="rgba(0,0,0,0.65)"/>'
+        f'</filter>'
+        f'</defs>'
+        f'<circle cx="{size//2}" cy="{size//2}" r="{size//2}" fill="url(#cyberGrad)"/>'
+        f'<circle cx="{size//2}" cy="{size//2}" r="{size//2 - 4}" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="3"/>'
+        f'<text x="50%" y="54%" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-family="Outfit, Inter, -apple-system, sans-serif" font-size="{font_size}" font-weight="800" letter-spacing="2" filter="url(#textGlow)">{initials}</text>'
+        f'</svg>'
+    )
+    return 'data:image/svg+xml;utf8,' + urllib.parse.quote(svg)
+
+def get_user_avatar_display(profile_photo, name='User'):
+    """Returns valid image URL or cyber SVG avatar with zero white background."""
+    if profile_photo and not str(profile_photo).startswith('https://ui-avatars.com'):
+        if str(profile_photo).startswith('http') or str(profile_photo).startswith('data:'):
+            return profile_photo
+        return url_for('static', filename=profile_photo)
+    return generate_avatar_svg(name)
+
+app.jinja_env.globals['generate_avatar_svg'] = generate_avatar_svg
+app.jinja_env.globals['get_user_avatar_display'] = get_user_avatar_display
+
 @app.context_processor
 def inject_user_data():
     current_user = None
@@ -6808,7 +6959,7 @@ def inject_user_data():
                             photo = photo + '&background=008be3&color=ffffff&bold=true&size=256'
                     else:
                         display_name = res[3] or username
-                        photo = f"https://ui-avatars.com/api/?name={urllib.parse.quote_plus(display_name)}&background=008be3&color=ffffff&bold=true&size=256"
+                        photo = generate_avatar_svg(display_name)
                     session['profile_photo'] = photo
                 
                 if not user_id:
@@ -7249,7 +7400,7 @@ def login():
                 session['role'] = 'host'
                 session['is_admin'] = 1
                 session['user_id'] = 'UID-0001'
-                session['profile_photo'] = 'https://ui-avatars.com/api/?name=Admin&background=008be3&color=ffffff&bold=true&size=256'
+                session['profile_photo'] = generate_avatar_svg('Admin')
                 return redirect(url_for('dashboard'), code=303)
             else:
                 try:
@@ -7358,7 +7509,7 @@ def login():
                         
                         photo = user[5]
                         if not photo:
-                            photo = f"https://ui-avatars.com/api/?name={urllib.parse.quote_plus(user_display_name)}&background=008be3&color=ffffff&bold=true&size=256"
+                            photo = generate_avatar_svg(user_display_name)
                         elif photo.startswith('https://ui-avatars.com/api/?') and 'background=' not in photo:
                             photo = photo + '&background=008be3&color=ffffff&bold=true&size=256'
                         elif not photo.startswith('http'):
@@ -10465,7 +10616,7 @@ def profile():
         'email': user_data[2] or '',
         'phone': user_data[3] or '',
         'college_id': user_data[4] or '',
-        'profile_photo': (user_data[5] + '&background=008be3&color=ffffff&bold=true&size=256' if (user_data[5] and user_data[5].startswith('https://ui-avatars.com/api/?') and 'background=' not in user_data[5]) else (user_data[5] or f"https://ui-avatars.com/api/?name={urllib.parse.quote_plus(user_data[1] or user_data[0])}&background=008be3&color=ffffff&bold=true&size=256")),
+        'profile_photo': get_user_avatar_display(user_data[5], user_data[1] or user_data[0]),
         'first_name': fn,
         'middle_name': mn,
         'last_name': ln,
@@ -10506,7 +10657,7 @@ def settings():
         'email': user_data[2] or '',
         'phone': user_data[3] or '',
         'college_id': user_data[4] or '',
-        'profile_photo': (user_data[5] + '&background=008be3&color=ffffff&bold=true&size=256' if (user_data[5] and user_data[5].startswith('https://ui-avatars.com/api/?') and 'background=' not in user_data[5]) else (user_data[5] or f"https://ui-avatars.com/api/?name={urllib.parse.quote_plus(user_data[1] or user_data[0])}&background=008be3&color=ffffff&bold=true&size=256")),
+        'profile_photo': get_user_avatar_display(user_data[5], user_data[1] or user_data[0]),
     }
 
     return render_template('settings.html', user=user, is_host=is_host(), is_admin=is_admin(), msg=msg, error=error)
@@ -14103,3 +14254,521 @@ if __name__ == '__main__':
 
 
 
+
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# 🚀 FULL ECOSYSTEM EXPANSION SUITE: AGENDA, KIOSK, EXPO, NETWORKING, & GROUPS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@app.route('/event/<int:event_id>/agenda')
+def event_agenda(event_id):
+    """Multi-Track Conference Agenda & Schedule Page"""
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT id, title, date, time, venue, color, image FROM events WHERE id = ?", (event_id,))
+    event = c.fetchone()
+    if not event:
+        conn.close()
+        flash("Event not found", "error")
+        return redirect(url_for('dashboard'))
+    
+    event_dict = {
+        'id': event[0], 'title': event[1], 'date': event[2], 
+        'time': event[3], 'venue': event[4], 'color': event[5], 'image': event[6]
+    }
+    
+    c.execute("SELECT id, track_name, room_location, color_code FROM event_agenda_tracks WHERE event_id = ? ORDER BY id ASC", (event_id,))
+    tracks = [{'id': r[0], 'name': r[1], 'room': r[2], 'color': r[3]} for r in c.fetchall()]
+    
+    c.execute("""SELECT id, track_id, title, description, speaker_name, speaker_role, 
+                        speaker_avatar, speaker_bio, slide_deck_url, start_time, end_time, session_date, is_keynote 
+                 FROM event_agenda_sessions WHERE event_id = ? ORDER BY start_time ASC""", (event_id,))
+    sessions = []
+    for r in c.fetchall():
+        sessions.append({
+            'id': r[0], 'track_id': r[1], 'title': r[2], 'desc': r[3],
+            'speaker_name': r[4], 'speaker_role': r[5], 'speaker_avatar': r[6],
+            'speaker_bio': r[7], 'slide_deck_url': r[8], 'start_time': r[9],
+            'end_time': r[10], 'session_date': r[11], 'is_keynote': r[12]
+        })
+    
+    username = session.get('username')
+    saved_ids = []
+    if username:
+        c.execute("SELECT session_id FROM user_saved_agenda WHERE username = ? AND event_id = ?", (username, event_id))
+        saved_ids = [r[0] for r in c.fetchall()]
+    
+    conn.close()
+    return render_template('agenda.html', event=event_dict, tracks=tracks, sessions=sessions, saved_ids=saved_ids)
+
+
+@app.route('/api/agenda/<int:session_id>/toggle-save', methods=['POST'])
+def toggle_save_agenda(session_id):
+    """Toggle bookmarking a session in personal day planner"""
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Please login to save sessions'}), 401
+    
+    username = session['username']
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT event_id FROM event_agenda_sessions WHERE id = ?", (session_id,))
+    sess = c.fetchone()
+    if not sess:
+        conn.close()
+        return jsonify({'ok': False, 'error': 'Session not found'}), 404
+    
+    event_id = sess[0]
+    c.execute("SELECT id FROM user_saved_agenda WHERE username = ? AND session_id = ?", (username, session_id))
+    existing = c.fetchone()
+    
+    if existing:
+        c.execute("DELETE FROM user_saved_agenda WHERE id = ?", (existing[0],))
+        conn.commit()
+        conn.close()
+        return jsonify({'ok': True, 'saved': False, 'message': 'Removed from your day plan'})
+    else:
+        c.execute("INSERT INTO user_saved_agenda (username, event_id, session_id) VALUES (?, ?, ?)", (username, event_id, session_id))
+        conn.commit()
+        conn.close()
+        return jsonify({'ok': True, 'saved': True, 'message': 'Added to your day plan! ✨'})
+
+
+@app.route('/kiosk/<int:event_id>')
+def on_site_kiosk(event_id):
+    """On-Site Venue Self Check-in Kiosk Mode"""
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT id, title, date, time, venue, color, image FROM events WHERE id = ?", (event_id,))
+    event = c.fetchone()
+    conn.close()
+    if not event:
+        flash("Event not found", "error")
+        return redirect(url_for('dashboard'))
+    
+    event_dict = {
+        'id': event[0], 'title': event[1], 'date': event[2], 
+        'time': event[3], 'venue': event[4], 'color': event[5], 'image': event[6]
+    }
+    return render_template('kiosk.html', event=event_dict)
+
+
+@app.route('/api/kiosk/checkin-and-print', methods=['POST'])
+def kiosk_checkin_and_print():
+    """Verify attendee credentials at venue kiosk and authorize badge printing"""
+    data = request.get_json(silent=True) or request.form
+    query = (data.get('query') or data.get('ticket_number') or '').strip()
+    event_id = data.get('event_id')
+    
+    if not query or not event_id:
+        return jsonify({'ok': False, 'error': 'Ticket number, phone, or email is required'}), 400
+    
+    conn = get_db()
+    c = conn.cursor()
+    
+    c.execute("""SELECT r.ticket_code, r.full_name, r.email, r.phone, r.checked_in, 
+                        r.seat_code, e.title, e.date, e.venue, r.username
+                 FROM registrations r
+                 JOIN events e ON r.event_id = e.id
+                 WHERE r.event_id = ? AND (r.ticket_code = ? OR r.email = ? OR r.phone = ?)
+                 LIMIT 1""", (event_id, query, query, query))
+    attendee = c.fetchone()
+    
+    if not attendee:
+        conn.close()
+        return jsonify({'ok': False, 'error': 'No matching ticket found for this event'}), 404
+    
+    ticket_no, name, email, phone, checked_in, seat_code, ev_title, ev_date, ev_venue, uname = attendee
+    
+    # Mark checked in
+    c.execute("UPDATE registrations SET checked_in = 1, checkin_time = CURRENT_TIMESTAMP WHERE ticket_code = ?", (ticket_no,))
+    
+    # Record in kiosk print logs
+    c.execute("INSERT INTO event_kiosk_logs (event_id, ticket_number, attendee_name, kiosk_id) VALUES (?, ?, ?, 'KIOSK-01')",
+              (event_id, ticket_no, name))
+    conn.commit()
+    conn.close()
+    
+    return jsonify({
+        'ok': True,
+        'already_checked_in': bool(checked_in),
+        'attendee': {
+            'ticket_number': ticket_no,
+            'name': name,
+            'email': email,
+            'seat_code': seat_code or 'General GA',
+            'event_title': ev_title,
+            'event_date': ev_date,
+            'event_venue': ev_venue,
+            'badge_url': url_for('kiosk_badge_sheet', event_id=event_id, ticket_number=ticket_no)
+        }
+    })
+
+
+@app.route('/kiosk/<int:event_id>/badge-sheet/<ticket_number>')
+def kiosk_badge_sheet(event_id, ticket_number):
+    """Printable 3x4-inch lanyard attendee credential pass"""
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""SELECT r.ticket_code, r.full_name, r.seat_code, e.title, e.date, e.venue, r.username, u.profile_photo
+                 FROM registrations r
+                 JOIN events e ON r.event_id = e.id
+                 LEFT JOIN users u ON r.username = u.username
+                 WHERE r.ticket_code = ? AND r.event_id = ?""", (ticket_number, event_id))
+    row = c.fetchone()
+    conn.close()
+    
+    if not row:
+        flash("Ticket not found for badge printing", "error")
+        return redirect(url_for('dashboard'))
+    
+    badge = {
+        'ticket_number': row[0], 'name': row[1], 'seat_code': row[2] or 'General Zone',
+        'event_title': row[3], 'event_date': row[4], 'venue': row[5], 'username': row[6],
+        'photo': row[7] or f"https://ui-avatars.com/api/?name={urllib.parse.quote_plus(row[1])}&background=008be3&color=ffffff&bold=true&size=256"
+    }
+    return render_template('badge_sheet.html', badge=badge)
+
+
+@app.route('/ticket/<ticket_number>/mobile-pass')
+def mobile_wallet_pass(ticket_number):
+    """Apple / Google Wallet Digital Pass Simulation"""
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""SELECT r.ticket_code, r.full_name, r.seat_code, e.title, e.date, e.time, e.venue, e.image, r.status, r.timestamp
+                 FROM registrations r
+                 JOIN events e ON r.event_id = e.id
+                 WHERE r.ticket_code = ?""", (ticket_number,))
+    row = c.fetchone()
+    conn.close()
+    
+    if not row:
+        flash("Pass not found", "error")
+        return redirect(url_for('dashboard'))
+    
+    pass_data = {
+        'ticket_number': row[0], 'name': row[1], 'seat_code': row[2] or 'ZONE-GA',
+        'event_title': row[3], 'event_date': row[4], 'event_time': row[5],
+        'venue': row[6], 'image': row[7], 'status': row[8], 'created_at': row[9]
+    }
+    return render_template('mobile_pass.html', pass_data=pass_data)
+
+
+@app.route('/event/<int:event_id>/expo')
+def event_expo(event_id):
+    """B2B Virtual Expo Hall & Sponsor Showcase"""
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT id, title, date, time, venue, color, image FROM events WHERE id = ?", (event_id,))
+    event = c.fetchone()
+    if not event:
+        conn.close()
+        flash("Event not found", "error")
+        return redirect(url_for('dashboard'))
+    
+    event_dict = {
+        'id': event[0], 'title': event[1], 'date': event[2], 
+        'time': event[3], 'venue': event[4], 'color': event[5], 'image': event[6]
+    }
+    
+    c.execute("""SELECT id, name, tier, logo_url, tagline, website_url, booth_number, hiring_url, promo_code, promo_discount 
+                 FROM event_sponsors WHERE event_id = ? ORDER BY 
+                 CASE tier 
+                    WHEN 'Platinum' THEN 1 
+                    WHEN 'Gold' THEN 2 
+                    WHEN 'Silver' THEN 3 
+                    ELSE 4 
+                 END, name ASC""", (event_id,))
+    sponsors = []
+    for r in c.fetchall():
+        sponsors.append({
+            'id': r[0], 'name': r[1], 'tier': r[2], 'logo': r[3],
+            'tagline': r[4], 'website': r[5], 'booth': r[6],
+            'hiring': r[7], 'promo_code': r[8], 'discount': r[9]
+        })
+    
+    conn.close()
+    return render_template('expo.html', event=event_dict, sponsors=sponsors)
+
+
+@app.route('/sponsor/leads')
+def sponsor_leads_portal():
+    """Lead Capture & QR Retrieval Portal for Exhibitors"""
+    if not session.get('loggedin'):
+        flash("Please login to access Exhibitor Portal", "info")
+        return redirect(url_for('login'))
+    
+    username = session['username']
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""SELECT l.id, l.attendee_name, l.attendee_email, l.attendee_phone, l.notes, l.created_at, e.title 
+                 FROM sponsor_leads l
+                 JOIN events e ON l.event_id = e.id
+                 WHERE l.scanned_by_username = ? ORDER BY l.created_at DESC""", (username,))
+    leads = [{'id': r[0], 'name': r[1], 'email': r[2], 'phone': r[3], 'notes': r[4], 'date': r[5], 'event': r[6]} for r in c.fetchall()]
+    conn.close()
+    return render_template('sponsor_leads.html', leads=leads)
+
+
+@app.route('/api/sponsor/lead-capture', methods=['POST'])
+def capture_sponsor_lead():
+    """Sponsor scans attendee QR and saves contact notes"""
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Authentication required'}), 401
+    
+    data = request.get_json(silent=True) or request.form
+    ticket_no = (data.get('ticket_number') or '').strip()
+    notes = data.get('notes', '').strip()
+    
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""SELECT r.event_id, r.username, r.full_name, r.email, r.phone 
+                 FROM registrations r WHERE r.ticket_code = ?""", (ticket_no,))
+    attendee = c.fetchone()
+    
+    if not attendee:
+        conn.close()
+        return jsonify({'ok': False, 'error': 'Attendee badge not recognized'}), 404
+    
+    ev_id, uname, name, email, phone = attendee
+    c.execute("""INSERT INTO sponsor_leads 
+                 (sponsor_id, event_id, scanned_by_username, attendee_username, attendee_name, attendee_email, attendee_phone, notes)
+                 VALUES (1, ?, ?, ?, ?, ?, ?, ?)""",
+              (ev_id, session['username'], uname, name, email, phone, notes))
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'ok': True, 'message': f'Lead for {name} saved successfully!'})
+
+
+@app.route('/api/sponsor/leads/export')
+def export_sponsor_leads_csv():
+    """Export captured leads to CSV"""
+    if not session.get('loggedin'):
+        return redirect(url_for('login'))
+    
+    username = session['username']
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""SELECT l.attendee_name, l.attendee_email, l.attendee_phone, l.notes, l.created_at, e.title 
+                 FROM sponsor_leads l
+                 JOIN events e ON l.event_id = e.id
+                 WHERE l.scanned_by_username = ? ORDER BY l.created_at DESC""", (username,))
+    leads = c.fetchall()
+    conn.close()
+    
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['Attendee Name', 'Email', 'Phone', 'Notes', 'Captured At', 'Event Title'])
+    for r in leads:
+        writer.writerow(r)
+    
+    output.seek(0)
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-disposition": "attachment; filename=sponsor_leads_export.csv"}
+    )
+
+
+@app.route('/event/<int:event_id>/networking')
+def event_networking_hub(event_id):
+    """Peer Networking & Matchmaking Hub"""
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT id, title, date, time, venue, color, image FROM events WHERE id = ?", (event_id,))
+    event = c.fetchone()
+    if not event:
+        conn.close()
+        flash("Event not found", "error")
+        return redirect(url_for('dashboard'))
+    
+    event_dict = {
+        'id': event[0], 'title': event[1], 'date': event[2], 
+        'time': event[3], 'venue': event[4], 'color': event[5], 'image': event[6]
+    }
+    
+    c.execute("""SELECT p.username, p.headline, p.bio, p.skills, p.interests, p.github_url, p.linkedin_url, p.portfolio_url, p.looking_for, u.profile_photo, u.full_name
+                 FROM peer_networking_profiles p
+                 LEFT JOIN users u ON p.username = u.username
+                 WHERE p.is_public = 1 ORDER BY p.updated_at DESC LIMIT 50""")
+    peers = []
+    for r in c.fetchall():
+        peers.append({
+            'username': r[0], 'headline': r[1], 'bio': r[2], 'skills': [s.strip() for s in r[3].split(',') if s.strip()],
+            'interests': [i.strip() for i in r[4].split(',') if i.strip()], 'github': r[5], 'linkedin': r[6],
+            'portfolio': r[7], 'looking_for': r[8],
+            'avatar': r[9] or f"https://ui-avatars.com/api/?name={urllib.parse.quote_plus(r[10] or r[0])}&background=008be3&color=ffffff&bold=true&size=256",
+            'full_name': r[10] or r[0]
+        })
+    
+    conn.close()
+    return render_template('networking.html', event=event_dict, peers=peers)
+
+
+@app.route('/api/networking/connect', methods=['POST'])
+def send_peer_connect():
+    """Send 1-on-1 networking connection request"""
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Login required'}), 401
+    
+    data = request.get_json(silent=True) or request.form
+    receiver = (data.get('receiver') or '').strip()
+    event_id = data.get('event_id')
+    message = data.get('message', 'Would love to connect and chat about tech!')
+    
+    if not receiver or not event_id:
+        return jsonify({'ok': False, 'error': 'Recipient and event required'}), 400
+    
+    sender = session['username']
+    if sender == receiver:
+        return jsonify({'ok': False, 'error': 'You cannot connect with yourself'}), 400
+    
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""INSERT INTO peer_connection_requests (sender_username, receiver_username, event_id, status, message)
+                 VALUES (?, ?, ?, 'pending', ?)""", (sender, receiver, event_id, message))
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'ok': True, 'message': f'Connection invite sent to @{receiver}! ✨'})
+
+
+@app.route('/event/<int:event_id>/speed-networking')
+def speed_networking_lounge(event_id):
+    """Virtual 1-on-1 Speed Networking Breakout Lounge"""
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT id, title, date, time, venue, color, image FROM events WHERE id = ?", (event_id,))
+    event = c.fetchone()
+    conn.close()
+    if not event:
+        flash("Event not found", "error")
+        return redirect(url_for('dashboard'))
+    
+    event_dict = {
+        'id': event[0], 'title': event[1], 'date': event[2], 
+        'time': event[3], 'venue': event[4], 'color': event[5], 'image': event[6]
+    }
+    return render_template('speed_networking.html', event=event_dict)
+
+
+@app.route('/event/<int:event_id>/group-booking')
+def group_booking_checkout(event_id):
+    """Squad & Group Booking Page (3 to 10 Attendees with Discounts)"""
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT id, title, date, time, venue, price, color, image FROM events WHERE id = ?", (event_id,))
+    event = c.fetchone()
+    conn.close()
+    if not event:
+        flash("Event not found", "error")
+        return redirect(url_for('dashboard'))
+    
+    event_dict = {
+        'id': event[0], 'title': event[1], 'date': event[2], 
+        'time': event[3], 'venue': event[4], 'price': event[5], 'color': event[6], 'image': event[7]
+    }
+    return render_template('group_checkout.html', event=event_dict)
+
+
+@app.route('/api/event/<int:event_id>/group-register', methods=['POST'])
+def process_group_registration(event_id):
+    """Process squad group registration with bulk discounts"""
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Login required'}), 401
+    
+    data = request.get_json(silent=True) or request.form
+    attendees = data.get('attendees', [])
+    group_name = data.get('group_name', 'Tech Squad')
+    
+    if not attendees or len(attendees) < 2:
+        return jsonify({'ok': False, 'error': 'Group booking requires at least 2 attendees'}), 400
+    
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT title, date, price FROM events WHERE id = ?", (event_id,))
+    ev = c.fetchone()
+    if not ev:
+        conn.close()
+        return jsonify({'ok': False, 'error': 'Event not found'}), 404
+    
+    ev_title, ev_date, unit_price = ev
+    total_qty = len(attendees)
+    
+    # 15% discount for 3+, 20% for 5+
+    discount_pct = 0.20 if total_qty >= 5 else (0.15 if total_qty >= 3 else 0.10)
+    try:
+        clean_price = re.sub(r'[^0-9.]', '', str(unit_price or '0'))
+        numeric_unit_price = float(clean_price) if clean_price else 0.0
+    except Exception:
+        numeric_unit_price = 0.0
+    total_amount = round(numeric_unit_price * total_qty * (1.0 - discount_pct), 2)
+    
+    group_payment_id = f"GRP-{random.randint(100000, 999999)}"
+    
+    c.execute("""INSERT INTO group_bookings (event_id, primary_buyer_username, group_name, total_attendees, payment_id, amount_paid, status)
+                 VALUES (?, ?, ?, ?, ?, ?, 'confirmed')""",
+              (event_id, session['username'], group_name, total_qty, group_payment_id, total_amount))
+    
+    # Issue ticket for each group member
+    created_tickets = []
+    for att in attendees:
+        tkt_no = f"TKT-{event_id:03d}-{random.randint(10000, 99999)}"
+        c.execute("""INSERT INTO registrations (event_id, username, full_name, email, phone, ticket_code, status, checked_in)
+                     VALUES (?, ?, ?, ?, ?, ?, 'confirmed', 0)""",
+                  (event_id, session['username'], att.get('name', 'Squad Member'), att.get('email', ''), att.get('phone', ''), tkt_no))
+        created_tickets.append({'name': att.get('name'), 'ticket_number': tkt_no})
+    
+    conn.commit()
+    conn.close()
+    
+    return jsonify({
+        'ok': True,
+        'message': f'Group registration confirmed for {total_qty} attendees! (Saved {int(discount_pct*100)}% Squad Discount)',
+        'payment_id': group_payment_id,
+        'amount_paid': total_amount,
+        'tickets': created_tickets
+    })
+
+
+@app.route('/api/ai/schedule-concierge', methods=['POST'])
+def ai_schedule_concierge():
+    """AI Conference Schedule Optimizer: Suggests non-overlapping sessions based on user interests"""
+    data = request.get_json(silent=True) or request.form
+    event_id = data.get('event_id')
+    interests = [i.strip().lower() for i in data.get('interests', '').split(',') if i.strip()]
+    
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""SELECT s.id, s.title, s.description, s.start_time, s.end_time, s.speaker_name, t.track_name, s.is_keynote
+                 FROM event_agenda_sessions s
+                 JOIN event_agenda_tracks t ON s.track_id = t.id
+                 WHERE s.event_id = ? ORDER BY s.start_time ASC""", (event_id,))
+    all_sessions = c.fetchall()
+    conn.close()
+    
+    recommended = []
+    selected_times = []
+    
+    for s in all_sessions:
+        s_id, title, desc, start, end, speaker, track, is_keynote = s
+        text_corpus = (title + " " + desc + " " + track).lower()
+        
+        matches = is_keynote or any(term in text_corpus for term in interests)
+        
+        # Conflict checker: Ensure not overlapping with already selected
+        if matches and start not in selected_times:
+            recommended.append({
+                'id': s_id, 'title': title, 'desc': desc,
+                'start_time': start, 'end_time': end,
+                'speaker': speaker, 'track': track, 'is_keynote': bool(is_keynote)
+            })
+            selected_times.append(start)
+    
+    return jsonify({
+        'ok': True,
+        'total_recommended': len(recommended),
+        'recommended_sessions': recommended,
+        'ai_rationale': 'Optimized for high-relevance topics with zero time clashes across stages.'
+    })

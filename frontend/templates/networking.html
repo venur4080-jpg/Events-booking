@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ event.title }} — Peer Networking &amp; Matchmaker | Events Booking</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=8.0">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='themes.js') }}?v=8.0"></script>
+    <script src="{{ url_for('static', filename='toast.js') }}"></script>
+    <style>
+        :root {
+            --net-bg: #070709;
+            --net-card: rgba(15, 23, 42, 0.88);
+            --net-border: rgba(255, 255, 255, 0.08);
+            --net-purple: #7c3aed;
+        }
+
+        body {
+            background-color: var(--net-bg);
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding-bottom: 5rem;
+        }
+
+        .net-header-banner {
+            background: linear-gradient(180deg, rgba(124, 58, 237, 0.15) 0%, rgba(7, 7, 9, 0.98) 100%),
+                        radial-gradient(circle at 50% 0%, rgba(0, 139, 227, 0.2), transparent 70%);
+            border-bottom: 1px solid var(--net-border);
+            padding: 2.8rem 1.5rem 2rem;
+            text-align: center;
+        }
+
+        .net-container {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .peer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .peer-card {
+            background: var(--net-card);
+            border: 1.5px solid var(--net-border);
+            border-radius: 20px;
+            padding: 1.6rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            backdrop-filter: blur(14px);
+            transition: all 0.28s ease;
+        }
+
+        .peer-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(124, 58, 237, 0.5);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(124, 58, 237, 0.18);
+        }
+
+        .peer-avatar {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2.5px solid #008be3;
+            background: #1e293b;
+        }
+
+        .skill-tag {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #cbd5e1;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        .speed-net-banner {
+            background: linear-gradient(135deg, rgba(255, 19, 137, 0.15) 0%, rgba(124, 58, 237, 0.2) 100%);
+            border: 1.5px solid rgba(255, 19, 137, 0.4);
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            margin-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <div style="display: flex; align-items: center;">
+                <a href="{{ url_for('dashboard') }}" class="logo">Events <span>Booking</span></a>
+            </div>
+            <div class="nav-links" style="display: flex; align-items: center; gap: 12px;">
+                <a href="{{ url_for('event_detail', event_id=event.id) }}" class="nav-btn-dash">← Back to Event Details</a>
+                <a href="{{ url_for('dashboard') }}" class="nav-btn-dash">🏠 Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="net-header-banner">
+        <div class="net-container">
+            <span style="background: rgba(124, 58, 237, 0.2); color: #c084fc; border: 1px solid rgba(124, 58, 237, 0.45); font-size: 0.76rem; font-weight: 800; padding: 4px 14px; border-radius: 50px; text-transform: uppercase; letter-spacing: 0.5px;">
+                🤝 Smart Peer Networking
+            </span>
+            <h1 style="font-family: 'Outfit', sans-serif; font-size: 2.5rem; font-weight: 900; margin: 0.6rem 0 0.4rem; color: #ffffff;">
+                Find Peers, Teammates &amp; Mentors
+            </h1>
+            <p style="color: #94a3b8; font-size: 0.95rem; margin: 0 auto; max-width: 650px;">
+                Discover attendees with complementary technical skills for hackathons, startups, and 1-on-1 coffee chats.
+            </p>
+        </div>
+    </div>
+
+    <div class="net-container">
+
+        <!-- Speed Networking Virtual Lounge Callout -->
+        <div class="speed-net-banner">
+            <div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 1.4rem;">⚡</span>
+                    <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.35rem; font-weight: 800; margin: 0; color: #ffffff;">
+                        3-Minute Speed Networking Roulette
+                    </h2>
+                </div>
+                <p style="color: #cbd5e1; font-size: 0.88rem; margin: 4px 0 0;">
+                    Drop into instant 1-on-1 virtual speed chats with fellow event attendees right in your browser.
+                </p>
+            </div>
+            <a href="{{ url_for('speed_networking_lounge', event_id=event.id) }}" class="btn-primary" style="padding: 12px 24px; font-size: 0.9rem; border-radius: 50px; width: auto; font-weight: 800; background: linear-gradient(135deg, #ff1389, #7c3aed); text-decoration: none;">
+                Join Speed Lounge ➔
+            </a>
+        </div>
+
+        <!-- Filter bar -->
+        <div style="margin-top: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div style="font-family: 'Outfit', sans-serif; font-size: 1.3rem; font-weight: 800; color: #ffffff;">
+                🌟 Community Members Attending ({{ peers|length }})
+            </div>
+            <input type="text" id="peerSearchInput" onkeyup="filterPeers()" placeholder="Filter by skill, e.g. Python, React, AI..."
+                   style="background: rgba(0,0,0,0.4); border: 1px solid var(--net-border); color: #fff; padding: 8px 16px; border-radius: 50px; font-size: 0.85rem; width: 280px; outline: none;">
+        </div>
+
+        <!-- Peer Grid -->
+        <div class="peer-grid" id="peersGrid">
+            {% for p in peers %}
+            <div class="peer-card" data-skills="{{ p.skills | join(' ') | lower }} {{ p.headline | lower }}">
+                <div>
+                    <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 1rem;">
+                        <img src="{{ p.avatar }}" alt="{{ p.full_name }}" class="peer-avatar">
+                        <div>
+                            <div style="font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.15rem; color: #ffffff;">
+                                {{ p.full_name }}
+                            </div>
+                            <div style="font-size: 0.78rem; color: #38bdf8; font-weight: 700;">
+                                @{{ p.username }} &bull; <span style="color: #a78bfa;">{{ p.looking_for }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p style="color: #cbd5e1; font-size: 0.85rem; line-height: 1.45; margin: 0 0 1rem;">
+                        {{ p.headline }}
+                    </p>
+
+                    <!-- Skills -->
+                    <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 1rem;">
+                        {% for s in p.skills %}
+                        <span class="skill-tag">{{ s }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Footer Actions -->
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.06);">
+                    <div style="display: flex; gap: 8px;">
+                        {% if p.github %}
+                        <a href="{{ p.github }}" target="_blank" style="color: #94a3b8; font-size: 0.95rem; text-decoration: none;" title="GitHub">🐙</a>
+                        {% endif %}
+                        {% if p.linkedin %}
+                        <a href="{{ p.linkedin }}" target="_blank" style="color: #008be3; font-size: 0.95rem; text-decoration: none;" title="LinkedIn">💼</a>
+                        {% endif %}
+                    </div>
+                    <button type="button" class="btn-primary" onclick="sendConnectInvite('{{ p.username }}', this)" style="padding: 6px 14px; font-size: 0.78rem; border-radius: 50px; width: auto; font-weight: 700;">
+                        + Connect ✨
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+    <script>
+        function filterPeers() {
+            const q = document.getElementById('peerSearchInput').value.toLowerCase();
+            document.querySelectorAll('.peer-card').forEach(card => {
+                const s = card.dataset.skills || '';
+                card.style.display = s.includes(q) ? 'flex' : 'none';
+            });
+        }
+
+        async function sendConnectInvite(username, btn) {
+            try {
+                const res = await fetch('/api/networking/connect', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ event_id: {{ event.id }}, receiver: username })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    btn.disabled = true;
+                    btn.textContent = '✓ Invite Sent';
+                    btn.style.background = 'rgba(16, 185, 129, 0.2)';
+                    btn.style.color = '#34d399';
+                    if (window.showToast) window.showToast(data.message, 'success', 3000);
+                } else {
+                    if (window.showToast) window.showToast(data.error, 'error', 3000);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    </script>
+
+</body>
+</html>
