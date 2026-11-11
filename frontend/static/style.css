@@ -275,6 +275,7 @@ select:focus {
     gap: 10px;
     margin-bottom: 1.5rem;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .captcha-display {
@@ -287,6 +288,14 @@ select:focus {
     font-size: 1.5rem;
     color: var(--primary);
     border: 1px dashed var(--primary-dark);
+    white-space: nowrap;
+    flex-shrink: 0;
+    user-select: none;
+}
+
+.captcha-input-container {
+    flex: 1;
+    min-width: 110px;
 }
 
 .refresh-btn {

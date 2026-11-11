@@ -13,6 +13,8 @@ import requests
 from datetime import datetime, timedelta
 import io
 import os
+import hmac
+import secrets
 import hashlib
 import base64
 import csv
@@ -7445,6 +7447,24 @@ def api_verify_otp():
     else:
         return jsonify({'ok': False, 'error': 'Incorrect OTP. Please enter the correct 6-digit code.'}), 400
 
+def _generate_login_captcha():
+    """Generate a 5-digit numeric CAPTCHA challenge and store its exact value in session."""
+    digits = [str(secrets.randbelow(10)) for _ in range(5)]
+    challenge_display = " ".join(digits)
+    challenge_value = "".join(digits)
+    session['captcha_answer'] = challenge_value
+    return challenge_display
+
+
+@app.route('/api/captcha/refresh', methods=['GET'])
+def refresh_login_captcha():
+    """Generate a fresh 5-digit login CAPTCHA without resubmitting the login form."""
+    challenge_display = _generate_login_captcha()
+    resp = jsonify({'ok': True, 'challenge_display': challenge_display})
+    resp.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    return resp
+
+
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if session.get('loggedin') and request.method == 'GET':
@@ -7518,13 +7538,20 @@ def login():
         elif action == 'login':
             raw_identifier = request.form.get('username', '').strip()
             password = request.form.get('password', '').strip()
-            captcha_input = request.form.get('captcha', '').replace(' ', '')
-            expected_answer = session.get('captcha_answer', '')
+            captcha_input = re.sub(r'\s+', '', request.form.get('captcha', ''))
+            # Consume CAPTCHA once per submission so failed/used tokens cannot be replayed
+            expected_answer = session.pop('captcha_answer', None)
 
             if not raw_identifier:
                 error = "Please enter your User ID or registered Email address."
             elif not password:
                 error = "Password is required."
+            elif not expected_answer:
+                error = "CAPTCHA expired or missing. Please enter the new CAPTCHA shown below."
+            elif not captcha_input:
+                error = "Please enter the CAPTCHA."
+            elif not captcha_input.isdigit() or not hmac.compare_digest(captcha_input, str(expected_answer)):
+                error = "Invalid CAPTCHA. Please enter the exact 5-digit code shown."
             elif raw_identifier.lower() in ('admin', '0001', 'uid-0001', 'admin@example.com') and password == 'password123':
                 # Fast Admin / Host check for high-concurrency test runs
                 session['loggedin'] = True
@@ -7574,99 +7601,93 @@ def login():
                         c.execute("SELECT COALESCE(is_banned, 0), COALESCE(ban_reason, '') FROM users WHERE id = ?", (user_id_val,))
                         binfo = c.fetchone()
                         if binfo and binfo[0] == 1:
-                            conn.close()
                             ban_why = binfo[1] or "Account suspended for excessive cancellations."
-                            return render_template('login.html', error=f"Your account has been suspended: {ban_why}")
-                        matched_username = user[8] or user[4] or f"User-{user_id_val}"
-                        matched_uid = user[7] if (len(user) > 7 and user[7]) else f"UID-{user_id_val:04d}"
-                        user_display_name = user[4] or matched_username
-                        
-                        is_pending_del = bool(user[9]) if len(user) > 9 else False
-                        del_deadline_raw = user[10] if len(user) > 10 else None
-                        
-                        # Handle Pending Account Deletion (60-day recovery grace period)
-                        if is_pending_del:
-                            is_expired = False
-                            if del_deadline_raw:
-                                try:
-                                    # Parse deletion deadline
-                                    deadline_dt = None
-                                    for dfmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d", "%d %b %Y, %I:%M %p"):
-                                        try:
-                                            deadline_dt = datetime.strptime(str(del_deadline_raw).strip(), dfmt)
-                                            break
-                                        except Exception:
-                                            pass
-                                    if deadline_dt and datetime.now() > deadline_dt:
-                                        is_expired = True
-                                except Exception:
-                                    pass
-                                    
-                            if is_expired:
-                                # 60 days grace period expired - permanently wipe records
-                                c.execute("DELETE FROM users WHERE id = ?", (user_id_val,))
-                                c.execute("DELETE FROM registrations WHERE username = ?", (matched_username,))
-                                c.execute("DELETE FROM notifications WHERE username = ?", (matched_username,))
-                                conn.commit()
-                                conn.close()
-                                return render_template('login.html', error="Your 60-day account deletion grace period has elapsed. This account and its records were permanently removed.")
-                            else:
-                                # Within 60-day grace period: Auto-reactivate account & cancel deletion!
+                            error = f"Your account has been suspended: {ban_why}"
+                        else:
+                            matched_username = user[8] or user[4] or f"User-{user_id_val}"
+                            matched_uid = user[7] if (len(user) > 7 and user[7]) else f"UID-{user_id_val:04d}"
+                            user_display_name = user[4] or matched_username
+                            
+                            is_pending_del = bool(user[9]) if len(user) > 9 else False
+                            del_deadline_raw = user[10] if len(user) > 10 else None
+                            
+                            # Handle Pending Account Deletion (60-day recovery grace period)
+                            if is_pending_del:
+                                is_expired = False
+                                if del_deadline_raw:
+                                    try:
+                                        # Parse deletion deadline
+                                        deadline_dt = None
+                                        for dfmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d", "%d %b %Y, %I:%M %p"):
+                                            try:
+                                                deadline_dt = datetime.strptime(str(del_deadline_raw).strip(), dfmt)
+                                                break
+                                            except Exception:
+                                                pass
+                                        if deadline_dt and datetime.now() > deadline_dt:
+                                            is_expired = True
+                                    except Exception:
+                                        pass
+                                        
+                                if is_expired:
+                                    # 60 days grace period expired - permanently wipe records
+                                    c.execute("DELETE FROM users WHERE id = ?", (user_id_val,))
+                                    c.execute("DELETE FROM registrations WHERE username = ?", (matched_username,))
+                                    c.execute("DELETE FROM notifications WHERE username = ?", (matched_username,))
+                                    conn.commit()
+                                    error = "Your 60-day account deletion grace period has elapsed. This account and its records were permanently removed."
+                                else:
+                                    # Within 60-day grace period: Auto-reactivate account & cancel deletion!
+                                    c.execute("""UPDATE users 
+                                                 SET is_pending_deletion = 0, is_active = 1, scheduled_deletion_at = NULL, 
+                                                     deletion_deadline = NULL, deletion_reason = '', deletion_feedback = '' 
+                                                 WHERE id = ?""", (user_id_val,))
+                                    conn.commit()
+                                    log_action(matched_username, 'reactivate_account', 
+                                               f"Account deletion automatically cancelled upon user login within 60-day grace period. Account fully reactivated.")
+                                    push_notification(matched_username, 
+                                                      "✨ Welcome back! Your scheduled account deletion was cancelled and your tickets and profile have been fully restored.", 
+                                                      url_for('dashboard'))
+                                    flash(f"✨ Welcome back, {user_display_name}! Your scheduled account deletion was cancelled, and your account has been fully reactivated. All your event passes and profile data are safe.", "success")
+                            elif user[3] == 0:
+                                # Standard deactivated account: Auto-reactivate upon login
                                 c.execute("""UPDATE users 
-                                             SET is_pending_deletion = 0, is_active = 1, scheduled_deletion_at = NULL, 
-                                                 deletion_deadline = NULL, deletion_reason = '', deletion_feedback = '' 
+                                             SET is_active = 1, deactivated_at = NULL, deactivation_reason = '', deactivation_feedback = '' 
                                              WHERE id = ?""", (user_id_val,))
                                 conn.commit()
-                                log_action(matched_username, 'reactivate_account', 
-                                           f"Account deletion automatically cancelled upon user login within 60-day grace period. Account fully reactivated.")
-                                push_notification(matched_username, 
-                                                  "✨ Welcome back! Your scheduled account deletion was cancelled and your tickets and profile have been fully restored.", 
-                                                  url_for('dashboard'))
-                                flash(f"✨ Welcome back, {user_display_name}! Your scheduled account deletion was cancelled, and your account has been fully reactivated. All your event passes and profile data are safe.", "success")
-                        elif user[3] == 0:
-                            # Standard deactivated account: Auto-reactivate upon login
-                            c.execute("""UPDATE users 
-                                         SET is_active = 1, deactivated_at = NULL, deactivation_reason = '', deactivation_feedback = '' 
-                                         WHERE id = ?""", (user_id_val,))
-                            conn.commit()
-                            log_action(matched_username, 'reactivate_account', "Deactivated account auto-reactivated upon successful login.")
-                            push_notification(matched_username, "✨ Welcome back! Your account has been reactivated successfully.", url_for('dashboard'))
-                            flash(f"✨ Welcome back, {user_display_name}! Your account has been reactivated successfully.", "success")
+                                log_action(matched_username, 'reactivate_account', "Deactivated account auto-reactivated upon successful login.")
+                                push_notification(matched_username, "✨ Welcome back! Your account has been reactivated successfully.", url_for('dashboard'))
+                                flash(f"✨ Welcome back, {user_display_name}! Your account has been reactivated successfully.", "success")
 
-                        session['loggedin'] = True
-                        session['username'] = matched_username
-                        session['role'] = user[1] or 'user'
-                        session['is_admin'] = user[2] or 0
-                        session['user_id'] = matched_uid
-                        
-                        photo = user[5]
-                        if not photo:
-                            photo = generate_avatar_svg(user_display_name)
-                        elif photo.startswith('https://ui-avatars.com/api/?') and 'background=' not in photo:
-                            photo = photo + '&background=008be3&color=ffffff&bold=true&size=256'
-                        elif not photo.startswith('http'):
-                            photo = url_for('static', filename=photo)
-                        session['profile_photo'] = photo
-                        
-                        conn.close()
-                        return redirect(url_for('dashboard'), code=303)
+                            if not error:
+                                session['loggedin'] = True
+                                session['username'] = matched_username
+                                session['role'] = user[1] or 'user'
+                                session['is_admin'] = user[2] or 0
+                                session['user_id'] = matched_uid
+                                
+                                photo = user[5]
+                                if not photo:
+                                    photo = generate_avatar_svg(user_display_name)
+                                elif photo.startswith('https://ui-avatars.com/api/?') and 'background=' not in photo:
+                                    photo = photo + '&background=008be3&color=ffffff&bold=true&size=256'
+                                elif not photo.startswith('http'):
+                                    photo = url_for('static', filename=photo)
+                                session['profile_photo'] = photo
+                                
+                                conn.close()
+                                return redirect(url_for('dashboard'), code=303)
                     
                     conn.close()
                 except Exception:
                     error = "Database busy. Please try again."
 
     # Generate Captcha
-    d1 = random.randint(0, 9)
-    d2 = random.randint(0, 9)
-    d3 = random.randint(0, 9)
-    d4 = random.randint(0, 9)
-    d5 = random.randint(0, 9)
-    
-    challenge_display = f"{d1} {d2} {d3} {d4} {d5}"
-    challenge_value = f"{d1}{d2}{d3}{d4}{d5}"
-    session['captcha_answer'] = challenge_value
+    challenge_display = _generate_login_captcha()
 
-    return render_template('login.html', error=error, msg=msg, challenge_display=challenge_display, username=request.form.get('username', ''))
+    resp = make_response(render_template('login.html', error=error, msg=msg, challenge_display=challenge_display, username=request.form.get('username', '')))
+    resp.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    return resp
 
 CATEGORY_METADATA = {
     'Education': {

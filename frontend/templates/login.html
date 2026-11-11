@@ -226,22 +226,22 @@
                 </div>
 
                 <!-- CAPTCHA Section -->
-                <label class="captcha-label">CAPTCHA</label>
+                <label class="captcha-label" for="captcha-input">CAPTCHA</label>
                 <div class="captcha-section">
                     <!-- Numbers Display -->
-                    <div class="captcha-display">
+                    <div class="captcha-display" id="captcha-display" aria-label="CAPTCHA code">
                         {{ challenge_display }}
                     </div>
 
                     <!-- Refresh Button -->
-                    <button type="button" class="refresh-btn" onclick="window.location.reload();" title="Refresh">
+                    <button type="button" class="refresh-btn" onclick="refreshLoginCaptcha()" title="Refresh CAPTCHA" aria-label="Refresh CAPTCHA">
                         &#x27F3;
                     </button>
 
                     <!-- Input -->
                     <div class="captcha-input-container">
-                        <input type="text" name="captcha" class="input-field" placeholder="Enter CAPTCHA" required
-                            autocomplete="off">
+                        <input type="text" id="captcha-input" name="captcha" class="input-field" placeholder="Enter CAPTCHA" required
+                            autocomplete="off" inputmode="numeric">
                     </div>
                 </div>
 
@@ -418,6 +418,32 @@
     <!-- Link to static JS -->
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script>
+        // Refresh CAPTCHA without wiping form inputs or triggering POST resubmission
+        async function refreshLoginCaptcha() {
+            const displayEl = document.getElementById('captcha-display');
+            const inputEl = document.getElementById('captcha-input');
+            try {
+                const res = await fetch("{{ url_for('refresh_login_captcha') }}", {
+                    method: 'GET',
+                    cache: 'no-store',
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (!res.ok) throw new Error('CAPTCHA refresh failed');
+                const data = await res.json();
+                if (data && data.ok && data.challenge_display) {
+                    if (displayEl) displayEl.textContent = data.challenge_display;
+                    if (inputEl) {
+                        inputEl.value = '';
+                        inputEl.focus();
+                    }
+                    return;
+                }
+            } catch (err) {
+                console.error('CAPTCHA refresh error:', err);
+            }
+            window.location.href = "{{ url_for('login') }}";
+        }
+
         // Password Visibility Toggle with Eyeball
         function togglePasswordVisibility(inputId, btn) {
             const input = document.getElementById(inputId);

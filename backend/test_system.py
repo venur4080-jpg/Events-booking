@@ -499,6 +499,19 @@ class EventManagementSystemTests(unittest.TestCase):
         conn.commit()
         conn.close()
 
+    def _fetch_login_captcha(self):
+        """Clear session, load login page, and return the displayed 5-digit CAPTCHA code."""
+        import re
+        self.client.get('/logout')
+        resp_get = self.client.get('/')
+        self.assertEqual(resp_get.status_code, 200)
+        match = re.search(rb'id="captcha-display"[^>]*>\s*([0-9 ]+?)\s*<', resp_get.data)
+        self.assertIsNotNone(match, "CAPTCHA display should render on login page.")
+        code = match.group(1).decode('utf-8').replace(' ', '')
+        self.assertEqual(len(code), 5, "CAPTCHA code must be 5 digits.")
+        self.assertTrue(code.isdigit(), "CAPTCHA code must contain digits only.")
+        return code
+
     def test_09_user_id_and_email_authentication(self):
         """Test authentication strictly via 4-digit User ID and Email, blocking login by name."""
         from flask_bcrypt import Bcrypt
@@ -518,7 +531,8 @@ class EventManagementSystemTests(unittest.TestCase):
         resp_email = self.client.post('/', data={
             'action': 'login',
             'username': 'uid_auth@example.com',
-            'password': 'SecretPass123!'
+            'password': 'SecretPass123!',
+            'captcha': self._fetch_login_captcha()
         }, follow_redirects=False)
         self.assertEqual(resp_email.status_code, 303)
         self.assertIn('/dashboard', resp_email.headers.get('Location', ''))
@@ -527,7 +541,8 @@ class EventManagementSystemTests(unittest.TestCase):
         resp_4digits = self.client.post('/', data={
             'action': 'login',
             'username': '0042',
-            'password': 'SecretPass123!'
+            'password': 'SecretPass123!',
+            'captcha': self._fetch_login_captcha()
         }, follow_redirects=False)
         self.assertEqual(resp_4digits.status_code, 303)
         self.assertIn('/dashboard', resp_4digits.headers.get('Location', ''))
@@ -536,7 +551,8 @@ class EventManagementSystemTests(unittest.TestCase):
         resp_uid = self.client.post('/', data={
             'action': 'login',
             'username': 'UID-0042',
-            'password': 'SecretPass123!'
+            'password': 'SecretPass123!',
+            'captcha': self._fetch_login_captcha()
         }, follow_redirects=False)
         self.assertEqual(resp_uid.status_code, 303)
         self.assertIn('/dashboard', resp_uid.headers.get('Location', ''))
@@ -545,7 +561,8 @@ class EventManagementSystemTests(unittest.TestCase):
         resp_name = self.client.post('/', data={
             'action': 'login',
             'username': 'uid_auth_test_user',
-            'password': 'SecretPass123!'
+            'password': 'SecretPass123!',
+            'captcha': self._fetch_login_captcha()
         }, follow_redirects=True)
         self.assertEqual(resp_name.status_code, 200)
         self.assertIn(b'Invalid credentials. Please enter your User ID or registered Email address.', resp_name.data)
@@ -554,7 +571,8 @@ class EventManagementSystemTests(unittest.TestCase):
         resp_fullname = self.client.post('/', data={
             'action': 'login',
             'username': 'Test Auth User',
-            'password': 'SecretPass123!'
+            'password': 'SecretPass123!',
+            'captcha': self._fetch_login_captcha()
         }, follow_redirects=True)
         self.assertEqual(resp_fullname.status_code, 200)
         self.assertIn(b'Invalid credentials. Please enter your User ID or registered Email address.', resp_fullname.data)
@@ -574,7 +592,8 @@ class EventManagementSystemTests(unittest.TestCase):
         resp_login_new = self.client.post('/', data={
             'action': 'login',
             'username': 'uid_auth@example.com',
-            'password': 'BrandNewPass456!'
+            'password': 'BrandNewPass456!',
+            'captcha': self._fetch_login_captcha()
         }, follow_redirects=False)
         self.assertEqual(resp_login_new.status_code, 303)
 
@@ -584,6 +603,123 @@ class EventManagementSystemTests(unittest.TestCase):
         c.execute("DELETE FROM users WHERE username='uid_auth_test_user'")
         conn.commit()
         conn.close()
+
+    def test_09b_login_captcha_strict_validation(self):
+        """Ensure CAPTCHA strictly rejects invalid/partial input (e.g. '12' for '03059') and accepts exact match."""
+        from flask_bcrypt import Bcrypt
+        bcrypt = Bcrypt()
+        pwd_hash = bcrypt.generate_password_hash('SecretPass123!').decode('utf-8')
+
+        conn = sqlite3.connect(DB_PATH, timeout=15)
+        c = conn.cursor()
+        c.execute("DELETE FROM users WHERE username='captcha_test_user'")
+        c.execute("""INSERT INTO users (username, password, full_name, email, phone, college_id, user_id, is_active)
+                     VALUES ('captcha_test_user', ?, 'Captcha User', 'captcha_test@example.com', '9876543211', 'COL-CAP-001', 'UID-0099', 1)""",
+                  (pwd_hash,))
+        conn.commit()
+        conn.close()
+
+        try:
+            # 1. Reject POST login without prior session CAPTCHA
+            fresh_client = self.app.test_client()
+            resp_no_sess = fresh_client.post('/', data={
+                'action': 'login',
+                'username': 'captcha_test@example.com',
+                'password': 'SecretPass123!',
+                'captcha': '12'
+            }, follow_redirects=False)
+            self.assertEqual(resp_no_sess.status_code, 200)
+            self.assertIn(b'CAPTCHA expired or missing', resp_no_sess.data)
+            with fresh_client.session_transaction() as sess:
+                self.assertFalse(sess.get('loggedin'))
+
+            # 2. Exact bug reproduction: CAPTCHA is '03059' and user submits '12' (regular user) -> REJECTED
+            self.client.get('/logout')
+            with self.client.session_transaction() as sess:
+                sess['captcha_answer'] = '03059'
+            resp_wrong_user = self.client.post('/', data={
+                'action': 'login',
+                'username': 'captcha_test@example.com',
+                'password': 'SecretPass123!',
+                'captcha': '12'
+            }, follow_redirects=False)
+            self.assertEqual(resp_wrong_user.status_code, 200)
+            self.assertIn(b'Invalid CAPTCHA', resp_wrong_user.data)
+            with self.client.session_transaction() as sess:
+                self.assertFalse(sess.get('loggedin'))
+                self.assertNotEqual(sess.get('captcha_answer'), '03059')
+
+            # 3. Admin fast-login MUST also enforce CAPTCHA: CAPTCHA '03059', user submits '12' -> REJECTED
+            with self.client.session_transaction() as sess:
+                sess['captcha_answer'] = '03059'
+            resp_wrong_admin = self.client.post('/', data={
+                'action': 'login',
+                'username': '0001',
+                'password': 'password123',
+                'captcha': '12'
+            }, follow_redirects=False)
+            self.assertEqual(resp_wrong_admin.status_code, 200)
+            self.assertIn(b'Invalid CAPTCHA', resp_wrong_admin.data)
+            with self.client.session_transaction() as sess:
+                self.assertFalse(sess.get('loggedin'))
+
+            # 4. Omitting leading zero ('3059' vs '03059'), extra digit ('030590'), non-digits, empty -> REJECTED
+            for bad_val in ('3059', '030590', 'abcde', ''):
+                with self.client.session_transaction() as sess:
+                    sess['captcha_answer'] = '03059'
+                resp_bad = self.client.post('/', data={
+                    'action': 'login',
+                    'username': 'captcha_test@example.com',
+                    'password': 'SecretPass123!',
+                    'captcha': bad_val
+                }, follow_redirects=False)
+                self.assertEqual(resp_bad.status_code, 200, f"Expected 200 rejection for CAPTCHA {bad_val!r}")
+                with self.client.session_transaction() as sess:
+                    self.assertFalse(sess.get('loggedin'), f"Should not log in with CAPTCHA {bad_val!r}")
+
+            # 5. Exact leading-zero CAPTCHA ('0 3 0 5 9' / '03059') -> SUCCEEDS and consumes CAPTCHA
+            with self.client.session_transaction() as sess:
+                sess['captcha_answer'] = '03059'
+            resp_ok = self.client.post('/', data={
+                'action': 'login',
+                'username': 'captcha_test@example.com',
+                'password': 'SecretPass123!',
+                'captcha': '0 3 0 5 9'
+            }, follow_redirects=False)
+            self.assertEqual(resp_ok.status_code, 303)
+            self.assertIn('/dashboard', resp_ok.headers.get('Location', ''))
+            with self.client.session_transaction() as sess:
+                self.assertTrue(sess.get('loggedin'))
+                self.assertIsNone(sess.get('captcha_answer'))
+
+            # 6. Admin login with exact CAPTCHA -> SUCCEEDS
+            admin_captcha = self._fetch_login_captcha()
+            resp_admin_ok = self.client.post('/', data={
+                'action': 'login',
+                'username': '0001',
+                'password': 'password123',
+                'captcha': admin_captcha
+            }, follow_redirects=False)
+            self.assertEqual(resp_admin_ok.status_code, 303)
+            self.assertIn('/dashboard', resp_admin_ok.headers.get('Location', ''))
+
+            # 7. CAPTCHA refresh endpoint issues new 5-digit code and updates session
+            self.client.get('/logout')
+            resp_ref = self.client.get('/api/captcha/refresh')
+            self.assertEqual(resp_ref.status_code, 200)
+            ref_data = resp_ref.get_json()
+            self.assertTrue(ref_data.get('ok'))
+            ref_digits = ref_data['challenge_display'].replace(' ', '')
+            self.assertEqual(len(ref_digits), 5)
+            self.assertTrue(ref_digits.isdigit())
+            with self.client.session_transaction() as sess:
+                self.assertEqual(sess.get('captcha_answer'), ref_digits)
+        finally:
+            conn = sqlite3.connect(DB_PATH, timeout=15)
+            c = conn.cursor()
+            c.execute("DELETE FROM users WHERE username='captcha_test_user'")
+            conn.commit()
+            conn.close()
 
     def test_10_checkin_history_page_and_export(self):
         """Test accessing /checkin_history and CSV export as host/admin."""
