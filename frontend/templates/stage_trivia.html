@@ -213,6 +213,30 @@
                 timerEl.textContent = "⏱️";
             }
         }, 1000);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.EventsRealtime) {
+                window.EventsRealtime.connectLiveStage(Number("{{ event.id }}"), (data) => {
+                    if (data && data.type === 'trivia_score' && data.username) {
+                        const list = document.getElementById('leaderboardList');
+                        if (!list) return;
+                        const existing = Array.from(list.querySelectorAll('.lead-row')).find(
+                            r => r.textContent.includes(data.username)
+                        );
+                        if (existing) {
+                            const strong = existing.querySelector('strong');
+                            if (strong) strong.textContent = `${data.total_score} XP`;
+                        } else {
+                            const row = document.createElement('div');
+                            row.className = 'lead-row';
+                            row.innerHTML = `<div style="display:flex;align-items:center;gap:10px;"><span style="color:#38bdf8;font-weight:800;">★</span><span>${data.username}</span></div><strong style="color:#38bdf8;">${data.total_score} XP</strong>`;
+                            list.prepend(row);
+                        }
+                    }
+                });
+            }
+        });
     </script>
+    <script src="{{ url_for('static', filename='realtime.js') }}"></script>
 </body>
 </html>

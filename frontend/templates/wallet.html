@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Wallet &amp; Credits | Events Booking</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=5.0">
+    <script src="{{ url_for('static', filename='themes.js') }}?v=5.0"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        .wallet-shell { max-width: 980px; margin: 2.5rem auto; padding: 0 1.25rem 4rem; }
+        .wallet-hero {
+            background: linear-gradient(135deg, rgba(0, 139, 227, 0.22), rgba(16, 185, 129, 0.16));
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            border-radius: 20px;
+            padding: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .wallet-balance { font-family: 'Outfit', sans-serif; font-size: 2.8rem; font-weight: 800; color: #34d399; }
+        .ledger-card {
+            background: rgba(15, 23, 42, 0.78);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            padding: 1.5rem;
+        }
+        .ledger-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        .ledger-table th, .ledger-table td { padding: 0.85rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08); text-align: left; font-size: 0.9rem; }
+        .ledger-table th { color: var(--text-muted); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; }
+        .tx-credit { color: #34d399; font-weight: 700; }
+        .tx-debit { color: #f87171; font-weight: 700; }
+    </style>
+</head>
+<body>
+    <nav class="navbar" style="padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center;">
+        <a href="{{ url_for('dashboard') }}" style="color: #fff; text-decoration: none; font-weight: 800; font-family: 'Outfit', sans-serif; font-size: 1.2rem;">← Back to Dashboard</a>
+        <div style="display: flex; gap: 0.85rem;">
+            <a href="{{ url_for('history') }}" class="btn-secondary" style="padding: 0.5rem 1rem; text-decoration: none; font-size: 0.88rem;">My Bookings</a>
+            <a href="{{ url_for('settings') }}" class="btn-secondary" style="padding: 0.5rem 1rem; text-decoration: none; font-size: 0.88rem;">Security Settings</a>
+        </div>
+    </nav>
+
+    <div class="wallet-shell">
+        <div class="wallet-hero">
+            <div>
+                <div style="font-size: 0.85rem; color: #38bdf8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;">Event Credits &amp; Refunds Wallet</div>
+                <div class="wallet-balance">₹{{ '%.2f'|format(balance) }}</div>
+                <p style="color: var(--text-muted); margin-top: 0.35rem; font-size: 0.92rem;">
+                    Automatic refund credits apply instantly during event cancellation and can be redeemed on any paid ticket or Season Pass.
+                </p>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.6rem; min-width: 220px;">
+                <a href="{{ url_for('category_events', category_name='all') }}" class="btn-primary" style="text-align: center; text-decoration: none;">Browse Paid Events</a>
+                <div style="font-size: 0.78rem; color: var(--text-muted); text-align: center;">
+                    Refund Policies: Flexible (100%/50%) • Moderate (50%) • Strict (Non-refundable)
+                </div>
+            </div>
+        </div>
+
+        <div class="ledger-card">
+            <h2 style="font-family: 'Outfit', sans-serif; margin: 0 0 0.5rem;">Wallet Transaction Ledger</h2>
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0 0 1rem;">Signed-in Account: <strong>@{{ username }}</strong></p>
+            {% if transactions %}
+            <table class="ledger-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Reference</th>
+                        <th>Amount</th>
+                        <th>Balance After</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tx in transactions %}
+                    <tr>
+                        <td>{{ tx.created_at }}</td>
+                        <td><span style="text-transform: uppercase; font-size: 0.76rem; padding: 2px 8px; border-radius: 999px; background: rgba(255,255,255,0.08);">{{ tx.tx_type }}</span></td>
+                        <td>{{ tx.description or 'Wallet adjustment' }}</td>
+                        <td><code>{{ tx.reference_code or '-' }}</code></td>
+                        <td class="{% if tx.amount >= 0 %}tx-credit{% else %}tx-debit{% endif %}">
+                            {% if tx.amount >= 0 %}+{% endif %}₹{{ '%.2f'|format(tx.amount) }}
+                        </td>
+                        <td>₹{{ '%.2f'|format(tx.balance_after) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                No wallet credit transactions yet. Any eligible ticket cancellation refund will appear here automatically.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
+

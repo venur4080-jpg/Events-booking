@@ -1165,11 +1165,19 @@
             }
         });
 
-        // Initialize and load recent check-ins on page load
+        // Initialize and load recent check-ins on page load + subscribe to telemetry WebSocket
         document.addEventListener('DOMContentLoaded', () => {
             loadRecentCheckins();
+            if (window.EventsRealtime) {
+                window.EventsRealtime.connectTelemetry((msg) => {
+                    if (msg && msg.type === 'telemetry_scan') {
+                        loadRecentCheckins();
+                    }
+                });
+            }
         });
     </script>
+    <script src="{{ url_for('static', filename='realtime.js') }}"></script>
     <script src="{{ url_for('static', filename='animations.js') }}"></script>
 </body>
 </html>

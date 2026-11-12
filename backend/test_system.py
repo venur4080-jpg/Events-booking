@@ -500,14 +500,14 @@ class EventManagementSystemTests(unittest.TestCase):
         conn.close()
 
     def _fetch_login_captcha(self):
-        """Clear session, load login page, and return the displayed 5-digit CAPTCHA code."""
-        import re
+        """Clear session, load login page, verify SVG CAPTCHA renders, and return expected 5-digit code."""
         self.client.get('/logout')
         resp_get = self.client.get('/')
         self.assertEqual(resp_get.status_code, 200)
-        match = re.search(rb'id="captcha-display"[^>]*>\s*([0-9 ]+?)\s*<', resp_get.data)
-        self.assertIsNotNone(match, "CAPTCHA display should render on login page.")
-        code = match.group(1).decode('utf-8').replace(' ', '')
+        self.assertIn(b'id="captcha-display"', resp_get.data)
+        self.assertIn(b'<svg', resp_get.data)
+        with self.client.session_transaction() as sess:
+            code = sess.get('captcha_answer', '')
         self.assertEqual(len(code), 5, "CAPTCHA code must be 5 digits.")
         self.assertTrue(code.isdigit(), "CAPTCHA code must contain digits only.")
         return code
@@ -577,13 +577,19 @@ class EventManagementSystemTests(unittest.TestCase):
         self.assertEqual(resp_fullname.status_code, 200)
         self.assertIn(b'Invalid credentials. Please enter your User ID or registered Email address.', resp_fullname.data)
 
-        # 6. Forgot Password reset using 4-digit User ID '0042' -> SUCCESS
+        # 6. Forgot Password reset using 4-digit User ID '0042' + CAPTCHA -> SUCCESS
+        resp_fg_get = self.client.get('/forgot_password')
+        self.assertEqual(resp_fg_get.status_code, 200)
+        self.assertIn(b'<svg', resp_fg_get.data)
+        with self.client.session_transaction() as sess:
+            forgot_cap = sess.get('forgot_captcha_answer', '')
         resp_forgot_uid = self.client.post('/forgot_password', data={
             'username': '0042',
             'college_id': 'COL-UID-999',
             'phone': '9876543210',
             'new_password': 'BrandNewPass456!',
-            'confirm_password': 'BrandNewPass456!'
+            'confirm_password': 'BrandNewPass456!',
+            'forgot_captcha': forgot_cap
         }, follow_redirects=True)
         self.assertEqual(resp_forgot_uid.status_code, 200)
         self.assertIn(b'Password reset successful', resp_forgot_uid.data)
@@ -703,17 +709,17 @@ class EventManagementSystemTests(unittest.TestCase):
             self.assertEqual(resp_admin_ok.status_code, 303)
             self.assertIn('/dashboard', resp_admin_ok.headers.get('Location', ''))
 
-            # 7. CAPTCHA refresh endpoint issues new 5-digit code and updates session
+            # 7. CAPTCHA refresh endpoint issues new distorted SVG + 5-digit code in session
             self.client.get('/logout')
             resp_ref = self.client.get('/api/captcha/refresh')
             self.assertEqual(resp_ref.status_code, 200)
             ref_data = resp_ref.get_json()
             self.assertTrue(ref_data.get('ok'))
-            ref_digits = ref_data['challenge_display'].replace(' ', '')
+            self.assertIn('<svg', ref_data.get('challenge_svg', ''))
+            with self.client.session_transaction() as sess:
+                ref_digits = sess.get('captcha_answer', '')
             self.assertEqual(len(ref_digits), 5)
             self.assertTrue(ref_digits.isdigit())
-            with self.client.session_transaction() as sess:
-                self.assertEqual(sess.get('captcha_answer'), ref_digits)
         finally:
             conn = sqlite3.connect(DB_PATH, timeout=15)
             c = conn.cursor()

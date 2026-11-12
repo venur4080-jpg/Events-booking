@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Two-Factor Verification | Events Booking</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=5.0">
+    <script src="{{ url_for('static', filename='themes.js') }}?v=5.0"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
+</head>
+<body class="login-body">
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+
+    <div class="auth-container" style="max-width: 460px;">
+        <div class="login-card">
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <div style="font-size: 2.8rem; margin-bottom: 0.4rem;">🔐</div>
+                <h1 class="form-title" style="margin-bottom: 0.35rem;">2-Step Verification</h1>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">
+                    Enter the 6-digit code from your authenticator app or an 8-character recovery backup code for <strong>{{ pending_username }}</strong>.
+                </p>
+            </div>
+
+            <form action="{{ url_for('verify_2fa') }}" method="POST" autocomplete="off">
+                <div class="input-group">
+                    <label for="totp_code">Authenticator / Backup Code</label>
+                    <input
+                        type="text"
+                        id="totp_code"
+                        name="code"
+                        class="input-field"
+                        placeholder="123456 or BACKUP-CODE"
+                        maxlength="16"
+                        required
+                        autofocus
+                        style="text-align: center; letter-spacing: 0.2rem; font-size: 1.2rem; font-weight: 700;"
+                    >
+                </div>
+
+                {% if error %}
+                <div class="login-feedback-banner error" style="margin-bottom: 1rem;">
+                    <span>❌</span>
+                    <div>{{ error }}</div>
+                </div>
+                {% endif %}
+
+                <button type="submit" class="btn-primary">VERIFY &amp; SIGN IN</button>
+                <a href="{{ url_for('login') }}" class="btn-secondary" style="display: block; text-align: center; text-decoration: none; margin-top: 0.75rem;">
+                    Cancel &amp; Return to Login
+                </a>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+

@@ -656,6 +656,7 @@
             <li><a href="{{ url_for('subscriptions_page') }}" style="color: #38bdf8; font-weight: 700; display: flex; align-items: center; justify-content: space-between;"><span>💳 Subscriptions & Plans</span>{% if user_subscription and user_subscription.is_active %}<span style="background: rgba(0,139,227,0.2); color: #38bdf8; font-size: 0.7rem; font-weight: 800; padding: 2px 8px; border-radius: 999px;">My Plan</span>{% endif %}</a></li>
             <li><a href="{{ url_for('category_events', category_name='all') }}">🎪 Browse All Categories</a></li>
             <li><a href="{{ url_for('passport_page') }}">🛂 Event Passport & XP</a></li>
+            <li><a href="{{ url_for('wallet_page') }}">💰 Event Wallet & Credits</a></li>
             <li><a href="{{ url_for('teams_page') }}">🤝 AI Team Matcher</a></li>
             <li><a href="{{ url_for('profile') }}">👤 My Profile</a></li>
             <li><a href="{{ url_for('history') }}">📋 My Bookings</a></li>
@@ -673,6 +674,10 @@
             <li><a href="{{ url_for('checkin_history') }}">📅 Check-in History</a></li>
             <li><a href="{{ url_for('add_event') }}">➕ Add New Event</a></li>
             <li><a href="{{ url_for('host_analytics') }}">📈 Host Analytics</a></li>
+            <li><a href="{{ url_for('host_magic_creator') }}">✨ AI Magic Creator</a></li>
+            <li><a href="{{ url_for('host_treasury') }}">💳 Host Treasury & Payouts</a></li>
+            <li><a href="{{ url_for('host_team_management') }}">👥 Team & Webhooks</a></li>
+            <li><a href="{{ url_for('sponsor_leads_portal') }}">🎯 Sponsor Leads Portal</a></li>
             {% endif %}
             <li role="separator">
                 <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 1rem 0;">

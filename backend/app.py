@@ -26,6 +26,44 @@ from werkzeug.utils import secure_filename
 import sqlite3
 from flask_bcrypt import Bcrypt
 from dotenv import load_dotenv
+try:
+    from backend.platform_services import (
+        generate_captcha_code,
+        render_captcha_svg,
+        check_login_rate_limit,
+        record_login_failure,
+        clear_login_failures,
+        reset_all_login_rate_limits,
+        generate_totp_secret,
+        get_totp_code,
+        verify_totp_code,
+        build_otpauth_uri,
+        generate_qr_data_uri,
+        generate_backup_codes,
+        calculate_event_ticket_refund,
+        generate_occurrence_dates,
+        sign_webhook_payload,
+        parse_event_price_numeric,
+    )
+except ImportError:
+    from platform_services import (
+        generate_captcha_code,
+        render_captcha_svg,
+        check_login_rate_limit,
+        record_login_failure,
+        clear_login_failures,
+        reset_all_login_rate_limits,
+        generate_totp_secret,
+        get_totp_code,
+        verify_totp_code,
+        build_otpauth_uri,
+        generate_qr_data_uri,
+        generate_backup_codes,
+        calculate_event_ticket_refund,
+        generate_occurrence_dates,
+        sign_webhook_payload,
+        parse_event_price_numeric,
+    )
 
 # Ensure UTF-8 console output on Windows
 if sys.platform == 'win32':
@@ -5437,6 +5475,47 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max payload limit
 
 bcrypt = Bcrypt(app)
 
+def _get_csrf_token():
+    """Return per-session CSRF token, creating one lazily if missing."""
+    tok = session.get('_csrf_token')
+    if not tok:
+        tok = secrets.token_urlsafe(32)
+        session['_csrf_token'] = tok
+    return tok
+
+
+@app.before_request
+def security_and_session_guard():
+    """Enforce session revocation ('sign out all devices') and CSRF protection."""
+    if session.get('loggedin') and session.get('session_token'):
+        try:
+            conn = get_db()
+            c = conn.cursor()
+            c.execute("SELECT is_active FROM user_login_sessions WHERE session_token = ?", (session.get('session_token'),))
+            row = c.fetchone()
+            conn.close()
+            if row is not None and row[0] == 0:
+                session.clear()
+                if request.path.startswith('/api/') or request.is_json:
+                    return jsonify({'ok': False, 'error': 'Session has been signed out.'}), 401
+                flash("This session was signed out from Security Settings.", "info")
+                return redirect(url_for('login'))
+        except Exception:
+            pass
+
+    if request.method in ('POST', 'PUT', 'PATCH', 'DELETE'):
+        csrf_enforced = (not app.config.get('TESTING') or app.config.get('ENFORCE_CSRF')) and (app.config.get('WTF_CSRF_ENABLED', True) is not False)
+        exempt_paths = ('/api/subscription/webhook',)
+        if csrf_enforced and not request.path.startswith('/api/v1/') and request.path not in exempt_paths:
+            expected = session.get('_csrf_token', '')
+            submitted = (request.form.get('csrf_token') or request.headers.get('X-CSRF-Token') or '').strip()
+            if not expected or not submitted or not hmac.compare_digest(submitted, expected):
+                if request.path.startswith('/api/') or request.is_json:
+                    return jsonify({'ok': False, 'error': 'CSRF token missing or invalid.'}), 403
+                flash('Security token expired or invalid. Please submit the form again.', 'error')
+                return redirect(request.referrer or url_for('login')), 403
+
+
 # Enterprise Security Headers & Cache Optimization Middleware
 @app.after_request
 def add_security_and_cache_headers(response):
@@ -5446,6 +5525,39 @@ def add_security_and_cache_headers(response):
     response.headers['X-XSS-Protection'] = '1; mode=block'
     response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
     response.headers['Permissions-Policy'] = 'camera=(self), microphone=(), geolocation=()'
+
+    # Inject per-session CSRF meta + hidden fields cleanly on HTML responses
+    try:
+        if response.mimetype == 'text/html' and not response.direct_passthrough and response.status_code in (200, 429):
+            tok = _get_csrf_token()
+            html = response.get_data(as_text=True)
+            modified = False
+            if '<meta name="csrf-token"' not in html and '</head>' in html:
+                html = html.replace('</head>', f'    <meta name="csrf-token" content="{tok}">\n</head>', 1)
+                modified = True
+            if re.search(r'<form\b[^>]*method=["\']?post["\']?', html, re.IGNORECASE):
+                def _inject_form_csrf(m):
+                    tag = m.group(0)
+                    return tag + f'\n<input type="hidden" name="csrf_token" value="{tok}">'
+                # Only add inside POST forms when csrf_token field is not injected inside that form
+                parts = re.split(r'(<form\b[^>]*method=["\']?post["\']?[^>]*>)', html, flags=re.IGNORECASE)
+                if len(parts) > 1:
+                    rebuilt = [parts[0]]
+                    for i in range(1, len(parts), 2):
+                        form_open = parts[i]
+                        form_rest = parts[i + 1] if i + 1 < len(parts) else ''
+                        form_body = form_rest.split('</form>', 1)[0]
+                        if 'name="csrf_token"' not in form_body and "name='csrf_token'" not in form_body:
+                            rebuilt.append(form_open + f'<input type="hidden" name="csrf_token" value="{tok}">')
+                            modified = True
+                        else:
+                            rebuilt.append(form_open)
+                        rebuilt.append(form_rest)
+                    html = ''.join(rebuilt)
+            if modified:
+                response.set_data(html)
+    except Exception:
+        pass
 
     # 2. Intelligent Caching
     path = request.path
@@ -6187,6 +6299,161 @@ def trigger_telemetry_checkin_broadcast(data):
             pass
 
 
+def trigger_live_stage_broadcast(event_id, payload):
+    """Dispatches a live Q&A / poll / trivia / viewer event over WebSockets."""
+    try:
+        from backend.fastapi_app import realtime_hub
+        import asyncio
+        loop = getattr(realtime_hub, 'main_loop', None)
+        if loop and loop.is_running():
+            asyncio.run_coroutine_threadsafe(realtime_hub.broadcast_live_stage(event_id, payload), loop)
+    except Exception:
+        pass
+
+
+def get_wallet_balance(username):
+    """Return user's current in-app wallet credit balance."""
+    if not username:
+        return 0.0
+    try:
+        conn = get_db()
+        c = conn.cursor()
+        c.execute("SELECT balance FROM user_wallet WHERE username = ?", (username,))
+        row = c.fetchone()
+        conn.close()
+        return round(float(row[0]), 2) if row else 0.0
+    except Exception:
+        return 0.0
+
+
+def credit_or_debit_wallet(conn, username, delta, tx_type, reference_code="", description=""):
+    """Atomically apply delta (+ credit / - debit) to user_wallet and append wallet_transactions ledger."""
+    c = conn.cursor()
+    c.execute("INSERT OR IGNORE INTO user_wallet (username, balance) VALUES (?, 0.0)", (username,))
+    c.execute("SELECT balance FROM user_wallet WHERE username = ?", (username,))
+    row = c.fetchone()
+    current = float(row[0]) if row else 0.0
+    new_bal = round(max(0.0, current + float(delta)), 2)
+    c.execute("UPDATE user_wallet SET balance = ?, updated_at = CURRENT_TIMESTAMP WHERE username = ?", (new_bal, username))
+    c.execute(
+        """INSERT INTO wallet_transactions (username, tx_type, amount, balance_after, reference_code, description)
+           VALUES (?, ?, ?, ?, ?, ?)""",
+        (username, tx_type, round(float(delta), 2), new_bal, reference_code, description)
+    )
+    return new_bal
+
+
+def promote_next_waitlist_attendee(conn, event_id, slots=1):
+    """Promote the highest-priority / earliest queued attendees when in-person seats open up."""
+    promoted = []
+    if slots <= 0:
+        return promoted
+    c = conn.cursor()
+    c.execute(
+        """SELECT id, username, email, full_name FROM event_waitlist
+           WHERE event_id = ? AND status = 'waiting'
+           ORDER BY priority_score DESC, id ASC LIMIT ?""",
+        (event_id, int(slots))
+    )
+    rows = c.fetchall()
+    ev = get_event(event_id)
+    ev_title = ev['title'] if ev else f"Event #{event_id}"
+    for w_id, w_user, w_email, w_name in rows:
+        c.execute(
+            "UPDATE event_waitlist SET status = 'promoted', promoted_at = CURRENT_TIMESTAMP WHERE id = ?",
+            (w_id,)
+        )
+        promoted.append({'id': w_id, 'username': w_user, 'email': w_email, 'full_name': w_name})
+        try:
+            push_notification(
+                w_user,
+                f"Spot Opened! You were promoted from the waitlist for '{ev_title}'. Claim your seat now!",
+                url_for('register_event', event_id=event_id)
+            )
+        except Exception:
+            pass
+    return promoted
+
+
+def dispatch_host_webhooks(event_type, event_id, payload_data):
+    """Fire configured outgoing host webhooks asynchronously with HMAC-SHA256 signature."""
+    try:
+        conn = get_db()
+        c = conn.cursor()
+        c.execute(
+            """SELECT id, target_url, secret_key, subscribed_events FROM host_webhooks
+               WHERE is_active = 1 AND (event_id = 0 OR event_id = ?)""",
+            (int(event_id or 0),)
+        )
+        hooks = c.fetchall()
+        conn.close()
+    except Exception:
+        return
+
+    matching = []
+    for hook_id, url, secret_k, sub_events in hooks:
+        subs = [s.strip().lower() for s in str(sub_events or '*').split(',') if s.strip()]
+        if '*' in subs or 'all' in subs or event_type.lower() in subs:
+            matching.append((hook_id, url, secret_k))
+
+    if not matching:
+        return
+
+    body_dict = {
+        'event': event_type,
+        'event_id': event_id,
+        'timestamp': datetime.now().isoformat(),
+        'data': payload_data or {}
+    }
+    body_bytes = json.dumps(body_dict).encode('utf-8')
+
+    def _deliver_all():
+        for hook_id, url, secret_k in matching:
+            sig = sign_webhook_payload(secret_k, body_bytes)
+            status_code = 0
+            snippet = ""
+            ok = 0
+            try:
+                if app.config.get('TESTING') and url.startswith(('http://mock-webhook', 'https://mock-webhook')):
+                    status_code = 200
+                    snippet = 'Mock webhook delivered'
+                    ok = 1
+                else:
+                    r = requests.post(
+                        url,
+                        data=body_bytes,
+                        headers={
+                            'Content-Type': 'application/json',
+                            'X-Events-Event': event_type,
+                            'X-Events-Signature': sig
+                        },
+                        timeout=4
+                    )
+                    status_code = r.status_code
+                    snippet = (r.text or '')[:240]
+                    ok = 1 if 200 <= r.status_code < 300 else 0
+            except Exception as ex:
+                snippet = str(ex)[:240]
+
+            try:
+                dconn = get_db()
+                dc = dconn.cursor()
+                dc.execute(
+                    """INSERT INTO webhook_deliveries (webhook_id, event_type, payload_json, status_code, response_snippet, success)
+                       VALUES (?, ?, ?, ?, ?, ?)""",
+                    (hook_id, event_type, body_bytes.decode('utf-8'), status_code, snippet, ok)
+                )
+                dconn.commit()
+                dconn.close()
+            except Exception:
+                pass
+
+    if app.config.get('TESTING'):
+        _deliver_all()
+    else:
+        threading.Thread(target=_deliver_all, daemon=True).start()
+
+
 def init_db():
     conn = get_db()
     c = conn.cursor()
@@ -6753,12 +7020,157 @@ def init_db():
                        ev.get('price', 'Free'),
                        ev['title']))
     
-    # Backfill default time and end_time for any existing custom events
+    # Backfill default time, end_time, color and image for any existing custom events
     try:
         c.execute("UPDATE events SET time = '10:00 AM' WHERE time IS NULL OR time = ''")
         c.execute("UPDATE events SET end_time = '05:00 PM' WHERE end_time IS NULL OR end_time = ''")
+        c.execute("UPDATE events SET color = '#4facfe' WHERE color IS NULL OR color = ''")
+        c.execute("UPDATE events SET image = 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80' WHERE image IS NULL OR image = ''")
     except Exception:
         pass
+
+    # Core Product, Security & Payments Expansion Tables
+    c.execute('''CREATE TABLE IF NOT EXISTS event_waitlist (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER NOT NULL,
+        username TEXT NOT NULL,
+        email TEXT DEFAULT '',
+        full_name TEXT DEFAULT '',
+        phone TEXT DEFAULT '',
+        pass_type TEXT DEFAULT 'in_person',
+        seats_requested INTEGER DEFAULT 1,
+        priority_score INTEGER DEFAULT 0,
+        status TEXT DEFAULT 'waiting',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        promoted_at TIMESTAMP
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS event_speaker_proposals (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER NOT NULL,
+        proposer_username TEXT,
+        speaker_name TEXT NOT NULL,
+        speaker_email TEXT DEFAULT '',
+        speaker_role TEXT DEFAULT '',
+        talk_title TEXT NOT NULL,
+        abstract TEXT NOT NULL,
+        track_preference TEXT DEFAULT 'Main Stage Keynotes',
+        session_duration_min INTEGER DEFAULT 45,
+        speaker_bio TEXT DEFAULT '',
+        speaker_avatar TEXT DEFAULT '',
+        status TEXT DEFAULT 'pending',
+        host_notes TEXT DEFAULT '',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        reviewed_at TIMESTAMP
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS event_series (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        recurrence_rule TEXT DEFAULT 'weekly',
+        total_sessions INTEGER DEFAULT 1,
+        season_pass_price REAL DEFAULT 0.0,
+        discount_percent REAL DEFAULT 20.0,
+        created_by TEXT DEFAULT 'admin',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS event_addons (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        description TEXT DEFAULT '',
+        price REAL DEFAULT 0.0,
+        stock_total INTEGER DEFAULT 100,
+        stock_sold INTEGER DEFAULT 0,
+        is_active INTEGER DEFAULT 1
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS registration_addons (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        registration_id INTEGER NOT NULL,
+        event_id INTEGER NOT NULL,
+        addon_id INTEGER NOT NULL,
+        addon_name TEXT NOT NULL,
+        quantity INTEGER DEFAULT 1,
+        unit_price REAL DEFAULT 0.0,
+        total_price REAL DEFAULT 0.0
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS user_2fa_settings (
+        username TEXT PRIMARY KEY,
+        totp_secret TEXT NOT NULL,
+        is_enabled INTEGER DEFAULT 0,
+        backup_codes_json TEXT DEFAULT '[]',
+        enabled_at TIMESTAMP
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS user_login_sessions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        session_token TEXT UNIQUE NOT NULL,
+        username TEXT NOT NULL,
+        ip_address TEXT DEFAULT '',
+        user_agent TEXT DEFAULT '',
+        login_method TEXT DEFAULT 'password',
+        is_active INTEGER DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        last_seen_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS user_wallet (
+        username TEXT PRIMARY KEY,
+        balance REAL DEFAULT 0.0,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS wallet_transactions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL,
+        tx_type TEXT NOT NULL,
+        amount REAL NOT NULL,
+        balance_after REAL NOT NULL,
+        reference_code TEXT DEFAULT '',
+        description TEXT DEFAULT '',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS host_webhooks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        host_username TEXT NOT NULL,
+        event_id INTEGER DEFAULT 0,
+        name TEXT NOT NULL,
+        target_url TEXT NOT NULL,
+        secret_key TEXT NOT NULL,
+        subscribed_events TEXT DEFAULT 'ticket.booked,ticket.checked_in,event.sold_out,waitlist.promoted',
+        is_active INTEGER DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS webhook_deliveries (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        webhook_id INTEGER NOT NULL,
+        event_type TEXT NOT NULL,
+        payload_json TEXT NOT NULL,
+        status_code INTEGER DEFAULT 0,
+        response_snippet TEXT DEFAULT '',
+        success INTEGER DEFAULT 0,
+        attempted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )''')
+
+    for alter_stmt in [
+        "ALTER TABLE events ADD COLUMN series_id INTEGER DEFAULT NULL",
+        "ALTER TABLE events ADD COLUMN refund_policy TEXT DEFAULT 'flexible'",
+        "ALTER TABLE events ADD COLUMN allow_transfer INTEGER DEFAULT 1",
+        "ALTER TABLE registrations ADD COLUMN transferred_from TEXT DEFAULT ''",
+        "ALTER TABLE registrations ADD COLUMN transferred_to TEXT DEFAULT ''",
+        "ALTER TABLE registrations ADD COLUMN transferred_at TEXT DEFAULT ''",
+        "ALTER TABLE registrations ADD COLUMN refund_amount REAL DEFAULT 0.0",
+        "ALTER TABLE registrations ADD COLUMN addons_total REAL DEFAULT 0.0",
+    ]:
+        try:
+            c.execute(alter_stmt)
+        except Exception:
+            pass
 
     # Also ensure 'admin' exists and has host and is_admin role
     c.execute("SELECT 1 FROM users WHERE username = 'admin'")
@@ -7106,7 +7518,7 @@ def inject_user_data():
             'user_id': user_id or 'UID-0001',
             'subscription': user_sub
         }
-    return dict(current_user=current_user, is_admin=user_is_admin, is_host=user_is_host, user_subscription=user_sub)
+    return dict(current_user=current_user, is_admin=user_is_admin, is_host=user_is_host, user_subscription=user_sub, csrf_token=_get_csrf_token)
 
 # Universal Validation Helpers for Email & Mobile Number 
 def validate_mobile(phone: str):
@@ -7447,20 +7859,74 @@ def api_verify_otp():
     else:
         return jsonify({'ok': False, 'error': 'Incorrect OTP. Please enter the correct 6-digit code.'}), 400
 
-def _generate_login_captcha():
-    """Generate a 5-digit numeric CAPTCHA challenge and store its exact value in session."""
-    digits = [str(secrets.randbelow(10)) for _ in range(5)]
-    challenge_display = " ".join(digits)
-    challenge_value = "".join(digits)
-    session['captcha_answer'] = challenge_value
-    return challenge_display
+_CAPTCHA_SESSION_KEYS = {
+    'login': 'captcha_answer',
+    'register': 'reg_captcha_answer',
+    'forgot': 'forgot_captcha_answer',
+}
+
+
+def _generate_scope_captcha(scope='login'):
+    """Generate a 5-digit numeric CAPTCHA in session and return hardened inline SVG."""
+    sess_key = _CAPTCHA_SESSION_KEYS.get(scope, 'captcha_answer')
+    code = generate_captcha_code(5)
+    session[sess_key] = code
+    return render_captcha_svg(code)
+
+
+def _record_login_session(conn, username, method='password'):
+    """Persist an active login session token for session history and remote revoke."""
+    tok = secrets.token_urlsafe(24)
+    session['session_token'] = tok
+    ip_addr = (request.remote_addr or '127.0.0.1')[:64]
+    ua = (request.headers.get('User-Agent') or 'Browser')[:220]
+    try:
+        c = conn.cursor()
+        c.execute(
+            """INSERT INTO user_login_sessions (session_token, username, ip_address, user_agent, login_method, is_active)
+               VALUES (?, ?, ?, ?, ?, 1)""",
+            (tok, username, ip_addr, ua, method)
+        )
+        conn.commit()
+    except Exception:
+        pass
+
+
+def _finalize_authenticated_login(conn, username, role, is_admin_val, user_id_str, profile_photo, client_ip, raw_identifier):
+    """Handle optional TOTP 2FA gate or establish active authenticated session."""
+    c = conn.cursor()
+    c.execute("SELECT is_enabled FROM user_2fa_settings WHERE username = ?", (username,))
+    tfa_row = c.fetchone()
+    clear_login_failures(client_ip, raw_identifier)
+
+    if tfa_row and tfa_row[0] == 1:
+        session['pending_2fa_payload'] = {
+            'username': username,
+            'role': role,
+            'is_admin': is_admin_val,
+            'user_id': user_id_str,
+            'profile_photo': profile_photo,
+        }
+        return redirect(url_for('verify_2fa'), code=303)
+
+    session['loggedin'] = True
+    session['username'] = username
+    session['role'] = role
+    session['is_admin'] = is_admin_val
+    session['user_id'] = user_id_str
+    session['profile_photo'] = profile_photo
+    _record_login_session(conn, username, method='password')
+    return redirect(url_for('dashboard'), code=303)
 
 
 @app.route('/api/captcha/refresh', methods=['GET'])
 def refresh_login_captcha():
-    """Generate a fresh 5-digit login CAPTCHA without resubmitting the login form."""
-    challenge_display = _generate_login_captcha()
-    resp = jsonify({'ok': True, 'challenge_display': challenge_display})
+    """Generate a fresh 5-digit SVG CAPTCHA without resubmitting forms."""
+    scope = (request.args.get('scope') or 'login').strip().lower()
+    if scope not in _CAPTCHA_SESSION_KEYS:
+        scope = 'login'
+    challenge_svg = _generate_scope_captcha(scope)
+    resp = jsonify({'ok': True, 'scope': scope, 'challenge_svg': challenge_svg})
     resp.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
     return resp
 
@@ -7471,10 +7937,13 @@ def login():
         return redirect(url_for('dashboard'), code=303)
     error = None
     msg = request.args.get('msg')
+    open_register = False
+    http_status = 200
     if request.method == 'POST':
         action = request.form.get('action')
         
         if action == 'register':
+            open_register = True
             username = request.form.get('reg_username', '').strip()
             password = request.form.get('reg_password', '').strip()
             confirm_password = request.form.get('reg_confirm_password', '').strip()
@@ -7488,12 +7957,16 @@ def login():
             state = request.form.get('state', '').strip()
             city = request.form.get('city', '').strip()
             pincode = request.form.get('pincode', '').strip()
+            reg_captcha_input = re.sub(r'\s+', '', request.form.get('reg_captcha', ''))
+            expected_reg_captcha = session.pop('reg_captcha_answer', None)
 
             full_name = f"{first_name} {middle_name} {last_name}".replace(' ', ' ').strip()
             if not full_name:
                 full_name = username
             
-            if not username or not password:
+            if not expected_reg_captcha or not reg_captcha_input.isdigit() or not hmac.compare_digest(reg_captcha_input, str(expected_reg_captcha)):
+                error = "Invalid or missing registration CAPTCHA. Please enter the 5-digit code shown."
+            elif not username or not password:
                 error = "Username and password are required!"
             elif password != confirm_password:
                 error = "Passwords do not match!"
@@ -7523,6 +7996,7 @@ def login():
                         c.execute("UPDATE users SET user_id = ? WHERE id = ?", (uid_str, new_id))
                         conn.commit()
                         conn.close()
+                        open_register = False
                         msg = f"Registration successful! Your User ID is {uid_str}. Please log in using your User ID or registered Email address."
                         
                         # Asynchronously dispatch welcome email to user
@@ -7541,8 +8015,13 @@ def login():
             captcha_input = re.sub(r'\s+', '', request.form.get('captcha', ''))
             # Consume CAPTCHA once per submission so failed/used tokens cannot be replayed
             expected_answer = session.pop('captcha_answer', None)
+            client_ip = request.remote_addr or '127.0.0.1'
 
-            if not raw_identifier:
+            allowed, retry_sec = check_login_rate_limit(client_ip, raw_identifier)
+            if not allowed:
+                error = f"Too many failed login attempts. Please wait {retry_sec} seconds before trying again."
+                http_status = 429
+            elif not raw_identifier:
                 error = "Please enter your User ID or registered Email address."
             elif not password:
                 error = "Password is required."
@@ -7551,16 +8030,20 @@ def login():
             elif not captcha_input:
                 error = "Please enter the CAPTCHA."
             elif not captcha_input.isdigit() or not hmac.compare_digest(captcha_input, str(expected_answer)):
-                error = "Invalid CAPTCHA. Please enter the exact 5-digit code shown."
+                locked, l_sec = record_login_failure(client_ip, raw_identifier)
+                if locked:
+                    error = f"Too many failed login attempts. Please wait {l_sec} seconds before trying again."
+                    http_status = 429
+                else:
+                    error = "Invalid CAPTCHA. Please enter the exact 5-digit code shown."
             elif raw_identifier.lower() in ('admin', '0001', 'uid-0001', 'admin@example.com') and password == 'password123':
-                # Fast Admin / Host check for high-concurrency test runs
-                session['loggedin'] = True
-                session['username'] = 'admin'
-                session['role'] = 'host'
-                session['is_admin'] = 1
-                session['user_id'] = 'UID-0001'
-                session['profile_photo'] = generate_avatar_svg('Admin')
-                return redirect(url_for('dashboard'), code=303)
+                # Fast Admin / Host check with session recording & optional 2FA gate
+                conn = get_db()
+                resp_redirect = _finalize_authenticated_login(
+                    conn, 'admin', 'host', 1, 'UID-0001', generate_avatar_svg('Admin'), client_ip, raw_identifier
+                )
+                conn.close()
+                return resp_redirect
             else:
                 try:
                     conn = get_db()
@@ -7574,7 +8057,10 @@ def login():
                                      FROM users WHERE LOWER(email) = LOWER(?)""", (raw_identifier,))
                         user = c.fetchone()
                         if not user or not check_password_cached(user[0], password):
-                            error = "Invalid Email or Password."
+                            locked, l_sec = record_login_failure(client_ip, raw_identifier)
+                            error = f"Too many failed login attempts. Please wait {l_sec} seconds before trying again." if locked else "Invalid Email or Password."
+                            if locked:
+                                http_status = 429
                     elif raw_identifier.isdigit() or raw_identifier.upper().startswith('UID-'):
                         # 2. 4-Digit User ID or UID Login (e.g. 0003, 0004, UID-0003)
                         if raw_identifier.isdigit():
@@ -7591,9 +8077,13 @@ def login():
                                          FROM users WHERE UPPER(user_id) = ?""", (formatted_uid,))
                         user = c.fetchone()
                         if not user or not check_password_cached(user[0], password):
-                            error = "Invalid User ID or Password."
+                            locked, l_sec = record_login_failure(client_ip, raw_identifier)
+                            error = f"Too many failed login attempts. Please wait {l_sec} seconds before trying again." if locked else "Invalid User ID or Password."
+                            if locked:
+                                http_status = 429
                     else:
                         # 3. Disallow login with plain username or full name
+                        record_login_failure(client_ip, raw_identifier)
                         error = "Invalid credentials. Please enter your User ID or registered Email address."
 
                     if user and check_password_cached(user[0], password):
@@ -7660,12 +8150,6 @@ def login():
                                 flash(f"✨ Welcome back, {user_display_name}! Your account has been reactivated successfully.", "success")
 
                             if not error:
-                                session['loggedin'] = True
-                                session['username'] = matched_username
-                                session['role'] = user[1] or 'user'
-                                session['is_admin'] = user[2] or 0
-                                session['user_id'] = matched_uid
-                                
                                 photo = user[5]
                                 if not photo:
                                     photo = generate_avatar_svg(user_display_name)
@@ -7673,19 +8157,33 @@ def login():
                                     photo = photo + '&background=008be3&color=ffffff&bold=true&size=256'
                                 elif not photo.startswith('http'):
                                     photo = url_for('static', filename=photo)
-                                session['profile_photo'] = photo
-                                
+
+                                resp_redirect = _finalize_authenticated_login(
+                                    conn, matched_username, user[1] or 'user', user[2] or 0, matched_uid, photo, client_ip, raw_identifier
+                                )
                                 conn.close()
-                                return redirect(url_for('dashboard'), code=303)
+                                return resp_redirect
                     
                     conn.close()
                 except Exception:
                     error = "Database busy. Please try again."
 
-    # Generate Captcha
-    challenge_display = _generate_login_captcha()
+    # Generate hardened SVG CAPTCHAs for both Login & Register tabs
+    challenge_svg = _generate_scope_captcha('login')
+    reg_challenge_svg = _generate_scope_captcha('register')
 
-    resp = make_response(render_template('login.html', error=error, msg=msg, challenge_display=challenge_display, username=request.form.get('username', '')))
+    resp = make_response(
+        render_template(
+            'login.html',
+            error=error,
+            msg=msg,
+            challenge_svg=challenge_svg,
+            reg_challenge_svg=reg_challenge_svg,
+            open_register=open_register,
+            username=request.form.get('username', '')
+        ),
+        http_status
+    )
     resp.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
     return resp
 
@@ -8098,12 +8596,16 @@ def event_detail(event_id):
     except Exception:
         google_cal_url = "#"
 
-    # Check for schedule conflicts on the same date with active bookings
+    # Check for schedule conflicts and enrich Waitlist / CfP / Series / Refund metadata
     conflict_event = None
-    if username and not event['is_registered']:
-        try:
-            conn = get_db()
-            c = conn.cursor()
+    waitlist_info = {'status': None, 'position': 0, 'total_waiting': 0}
+    cfp_count = 0
+    series_info = None
+    addons_count = 0
+    try:
+        conn = get_db()
+        c = conn.cursor()
+        if username and not event['is_registered']:
             c.execute("""SELECT e.id, e.title, e.date, e.time, e.venue 
                          FROM registrations r 
                          JOIN events e ON r.event_id = e.id 
@@ -8111,7 +8613,6 @@ def event_detail(event_id):
                            AND e.id != ? AND e.date = ? 
                          LIMIT 1""", (username, event_id, event['date']))
             crow = c.fetchone()
-            conn.close()
             if crow:
                 conflict_event = {
                     'id': crow[0],
@@ -8120,10 +8621,54 @@ def event_detail(event_id):
                     'time': crow[3] or '10:00 AM',
                     'venue': crow[4] or 'Main Auditorium'
                 }
-        except Exception:
-            conflict_event = None
 
-    return render_template('details.html', event=event, username=username, is_host=is_host(), google_cal_url=google_cal_url, conflict_event=conflict_event)
+        c.execute("SELECT COUNT(*) FROM event_waitlist WHERE event_id = ? AND status = 'waiting'", (event_id,))
+        waitlist_info['total_waiting'] = c.fetchone()[0]
+        if username:
+            c.execute("SELECT id, status, priority_score FROM event_waitlist WHERE event_id = ? AND username = ? ORDER BY id DESC LIMIT 1", (event_id, username))
+            w_row = c.fetchone()
+            if w_row and w_row[1] in ('waiting', 'promoted'):
+                waitlist_info['status'] = w_row[1]
+                if w_row[1] == 'waiting':
+                    c.execute(
+                        "SELECT COUNT(*) FROM event_waitlist WHERE event_id = ? AND status = 'waiting' AND (priority_score > ? OR (priority_score = ? AND id <= ?))",
+                        (event_id, w_row[2], w_row[2], w_row[0])
+                    )
+                    waitlist_info['position'] = c.fetchone()[0]
+
+        c.execute("SELECT COUNT(*) FROM event_speaker_proposals WHERE event_id = ? AND status != 'declined'", (event_id,))
+        cfp_count = c.fetchone()[0]
+
+        c.execute("SELECT COUNT(*) FROM event_addons WHERE event_id = ? AND is_active = 1 AND stock_total > stock_sold", (event_id,))
+        addons_count = c.fetchone()[0]
+
+        if event.get('series_id'):
+            c.execute("SELECT id, title, recurrence_rule, total_sessions, season_pass_price, discount_percent FROM event_series WHERE id = ?", (event['series_id'],))
+            s_row = c.fetchone()
+            if s_row:
+                series_info = {
+                    'id': s_row[0], 'title': s_row[1], 'recurrence_rule': s_row[2],
+                    'total_sessions': s_row[3], 'season_pass_price': s_row[4], 'discount_percent': s_row[5]
+                }
+        conn.close()
+    except Exception:
+        pass
+
+    refund_preview = calculate_event_ticket_refund(event, parse_event_price_numeric(event.get('price', 'Free')))
+
+    return render_template(
+        'details.html',
+        event=event,
+        username=username,
+        is_host=is_host(),
+        google_cal_url=google_cal_url,
+        conflict_event=conflict_event,
+        waitlist_info=waitlist_info,
+        refund_preview=refund_preview,
+        cfp_count=cfp_count,
+        series_info=series_info,
+        addons_count=addons_count
+    )
 
 def generate_ticket_pdf_bytes(event: dict, reg_info) -> bytes:
     """
@@ -9532,6 +10077,56 @@ def register_event(event_id):
         except Exception:
             conflict_event = None
 
+    def _load_checkout_context():
+        conn_ctx = get_db()
+        c_ctx = conn_ctx.cursor()
+        c_ctx.execute("SELECT id, question_label, field_type, options_json, is_required FROM event_custom_questions WHERE event_id = ? ORDER BY display_order ASC", (event_id,))
+        cqs = []
+        for q_id, q_lbl, q_type, q_opts, q_req in c_ctx.fetchall():
+            opts = json.loads(q_opts) if q_opts else []
+            cqs.append({
+                'id': q_id,
+                'label': q_lbl,
+                'type': q_type,
+                'options': opts,
+                'required': bool(q_req)
+            })
+        c_ctx.execute("SELECT id, name, description, price, stock_total, stock_sold FROM event_addons WHERE event_id = ? AND is_active = 1 ORDER BY id ASC", (event_id,))
+        ev_addons = []
+        for aid, aname, adesc, aprice, atotal, asold in c_ctx.fetchall():
+            ev_addons.append({
+                'id': aid,
+                'name': aname,
+                'description': adesc or '',
+                'price': round(float(aprice or 0.0), 2),
+                'stock_total': int(atotal or 0),
+                'stock_sold': int(asold or 0),
+                'stock_left': max(0, int(atotal or 0) - int(asold or 0))
+            })
+        wl_promoted = False
+        if username:
+            c_ctx.execute("SELECT status FROM event_waitlist WHERE event_id = ? AND username = ? ORDER BY id DESC LIMIT 1", (event_id, username))
+            wr = c_ctx.fetchone()
+            wl_promoted = bool(wr and wr[0] == 'promoted')
+        conn_ctx.close()
+        return cqs, ev_addons, get_wallet_balance(username), wl_promoted
+
+    def _render_reg_form(error=None, req_type=None):
+        cqs, ev_addons, w_bal, wl_promoted = _load_checkout_context()
+        return render_template(
+            'registration.html',
+            event=event,
+            username=username,
+            is_host=is_host(),
+            error=error,
+            requested_type=req_type or requested_type,
+            conflict_event=conflict_event,
+            custom_questions=cqs,
+            addons=ev_addons,
+            wallet_balance=w_bal,
+            waitlist_promoted=wl_promoted
+        )
+
     requested_type = request.args.get('type') or request.form.get('pass_type') or ('live_stream' if event['is_in_person_sold_out'] else 'in_person')
 
     if request.method == 'POST':
@@ -9553,13 +10148,13 @@ def register_event(event_id):
         is_email_v, clean_email = validate_email_address(email or '')
         if not is_email_v:
             flash(clean_email, "error")
-            return render_template('registration.html', event=event, username=username, is_host=is_host(), error=clean_email, requested_type=pass_type, conflict_event=conflict_event)
+            return _render_reg_form(error=clean_email, req_type=pass_type)
         email = clean_email
 
         is_phone_v, clean_phone = validate_mobile(phone or '')
         if not is_phone_v:
             flash(clean_phone, "error")
-            return render_template('registration.html', event=event, username=username, is_host=is_host(), error=clean_phone, requested_type=pass_type, conflict_event=conflict_event)
+            return _render_reg_form(error=clean_phone, req_type=pass_type)
         phone = clean_phone
 
         team_name = request.form.get('team_name', '').strip() if reg_type == 'team' else ''
@@ -9577,14 +10172,14 @@ def register_event(event_id):
                     if not is_tm_e_v:
                         err = f"Teammate #{i} ({m_name or 'Member'}): {clean_tm_email}"
                         flash(err, "error")
-                        return render_template('registration.html', event=event, username=username, is_host=is_host(), error=err, requested_type=pass_type, conflict_event=conflict_event)
+                        return _render_reg_form(error=err, req_type=pass_type)
                     m_email = clean_tm_email
                 if m_phone:
                     is_tm_p_v, clean_tm_phone = validate_mobile(m_phone)
                     if not is_tm_p_v:
                         err = f"Teammate #{i} ({m_name or 'Member'}): {clean_tm_phone}"
                         flash(err, "error")
-                        return render_template('registration.html', event=event, username=username, is_host=is_host(), error=err, requested_type=pass_type, conflict_event=conflict_event)
+                        return _render_reg_form(error=err, req_type=pass_type)
                     m_phone = clean_tm_phone
 
                 if m_name:
@@ -9606,12 +10201,12 @@ def register_event(event_id):
             if seats_filled + total_people > seats_total or status_info.get('is_sold_out'):
                 err = f"In-person registration is full! This event has reached its capacity limit of {seats_total} seats ({seats_left} seat(s) left). Please choose the unlimited Live Stream Pass below."
                 flash(err, "error")
-                return render_template('registration.html', event=event, username=username, is_host=is_host(), error=err, requested_type='live_stream', conflict_event=conflict_event)
+                return _render_reg_form(error=err, req_type='live_stream')
             
             if status_info.get('is_cutoff_reached'):
                 err = f"Registration is closed for in-person attendance 2 hours prior to start time ({status_info.get('cutoff_time_str')}). Please select the unlimited Live Stream Pass below."
                 flash(err, "error")
-                return render_template('registration.html', event=event, username=username, is_host=is_host(), error=err, requested_type='live_stream', conflict_event=conflict_event)
+                return _render_reg_form(error=err, req_type='live_stream')
 
             seats_to_add = total_people
             ticket_prefix = "TKT"
@@ -9620,7 +10215,7 @@ def register_event(event_id):
             seats_to_add = 0
             ticket_prefix = "LIVE"
         
-        # Calculate pricing, promo discount, and final amount paid
+        # Calculate pricing and promo discount
         raw_price_str = event.get('stream_price') if pass_type == 'live_stream' else event.get('price', 'Free')
         clean_digits = re.sub(r'[^\d.]', '', str(raw_price_str))
         try:
@@ -9636,14 +10231,47 @@ def register_event(event_id):
                 discount_amount = round(min((base_total * rule['val'] / 100.0), rule.get('max', base_total)), 2)
             else:
                 discount_amount = round(min(rule['val'], base_total), 2)
-        
-        amount_paid = max(0.0, round(base_total - discount_amount, 2))
-        if amount_paid == 0.0 and (not payment_method or payment_method == 'UPI'):
-            payment_method = 'Complimentary / Promo Waiver'
 
         try:
             conn = get_db()
             c = conn.cursor()
+
+            # Compute selected ticket add-ons and verify inventory
+            c.execute("SELECT id, name, price, stock_total, stock_sold FROM event_addons WHERE event_id = ? AND is_active = 1", (event_id,))
+            selected_addon_ids = set(str(x) for x in request.form.getlist('addon_ids'))
+            chosen_addons = []
+            addons_total = 0.0
+            for aid, aname, aprice, atotal, asold in c.fetchall():
+                qty = request.form.get(f'addon_qty_{aid}', type=int)
+                if qty is None and str(aid) in selected_addon_ids:
+                    qty = 1
+                qty = max(0, int(qty or 0))
+                if qty > 0:
+                    stock_left = max(0, int(atotal or 0) - int(asold or 0))
+                    if qty > stock_left:
+                        conn.close()
+                        err = f"Add-on '{aname}' only has {stock_left} item(s) remaining in stock."
+                        flash(err, "error")
+                        return _render_reg_form(error=err, req_type=pass_type)
+                    unit_p = round(float(aprice or 0.0), 2)
+                    line_total = round(unit_p * qty, 2)
+                    addons_total = round(addons_total + line_total, 2)
+                    chosen_addons.append({'id': aid, 'name': aname, 'qty': qty, 'unit_price': unit_p, 'total_price': line_total})
+
+            gross_total = max(0.0, round(base_total - discount_amount + addons_total, 2))
+            wallet_used = 0.0
+            if request.form.get('use_wallet_credits') in ('1', 'true', 'on', 'yes') and gross_total > 0 and username:
+                c.execute("SELECT balance FROM user_wallet WHERE username = ?", (username,))
+                wbal_row = c.fetchone()
+                avail_bal = float(wbal_row[0]) if wbal_row else 0.0
+                wallet_used = round(min(avail_bal, gross_total), 2)
+
+            amount_paid = max(0.0, round(gross_total - wallet_used, 2))
+            if amount_paid == 0.0:
+                if wallet_used > 0:
+                    payment_method = 'Wallet Credits'
+                elif not payment_method or payment_method == 'UPI':
+                    payment_method = 'Complimentary / Promo Waiver'
             
             # Check if user had a previous cancelled registration to reactivate or create new
             c.execute("SELECT id FROM registrations WHERE username = ? AND event_id = ? ORDER BY id DESC LIMIT 1", (username, event_id))
@@ -9653,21 +10281,41 @@ def register_event(event_id):
             if existing_row:
                 reg_id = existing_row[0]
                 ticket_code = f"{ticket_prefix}-{event_id:03d}-{reg_id:05d}"
+                c.execute("DELETE FROM registration_addons WHERE registration_id = ?", (reg_id,))
                 c.execute("""UPDATE registrations 
                              SET full_name = ?, email = ?, phone = ?, college_id = ?, payment_method = ?, upi_id = ?, 
                                  team_name = ?, team_members = ?, status = 'active', cancelled_at = NULL, checked_in = 0, 
                                  checkin_time = NULL, timestamp = CURRENT_TIMESTAMP, ticket_code = ?, pass_type = ?,
-                                 promo_code = ?, discount_amount = ?, amount_paid = ?, seat_code = COALESCE(?, seat_code) 
+                                 promo_code = ?, discount_amount = ?, amount_paid = ?, addons_total = ?,
+                                 transferred_from = '', transferred_to = '', transferred_at = '', refund_amount = 0.0,
+                                 seat_code = COALESCE(?, seat_code) 
                              WHERE id = ?""",
-                          (full_name, email, phone, college_id, payment_method, upi_id, team_name, team_members_json, ticket_code, pass_type, promo_code, discount_amount, amount_paid, seat_code, reg_id))
+                          (full_name, email, phone, college_id, payment_method, upi_id, team_name, team_members_json, ticket_code, pass_type, promo_code, discount_amount, amount_paid, addons_total, seat_code, reg_id))
             else:
                 c.execute("""INSERT INTO registrations 
-                             (username, event_id, full_name, email, phone, college_id, payment_method, upi_id, team_name, team_members, pass_type, status, promo_code, discount_amount, amount_paid, seat_code) 
-                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?)""",
-                          (username, event_id, full_name, email, phone, college_id, payment_method, upi_id, team_name, team_members_json, pass_type, promo_code, discount_amount, amount_paid, seat_code))
+                             (username, event_id, full_name, email, phone, college_id, payment_method, upi_id, team_name, team_members, pass_type, status, promo_code, discount_amount, amount_paid, addons_total, seat_code) 
+                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?)""",
+                          (username, event_id, full_name, email, phone, college_id, payment_method, upi_id, team_name, team_members_json, pass_type, promo_code, discount_amount, amount_paid, addons_total, seat_code))
                 reg_id = c.lastrowid
                 ticket_code = f"{ticket_prefix}-{event_id:03d}-{reg_id:05d}"
                 c.execute("UPDATE registrations SET ticket_code = ? WHERE id = ?", (ticket_code, reg_id))
+
+            if wallet_used > 0:
+                credit_or_debit_wallet(conn, username, -wallet_used, 'debit', ticket_code, f"Checkout credits applied for {event['title']}")
+
+            for item in chosen_addons:
+                c.execute("UPDATE event_addons SET stock_sold = stock_sold + ? WHERE id = ?", (item['qty'], item['id']))
+                c.execute(
+                    """INSERT INTO registration_addons (registration_id, event_id, addon_id, addon_name, quantity, unit_price, total_price)
+                       VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                    (reg_id, event_id, item['id'], item['name'], item['qty'], item['unit_price'], item['total_price'])
+                )
+
+            if username:
+                c.execute(
+                    "UPDATE event_waitlist SET status = 'claimed' WHERE event_id = ? AND username = ? AND status IN ('waiting', 'promoted')",
+                    (event_id, username)
+                )
 
             # Mark seat as booked if selected
             if seat_code:
@@ -9697,14 +10345,29 @@ def register_event(event_id):
             invalidate_user_regs(username)
             invalidate_events_cache()
 
-            # Real-time WebSocket zero-latency broadcast
-            if seats_to_add > 0:
+            # Real-time WebSocket zero-latency broadcast & Host Webhooks
+            c_ev = get_event(event_id)
+            if seats_to_add > 0 and c_ev:
                 try:
-                    c_ev = get_event(event_id)
-                    if c_ev:
-                        trigger_seat_update_broadcast(event_id, c_ev.get('seats_filled', 0), c_ev.get('seats_total', 100))
+                    trigger_seat_update_broadcast(event_id, c_ev.get('seats_filled', 0), c_ev.get('seats_total', 100))
                 except Exception:
                     pass
+
+            dispatch_host_webhooks('ticket.booked', event_id, {
+                'ticket_code': ticket_code,
+                'username': username,
+                'full_name': full_name,
+                'pass_type': pass_type,
+                'amount_paid': amount_paid,
+                'addons_total': addons_total,
+                'wallet_used': wallet_used,
+            })
+            if seats_to_add > 0 and c_ev and (c_ev.get('seats_filled') or 0) >= (c_ev.get('seats_total') or 100):
+                dispatch_host_webhooks('event.sold_out', event_id, {
+                    'event_title': event['title'],
+                    'seats_total': c_ev.get('seats_total', 100),
+                    'seats_filled': c_ev.get('seats_filled', 0),
+                })
 
             # Construct registration details dict & generate PDF ticket
             reg_dict = {
@@ -9757,22 +10420,7 @@ def register_event(event_id):
         except Exception as e:
             return f"Error: {str(e)}", 500
             
-        ensure_event_seats(event_id)
-    conn = get_db()
-    c = conn.cursor()
-    c.execute("SELECT id, question_label, field_type, options_json, is_required FROM event_custom_questions WHERE event_id = ? ORDER BY display_order ASC", (event_id,))
-    custom_questions = []
-    for q_id, q_lbl, q_type, q_opts, q_req in c.fetchall():
-        opts = json.loads(q_opts) if q_opts else []
-        custom_questions.append({
-            'id': q_id,
-            'label': q_lbl,
-            'type': q_type,
-            'options': opts,
-            'required': bool(q_req)
-        })
-    conn.close()
-    return render_template('registration.html', event=event, username=session.get('username'), is_host=is_host(), requested_type=requested_type, conflict_event=conflict_event, custom_questions=custom_questions)
+    return _render_reg_form(req_type=requested_type)
 
 @app.route('/unregister/<int:event_id>', methods=['POST'])
 def unregister_event(event_id):
@@ -9788,7 +10436,7 @@ def unregister_event(event_id):
         c = conn.cursor()
         
         # Check active registration details
-        c.execute("""SELECT id, team_name, team_members, full_name, email, phone, ticket_code, checked_in, pass_type 
+        c.execute("""SELECT id, team_name, team_members, full_name, email, phone, ticket_code, checked_in, pass_type, COALESCE(amount_paid, 0), seat_code 
                      FROM registrations 
                      WHERE username = ? AND event_id = ? AND (status IS NULL OR status = 'active') 
                      ORDER BY id DESC LIMIT 1""", (username, event_id))
@@ -9818,6 +10466,8 @@ def unregister_event(event_id):
             reg_email = reg_row[4]
             ticket_code = reg_row[6] or f"TKT-{event_id:03d}-{reg_id:05d}"
             reg_pass_type = reg_row[8] if len(reg_row) > 8 and reg_row[8] else 'in_person'
+            amount_paid = float(reg_row[9] or 0.0) if len(reg_row) > 9 else 0.0
+            reg_seat_code = reg_row[10] if len(reg_row) > 10 else None
 
             # Fallback: if email wasn't recorded directly on registration, fetch from users table
             if not reg_email:
@@ -9833,20 +10483,42 @@ def unregister_event(event_id):
             except Exception:
                 team_members = []
             seats_freed = (1 + len(team_members)) if reg_pass_type == 'in_person' else 0
+
+            event = get_event(event_id)
+            ev_title = event['title'] if event else f"Event #{event_id}"
+            refund_info = calculate_event_ticket_refund(event or {}, amount_paid)
+            refund_amt = round(float(refund_info.get('refund_amount') or 0.0), 2)
             
             now_str = datetime.now().strftime('%d %b %Y, %I:%M %p')
-            # Soft-cancel: Mark as cancelled with timestamp, reason, and feedback
+            # Soft-cancel: Mark as cancelled with timestamp, reason, feedback, and refund
             c.execute("""UPDATE registrations 
-                         SET status = 'cancelled', cancelled_at = ?, cancellation_reason = ?, cancellation_feedback = ? 
-                         WHERE id = ?""", (now_str, reason, feedback, reg_id))
+                         SET status = 'cancelled', cancelled_at = ?, cancellation_reason = ?, cancellation_feedback = ?, refund_amount = ? 
+                         WHERE id = ?""", (now_str, reason, feedback, refund_amt, reg_id))
+            if reg_seat_code:
+                c.execute("UPDATE event_seats SET status = 'available', booked_by = NULL, ticket_id = NULL WHERE event_id = ? AND ticket_id = ?", (event_id, ticket_code))
             if seats_freed > 0:
                 c.execute("UPDATE events SET seats_filled = MAX(0, COALESCE(seats_filled, 0) - ?) WHERE id = ?", (seats_freed, event_id))
             c.execute("DELETE FROM live_stream_passes WHERE username = ? AND event_id = ?", (username, event_id))
+
+            if refund_amt > 0:
+                credit_or_debit_wallet(
+                    conn,
+                    username,
+                    refund_amt,
+                    'refund',
+                    ticket_code,
+                    f"{refund_info['refund_percent']}% ({refund_info['policy']}) cancellation refund for {ev_title}"
+                )
+
+            promoted_attendees = []
+            if seats_freed > 0:
+                promoted_attendees = promote_next_waitlist_attendee(conn, event_id, slots=seats_freed)
+
             conn.commit()
             invalidate_user_regs(username)
             invalidate_events_cache()
             
-            # Real-time WebSocket zero-latency broadcast
+            # Real-time WebSocket zero-latency broadcast & Host Webhooks
             if seats_freed > 0:
                 try:
                     c_ev = get_event(event_id)
@@ -9854,17 +10526,26 @@ def unregister_event(event_id):
                         trigger_seat_update_broadcast(event_id, c_ev.get('seats_filled', 0), c_ev.get('seats_total', 100))
                 except Exception:
                     pass
-            
-            event = get_event(event_id)
-            ev_title = event['title'] if event else f"Event #{event_id}"
+
+            dispatch_host_webhooks('ticket.cancelled', event_id, {
+                'ticket_code': ticket_code,
+                'username': username,
+                'refund_amount': refund_amt,
+                'seats_freed': seats_freed,
+            })
+            for p_att in promoted_attendees:
+                dispatch_host_webhooks('waitlist.promoted', event_id, p_att)
             
             log_detail = f"Event: {ev_title} (ID {event_id}) | Reason: {reason}"
             if feedback:
                 log_detail += f" | Feedback: {feedback}"
+            if refund_amt > 0:
+                log_detail += f" | Wallet Refund: ₹{refund_amt:.2f}"
             log_action(username, 'unregister_event', log_detail)
             
             push_notification(username, f"You unregistered from {ev_title}. Your admission pass has been voided.", url_for('dashboard'))
-            flash(f"You have successfully unregistered from '{ev_title}'. Thank you for your feedback!", "info")
+            refund_note = f" ₹{refund_amt:.2f} ({refund_info['refund_percent']}%) has been credited to your Event Wallet." if refund_amt > 0 else ""
+            flash(f"You have successfully unregistered from '{ev_title}'. Thank you for your feedback!{refund_note}", "info")
 
             # Asynchronously send unregistration confirmation email to attendee
             if reg_email and event:
@@ -9991,16 +10672,23 @@ def view_ticket_interactive(event_id=None, ticket_code=None):
     c = conn.cursor()
 
     if ticket_code:
-        c.execute("""SELECT id, event_id, full_name, email, phone, college_id, payment_method, upi_id, timestamp, team_name, team_members, status, cancelled_at, ticket_code, username, pass_type, seat_code
+        c.execute("""SELECT id, event_id, full_name, email, phone, college_id, payment_method, upi_id, timestamp, team_name, team_members, status, cancelled_at, ticket_code, username, pass_type, seat_code, transferred_from, transferred_to, transferred_at, COALESCE(addons_total, 0), COALESCE(amount_paid, 0)
                      FROM registrations WHERE ticket_code = ?""", (ticket_code,))
     elif event_id:
-        c.execute("""SELECT id, event_id, full_name, email, phone, college_id, payment_method, upi_id, timestamp, team_name, team_members, status, cancelled_at, ticket_code, username, pass_type, seat_code
+        c.execute("""SELECT id, event_id, full_name, email, phone, college_id, payment_method, upi_id, timestamp, team_name, team_members, status, cancelled_at, ticket_code, username, pass_type, seat_code, transferred_from, transferred_to, transferred_at, COALESCE(addons_total, 0), COALESCE(amount_paid, 0)
                      FROM registrations WHERE username = ? AND event_id = ? ORDER BY id DESC LIMIT 1""", (username, event_id))
     else:
         conn.close()
         return redirect(url_for('dashboard'))
 
     registration = c.fetchone()
+    reg_addons = []
+    if registration:
+        c.execute("SELECT addon_name, quantity, unit_price, total_price FROM registration_addons WHERE registration_id = ? ORDER BY id ASC", (registration[0],))
+        reg_addons = [
+            {'name': r[0], 'quantity': r[1], 'unit_price': r[2], 'total_price': r[3]}
+            for r in c.fetchall()
+        ]
     conn.close()
 
     if not registration:
@@ -10009,6 +10697,12 @@ def view_ticket_interactive(event_id=None, ticket_code=None):
 
     reg_id, ev_id, full_name, email, phone, college_id, payment_method, upi_id, reg_time, team_name, team_members_raw, reg_status, cancelled_at, t_code, reg_user = registration[:15]
     reg_pass_type = registration[15] if len(registration) > 15 and registration[15] else 'in_person'
+    assigned_seat = registration[16] if len(registration) > 16 and registration[16] else None
+    transferred_from = registration[17] if len(registration) > 17 else ''
+    transferred_to = registration[18] if len(registration) > 18 else ''
+    transferred_at = registration[19] if len(registration) > 19 else ''
+    addons_total = float(registration[20] or 0.0) if len(registration) > 20 else 0.0
+    amount_paid = float(registration[21] or 0.0) if len(registration) > 21 else 0.0
     event = get_event(ev_id)
     if not event:
         flash("Event details not found.", "error")
@@ -10026,7 +10720,6 @@ def view_ticket_interactive(event_id=None, ticket_code=None):
         gate_num = "STREAM ROOM 📡"
     else:
         pass_type_str = f"Team Pass ({team_name})" if team_name else "Solo Entry Pass"
-        assigned_seat = registration[16] if len(registration) > 16 and registration[16] else None
         if assigned_seat:
             seat_zone = f"RESERVED {assigned_seat}"
             gate_num = "VIP EXPRESS GATE ⚡" if "VIP" in assigned_seat else f"GATE-0{((reg_id % 3) + 1)}"
@@ -10048,6 +10741,8 @@ def view_ticket_interactive(event_id=None, ticket_code=None):
 
     reg_info = {
         'id': reg_id,
+        'ticket_code': final_ticket_code,
+        'seat_code': assigned_seat,
         'full_name': full_name or username,
         'email': email,
         'phone': phone,
@@ -10055,20 +10750,16 @@ def view_ticket_interactive(event_id=None, ticket_code=None):
         'team_name': team_name,
         'team_members': team_members,
         'reg_time': reg_time,
-        'status': reg_status
+        'status': reg_status,
+        'transferred_from': transferred_from,
+        'transferred_to': transferred_to,
+        'transferred_at': transferred_at,
+        'addons_total': addons_total,
+        'amount_paid': amount_paid,
     }
 
     security_hash = hashlib.sha256(f"{final_ticket_code}:{ev_id}:{reg_user}:SECURE_GATE".encode()).hexdigest()[:16].upper()
-    if reg_pass_type != 'live_stream':
-        assigned_seat = registration[16] if len(registration) > 16 and registration[16] else None
-        if assigned_seat:
-            seat_zone = f"RESERVED {assigned_seat}"
-            gate_num = "VIP EXPRESS GATE ⚡" if "VIP" in assigned_seat else f"GATE-0{((reg_id % 3) + 1)}"
-        else:
-            zone_letter = chr(65 + (reg_id % 4))
-            seat_num = ((reg_id * 7) % 60) + 1
-            seat_zone = f"ZONE {zone_letter} • SEAT #{seat_num:02d}"
-            gate_num = f"GATE-0{((reg_id % 3) + 1)}"
+    allow_transfer = bool(event.get('allow_transfer', 1)) and (reg_status in (None, '', 'active')) and (reg_user == username or is_host() or is_admin())
 
     return render_template(
         'ticket.html',
@@ -10081,7 +10772,9 @@ def view_ticket_interactive(event_id=None, ticket_code=None):
         security_hash=security_hash,
         seat_zone=seat_zone,
         gate_num=gate_num,
-        verify_url=verify_url
+        verify_url=verify_url,
+        addons=reg_addons,
+        allow_transfer=allow_transfer
     )
 
 @app.route('/passport')
@@ -10792,10 +11485,41 @@ def settings():
     c = conn.cursor()
     c.execute("SELECT username, full_name, email, phone, college_id, profile_photo, id, user_id FROM users WHERE username=?", (username,))
     user_data = c.fetchone()
+    if not user_data:
+        conn.close()
+        return "User profile not found", 404
+
+    two_factor_enabled = False
+    login_sessions = []
+    try:
+        c.execute("SELECT is_enabled FROM user_2fa_settings WHERE username = ?", (username,))
+        tfa_row = c.fetchone()
+        two_factor_enabled = bool(tfa_row and tfa_row[0] == 1)
+    except Exception:
+        pass
+
+    try:
+        c.execute(
+            """SELECT id, session_token, ip_address, user_agent, login_method, is_active, created_at
+               FROM user_login_sessions WHERE username = ? ORDER BY id DESC LIMIT 12""",
+            (username,)
+        )
+        cur_tok = session.get('session_token', '')
+        for sid, stok, sip, sua, smeth, sact, screated in c.fetchall():
+            login_sessions.append({
+                'id': sid,
+                'is_current': bool(cur_tok and stok == cur_tok),
+                'ip_address': sip or '127.0.0.1',
+                'user_agent': sua or 'Browser Session',
+                'login_method': smeth or 'password',
+                'is_active': bool(sact),
+                'created_at': screated or ''
+            })
+    except Exception:
+        pass
     conn.close()
 
-    if not user_data:
-        return "User profile not found", 404
+    wallet_balance = get_wallet_balance(username)
 
     msg = request.args.get('msg')
     error = request.args.get('error')
@@ -10813,7 +11537,17 @@ def settings():
         'profile_photo': get_user_avatar_display(user_data[5], user_data[1] or user_data[0]),
     }
 
-    return render_template('settings.html', user=user, is_host=is_host(), is_admin=is_admin(), msg=msg, error=error)
+    return render_template(
+        'settings.html',
+        user=user,
+        is_host=is_host(),
+        is_admin=is_admin(),
+        msg=msg,
+        error=error,
+        two_factor_enabled=two_factor_enabled,
+        login_sessions=login_sessions,
+        wallet_balance=wallet_balance
+    )
 
 @app.route('/account/deactivate', methods=['POST'])
 def deactivate_account():
@@ -11004,9 +11738,14 @@ def forgot_password():
         phone = request.form.get('phone', '').strip()
         new_password = request.form.get('new_password', '').strip()
         confirm_password = request.form.get('confirm_password', '').strip()
+        forgot_captcha = re.sub(r'\s+', '', request.form.get('forgot_captcha', ''))
+        expected_forgot = session.pop('forgot_captcha_answer', None)
+
+        if not expected_forgot or not forgot_captcha.isdigit() or not hmac.compare_digest(forgot_captcha, str(expected_forgot)):
+            return render_template('forgot_password.html', error="Invalid or missing CAPTCHA. Please enter the 5-digit code shown.", forgot_challenge_svg=_generate_scope_captcha('forgot'))
 
         if new_password != confirm_password:
-            return render_template('forgot_password.html', error="Passwords do not match.")
+            return render_template('forgot_password.html', error="Passwords do not match.", forgot_challenge_svg=_generate_scope_captcha('forgot'))
 
         conn = get_db()
         c = conn.cursor()
@@ -11036,15 +11775,15 @@ def forgot_password():
                 c.execute("UPDATE users SET password=? WHERE id=?", (hashed_new, target_id))
                 conn.commit()
                 conn.close()
-                return render_template('login.html', msg="Password reset successful! Please log in using your User ID or Email.")
+                return redirect(url_for('login', msg="Password reset successful! Please log in using your User ID or Email."))
             else:
                 conn.close()
-                return render_template('forgot_password.html', error="Verification failed. The details provided do not match our records or your profile is incomplete.")
+                return render_template('forgot_password.html', error="Verification failed. The details provided do not match our records or your profile is incomplete.", forgot_challenge_svg=_generate_scope_captcha('forgot'))
         else:
             conn.close()
-            return render_template('forgot_password.html', error="User account not found with the provided User ID or Email.")
+            return render_template('forgot_password.html', error="User account not found with the provided User ID or Email.", forgot_challenge_svg=_generate_scope_captcha('forgot'))
 
-    return render_template('forgot_password.html')
+    return render_template('forgot_password.html', forgot_challenge_svg=_generate_scope_captcha('forgot'))
 
 @app.route('/add_event', methods=['GET', 'POST'])
 def add_event():
@@ -11058,8 +11797,8 @@ def add_event():
         end_time_val = request.form.get('end_time', '05:00 PM').strip() or '05:00 PM'
         desc = request.form.get('desc')
         price = request.form.get('price')
-        color = request.form.get('color')
-        image = request.form.get('image')
+        color = request.form.get('color') or '#4facfe'
+        image = request.form.get('image') or 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80'
         venue = request.form.get('venue', 'Main Campus Auditorium').strip()
         venue_address = request.form.get('venue_address', 'Tech Park Campus, Innovation Block A, Bangalore - 560103').strip()
         purpose = request.form.get('purpose')
@@ -11069,13 +11808,51 @@ def add_event():
         stream_price = request.form.get('stream_price', '').strip()
         if not stream_price:
             stream_price = 'Free' if (price or '').strip().lower() == 'free' else '₹199'
+        refund_policy = (request.form.get('refund_policy') or 'flexible').strip().lower()
+        if refund_policy not in ('flexible', 'moderate', 'strict'):
+            refund_policy = 'flexible'
+        allow_transfer = 1 if request.form.get('allow_transfer', '1') in ('1', 'true', 'on', 'yes') else 0
+        recurrence_rule = (request.form.get('recurrence_rule') or 'none').strip().lower()
+        occurrence_count = request.form.get('occurrence_count', type=int) or 1
+        series_discount = float(request.form.get('series_discount', type=float) or 20.0)
 
         try:
             conn = get_db()
             c = conn.cursor()
-            c.execute("""INSERT INTO events (title, date, time, end_time, desc, price, color, image, purpose, full_details, outcome, venue, venue_address, seats_total, seats_filled, stream_price) 
-                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)""", 
-                      (title, date, time_val, end_time_val, desc, price, color, image, purpose, full_details, outcome, venue, venue_address, seats_total, stream_price))
+            series_id = None
+            dates_to_create = [date]
+            if recurrence_rule in ('weekly', 'biweekly', 'monthly') and occurrence_count > 1:
+                dates_to_create = generate_occurrence_dates(date, rule=recurrence_rule, count=occurrence_count)
+                unit_num = parse_event_price_numeric(price)
+                season_price = round(unit_num * len(dates_to_create) * max(0.0, (1.0 - (series_discount / 100.0))), 2)
+                c.execute(
+                    """INSERT INTO event_series (title, recurrence_rule, total_sessions, season_pass_price, discount_percent, created_by)
+                       VALUES (?, ?, ?, ?, ?, ?)""",
+                    (f"{title} Series", recurrence_rule, len(dates_to_create), season_price, series_discount, session.get('username', 'admin'))
+                )
+                series_id = c.lastrowid
+
+            addon_names = request.form.getlist('addon_name') or request.form.getlist('addon_name[]')
+            addon_prices = request.form.getlist('addon_price') or request.form.getlist('addon_price[]')
+            addon_stocks = request.form.getlist('addon_stock') or request.form.getlist('addon_stock[]')
+
+            for idx, occ_date in enumerate(dates_to_create):
+                occ_title = f"{title} (#{idx + 1})" if len(dates_to_create) > 1 else title
+                c.execute("""INSERT INTO events (title, date, time, end_time, desc, price, color, image, purpose, full_details, outcome, venue, venue_address, seats_total, seats_filled, stream_price, series_id, refund_policy, allow_transfer) 
+                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?)""", 
+                          (occ_title, occ_date, time_val, end_time_val, desc, price, color, image, purpose, full_details, outcome, venue, venue_address, seats_total, stream_price, series_id, refund_policy, allow_transfer))
+                ev_id = c.lastrowid
+                for a_idx, a_name in enumerate(addon_names):
+                    clean_name = (a_name or '').strip()
+                    if clean_name:
+                        a_price = float(addon_prices[a_idx] or 0.0) if a_idx < len(addon_prices) and addon_prices[a_idx] else 0.0
+                        a_stock = int(addon_stocks[a_idx] or 50) if a_idx < len(addon_stocks) and addon_stocks[a_idx] else 50
+                        c.execute(
+                            """INSERT INTO event_addons (event_id, name, price, stock_total, stock_sold, is_active)
+                               VALUES (?, ?, ?, ?, 0, 1)""",
+                            (ev_id, clean_name, max(0.0, a_price), max(1, a_stock))
+                        )
+
             conn.commit()
             conn.close()
             invalidate_events_cache()
@@ -11105,10 +11882,24 @@ def delete_event(event_id):
 
 @app.route('/logout')
 def logout():
+    tok = session.get('session_token')
+    if tok:
+        try:
+            conn = get_db()
+            c = conn.cursor()
+            c.execute("UPDATE user_login_sessions SET is_active = 0 WHERE session_token = ?", (tok,))
+            conn.commit()
+            conn.close()
+        except Exception:
+            pass
     session.pop('loggedin', None)
     session.pop('username', None)
     session.pop('profile_photo', None)
+    session.pop('session_token', None)
+    session.pop('pending_2fa_payload', None)
     session.pop('captcha_answer', None)
+    session.pop('reg_captcha_answer', None)
+    session.pop('forgot_captcha_answer', None)
     return redirect(url_for('login'))
 
 @app.route('/event/<int:event_id>/ical', endpoint='event_ical')
@@ -11953,9 +12744,15 @@ def api_verify_ticket():
 
     found_reg = None
     import re
+
+    # 0. Exact ticket_code match (supports TKT-..., LIVE-..., TRF-...)
+    c.execute("""SELECT r.*, e.title as event_title, e.date as event_date 
+                 FROM registrations r JOIN events e ON r.event_id=e.id 
+                 WHERE LOWER(r.ticket_code) = LOWER(?)""", (raw_payload,))
+    found_reg = c.fetchone()
     
     # 1. Match ticket format TKT-002-00012 or TKT-(\d+)-(\d+)
-    tkt_match = re.search(r'TKT-(\d+)-(\d+)', raw_payload, re.IGNORECASE)
+    tkt_match = re.search(r'TKT-(\d+)-(\d+)', raw_payload, re.IGNORECASE) if not found_reg else None
     if tkt_match:
         evt_id_parsed = int(tkt_match.group(1))
         reg_id_parsed = int(tkt_match.group(2))
@@ -12019,7 +12816,7 @@ def api_verify_ticket():
 
     reg_dict = dict(found_reg)
     
-    # CRITICAL SECURITY CHECK: Check if ticket was revoked / unregistered 
+    # CRITICAL SECURITY CHECK: Check if ticket was revoked / unregistered or transferred
     if reg_dict.get('status') == 'cancelled':
         conn.close()
         cancelled_time = reg_dict.get('cancelled_at') or 'recorded earlier'
@@ -12034,6 +12831,21 @@ def api_verify_ticket():
             'college_id': reg_dict.get('college_id') or 'N/A',
             'event_title': reg_dict['event_title'],
             'cancelled_at': cancelled_time
+        }), 400
+
+    if reg_dict.get('status') == 'transferred':
+        conn.close()
+        transferred_to = reg_dict.get('transferred_to') or 'another delegate'
+        log_action(session.get('username') or 'gate_scanner', 'ticket_rejected_transferred',
+                   f"Transferred pass scan attempt: '{reg_dict.get('ticket_code')}' was transferred to '{transferred_to}'")
+        return jsonify({
+            'ok': False,
+            'is_transferred': True,
+            'error': f"🚫 PASS TRANSFERRED! This ticket was transferred to '{transferred_to}'. Please scan the newly issued pass.",
+            'attendee': reg_dict['full_name'] or reg_dict['username'],
+            'username': reg_dict['username'],
+            'transferred_to': transferred_to,
+            'event_title': reg_dict['event_title'],
         }), 400
 
     already_checked = bool(reg_dict.get('checked_in'))
@@ -12055,6 +12867,13 @@ def api_verify_ticket():
             'event_title': reg_dict['event_title'],
             'ticket_code': reg_dict.get('ticket_code') or '',
             'checkin_time': checkin_time_str
+        })
+        dispatch_host_webhooks('ticket.checked_in', reg_dict['event_id'], {
+            'reg_id': reg_dict['id'],
+            'ticket_code': reg_dict.get('ticket_code') or '',
+            'username': reg_dict['username'],
+            'attendee': reg_dict['full_name'] or reg_dict['username'],
+            'checkin_time': checkin_time_str,
         })
     conn.close()
 
@@ -14018,7 +14837,12 @@ def api_live_qa_ask(event_id):
     c.execute("INSERT INTO live_qa_upvotes (question_id, username) VALUES (?, ?)", (q_id, username))
     conn.commit()
     conn.close()
-    
+
+    trigger_live_stage_broadcast(event_id, {
+        'type': 'qa_added',
+        'event_id': event_id,
+        'question': {'id': q_id, 'username': username, 'question': text, 'upvotes': 1}
+    })
     return jsonify({'ok': True, 'id': q_id, 'question': text})
 
 @app.route('/api/live/<int:event_id>/qa/<int:question_id>/upvote', methods=['POST'])
@@ -14045,7 +14869,13 @@ def api_live_qa_upvote(event_id, question_id):
     new_upvotes = c.fetchone()[0]
     conn.commit()
     conn.close()
-    
+
+    trigger_live_stage_broadcast(event_id, {
+        'type': 'qa_upvoted',
+        'event_id': event_id,
+        'question_id': question_id,
+        'upvotes': new_upvotes
+    })
     return jsonify({'ok': True, 'upvotes': new_upvotes, 'has_upvoted': voted_now})
 
 @app.route('/api/live/<int:event_id>/polls', methods=['GET'])
@@ -14125,7 +14955,13 @@ def api_live_polls_vote(event_id):
                  VALUES (?, ?, ?)""", (poll_id, username, int(option_idx)))
     conn.commit()
     conn.close()
-    
+
+    trigger_live_stage_broadcast(event_id, {
+        'type': 'poll_updated',
+        'event_id': event_id,
+        'poll_id': poll_id,
+        'option_index': int(option_idx)
+    })
     return jsonify({'ok': True, 'message': 'Vote recorded successfully!'})
 
 @app.route('/api/live/<int:event_id>/raffle', methods=['GET'])
@@ -14341,6 +15177,919 @@ def api_xp_redeem_reward():
         'coupon_code': coupon_code,
         'remaining_xp': available_xp - cost
     })
+
+
+# ==============================================================================
+# PLATFORM ENHANCEMENT PILLARS: WAITLIST, TRANSFER, CFP, SERIES, 2FA, WALLET, WEBHOOKS
+# ==============================================================================
+
+@app.route('/api/event/<int:event_id>/waitlist/join', methods=['POST'])
+def api_waitlist_join(event_id):
+    """Join FIFO + VIP-priority waitlist when an event reaches in-person capacity."""
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Please log in to join the waitlist.'}), 401
+    event = get_event(event_id)
+    if not event:
+        return jsonify({'ok': False, 'error': 'Event not found.'}), 404
+
+    username = session.get('username')
+    conn = get_db()
+    c = conn.cursor()
+    c.execute(
+        "SELECT id FROM registrations WHERE username = ? AND event_id = ? AND (status IS NULL OR status = 'active') LIMIT 1",
+        (username, event_id)
+    )
+    if c.fetchone():
+        conn.close()
+        return jsonify({'ok': False, 'error': 'You already hold an active ticket for this event.'}), 400
+
+    c.execute("SELECT email, full_name, phone FROM users WHERE username = ?", (username,))
+    u_row = c.fetchone()
+    u_email = u_row[0] if u_row else ''
+    u_name = (u_row[1] or username) if u_row else username
+    u_phone = u_row[2] if u_row else ''
+
+    c.execute("SELECT plan_type FROM subscriptions WHERE username = ? AND status = 'active' ORDER BY id DESC LIMIT 1", (username,))
+    sub_row = c.fetchone()
+    priority_score = 10 if sub_row else 0
+
+    c.execute("SELECT id, status FROM event_waitlist WHERE event_id = ? AND username = ? ORDER BY id DESC LIMIT 1", (event_id, username))
+    existing = c.fetchone()
+    if existing and existing[1] in ('waiting', 'promoted'):
+        w_id = existing[0]
+        w_status = existing[1]
+    elif existing:
+        w_id = existing[0]
+        w_status = 'waiting'
+        c.execute(
+            """UPDATE event_waitlist
+               SET status = 'waiting', priority_score = ?, email = ?, full_name = ?, phone = ?, created_at = CURRENT_TIMESTAMP, promoted_at = NULL
+               WHERE id = ?""",
+            (priority_score, u_email, u_name, u_phone, w_id)
+        )
+    else:
+        c.execute(
+            """INSERT INTO event_waitlist (event_id, username, email, full_name, phone, pass_type, seats_requested, priority_score, status)
+               VALUES (?, ?, ?, ?, ?, 'in_person', 1, ?, 'waiting')""",
+            (event_id, username, u_email, u_name, u_phone, priority_score)
+        )
+        w_id = c.lastrowid
+        w_status = 'waiting'
+
+    c.execute(
+        "SELECT COUNT(*) FROM event_waitlist WHERE event_id = ? AND status = 'waiting' AND (priority_score > ? OR (priority_score = ? AND id <= ?))",
+        (event_id, priority_score, priority_score, w_id)
+    )
+    position = c.fetchone()[0] if w_status == 'waiting' else 0
+    c.execute("SELECT COUNT(*) FROM event_waitlist WHERE event_id = ? AND status = 'waiting'", (event_id,))
+    total_waiting = c.fetchone()[0]
+    conn.commit()
+    conn.close()
+
+    log_action(username, 'waitlist_join', f"Joined waitlist for event #{event_id} (priority={priority_score}, position={position})")
+    return jsonify({
+        'ok': True,
+        'status': w_status,
+        'position': position,
+        'total_waiting': total_waiting,
+        'priority_score': priority_score,
+        'message': f"Added to priority waitlist at position #{position}!" if w_status == 'waiting' else "You are already promoted! Claim your seat now."
+    })
+
+
+@app.route('/api/event/<int:event_id>/waitlist/leave', methods=['POST'])
+def api_waitlist_leave(event_id):
+    """Leave an active or promoted waitlist entry."""
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Unauthorized'}), 401
+    username = session.get('username')
+    conn = get_db()
+    c = conn.cursor()
+    c.execute(
+        "UPDATE event_waitlist SET status = 'removed' WHERE event_id = ? AND username = ? AND status IN ('waiting', 'promoted')",
+        (event_id, username)
+    )
+    conn.commit()
+    conn.close()
+    return jsonify({'ok': True, 'message': 'Removed from waitlist.'})
+
+
+@app.route('/api/event/<int:event_id>/waitlist/status', methods=['GET'])
+def api_waitlist_status(event_id):
+    """Inspect current user's queue status and total waiting delegates for an event."""
+    username = session.get('username')
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT COUNT(*) FROM event_waitlist WHERE event_id = ? AND status = 'waiting'", (event_id,))
+    total_waiting = c.fetchone()[0]
+    status_val = None
+    pos = 0
+    if username:
+        c.execute("SELECT id, status, priority_score FROM event_waitlist WHERE event_id = ? AND username = ? ORDER BY id DESC LIMIT 1", (event_id, username))
+        row = c.fetchone()
+        if row and row[1] in ('waiting', 'promoted'):
+            status_val = row[1]
+            if status_val == 'waiting':
+                c.execute(
+                    "SELECT COUNT(*) FROM event_waitlist WHERE event_id = ? AND status = 'waiting' AND (priority_score > ? OR (priority_score = ? AND id <= ?))",
+                    (event_id, row[2], row[2], row[0])
+                )
+                pos = c.fetchone()[0]
+    conn.close()
+    return jsonify({'ok': True, 'status': status_val, 'position': pos, 'total_waiting': total_waiting})
+
+
+@app.route('/ticket/<ticket_code>/transfer', methods=['POST'])
+@app.route('/api/ticket/<ticket_code>/transfer', methods=['POST'])
+def transfer_ticket(ticket_code):
+    """Self-service cryptographic pass transfer: voids old QR code and issues fresh pass to recipient."""
+    wants_json = request.path.startswith('/api/') or request.is_json or 'application/json' in str(request.headers.get('Accept', ''))
+    if not session.get('loggedin'):
+        if wants_json:
+            return jsonify({'ok': False, 'error': 'Authentication required.'}), 401
+        return redirect(url_for('login'))
+
+    data = request.get_json(silent=True) or request.form or {}
+    recipient_identifier = (data.get('recipient_identifier') or data.get('recipient') or '').strip()
+    recipient_name = (data.get('recipient_name') or '').strip()
+    recipient_email = (data.get('recipient_email') or '').strip()
+    recipient_phone = (data.get('recipient_phone') or '').strip()
+    acting_user = session.get('username')
+
+    def _err(msg, code=400):
+        if wants_json:
+            return jsonify({'ok': False, 'error': msg}), code
+        flash(msg, 'error')
+        return redirect(url_for('view_ticket_interactive', ticket_code=ticket_code))
+
+    if not recipient_identifier and not recipient_email:
+        return _err('Please provide recipient username, User ID, or email address.')
+
+    conn = get_db(row_factory=True)
+    c = conn.cursor()
+    c.execute("SELECT * FROM registrations WHERE LOWER(ticket_code) = LOWER(?)", (ticket_code,))
+    reg = c.fetchone()
+    if not reg:
+        conn.close()
+        return _err('Ticket not found.', 404)
+
+    reg_dict = dict(reg)
+    if reg_dict.get('username') != acting_user and not (is_host() or is_admin()):
+        conn.close()
+        return _err('Only the ticket holder or event host can transfer this pass.', 403)
+
+    if reg_dict.get('status') not in (None, '', 'active'):
+        conn.close()
+        return _err(f"Cannot transfer a ticket with status '{reg_dict.get('status')}'.")
+
+    if reg_dict.get('checked_in'):
+        conn.close()
+        return _err('Ticket has already been scanned/checked in and cannot be transferred.')
+
+    event = get_event(reg_dict['event_id'])
+    if not event or event.get('allow_transfer') == 0:
+        conn.close()
+        return _err('Self-service ticket transfer is disabled by the organizer for this event.', 403)
+
+    lookup_key = recipient_identifier or recipient_email
+    c.execute(
+        "SELECT username, full_name, email, phone FROM users WHERE LOWER(username) = LOWER(?) OR LOWER(email) = LOWER(?) OR LOWER(user_id) = LOWER(?)",
+        (lookup_key, lookup_key, lookup_key)
+    )
+    target_row = c.fetchone()
+    if target_row:
+        target_username = target_row['username']
+        rec_name = recipient_name or target_row['full_name'] or target_username
+        rec_email = recipient_email or target_row['email'] or ''
+        rec_phone = recipient_phone or target_row['phone'] or reg_dict.get('phone') or ''
+    else:
+        email_candidate = recipient_email or recipient_identifier
+        is_em_ok, clean_em = validate_email_address(email_candidate)
+        if not is_em_ok:
+            conn.close()
+            return _err('Recipient must be an existing user (username / UID) or a valid email address.')
+        target_username = clean_em
+        rec_email = clean_em
+        rec_name = recipient_name or clean_em.split('@')[0]
+        rec_phone = recipient_phone or reg_dict.get('phone') or ''
+
+    if target_username.lower() == (reg_dict.get('username') or '').lower():
+        conn.close()
+        return _err('Cannot transfer a ticket to yourself.')
+
+    ev_id = reg_dict['event_id']
+    old_reg_id = reg_dict['id']
+    old_owner = reg_dict.get('username')
+    new_ticket_code = f"TRF-{ev_id:03d}-{old_reg_id:05d}-{secrets.token_hex(2).upper()}"
+    now_str = datetime.now().strftime('%d %b %Y, %I:%M %p')
+
+    c.execute(
+        "UPDATE registrations SET status = 'transferred', transferred_to = ?, transferred_at = ? WHERE id = ?",
+        (target_username, now_str, old_reg_id)
+    )
+    c.execute(
+        """INSERT INTO registrations
+           (username, event_id, full_name, email, phone, college_id, payment_method, upi_id,
+            team_name, team_members, pass_type, status, promo_code, discount_amount, amount_paid,
+            addons_total, seat_code, ticket_code, transferred_from, transferred_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?, ?, ?, ?)""",
+        (
+            target_username, ev_id, rec_name, rec_email, rec_phone,
+            reg_dict.get('college_id') or '', reg_dict.get('payment_method') or 'Transferred Pass',
+            reg_dict.get('upi_id') or '', reg_dict.get('team_name') or '',
+            reg_dict.get('team_members') or '[]', reg_dict.get('pass_type') or 'in_person',
+            reg_dict.get('promo_code') or '', reg_dict.get('discount_amount') or 0.0,
+            reg_dict.get('amount_paid') or 0.0, reg_dict.get('addons_total') or 0.0,
+            reg_dict.get('seat_code'), new_ticket_code, old_owner, now_str
+        )
+    )
+    new_reg_id = c.lastrowid
+
+    c.execute("UPDATE registration_addons SET registration_id = ? WHERE registration_id = ?", (new_reg_id, old_reg_id))
+    if reg_dict.get('seat_code'):
+        c.execute(
+            "UPDATE event_seats SET booked_by = ?, ticket_id = ? WHERE event_id = ? AND ticket_id = ?",
+            (target_username, new_ticket_code, ev_id, reg_dict.get('ticket_code'))
+        )
+    c.execute("DELETE FROM live_stream_passes WHERE event_id = ? AND username = ?", (ev_id, old_owner))
+    c.execute(
+        """INSERT OR REPLACE INTO live_stream_passes (event_id, username, pass_type, ticket_code, payment_method)
+           VALUES (?, ?, ?, ?, 'transfer')""",
+        (ev_id, target_username, 'virtual_pass' if reg_dict.get('pass_type') == 'live_stream' else 'registered_ticket', new_ticket_code)
+    )
+    conn.commit()
+    conn.close()
+
+    invalidate_user_regs(old_owner)
+    invalidate_user_regs(target_username)
+    log_action(acting_user, 'ticket_transferred', f"Transferred {reg_dict.get('ticket_code')} -> {new_ticket_code} (to {target_username})")
+    push_notification(old_owner, f"Ticket {reg_dict.get('ticket_code')} transferred to {target_username}. Old QR is now void.", url_for('history'))
+    push_notification(target_username, f"You received a transferred pass ({new_ticket_code}) for '{event['title']}'!", url_for('view_ticket_interactive', ticket_code=new_ticket_code))
+    dispatch_host_webhooks('ticket.transferred', ev_id, {
+        'old_ticket_code': reg_dict.get('ticket_code'),
+        'new_ticket_code': new_ticket_code,
+        'from_user': old_owner,
+        'to_user': target_username,
+    })
+
+    if wants_json:
+        return jsonify({
+            'ok': True,
+            'old_ticket_code': reg_dict.get('ticket_code'),
+            'new_ticket_code': new_ticket_code,
+            'transferred_to': target_username,
+            'new_reg_id': new_reg_id,
+            'message': f"Ticket successfully transferred to {target_username}!"
+        })
+
+    flash(f"Ticket successfully transferred to {target_username}! New pass code: {new_ticket_code}", "success")
+    return redirect(url_for('dashboard'))
+
+
+@app.route('/event/<int:event_id>/cfp', methods=['GET', 'POST'])
+def event_cfp_portal(event_id):
+    """Call for Speakers (CfP) submission portal & Host moderation queue."""
+    if not session.get('loggedin'):
+        return redirect(url_for('login'))
+    event = get_event(event_id)
+    if not event:
+        return "Event not found", 404
+
+    username = session.get('username')
+    msg = request.args.get('msg')
+    error = request.args.get('error')
+
+    conn = get_db()
+    c = conn.cursor()
+    if request.method == 'POST':
+        speaker_name = (request.form.get('speaker_name') or username or '').strip()
+        speaker_email = (request.form.get('speaker_email') or '').strip()
+        speaker_role = (request.form.get('speaker_role') or '').strip()
+        talk_title = (request.form.get('talk_title') or '').strip()
+        abstract = (request.form.get('abstract') or '').strip()
+        track_pref = (request.form.get('track_preference') or 'Main Stage Keynotes').strip()
+        duration_min = request.form.get('session_duration_min', type=int) or 45
+        speaker_bio = (request.form.get('speaker_bio') or '').strip()
+
+        if not talk_title or not abstract:
+            error = "Talk title and abstract are required."
+        else:
+            if speaker_email:
+                is_ev, clean_em = validate_email_address(speaker_email)
+                if not is_ev:
+                    error = clean_em
+                else:
+                    speaker_email = clean_em
+            if not error:
+                c.execute(
+                    """INSERT INTO event_speaker_proposals
+                       (event_id, proposer_username, speaker_name, speaker_email, speaker_role,
+                        talk_title, abstract, track_preference, session_duration_min, speaker_bio, status)
+                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')""",
+                    (event_id, username, speaker_name, speaker_email, speaker_role, talk_title, abstract, track_pref, duration_min, speaker_bio)
+                )
+                conn.commit()
+                conn.close()
+                log_action(username, 'cfp_submit', f"Submitted talk '{talk_title}' for event #{event_id}")
+                return redirect(url_for('event_cfp_portal', event_id=event_id, msg="Your speaker proposal was submitted! The event host will review it soon."))
+
+    if is_host() or is_admin():
+        c.execute(
+            """SELECT id, proposer_username, speaker_name, speaker_email, speaker_role, talk_title,
+                      abstract, track_preference, session_duration_min, speaker_bio, status, host_notes, created_at
+               FROM event_speaker_proposals WHERE event_id = ? ORDER BY id DESC""",
+            (event_id,)
+        )
+    else:
+        c.execute(
+            """SELECT id, proposer_username, speaker_name, speaker_email, speaker_role, talk_title,
+                      abstract, track_preference, session_duration_min, speaker_bio, status, host_notes, created_at
+               FROM event_speaker_proposals WHERE event_id = ? AND (proposer_username = ? OR status = 'accepted') ORDER BY id DESC""",
+            (event_id, username)
+        )
+    proposals = [
+        {
+            'id': r[0], 'proposer_username': r[1], 'speaker_name': r[2], 'speaker_email': r[3],
+            'speaker_role': r[4], 'talk_title': r[5], 'abstract': r[6], 'track_preference': r[7],
+            'duration_min': r[8], 'speaker_bio': r[9], 'status': r[10], 'host_notes': r[11], 'created_at': r[12]
+        }
+        for r in c.fetchall()
+    ]
+    conn.close()
+    return render_template('cfp.html', event=event, proposals=proposals, username=username, is_host=is_host(), is_admin=is_admin(), msg=msg, error=error)
+
+
+@app.route('/api/event/<int:event_id>/cfp/<int:prop_id>/review', methods=['POST'])
+def api_cfp_review(event_id, prop_id):
+    """Host moderation endpoint for CfP talks; auto-creates agenda track & session when accepted."""
+    if not (is_host() or is_admin()):
+        return jsonify({'ok': False, 'error': 'Host permissions required.'}), 403
+    data = request.get_json(silent=True) or request.form or {}
+    decision = (data.get('decision') or '').strip().lower()
+    host_notes = (data.get('host_notes') or '').strip()
+    start_time = (data.get('start_time') or '11:00 AM').strip()
+    end_time = (data.get('end_time') or '11:45 AM').strip()
+
+    if decision not in ('accepted', 'waitlisted', 'declined'):
+        return jsonify({'ok': False, 'error': 'Invalid decision. Choose accepted, waitlisted, or declined.'}), 400
+
+    conn = get_db()
+    c = conn.cursor()
+    c.execute(
+        """SELECT proposer_username, speaker_name, speaker_role, talk_title, abstract, track_preference, speaker_bio
+           FROM event_speaker_proposals WHERE id = ? AND event_id = ?""",
+        (prop_id, event_id)
+    )
+    prop = c.fetchone()
+    if not prop:
+        conn.close()
+        return jsonify({'ok': False, 'error': 'Proposal not found.'}), 404
+
+    proposer_user, spk_name, spk_role, talk_title, abstract, track_pref, spk_bio = prop
+    c.execute(
+        "UPDATE event_speaker_proposals SET status = ?, host_notes = ?, reviewed_at = CURRENT_TIMESTAMP WHERE id = ? AND event_id = ?",
+        (decision, host_notes, prop_id, event_id)
+    )
+
+    agenda_created = False
+    if decision == 'accepted':
+        track_name = track_pref or 'Main Stage Keynotes'
+        c.execute("SELECT id FROM event_agenda_tracks WHERE event_id = ? AND track_name = ? LIMIT 1", (event_id, track_name))
+        tr_row = c.fetchone()
+        if tr_row:
+            track_id = tr_row[0]
+        else:
+            c.execute(
+                "INSERT INTO event_agenda_tracks (event_id, track_name, room_location, color_code) VALUES (?, ?, 'Auditorium Stage', '#008be3')",
+                (event_id, track_name)
+            )
+            track_id = c.lastrowid
+
+        c.execute("SELECT id FROM event_agenda_sessions WHERE event_id = ? AND title = ? AND speaker_name = ? LIMIT 1", (event_id, talk_title, spk_name))
+        if not c.fetchone():
+            ev = get_event(event_id)
+            ev_date = ev.get('date', '') if ev else ''
+            c.execute(
+                """INSERT INTO event_agenda_sessions
+                   (event_id, track_id, title, description, speaker_name, speaker_role, speaker_bio, start_time, end_time, session_date, is_keynote)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)""",
+                (event_id, track_id, talk_title, abstract, spk_name, spk_role, spk_bio, start_time, end_time, ev_date)
+            )
+            agenda_created = True
+
+    conn.commit()
+    conn.close()
+    if proposer_user:
+        push_notification(
+            proposer_user,
+            f"Your speaker proposal '{talk_title}' was {decision.upper()}!",
+            url_for('event_cfp_portal', event_id=event_id)
+        )
+    log_action(session.get('username'), 'cfp_review', f"Reviewed proposal #{prop_id} ({decision}) for event #{event_id}")
+    return jsonify({'ok': True, 'status': decision, 'agenda_created': agenda_created})
+
+
+@app.route('/series/<int:series_id>')
+def event_series_detail(series_id):
+    """Display recurring event series timeline and Season Pass discounted checkout."""
+    if not session.get('loggedin'):
+        return redirect(url_for('login'))
+
+    username = session.get('username')
+    conn = get_db(row_factory=True)
+    c = conn.cursor()
+    c.execute("SELECT * FROM event_series WHERE id = ?", (series_id,))
+    s_row = c.fetchone()
+    if not s_row:
+        conn.close()
+        return "Event series not found", 404
+    series = dict(s_row)
+
+    c.execute("SELECT * FROM events WHERE series_id = ? ORDER BY id ASC", (series_id,))
+    occurrences = [dict(r) for r in c.fetchall()]
+    conn.close()
+
+    registered_ids = set(get_user_registered_ids(username))
+    single_sum = 0.0
+    unbooked_single_sum = 0.0
+    for ev in occurrences:
+        ev['is_registered'] = ev['id'] in registered_ids
+        info = get_event_status_info(ev)
+        ev['seats_total'] = info.get('seats_total') or 100
+        ev['seats_filled'] = info.get('seats_filled') or 0
+        ev['seats_left'] = max(0, ev['seats_total'] - ev['seats_filled'])
+        p_num = parse_event_price_numeric(ev.get('price', 'Free'))
+        single_sum += p_num
+        if not ev['is_registered']:
+            unbooked_single_sum += p_num
+
+    disc_pct = float(series.get('discount_percent') or 20.0)
+    bundle_price = round(unbooked_single_sum * (1.0 - disc_pct / 100.0), 2)
+    return render_template(
+        'series.html',
+        series=series,
+        occurrences=occurrences,
+        single_sum=round(single_sum, 2),
+        bundle_price=bundle_price,
+        wallet_balance=get_wallet_balance(username),
+        is_host=is_host()
+    )
+
+
+@app.route('/api/series/<int:series_id>/book-season-pass', methods=['POST'])
+def api_book_season_pass(series_id):
+    """Book all remaining occurrences in a recurring series in one discounted Season Pass checkout."""
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Please log in first.'}), 401
+
+    username = session.get('username')
+    data = request.get_json(silent=True) or request.form or {}
+    use_wallet = str(data.get('use_wallet_credits', '')).lower() in ('1', 'true', 'yes', 'on')
+
+    conn = get_db(row_factory=True)
+    c = conn.cursor()
+    c.execute("SELECT * FROM event_series WHERE id = ?", (series_id,))
+    s_row = c.fetchone()
+    if not s_row:
+        conn.close()
+        return jsonify({'ok': False, 'error': 'Series not found.'}), 404
+    series = dict(s_row)
+
+    c.execute("SELECT email, full_name, phone FROM users WHERE username = ?", (username,))
+    u_row = c.fetchone()
+    u_email = u_row['email'] if u_row else ''
+    u_name = (u_row['full_name'] or username) if u_row else username
+    u_phone = u_row['phone'] if u_row else ''
+
+    c.execute("SELECT * FROM events WHERE series_id = ? ORDER BY id ASC", (series_id,))
+    occurrences = [dict(r) for r in c.fetchall()]
+    registered_ids = set(get_user_registered_ids(username))
+    target_events = [ev for ev in occurrences if ev['id'] not in registered_ids]
+
+    if not target_events:
+        conn.close()
+        return jsonify({'ok': False, 'error': 'You are already registered for every session in this series.'}), 400
+
+    disc_pct = float(series.get('discount_percent') or 20.0)
+    raw_total = sum(parse_event_price_numeric(ev.get('price', 'Free')) for ev in target_events)
+    discounted_total = round(raw_total * (1.0 - disc_pct / 100.0), 2)
+
+    wallet_used = 0.0
+    if use_wallet and discounted_total > 0:
+        c.execute("SELECT balance FROM user_wallet WHERE username = ?", (username,))
+        wr = c.fetchone()
+        avail = float(wr['balance']) if wr else 0.0
+        wallet_used = round(min(avail, discounted_total), 2)
+        if wallet_used > 0:
+            credit_or_debit_wallet(conn, username, -wallet_used, 'debit', f"SER-{series_id:03d}", f"Season pass credits for {series['title']}")
+
+    final_cash_total = max(0.0, round(discounted_total - wallet_used, 2))
+    per_event_paid = round(final_cash_total / max(1, len(target_events)), 2)
+
+    tickets = []
+    for ev in target_events:
+        c.execute(
+            """INSERT INTO registrations
+               (username, event_id, full_name, email, phone, payment_method, pass_type, status, promo_code, discount_amount, amount_paid)
+               VALUES (?, ?, ?, ?, ?, ?, 'in_person', 'active', ?, ?, ?)""",
+            (
+                username, ev['id'], u_name, u_email, u_phone,
+                'Wallet Credits' if wallet_used > 0 and final_cash_total == 0 else 'Season Pass Bundle',
+                f"SEASON-{int(disc_pct)}PCT", round(parse_event_price_numeric(ev.get('price', 'Free')) * disc_pct / 100.0, 2), per_event_paid
+            )
+        )
+        reg_id = c.lastrowid
+        t_code = f"SEA-{series_id:02d}-{ev['id']:03d}-{reg_id:05d}"
+        c.execute("UPDATE registrations SET ticket_code = ? WHERE id = ?", (t_code, reg_id))
+        c.execute("UPDATE events SET seats_filled = COALESCE(seats_filled, 0) + 1 WHERE id = ?", (ev['id'],))
+        c.execute(
+            "INSERT OR REPLACE INTO live_stream_passes (event_id, username, pass_type, ticket_code, payment_method) VALUES (?, ?, 'registered_ticket', ?, 'season_pass')",
+            (ev['id'], username, t_code)
+        )
+        tickets.append({'event_id': ev['id'], 'title': ev['title'], 'date': ev['date'], 'ticket_code': t_code})
+
+    conn.commit()
+    conn.close()
+    invalidate_user_regs(username)
+    invalidate_events_cache()
+
+    for t in tickets:
+        dispatch_host_webhooks('ticket.booked', t['event_id'], {'ticket_code': t['ticket_code'], 'username': username, 'season_pass': True})
+
+    push_notification(username, f"Season Pass unlocked for '{series['title']}' ({len(tickets)} sessions booked)!", url_for('history'))
+    log_action(username, 'book_season_pass', f"Series #{series_id} ({len(tickets)} occurrences)")
+    return jsonify({
+        'ok': True,
+        'booked_count': len(tickets),
+        'total_paid': final_cash_total,
+        'wallet_used': wallet_used,
+        'tickets': tickets,
+        'message': f"Booked {len(tickets)} events in Season Pass!"
+    })
+
+
+@app.route('/api/event/<int:event_id>/addons', methods=['GET', 'POST'])
+def api_event_addons(event_id):
+    """List event merchandise/VIP add-ons or let hosts create a new add-on."""
+    conn = get_db()
+    c = conn.cursor()
+    if request.method == 'POST':
+        if not (is_host() or is_admin()):
+            conn.close()
+            return jsonify({'ok': False, 'error': 'Unauthorized'}), 403
+        data = request.get_json(silent=True) or request.form or {}
+        name = (data.get('name') or '').strip()
+        desc = (data.get('description') or '').strip()
+        try:
+            price = max(0.0, float(data.get('price') or 0.0))
+            stock = max(1, int(data.get('stock_total') or 50))
+        except Exception:
+            conn.close()
+            return jsonify({'ok': False, 'error': 'Invalid price or stock number.'}), 400
+        if not name:
+            conn.close()
+            return jsonify({'ok': False, 'error': 'Add-on name is required.'}), 400
+        c.execute(
+            "INSERT INTO event_addons (event_id, name, description, price, stock_total, stock_sold, is_active) VALUES (?, ?, ?, ?, ?, 0, 1)",
+            (event_id, name, desc, price, stock)
+        )
+        aid = c.lastrowid
+        conn.commit()
+        conn.close()
+        return jsonify({'ok': True, 'addon_id': aid})
+
+    c.execute("SELECT id, name, description, price, stock_total, stock_sold FROM event_addons WHERE event_id = ? AND is_active = 1 ORDER BY id ASC", (event_id,))
+    rows = [
+        {'id': r[0], 'name': r[1], 'description': r[2], 'price': r[3], 'stock_total': r[4], 'stock_sold': r[5], 'stock_left': max(0, r[4] - r[5])}
+        for r in c.fetchall()
+    ]
+    conn.close()
+    return jsonify({'ok': True, 'addons': rows})
+
+
+@app.route('/verify-2fa', methods=['GET', 'POST'])
+def verify_2fa():
+    """Second-factor TOTP authenticator or recovery backup-code verification step."""
+    pending = session.get('pending_2fa_payload')
+    if not pending or not pending.get('username'):
+        return redirect(url_for('login'))
+
+    error = None
+    uname = pending['username']
+    if request.method == 'POST':
+        code = re.sub(r'\s+', '', request.form.get('code') or '')
+        conn = get_db()
+        c = conn.cursor()
+        c.execute("SELECT totp_secret, is_enabled, backup_codes_json FROM user_2fa_settings WHERE username = ?", (uname,))
+        row = c.fetchone()
+        if not row or row[1] != 1:
+            conn.close()
+            session.pop('pending_2fa_payload', None)
+            return redirect(url_for('login'))
+
+        secret, _, b_json = row
+        verified_method = None
+        if verify_totp_code(secret, code):
+            verified_method = 'totp_2fa'
+        else:
+            try:
+                codes_list = json.loads(b_json or '[]')
+            except Exception:
+                codes_list = []
+            matched = next((bc for bc in codes_list if bc.upper() == code.upper()), None)
+            if matched:
+                codes_list.remove(matched)
+                c.execute("UPDATE user_2fa_settings SET backup_codes_json = ? WHERE username = ?", (json.dumps(codes_list), uname))
+                verified_method = 'backup_code'
+
+        if verified_method:
+            session.pop('pending_2fa_payload', None)
+            session['loggedin'] = True
+            session['username'] = uname
+            session['role'] = pending.get('role', 'user')
+            session['is_admin'] = pending.get('is_admin', False)
+            session['user_id'] = pending.get('user_id', '')
+            session['profile_photo'] = pending.get('profile_photo', '')
+            _record_login_session(conn, uname, method=verified_method)
+            conn.close()
+            log_action(uname, 'login_2fa_verified', f"Verified second factor via {verified_method}")
+            return redirect(url_for('dashboard'), code=303)
+
+        conn.close()
+        error = "Invalid authentication code or backup recovery code. Please try again."
+
+    return render_template('verify_2fa.html', pending_username=uname, error=error)
+
+
+@app.route('/api/settings/2fa/setup', methods=['POST'])
+def api_2fa_setup():
+    """Generate TOTP secret, authenticator QR code URI, and backup codes for the logged-in user."""
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Unauthorized'}), 401
+    username = session.get('username')
+    secret = generate_totp_secret()
+    backup_codes = generate_backup_codes(8)
+    uri = build_otpauth_uri(secret, username, issuer="Events Booking")
+    qr_uri = generate_qr_data_uri(uri)
+
+    conn = get_db()
+    c = conn.cursor()
+    c.execute(
+        """INSERT INTO user_2fa_settings (username, totp_secret, is_enabled, backup_codes_json)
+           VALUES (?, ?, 0, ?)
+           ON CONFLICT(username) DO UPDATE SET totp_secret = excluded.totp_secret, is_enabled = 0, backup_codes_json = excluded.backup_codes_json""",
+        (username, secret, json.dumps(backup_codes))
+    )
+    conn.commit()
+    conn.close()
+
+    return jsonify({
+        'ok': True,
+        'secret': secret,
+        'otpauth_uri': uri,
+        'qr_data_uri': qr_uri,
+        'backup_codes': backup_codes
+    })
+
+
+@app.route('/api/settings/2fa/verify-enable', methods=['POST'])
+def api_2fa_verify_enable():
+    """Confirm a live 6-digit TOTP code before activating 2FA on the user account."""
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Unauthorized'}), 401
+    username = session.get('username')
+    data = request.get_json(silent=True) or request.form or {}
+    code = re.sub(r'\s+', '', data.get('code') or '')
+
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT totp_secret FROM user_2fa_settings WHERE username = ?", (username,))
+    row = c.fetchone()
+    if not row:
+        conn.close()
+        return jsonify({'ok': False, 'error': 'Please click Setup 2FA first.'}), 400
+    if not verify_totp_code(row[0], code):
+        conn.close()
+        return jsonify({'ok': False, 'error': 'Invalid 6-digit verification code.'}), 400
+
+    c.execute("UPDATE user_2fa_settings SET is_enabled = 1, enabled_at = CURRENT_TIMESTAMP WHERE username = ?", (username,))
+    conn.commit()
+    conn.close()
+    log_action(username, '2fa_enabled', "Enabled RFC-6238 TOTP Two-Factor Authentication")
+    return jsonify({'ok': True, 'message': 'Two-Factor Authentication is now active!'})
+
+
+@app.route('/api/settings/2fa/disable', methods=['POST'])
+def api_2fa_disable():
+    """Disable TOTP 2FA after confirming account password or current OTP code."""
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Unauthorized'}), 401
+    username = session.get('username')
+    data = request.get_json(silent=True) or request.form or {}
+    password = data.get('password') or ''
+    code = re.sub(r'\s+', '', data.get('code') or '')
+
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT password FROM users WHERE username = ?", (username,))
+    u_row = c.fetchone()
+    c.execute("SELECT totp_secret FROM user_2fa_settings WHERE username = ?", (username,))
+    t_row = c.fetchone()
+
+    pwd_ok = bool(u_row and password and check_password_cached(u_row[0], password))
+    totp_ok = bool(t_row and code and verify_totp_code(t_row[0], code))
+    if not (pwd_ok or totp_ok):
+        conn.close()
+        return jsonify({'ok': False, 'error': 'Confirm your password or current 6-digit TOTP code to disable 2FA.'}), 400
+
+    c.execute("UPDATE user_2fa_settings SET is_enabled = 0 WHERE username = ?", (username,))
+    conn.commit()
+    conn.close()
+    log_action(username, '2fa_disabled', "Disabled Two-Factor Authentication")
+    return jsonify({'ok': True, 'message': 'Two-Factor Authentication disabled.'})
+
+
+@app.route('/settings/sessions/revoke-others', methods=['POST'])
+def revoke_other_sessions():
+    """Revoke all other active login sessions for the current user."""
+    wants_json = request.is_json or 'application/json' in str(request.headers.get('Accept', ''))
+    if not session.get('loggedin'):
+        if wants_json:
+            return jsonify({'ok': False, 'error': 'Unauthorized'}), 401
+        return redirect(url_for('login'))
+
+    username = session.get('username')
+    cur_tok = session.get('session_token') or ''
+    conn = get_db()
+    c = conn.cursor()
+    c.execute(
+        "UPDATE user_login_sessions SET is_active = 0 WHERE username = ? AND session_token != ?",
+        (username, cur_tok)
+    )
+    revoked_count = c.rowcount
+    conn.commit()
+    conn.close()
+    log_action(username, 'revoke_other_sessions', f"Signed out {revoked_count} other active session(s)")
+    if wants_json:
+        return jsonify({'ok': True, 'revoked_count': revoked_count})
+    return redirect(url_for('settings', msg=f"Signed out {revoked_count} other device session(s)."))
+
+
+@app.route('/wallet')
+def wallet_page():
+    """In-App Event Wallet & Credit Ledger UI."""
+    if not session.get('loggedin'):
+        return redirect(url_for('login'))
+    username = session.get('username')
+    balance = get_wallet_balance(username)
+    conn = get_db()
+    c = conn.cursor()
+    c.execute(
+        """SELECT id, tx_type, amount, balance_after, reference_code, description, created_at
+           FROM wallet_transactions WHERE username = ? ORDER BY id DESC LIMIT 50""",
+        (username,)
+    )
+    txs = [
+        {'id': r[0], 'tx_type': r[1], 'amount': r[2], 'balance_after': r[3], 'reference_code': r[4], 'description': r[5], 'created_at': r[6]}
+        for r in c.fetchall()
+    ]
+    conn.close()
+    return render_template('wallet.html', username=username, balance=balance, transactions=txs, is_host=is_host())
+
+
+@app.route('/api/wallet', methods=['GET'])
+def api_wallet_summary():
+    """JSON wallet credit balance and transaction history."""
+    if not session.get('loggedin'):
+        return jsonify({'ok': False, 'error': 'Unauthorized'}), 401
+    username = session.get('username')
+    balance = get_wallet_balance(username)
+    conn = get_db()
+    c = conn.cursor()
+    c.execute(
+        "SELECT id, tx_type, amount, balance_after, reference_code, description, created_at FROM wallet_transactions WHERE username = ? ORDER BY id DESC LIMIT 30",
+        (username,)
+    )
+    txs = [
+        {'id': r[0], 'tx_type': r[1], 'amount': r[2], 'balance_after': r[3], 'reference_code': r[4], 'description': r[5], 'created_at': r[6]}
+        for r in c.fetchall()
+    ]
+    conn.close()
+    return jsonify({'ok': True, 'balance': balance, 'transactions': txs})
+
+
+@app.route('/api/event/<int:event_id>/refund-preview', methods=['GET'])
+def api_refund_preview(event_id):
+    """Calculate live cancellation refund amount under the event's configured policy."""
+    event = get_event(event_id)
+    if not event:
+        return jsonify({'ok': False, 'error': 'Event not found'}), 404
+    paid = request.args.get('amount_paid', type=float)
+    if paid is None:
+        paid = parse_event_price_numeric(event.get('price', 'Free'))
+    preview = calculate_event_ticket_refund(event, paid)
+    preview['ok'] = True
+    return jsonify(preview)
+
+
+@app.route('/api/host/webhooks', methods=['GET'])
+def api_host_webhooks_list():
+    """List host outgoing webhooks and recent delivery telemetry."""
+    if not (is_host() or is_admin()):
+        return jsonify({'ok': False, 'error': 'Unauthorized'}), 403
+    conn = get_db(row_factory=True)
+    c = conn.cursor()
+    c.execute("SELECT * FROM host_webhooks ORDER BY id DESC")
+    hooks = [dict(r) for r in c.fetchall()]
+    c.execute(
+        """SELECT d.*, h.name as hook_name
+           FROM webhook_deliveries d LEFT JOIN host_webhooks h ON d.webhook_id = h.id
+           ORDER BY d.id DESC LIMIT 25"""
+    )
+    deliveries = [dict(r) for r in c.fetchall()]
+    conn.close()
+    return jsonify({'ok': True, 'webhooks': hooks, 'deliveries': deliveries})
+
+
+@app.route('/api/host/webhooks/create', methods=['POST'])
+def api_host_webhooks_create():
+    """Register a new outgoing HTTP webhook endpoint for Slack/Discord/Zapier alerts."""
+    if not (is_host() or is_admin()):
+        return jsonify({'ok': False, 'error': 'Unauthorized'}), 403
+    data = request.get_json(silent=True) or request.form or {}
+    name = (data.get('name') or 'Event Alert Webhook').strip()
+    target_url = (data.get('target_url') or '').strip()
+    event_id = int(data.get('event_id') or 0)
+    sub_events = (data.get('subscribed_events') or 'ticket.booked,ticket.checked_in,ticket.transferred,event.sold_out,waitlist.promoted').strip()
+    secret_key = (data.get('secret_key') or '').strip() or f"whsec_{secrets.token_hex(12)}"
+
+    if not target_url.startswith(('http://', 'https://')):
+        return jsonify({'ok': False, 'error': 'Webhook URL must start with http:// or https://'}), 400
+
+    conn = get_db()
+    c = conn.cursor()
+    c.execute(
+        """INSERT INTO host_webhooks (host_username, event_id, name, target_url, secret_key, subscribed_events, is_active)
+           VALUES (?, ?, ?, ?, ?, ?, 1)""",
+        (session.get('username'), event_id, name, target_url, secret_key, sub_events)
+    )
+    hook_id = c.lastrowid
+    conn.commit()
+    conn.close()
+    log_action(session.get('username'), 'webhook_created', f"Created webhook #{hook_id} ({name} -> {target_url})")
+    return jsonify({'ok': True, 'id': hook_id, 'secret_key': secret_key, 'name': name})
+
+
+@app.route('/api/host/webhooks/<int:hook_id>/toggle', methods=['POST'])
+def api_host_webhooks_toggle(hook_id):
+    """Enable or pause an outgoing host webhook."""
+    if not (is_host() or is_admin()):
+        return jsonify({'ok': False, 'error': 'Unauthorized'}), 403
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("UPDATE host_webhooks SET is_active = CASE WHEN is_active = 1 THEN 0 ELSE 1 END WHERE id = ?", (hook_id,))
+    c.execute("SELECT is_active FROM host_webhooks WHERE id = ?", (hook_id,))
+    row = c.fetchone()
+    conn.commit()
+    conn.close()
+    if not row:
+        return jsonify({'ok': False, 'error': 'Webhook not found'}), 404
+    return jsonify({'ok': True, 'is_active': bool(row[0])})
+
+
+@app.route('/api/host/webhooks/<int:hook_id>/test', methods=['POST'])
+def api_host_webhooks_test(hook_id):
+    """Send a signed synthetic test payload to an outgoing host webhook."""
+    if not (is_host() or is_admin()):
+        return jsonify({'ok': False, 'error': 'Unauthorized'}), 403
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT event_id, target_url, secret_key, name FROM host_webhooks WHERE id = ?", (hook_id,))
+    row = c.fetchone()
+    conn.close()
+    if not row:
+        return jsonify({'ok': False, 'error': 'Webhook not found'}), 404
+    ev_id, url, secret_k, name = row
+    payload = {'test': True, 'webhook_name': name, 'triggered_by': session.get('username')}
+    body_bytes = json.dumps({'event': 'webhook.test', 'event_id': ev_id, 'timestamp': datetime.now().isoformat(), 'data': payload}).encode('utf-8')
+    sig = sign_webhook_payload(secret_k, body_bytes)
+    status_code, snippet, ok = 0, '', 0
+    try:
+        if app.config.get('TESTING') and url.startswith(('http://mock-webhook', 'https://mock-webhook')):
+            status_code, snippet, ok = 200, 'Mock webhook test delivered', 1
+        else:
+            r = requests.post(url, data=body_bytes, headers={'Content-Type': 'application/json', 'X-Events-Event': 'webhook.test', 'X-Events-Signature': sig}, timeout=4)
+            status_code, snippet, ok = r.status_code, (r.text or '')[:240], (1 if 200 <= r.status_code < 300 else 0)
+    except Exception as ex:
+        snippet = str(ex)[:240]
+    dconn = get_db()
+    dconn.cursor().execute(
+        "INSERT INTO webhook_deliveries (webhook_id, event_type, payload_json, status_code, response_snippet, success) VALUES (?, 'webhook.test', ?, ?, ?, ?)",
+        (hook_id, body_bytes.decode('utf-8'), status_code, snippet, ok)
+    )
+    dconn.commit()
+    dconn.close()
+    return jsonify({'ok': bool(ok), 'status_code': status_code, 'response_snippet': snippet, 'signature': sig})
 
 
 if __name__ == '__main__':
@@ -15364,8 +17113,8 @@ def api_ai_magic_generate_event():
     purpose = "Accelerate industry breakthroughs, foster collaboration, and empower attendees with actionable technical blueprints."
     outcome = "Leave equipped with enterprise production frameworks, verified POAP credentials, and valuable peer connections."
 
-    c.execute("""INSERT INTO events (title, date, time, end_time, desc, price, stream_price, venue, venue_address, category, purpose, full_details, outcome, seats_total, seats_filled, is_draft, featured)
-                 VALUES (?, ?, '09:30 AM', '06:00 PM', ?, ?, '₹199', ?, ?, ?, ?, ?, ?, 250, 0, 0, 1)""",
+    c.execute("""INSERT INTO events (title, date, time, end_time, desc, price, color, image, stream_price, venue, venue_address, category, purpose, full_details, outcome, seats_total, seats_filled, is_draft, featured)
+                 VALUES (?, ?, '09:30 AM', '06:00 PM', ?, ?, '#008be3', 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80', '₹199', ?, ?, ?, ?, ?, ?, 250, 0, 0, 1)""",
               (title, date_str, desc, price_str, venue, venue_address, category, purpose, full_details, outcome))
     new_event_id = c.lastrowid
 
@@ -15644,12 +17393,23 @@ def api_trivia_submit_answer(event_id):
     user_stat = c.fetchone()
     conn.close()
 
+    total_sc = user_stat[0] if user_stat else points
+    streak_cnt = user_stat[1] if user_stat else (1 if is_correct else 0)
+    trigger_live_stage_broadcast(event_id, {
+        'type': 'trivia_score',
+        'event_id': event_id,
+        'username': username,
+        'points': points,
+        'total_score': total_sc,
+        'streak_count': streak_cnt,
+    })
+
     return jsonify({
         'ok': True,
         'is_correct': is_correct,
         'points_awarded': points,
-        'total_score': user_stat[0] if user_stat else points,
-        'streak_count': user_stat[1] if user_stat else (1 if is_correct else 0),
+        'total_score': total_sc,
+        'streak_count': streak_cnt,
         'message': f'🔥 Correct! +{points} XP!' if is_correct else '❌ Incorrect answer. Streak reset!'
     })
 

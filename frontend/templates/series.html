@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ series.title }} — Event Series | Events Booking</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=5.0">
+    <script src="{{ url_for('static', filename='themes.js') }}?v=5.0"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        .series-shell { max-width: 1020px; margin: 2rem auto; padding: 0 1.25rem 4rem; }
+        .series-hero {
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(168, 85, 247, 0.16));
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            border-radius: 20px;
+            padding: 2rem;
+            display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .occ-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 1.15rem; }
+        .occ-card {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.25rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar" style="padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center;">
+        <a href="{{ url_for('dashboard') }}" style="color: #fff; text-decoration: none; font-weight: 800; font-family: 'Outfit', sans-serif;">← Back to Dashboard</a>
+        <a href="{{ url_for('wallet_page') }}" class="btn-secondary" style="padding: 0.45rem 1rem; text-decoration: none; font-size: 0.85rem;">💰 Wallet: ₹{{ '%.2f'|format(wallet_balance) }}</a>
+    </nav>
+
+    <div class="series-shell">
+        <div class="series-hero">
+            <div>
+                <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: #38bdf8; font-weight: 700;">
+                    🔁 Recurring {{ series.recurrence_rule|title }} Series • {{ occurrences|length }} Sessions
+                </div>
+                <h1 style="font-family: 'Outfit', sans-serif; margin: 0.35rem 0;">{{ series.title }}</h1>
+                <p style="color: var(--text-muted); margin: 0;">Save <strong>{{ series.discount_percent|int }}%</strong> across every session with a unified Season Pass.</p>
+            </div>
+            <div style="text-align: right; min-width: 240px;">
+                <div style="font-size: 0.85rem; color: var(--text-muted); text-decoration: line-through;">Individual Total: ₹{{ '%.2f'|format(single_sum) }}</div>
+                <div style="font-size: 2rem; font-weight: 800; color: #34d399; font-family: 'Outfit', sans-serif;">Season Pass: ₹{{ '%.2f'|format(bundle_price) }}</div>
+                {% if wallet_balance > 0 %}
+                <label style="display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.84rem; color: #e2e8f0; margin: 0.5rem 0;">
+                    <input type="checkbox" id="useWalletSeries"> Apply Wallet Credits (₹{{ '%.2f'|format(wallet_balance) }})
+                </label>
+                {% endif %}
+                <div>
+                    <button type="button" id="bookSeasonBtn" onclick="bookSeasonPass()" class="btn-primary" style="margin-top: 0.5rem;">
+                        🎟️ Unlock Full Season Pass
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="seasonMsg" style="display: none; margin-bottom: 1.5rem;" class="login-feedback-banner success"></div>
+
+        <h2 style="font-family: 'Outfit', sans-serif; margin-bottom: 1rem;">Series Schedule</h2>
+        <div class="occ-grid">
+            {% for ev in occurrences %}
+            <div class="occ-card">
+                <div style="font-size: 0.78rem; color: #38bdf8; font-weight: 700;">Session #{{ loop.index }} • {{ ev.date }}</div>
+                <h3 style="margin: 0.4rem 0; font-size: 1.05rem;">{{ ev.title }}</h3>
+                <div style="font-size: 0.84rem; color: var(--text-muted);">{{ ev.time or '10:00 AM' }} • {{ ev.venue or 'Main Auditorium' }}</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                    <span style="font-weight: 700; color: #34d399;">{{ ev.price or 'Free' }}</span>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        {% if ev.is_registered %}
+                        <span style="font-size: 0.78rem; padding: 3px 9px; border-radius: 999px; background: rgba(16,185,129,0.16); color: #34d399;">✓ Registered</span>
+                        {% endif %}
+                        <a href="{{ url_for('event_detail', event_id=ev.id) }}" class="btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; text-decoration: none;">Details</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        async function bookSeasonPass() {
+            const btn = document.getElementById('bookSeasonBtn');
+            const useWalletEl = document.getElementById('useWalletSeries');
+            btn.disabled = true;
+            btn.textContent = 'Processing Season Pass...';
+            try {
+                const res = await fetch('/api/series/{{ series.id }}/book-season-pass', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ use_wallet_credits: Boolean(useWalletEl && useWalletEl.checked) })
+                });
+                const data = await res.json();
+                const msgBox = document.getElementById('seasonMsg');
+                msgBox.style.display = 'flex';
+                if (data.ok) {
+                    msgBox.className = 'login-feedback-banner success';
+                    msgBox.innerHTML = `<span>🎉</span><div>${data.message} Reloading schedule...</div>`;
+                    setTimeout(() => window.location.reload(), 1200);
+                } else {
+                    msgBox.className = 'login-feedback-banner error';
+                    msgBox.innerHTML = `<span>❌</span><div>${data.error || 'Booking failed'}</div>`;
+                    btn.disabled = false;
+                    btn.textContent = '🎟️ Unlock Full Season Pass';
+                }
+            } catch (e) {
+                btn.disabled = false;
+                btn.textContent = '🎟️ Unlock Full Season Pass';
+            }
+        }
+    </script>
+</body>
+</html>
+

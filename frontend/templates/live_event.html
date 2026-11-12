@@ -1754,6 +1754,10 @@
                             }
                         } else if (data.type === 'reaction') {
                             spawnFloatingReaction(data.emoji);
+                        } else if (data.type === 'qa_added' || data.type === 'qa_upvoted') {
+                            if (typeof loadQA === 'function') loadQA();
+                        } else if (data.type === 'poll_updated') {
+                            if (typeof loadPolls === 'function') loadPolls();
                         }
                     } catch (err) {
                         console.error("Stage WS parse error", err);

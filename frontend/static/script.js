@@ -98,6 +98,32 @@ function validateEmailAddress(email) {
     return { valid: true, cleaned: val };
 }
 
+// Automatic same-origin CSRF header attachment for fetch() calls
+(function () {
+    const origFetch = window.fetch;
+    if (!origFetch) return;
+    window.fetch = function (input, init) {
+        const opts = init ? Object.assign({}, init) : {};
+        const method = (opts.method || 'GET').toUpperCase();
+        if (method !== 'GET' && method !== 'HEAD' && method !== 'OPTIONS') {
+            const url = typeof input === 'string' ? input : (input && input.url) || '';
+            const sameOrigin = !url || url.startsWith('/') || url.startsWith(window.location.origin);
+            if (sameOrigin) {
+                const meta = document.querySelector('meta[name="csrf-token"]');
+                const token = meta ? meta.getAttribute('content') : '';
+                if (token) {
+                    const hdrs = new Headers(opts.headers || {});
+                    if (!hdrs.has('X-CSRF-Token')) {
+                        hdrs.set('X-CSRF-Token', token);
+                    }
+                    opts.headers = hdrs;
+                }
+            }
+        }
+        return origFetch.call(this, input, opts);
+    };
+})();
+
 // Prevent background scroll leak when scrolling over sidebar
 document.addEventListener('DOMContentLoaded', function() {
     const sidebar = document.getElementById('sidebar');
@@ -111,4 +137,120 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }, { passive: false });
     }
+    initCaptchaDigitGroups();
 });
+
+/**
+ * Bind 5-box OTP-style numeric CAPTCHA inputs to a backing hidden form field.
+ * Supports single-digit typing with auto-advance, multi-digit paste,
+ * Backspace navigation, and Left/Right arrow navigation.
+ */
+function syncCaptchaDigitGroup(group) {
+    if (!group) return '';
+    const hiddenId = group.getAttribute('data-captcha-group');
+    const hiddenEl = hiddenId ? document.getElementById(hiddenId) : null;
+    const boxes = Array.from(group.querySelectorAll('.captcha-digit-box'));
+    const combined = boxes.map((b) => {
+        const clean = (b.value || '').replace(/\D/g, '').slice(0, 1);
+        if (b.value !== clean) b.value = clean;
+        b.classList.toggle('is-filled', clean.length === 1);
+        return clean;
+    }).join('');
+    if (hiddenEl) hiddenEl.value = combined;
+    return combined;
+}
+
+function clearCaptchaDigitGroup(hiddenId) {
+    const group = document.querySelector(`[data-captcha-group="${hiddenId}"]`);
+    const hiddenEl = document.getElementById(hiddenId);
+    if (hiddenEl) hiddenEl.value = '';
+    if (!group) return;
+    const boxes = Array.from(group.querySelectorAll('.captcha-digit-box'));
+    boxes.forEach((b) => {
+        b.value = '';
+        b.classList.remove('is-filled');
+    });
+    if (boxes[0]) boxes[0].focus();
+}
+
+function initCaptchaDigitGroups() {
+    const groups = document.querySelectorAll('[data-captcha-group]');
+    groups.forEach((group) => {
+        if (group.dataset.captchaBound === '1') return;
+        group.dataset.captchaBound = '1';
+
+        const boxes = Array.from(group.querySelectorAll('.captcha-digit-box'));
+        const form = group.closest('form');
+        if (form && form.dataset.captchaSubmitBound !== '1') {
+            form.dataset.captchaSubmitBound = '1';
+            form.addEventListener('submit', () => {
+                form.querySelectorAll('[data-captcha-group]').forEach(syncCaptchaDigitGroup);
+            });
+        }
+
+        const fillFromIndex = (startIdx, digits) => {
+            if (!digits) {
+                syncCaptchaDigitGroup(group);
+                return;
+            }
+            let pos = startIdx;
+            for (const ch of digits) {
+                if (pos >= boxes.length) break;
+                boxes[pos].value = ch;
+                pos += 1;
+            }
+            syncCaptchaDigitGroup(group);
+            const focusIdx = Math.min(pos, boxes.length - 1);
+            if (boxes[focusIdx]) boxes[focusIdx].focus();
+        };
+
+        boxes.forEach((box, idx) => {
+            box.addEventListener('focus', () => {
+                setTimeout(() => box.select(), 0);
+            });
+
+            box.addEventListener('input', () => {
+                const digits = (box.value || '').replace(/\D/g, '');
+                if (digits.length > 1) {
+                    fillFromIndex(idx, digits);
+                    return;
+                }
+                box.value = digits;
+                syncCaptchaDigitGroup(group);
+                if (digits.length === 1 && idx < boxes.length - 1) {
+                    boxes[idx + 1].focus();
+                }
+            });
+
+            box.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace') {
+                    if (!box.value && idx > 0) {
+                        e.preventDefault();
+                        boxes[idx - 1].value = '';
+                        syncCaptchaDigitGroup(group);
+                        boxes[idx - 1].focus();
+                    } else {
+                        setTimeout(() => syncCaptchaDigitGroup(group), 0);
+                    }
+                } else if (e.key === 'ArrowLeft' && idx > 0) {
+                    e.preventDefault();
+                    boxes[idx - 1].focus();
+                } else if (e.key === 'ArrowRight' && idx < boxes.length - 1) {
+                    e.preventDefault();
+                    boxes[idx + 1].focus();
+                }
+            });
+
+            box.addEventListener('paste', (e) => {
+                const raw = (e.clipboardData || window.clipboardData)?.getData('text') || '';
+                const digits = raw.replace(/\D/g, '');
+                if (!digits) return;
+                e.preventDefault();
+                const start = digits.length >= boxes.length ? 0 : idx;
+                fillFromIndex(start, digits);
+            });
+        });
+
+        syncCaptchaDigitGroup(group);
+    });
+}

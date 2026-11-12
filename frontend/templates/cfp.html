@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Call for Speakers (CfP) — {{ event.title }} | Events Booking</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=5.0">
+    <script src="{{ url_for('static', filename='themes.js') }}?v=5.0"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        .cfp-shell { max-width: 1120px; margin: 2rem auto; padding: 0 1.25rem 4rem; display: grid; grid-template-columns: 1fr 1.2fr; gap: 1.75rem; }
+        @media (max-width: 900px) { .cfp-shell { grid-template-columns: 1fr; } }
+        .cfp-card {
+            background: rgba(15, 23, 42, 0.82);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            padding: 1.6rem;
+        }
+        .proposal-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 14px;
+            padding: 1.15rem;
+            margin-bottom: 1rem;
+        }
+        .status-pill {
+            display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 0.74rem; font-weight: 800; text-transform: uppercase;
+        }
+        .status-pending { background: rgba(245, 158, 11, 0.16); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.35); }
+        .status-accepted { background: rgba(16, 185, 129, 0.16); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.35); }
+        .status-waitlisted { background: rgba(56, 189, 248, 0.16); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35); }
+        .status-declined { background: rgba(239, 68, 68, 0.16); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); }
+    </style>
+</head>
+<body>
+    <nav class="navbar" style="padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center;">
+        <a href="{{ url_for('event_detail', event_id=event.id) }}" style="color: #fff; text-decoration: none; font-weight: 800; font-family: 'Outfit', sans-serif;">← Back to {{ event.title }}</a>
+        <a href="{{ url_for('dashboard') }}" class="btn-secondary" style="padding: 0.45rem 1rem; text-decoration: none; font-size: 0.85rem;">Dashboard</a>
+    </nav>
+
+    <div style="max-width: 1120px; margin: 1.5rem auto 0; padding: 0 1.25rem;">
+        <h1 style="font-family: 'Outfit', sans-serif; margin-bottom: 0.25rem;">🎤 Call for Speakers — {{ event.title }}</h1>
+        <p style="color: var(--text-muted); margin-top: 0;">Pitch a talk, keynote, or workshop. Accepted proposals are automatically promoted into the event agenda!</p>
+        {% if msg %}
+        <div class="login-feedback-banner success" style="margin-top: 1rem;"><span>✨</span><div>{{ msg }}</div></div>
+        {% endif %}
+        {% if error %}
+        <div class="login-feedback-banner error" style="margin-top: 1rem;"><span>❌</span><div>{{ error }}</div></div>
+        {% endif %}
+    </div>
+
+    <div class="cfp-shell">
+        <div class="cfp-card">
+            <h2 style="font-family: 'Outfit', sans-serif; margin-top: 0;">Submit Speaker Proposal</h2>
+            <form action="{{ url_for('event_cfp_portal', event_id=event.id) }}" method="POST">
+                <div class="input-group">
+                    <label for="speaker_name">Speaker Full Name *</label>
+                    <input type="text" id="speaker_name" name="speaker_name" class="input-field" required value="{{ username }}">
+                </div>
+                <div class="input-group">
+                    <label for="speaker_email">Contact Email</label>
+                    <input type="email" id="speaker_email" name="speaker_email" class="input-field" placeholder="speaker@example.com">
+                </div>
+                <div class="input-group">
+                    <label for="speaker_role">Role / Organization</label>
+                    <input type="text" id="speaker_role" name="speaker_role" class="input-field" placeholder="e.g. Principal AI Engineer at Acme">
+                </div>
+                <div class="input-group">
+                    <label for="talk_title">Session / Talk Title *</label>
+                    <input type="text" id="talk_title" name="talk_title" class="input-field" required placeholder="e.g. Scaling Multi-Agent Workflows in Production">
+                </div>
+                <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 0.8rem;">
+                    <div class="input-group">
+                        <label for="track_preference">Preferred Track</label>
+                        <select id="track_preference" name="track_preference" class="input-field">
+                            <option value="Main Stage Keynotes">Main Stage Keynotes</option>
+                            <option value="Technical Deep Dive">Technical Deep Dive</option>
+                            <option value="Hands-on Workshop">Hands-on Workshop</option>
+                            <option value="Lightning Talks">Lightning Talks</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="session_duration_min">Duration</label>
+                        <select id="session_duration_min" name="session_duration_min" class="input-field">
+                            <option value="20">20 mins</option>
+                            <option value="45" selected>45 mins</option>
+                            <option value="60">60 mins</option>
+                            <option value="90">90 mins</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="abstract">Talk Abstract &amp; Key Takeaways *</label>
+                    <textarea id="abstract" name="abstract" class="input-field" rows="4" required placeholder="Outline what attendees will learn..."></textarea>
+                </div>
+                <div class="input-group">
+                    <label for="speaker_bio">Speaker Bio</label>
+                    <textarea id="speaker_bio" name="speaker_bio" class="input-field" rows="2" placeholder="Brief background or past talks..."></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Submit Talk Proposal</button>
+            </form>
+        </div>
+
+        <div class="cfp-card">
+            <h2 style="font-family: 'Outfit', sans-serif; margin-top: 0;">
+                {% if is_host or is_admin %}Host Moderation Queue ({{ proposals|length }}){% else %}Accepted Talks &amp; Your Submissions ({{ proposals|length }}){% endif %}
+            </h2>
+            {% if proposals %}
+                {% for p in proposals %}
+                <div class="proposal-item" id="proposal-{{ p.id }}">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem;">
+                        <div>
+                            <h3 style="margin: 0 0 0.25rem; font-size: 1.05rem;">{{ p.talk_title }}</h3>
+                            <div style="font-size: 0.82rem; color: #38bdf8; font-weight: 600;">
+                                {{ p.speaker_name }}{% if p.speaker_role %} • {{ p.speaker_role }}{% endif %}
+                            </div>
+                        </div>
+                        <span class="status-pill status-{{ p.status }}" id="prop-status-{{ p.id }}">{{ p.status }}</span>
+                    </div>
+                    <p style="margin: 0.65rem 0; font-size: 0.88rem; color: var(--text-muted); line-height: 1.45;">{{ p.abstract }}</p>
+                    <div style="font-size: 0.78rem; color: #94a3b8;">Track: {{ p.track_preference }} • {{ p.duration_min }} mins</div>
+                    {% if is_host or is_admin %}
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.85rem;">
+                        <button type="button" onclick="reviewProposal({{ p.id }}, 'accepted')" class="btn-primary" style="width: auto; padding: 0.4rem 0.9rem; margin: 0; font-size: 0.8rem; background: #10b981;">✓ Accept &amp; Add to Agenda</button>
+                        <button type="button" onclick="reviewProposal({{ p.id }}, 'waitlisted')" class="btn-secondary" style="width: auto; padding: 0.4rem 0.9rem; margin: 0; font-size: 0.8rem;">Waitlist</button>
+                        <button type="button" onclick="reviewProposal({{ p.id }}, 'declined')" class="btn-secondary" style="width: auto; padding: 0.4rem 0.9rem; margin: 0; font-size: 0.8rem; color: #f87171;">Decline</button>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <p style="color: var(--text-muted); text-align: center; padding: 2rem;">No speaker proposals submitted yet. Be the first to propose a talk!</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        async function reviewProposal(propId, decision) {
+            const res = await fetch(`/api/event/{{ event.id }}/cfp/${propId}/review`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ decision: decision })
+            });
+            const data = await res.json();
+            if (data.ok) {
+                const badge = document.getElementById(`prop-status-${propId}`);
+                if (badge) {
+                    badge.textContent = decision;
+                    badge.className = `status-pill status-${decision}`;
+                }
+            } else {
+                alert(data.error || 'Could not update proposal status.');
+            }
+        }
+    </script>
+</body>
+</html>
+

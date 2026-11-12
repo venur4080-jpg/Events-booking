@@ -294,8 +294,69 @@ select:focus {
 }
 
 .captcha-input-container {
-    flex: 1;
-    min-width: 110px;
+    flex: 1 1 250px;
+    min-width: min(100%, 250px);
+    max-width: 325px;
+}
+
+.captcha-digits-group {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+    width: 100%;
+}
+
+.captcha-digits-group input[type="text"].captcha-digit-box {
+    width: 100% !important;
+    height: 48px;
+    padding: 0 !important;
+    margin: 0 !important;
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 48px;
+    color: #ffffff !important;
+    background: rgba(15, 23, 42, 0.72) !important;
+    background-color: rgba(15, 23, 42, 0.72) !important;
+    border: 1.5px solid rgba(56, 189, 248, 0.35) !important;
+    border-radius: 10px !important;
+    caret-color: var(--primary);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, transform 0.15s ease;
+}
+
+.captcha-digits-group input[type="text"].captcha-digit-box:focus {
+    outline: none !important;
+    border-color: var(--primary) !important;
+    background: rgba(15, 23, 42, 0.95) !important;
+    background-color: rgba(15, 23, 42, 0.95) !important;
+    box-shadow: 0 0 0 3px rgba(0, 139, 227, 0.25) !important;
+    transform: translateY(-1px);
+}
+
+.captcha-digits-group input[type="text"].captcha-digit-box.is-filled {
+    border-color: rgba(0, 139, 227, 0.8) !important;
+    background: rgba(0, 139, 227, 0.14) !important;
+    background-color: rgba(0, 139, 227, 0.14) !important;
+}
+
+body.light-mode .captcha-digits-group input[type="text"].captcha-digit-box {
+    color: #070709 !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    border-color: rgba(7, 7, 9, 0.18) !important;
+}
+
+body.light-mode .captcha-digits-group input[type="text"].captcha-digit-box:focus {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    border-color: var(--primary) !important;
+}
+
+body.light-mode .captcha-digits-group input[type="text"].captcha-digit-box.is-filled {
+    background: rgba(0, 139, 227, 0.08) !important;
+    background-color: rgba(0, 139, 227, 0.08) !important;
+    border-color: var(--primary) !important;
 }
 
 .refresh-btn {
@@ -379,10 +440,16 @@ select:focus {
     color: white;
     text-decoration: none;
     cursor: pointer;
+    display: inline-block;
+    white-space: nowrap;
+    line-height: 1.2;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.logo:has(> img), a.logo:has(> img) {
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
 .logo:hover, a.logo:hover {
@@ -401,10 +468,16 @@ select:focus {
     color: white;
     text-decoration: none;
     cursor: pointer;
+    display: inline-block;
+    white-space: nowrap;
+    line-height: 1.2;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.sidebar-logo:has(> img), a.sidebar-logo:has(> img) {
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
 .sidebar-logo:hover, a.sidebar-logo:hover {

@@ -873,6 +873,133 @@
                 </form>
             </div>
 
+            <!-- SECTION 2B: 🔐 Two-Factor Authentication (TOTP) & Active Sessions -->
+            <div class="settings-card" style="border-color: rgba(56, 189, 248, 0.25);">
+                <div class="settings-section-title">
+                    <span>🔐</span> Two-Factor Authentication (Authenticator App)
+                </div>
+                <p class="settings-section-desc">
+                    Protect your account and tickets with time-based 6-digit codes (Google Authenticator / Authy) plus emergency backup codes.
+                </p>
+
+                {% if two_factor_enabled %}
+                <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
+                    <div style="color: #34d399; font-weight: 800; font-size: 0.95rem;">✓ Two-Factor Authentication is ENABLED</div>
+                    <div style="font-size: 0.84rem; color: var(--text-muted); margin-top: 4px;">Every sign-in requires your password plus a 6-digit TOTP or recovery code.</div>
+                    <div style="display: flex; gap: 0.7rem; flex-wrap: wrap; margin-top: 0.9rem; align-items: center;">
+                        <input type="password" id="disable2faPassword" placeholder="Enter password to disable 2FA" class="settings-input" style="max-width: 260px;">
+                        <button type="button" onclick="disable2FA()" class="btn-warning-outline">Disable 2FA</button>
+                    </div>
+                </div>
+                {% else %}
+                <div id="twoFaSetupContainer">
+                    <button type="button" onclick="start2FASetup()" class="unique-save-btn" style="max-width: 260px;">Enable Authenticator 2FA</button>
+                    <div id="twoFaSetupPanel" style="display: none; margin-top: 1.25rem; background: rgba(0, 0, 0, 0.28); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 14px; padding: 1.2rem;">
+                        <div style="display: flex; flex-wrap: wrap; gap: 1.4rem; align-items: center;">
+                            <img id="twoFaQrImg" src="" alt="2FA QR Code" style="width: 150px; height: 150px; border-radius: 10px; background: #fff; padding: 6px;">
+                            <div style="flex: 1; min-width: 230px;">
+                                <div style="font-weight: 700; color: #38bdf8; margin-bottom: 0.4rem;">1. Scan QR Code in Authenticator App</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;">Manual Secret Key: <code id="twoFaSecretText" style="color: #fff;"></code></div>
+                                <div style="font-size: 0.78rem; color: #fbbf24; margin-bottom: 0.75rem;">Save these Backup Codes: <span id="twoFaBackupList" style="font-family: monospace;"></span></div>
+                                <div style="display: flex; gap: 0.6rem; align-items: center;">
+                                    <input type="text" id="twoFaVerifyCode" maxlength="6" placeholder="6-digit OTP" class="settings-input" style="max-width: 150px; text-align: center; font-weight: 700;">
+                                    <button type="button" onclick="confirm2FAEnable()" class="unique-save-btn" style="max-width: 180px;">Verify &amp; Activate</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                <div id="twoFaStatusMsg" style="margin-top: 0.75rem; font-size: 0.86rem; font-weight: 600;"></div>
+
+                <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.08); margin: 1.5rem 0;">
+
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 0.8rem;">
+                    <div>
+                        <div style="font-weight: 700; font-size: 1rem; color: #fff;">🖥️ Recent Login Sessions</div>
+                        <div style="font-size: 0.82rem; color: var(--text-muted);">Monitor active devices and remotely sign out unrecognized browsers.</div>
+                    </div>
+                    <form action="{{ url_for('revoke_other_sessions') }}" method="POST" style="margin: 0;">
+                        <button type="submit" class="btn-warning-outline" style="padding: 0.45rem 0.9rem; font-size: 0.82rem;">Sign Out Other Devices</button>
+                    </form>
+                </div>
+                {% if login_sessions %}
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.83rem;">
+                        <thead>
+                            <tr style="color: var(--text-muted); border-bottom: 1px solid rgba(255,255,255,0.08); text-align: left;">
+                                <th style="padding: 0.5rem;">Method / IP</th>
+                                <th style="padding: 0.5rem;">Device</th>
+                                <th style="padding: 0.5rem;">Time</th>
+                                <th style="padding: 0.5rem;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sess in login_sessions %}
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td style="padding: 0.5rem;">{{ sess.login_method }} • <code>{{ sess.ip_address }}</code></td>
+                                <td style="padding: 0.5rem; color: var(--text-muted);">{{ sess.user_agent[:52] }}</td>
+                                <td style="padding: 0.5rem;">{{ sess.created_at }}</td>
+                                <td style="padding: 0.5rem;">
+                                    {% if sess.is_current %}<span style="color: #38bdf8; font-weight: 700;">Current Device</span>
+                                    {% elif sess.is_active %}<span style="color: #34d399;">Active</span>
+                                    {% else %}<span style="color: #94a3b8;">Signed Out</span>{% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+            </div>
+
+            <script>
+                async function start2FASetup() {
+                    const res = await fetch('/api/settings/2fa/setup', { method: 'POST' });
+                    const data = await res.json();
+                    if (data.ok) {
+                        document.getElementById('twoFaSetupPanel').style.display = 'block';
+                        document.getElementById('twoFaQrImg').src = data.qr_data_uri;
+                        document.getElementById('twoFaSecretText').textContent = data.secret;
+                        document.getElementById('twoFaBackupList').textContent = (data.backup_codes || []).join('  ');
+                    }
+                }
+                async function confirm2FAEnable() {
+                    const code = document.getElementById('twoFaVerifyCode').value;
+                    const res = await fetch('/api/settings/2fa/verify-enable', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ code })
+                    });
+                    const data = await res.json();
+                    const msg = document.getElementById('twoFaStatusMsg');
+                    if (data.ok) {
+                        msg.style.color = '#34d399';
+                        msg.textContent = data.message;
+                        setTimeout(() => window.location.reload(), 900);
+                    } else {
+                        msg.style.color = '#f87171';
+                        msg.textContent = data.error || 'Verification failed.';
+                    }
+                }
+                async function disable2FA() {
+                    const pwd = document.getElementById('disable2faPassword').value;
+                    const res = await fetch('/api/settings/2fa/disable', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ password: pwd })
+                    });
+                    const data = await res.json();
+                    const msg = document.getElementById('twoFaStatusMsg');
+                    if (data.ok) {
+                        window.location.reload();
+                    } else {
+                        msg.style.color = '#f87171';
+                        msg.textContent = data.error || 'Failed to disable 2FA.';
+                    }
+                }
+            </script>
+
             <!-- SECTION 3: ⚠️ Danger Zone (Deactivation & Deletion) -->
             <div class="danger-zone-card">
                 <div class="danger-zone-title">

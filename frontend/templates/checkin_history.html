@@ -370,43 +370,19 @@
         // REAL-TIME GATE CHECK-IN TELEMETRY WEBSOCKET LISTENER
         // ============================================================================
         (function initTelemetryListener() {
-            const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            let ws = null;
-            let reconnectTimer = null;
-
             function connectTelemetry() {
-                try {
-                    ws = new WebSocket(`${wsProtocol}//${window.location.host}/ws/telemetry`);
-
-                    ws.onopen = function() {
-                        const statusTxt = document.getElementById('telemetryStatusText');
-                        if (statusTxt) statusTxt.innerText = 'Telemetry Sync Live';
-                    };
-
-                    ws.onmessage = function(event) {
-                        try {
-                            const data = JSON.parse(event.data);
-                            if (data.type === 'telemetry_scan') {
-                                handleLiveCheckinEvent(data);
-                            }
-                        } catch (err) {
-                            console.error("Telemetry parse error", err);
+                if (!window.EventsRealtime) return;
+                window.EventsRealtime.connectTelemetry(
+                    function(data) {
+                        if (data.type === 'telemetry_scan') {
+                            handleLiveCheckinEvent(data);
                         }
-                    };
-
-                    ws.onclose = function() {
+                    },
+                    function(online) {
                         const statusTxt = document.getElementById('telemetryStatusText');
-                        if (statusTxt) statusTxt.innerText = 'Telemetry Reconnecting...';
-                        clearTimeout(reconnectTimer);
-                        reconnectTimer = setTimeout(connectTelemetry, 3000);
-                    };
-
-                    ws.onerror = function() {
-                        if (ws) ws.close();
-                    };
-                } catch (e) {
-                    console.log("Telemetry WS fallback", e);
-                }
+                        if (statusTxt) statusTxt.innerText = online ? 'Telemetry Sync Live' : 'Telemetry Reconnecting...';
+                    }
+                );
             }
 
             function handleLiveCheckinEvent(item) {
@@ -474,6 +450,7 @@
             document.addEventListener('DOMContentLoaded', connectTelemetry);
         })();
     </script>
+    <script src="{{ url_for('static', filename='realtime.js') }}"></script>
     <script src="{{ url_for('static', filename='animations.js') }}"></script>
 </body>
 </html>

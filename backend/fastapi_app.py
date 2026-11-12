@@ -518,6 +518,35 @@ async def get_categories():
     return categories
 
 
+_DEFAULT_EVENT_IMAGE = "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80"
+
+
+def _enrich_event_dict(ev):
+    """Normalize SQLite event row dict so required EventResponse fields are never None."""
+    e_dict = dict(ev)
+    cat = get_category(e_dict.get('title', ''))
+    e_dict['category'] = cat
+    timing = get_event_status_info(e_dict)
+    e_dict['time'] = e_dict.get('time') or timing.get('time_str') or '10:00 AM'
+    e_dict['end_time'] = e_dict.get('end_time') or timing.get('end_time_str') or '05:00 PM'
+    e_dict['desc'] = e_dict.get('desc') or ''
+    e_dict['price'] = e_dict.get('price') or 'Free'
+    e_dict['color'] = e_dict.get('color') or '#4facfe'
+    e_dict['image'] = e_dict.get('image') or _DEFAULT_EVENT_IMAGE
+    e_dict['venue'] = e_dict.get('venue') or 'Main Campus Auditorium'
+    e_dict['venue_address'] = e_dict.get('venue_address') or 'Bangalore, India'
+    e_dict['featured'] = int(e_dict.get('featured') or 0)
+    e_dict['status_label'] = timing.get('status_label', 'Registration Open')
+    e_dict['status_badge'] = timing.get('status_badge', 'open')
+    e_dict['is_sold_out'] = timing.get('is_sold_out', False)
+    seats_tot = int(e_dict.get('seats_total') or 100)
+    seats_fil = int(e_dict.get('seats_filled') or 0)
+    e_dict['seats_total'] = seats_tot
+    e_dict['seats_filled'] = seats_fil
+    e_dict['seats_available'] = max(0, seats_tot - seats_fil)
+    return e_dict, timing, cat
+
+
 @api_v1.get(
     "/events",
     response_model=EventListResponse,
@@ -538,17 +567,7 @@ async def list_events(
     filtered = []
 
     for e in raw_events:
-        cat = get_category(e.get('title', ''))
-        e_dict = dict(e)
-        e_dict['category'] = cat
-        timing = get_event_status_info(e_dict)
-        e_dict['status_label'] = timing.get('status_label', 'Registration Open')
-        e_dict['status_badge'] = timing.get('status_badge', 'open')
-        e_dict['is_sold_out'] = timing.get('is_sold_out', False)
-        
-        seats_tot = e_dict.get('seats_total') or 100
-        seats_fil = e_dict.get('seats_filled') or 0
-        e_dict['seats_available'] = max(0, seats_tot - seats_fil)
+        e_dict, timing, cat = _enrich_event_dict(e)
 
         # Filters
         if category and category.lower() != 'all' and cat.lower() != category.lower():
@@ -594,18 +613,8 @@ async def get_single_event(
     ev = backend_module.get_event(event_id)
     if not ev:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Event with ID {event_id} not found")
-    
-    ev_dict = dict(ev)
-    ev_dict['category'] = get_category(ev_dict.get('title', ''))
-    timing = get_event_status_info(ev_dict)
-    ev_dict['status_label'] = timing.get('status_label', 'Registration Open')
-    ev_dict['status_badge'] = timing.get('status_badge', 'open')
-    ev_dict['is_sold_out'] = timing.get('is_sold_out', False)
-    
-    seats_tot = ev_dict.get('seats_total') or 100
-    seats_fil = ev_dict.get('seats_filled') or 0
-    ev_dict['seats_available'] = max(0, seats_tot - seats_fil)
-    
+
+    ev_dict, _, _ = _enrich_event_dict(ev)
     return ev_dict
 
 
@@ -1227,6 +1236,12 @@ async def api_broadcast_seat(payload: RealtimeSeatBroadcastRequest):
     return StandardApiResponse(success=True, message=f"Seat update broadcasted for event #{payload.event_id}")
 
 
+class RealtimeLiveBroadcastRequest(BaseModel):
+    event_id: int = Field(..., example=1)
+    type: str = Field(..., example="qa_update")
+    payload: Dict[str, Any] = Field(default_factory=dict)
+
+
 @api_v1.post(
     "/realtime/broadcast-telemetry",
     response_model=StandardApiResponse,
@@ -1242,6 +1257,21 @@ async def api_broadcast_telemetry(payload: RealtimeTelemetryBroadcastRequest):
         "checkin_time": payload.checkin_time or datetime.now().strftime("%d %b %Y, %I:%M %p")
     })
     return StandardApiResponse(success=True, message=f"Check-in telemetry broadcasted for event #{payload.event_id}")
+
+
+@api_v1.post(
+    "/realtime/broadcast-live",
+    response_model=StandardApiResponse,
+    tags=["Real-Time & WebSockets"],
+    summary="Broadcast live stage Q&A, polls, or trivia events over WebSockets"
+)
+async def api_broadcast_live(payload: RealtimeLiveBroadcastRequest):
+    msg = dict(payload.payload or {})
+    msg["type"] = payload.type
+    msg["event_id"] = payload.event_id
+    msg.setdefault("timestamp", datetime.now().isoformat())
+    await realtime_hub.broadcast_live_stage(payload.event_id, msg)
+    return StandardApiResponse(success=True, message=f"Live stage event '{payload.type}' broadcasted for event #{payload.event_id}")
 
 
 # ============================================================================
