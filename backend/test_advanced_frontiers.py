@@ -47,6 +47,19 @@ class AdvancedFrontiersTestCase(unittest.TestCase):
         self.assertTrue(data['ok'])
         self.assertIn('event_id', data)
         self.assertIn('redirect_url', data)
+        # Clean up synthetic test event so users.db stays clean across repeated test runs
+        new_id = data.get('event_id')
+        if new_id and new_id > 10031:
+            conn = get_db()
+            c = conn.cursor()
+            for tbl in ('event_pricing_tiers', 'event_agenda_sessions', 'event_agenda_tracks', 'event_coupons'):
+                try:
+                    c.execute(f"DELETE FROM {tbl} WHERE event_id = ?", (new_id,))
+                except Exception:
+                    pass
+            c.execute("DELETE FROM events WHERE id = ?", (new_id,))
+            conn.commit()
+            conn.close()
 
     def test_02_whatsapp_ticket_card(self):
         """Test WhatsApp ticket delivery with formatted QR link and directions"""

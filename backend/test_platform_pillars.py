@@ -598,6 +598,100 @@ class PlatformPillarsTests(unittest.TestCase):
                 conn.commit()
                 conn.close()
 
+    def test_09_unique_event_images_and_local_assets_exist(self):
+        conn = sqlite3.connect(DB_PATH, timeout=15)
+        c = conn.cursor()
+        c.execute("SELECT image, COUNT(*) FROM events GROUP BY image HAVING COUNT(*) > 1")
+        dups = c.fetchall()
+        self.assertEqual(dups, [], f"Duplicate event image URLs found: {dups}")
+
+        c.execute("SELECT id, image FROM events WHERE id IN (1, 19, 20, 49, 97, 98, 110, 165, 10000, 10001, 10031)")
+        rows = dict(c.fetchall())
+        conn.close()
+
+        expected_local = {
+            19: '/static/event_images/cricket_league_2026.jpg',
+            20: '/static/event_images/football_cup_2026.jpg',
+            49: '/static/event_images/candlelight_concert.jpg',
+            97: '/static/event_images/solar_agri_expo.jpg',
+            98: '/static/event_images/dairy_farming_expo.jpg',
+            110: '/static/event_images/smart_city_townhall.jpg',
+            165: '/static/event_images/contemporary_art_biennial.jpg',
+        }
+        repo_root = os.path.dirname(_backend_dir)
+        for ev_id, expected_path in expected_local.items():
+            self.assertEqual(rows.get(ev_id), expected_path)
+            disk_path = os.path.join(repo_root, 'frontend', expected_path.lstrip('/').replace('/', os.sep))
+            self.assertTrue(os.path.isfile(disk_path), f"Missing generated asset on disk: {disk_path}")
+            static_resp = self.client.get(expected_path)
+            self.assertEqual(static_resp.status_code, 200)
+            static_resp.close()
+
+        genai_imgs = {rows.get(eid) for eid in (10000, 10001, 10031) if eid in rows}
+        self.assertEqual(len(genai_imgs), len([eid for eid in (10000, 10001, 10031) if eid in rows]))
+
+    def test_10_public_event_share_copy_title_and_mandatory_login_before_register(self):
+        # 1. Public event link loads cleanly without login, shows Share + Login-to-Register CTAs
+        pub_resp = self.client.get('/event/19')
+        self.assertEqual(pub_resp.status_code, 200)
+        pub_html = pub_resp.get_data(as_text=True)
+        self.assertIn('Inter-College Premier Cricket League 2026', pub_html)
+        self.assertIn('property="og:url"', pub_html)
+        self.assertIn('Share Public Link', pub_html)
+        self.assertIn('Copy Event Name', pub_html)
+        self.assertIn('Login to Register', pub_html)
+        self.assertNotIn('⏻ Logout', pub_html)
+
+        # 2. Attempting to register or group-book while logged out redirects to login with ?next=
+        reg_gate = self.client.get('/register/19?type=in_person', follow_redirects=False)
+        self.assertIn(reg_gate.status_code, (301, 302, 303))
+        self.assertIn('next=', reg_gate.headers.get('Location', ''))
+        self.assertIn('register', reg_gate.headers.get('Location', ''))
+
+        grp_gate = self.client.get('/event/19/group-booking', follow_redirects=False)
+        self.assertIn(grp_gate.status_code, (301, 302, 303))
+        self.assertIn('next=', grp_gate.headers.get('Location', ''))
+
+        # 3. Logging in with ?next=/register/19 redirects back to registration; external URLs are blocked
+        self.client.get('/?next=/register/19')
+        with self.client.session_transaction() as sess:
+            ans = sess['captcha_answer']
+        login_res = self.client.post('/', data={
+            'action': 'login',
+            'username': 'admin@example.com',
+            'password': 'password123',
+            'captcha': ans,
+            'next': '/register/19',
+        }, follow_redirects=False)
+        self.assertEqual(login_res.status_code, 303)
+        self.assertEqual(login_res.headers.get('Location'), '/register/19')
+
+        # Open redirect protection rejects external URLs
+        self.client.get('/logout')
+        self.client.get('/')
+        with self.client.session_transaction() as sess:
+            ans2 = sess['captcha_answer']
+        ext_res = self.client.post('/', data={
+            'action': 'login',
+            'username': 'admin@example.com',
+            'password': 'password123',
+            'captcha': ans2,
+            'next': 'https://evil.example/phish',
+        }, follow_redirects=False)
+        self.assertEqual(ext_res.status_code, 303)
+        self.assertEqual(ext_res.headers.get('Location'), '/dashboard')
+
+        # 4. Dashboard & Category cards do not wrap titles in <a> tags and render Share buttons
+        dash_html = self.client.get('/dashboard').get_data(as_text=True)
+        self.assertIn('class="highlight-card-title event-copy-title"', dash_html)
+        self.assertNotIn('<h3 class="highlight-card-title">\n                            <a ', dash_html)
+        self.assertIn('shareEventFromBtn(this, event)', dash_html)
+
+        cat_html = self.client.get('/category/Sports').get_data(as_text=True)
+        self.assertIn('class="event-title event-copy-title"', cat_html)
+        self.assertIn('class="grid-event-card-title event-copy-title"', cat_html)
+        self.assertIn('shareEventFromBtn(this, event)', cat_html)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

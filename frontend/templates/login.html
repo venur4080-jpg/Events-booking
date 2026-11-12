@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login & Registration | Events Booking</title>
     <!-- Link to static CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=8.2">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=8.3">
     <script src="{{ url_for('static', filename='themes.js') }}?v=5.0"></script>
-    <script src="{{ url_for('static', filename='script.js') }}?v=8.2"></script>
+    <script src="{{ url_for('static', filename='script.js') }}?v=8.3"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@700;800&display=swap"
         rel="stylesheet">
     <style>
@@ -197,6 +197,7 @@
             <h2 class="form-title">Welcome Back</h2>
             <form method="POST" action="">
                 <input type="hidden" name="action" value="login">
+                <input type="hidden" name="next" value="{{ next_url or '' }}">
 
                 <!-- User ID or Email -->
                 <div class="input-group">
@@ -242,11 +243,11 @@
                     <div class="captcha-input-container">
                         <input type="hidden" id="captcha-input" name="captcha" value="">
                         <div class="captcha-digits-group" data-captcha-group="captcha-input" role="group" aria-label="Enter 5-digit CAPTCHA">
-                            <input type="text" id="captcha-digit-0" class="captcha-digit-box" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="off" aria-label="CAPTCHA digit 1" required>
-                            <input type="text" class="captcha-digit-box" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="off" aria-label="CAPTCHA digit 2" required>
-                            <input type="text" class="captcha-digit-box" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="off" aria-label="CAPTCHA digit 3" required>
-                            <input type="text" class="captcha-digit-box" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="off" aria-label="CAPTCHA digit 4" required>
-                            <input type="text" class="captcha-digit-box" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="off" aria-label="CAPTCHA digit 5" required>
+                            <input type="text" id="captcha-digit-0" class="captcha-digit-box" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="one-time-code" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other" aria-label="Verification digit 1" required>
+                            <input type="text" class="captcha-digit-box" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="one-time-code" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other" aria-label="Verification digit 2" required>
+                            <input type="text" class="captcha-digit-box" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="one-time-code" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other" aria-label="Verification digit 3" required>
+                            <input type="text" class="captcha-digit-box" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="one-time-code" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other" aria-label="Verification digit 4" required>
+                            <input type="text" class="captcha-digit-box" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="one-time-code" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other" aria-label="Verification digit 5" required>
                         </div>
                     </div>
                 </div>
@@ -299,6 +300,7 @@
             
             <form method="POST" action="" id="registrationForm" onsubmit="return validateRegistrationForm()">
                 <input type="hidden" name="action" value="register">
+                <input type="hidden" name="next" value="{{ next_url or '' }}">
 
                 <!-- 1. Account Credentials -->
                 <div class="form-section-header" style="margin-top: 0;">
@@ -431,11 +433,11 @@
                     <div class="captcha-input-container">
                         <input type="hidden" id="reg-captcha-input" name="reg_captcha" value="">
                         <div class="captcha-digits-group" data-captcha-group="reg-captcha-input" role="group" aria-label="Enter 5-digit Registration CAPTCHA">
-                            <input type="text" id="reg-captcha-digit-0" class="captcha-digit-box" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="off" aria-label="Registration CAPTCHA digit 1" required>
-                            <input type="text" class="captcha-digit-box" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="off" aria-label="Registration CAPTCHA digit 2" required>
-                            <input type="text" class="captcha-digit-box" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="off" aria-label="Registration CAPTCHA digit 3" required>
-                            <input type="text" class="captcha-digit-box" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="off" aria-label="Registration CAPTCHA digit 4" required>
-                            <input type="text" class="captcha-digit-box" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="off" aria-label="Registration CAPTCHA digit 5" required>
+                            <input type="text" id="reg-captcha-digit-0" class="captcha-digit-box" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="one-time-code" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other" aria-label="Registration verification digit 1" required>
+                            <input type="text" class="captcha-digit-box" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="one-time-code" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other" aria-label="Registration verification digit 2" required>
+                            <input type="text" class="captcha-digit-box" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="one-time-code" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other" aria-label="Registration verification digit 3" required>
+                            <input type="text" class="captcha-digit-box" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="one-time-code" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other" aria-label="Registration verification digit 4" required>
+                            <input type="text" class="captcha-digit-box" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="one-time-code" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other" aria-label="Registration verification digit 5" required>
                         </div>
                     </div>
                 </div>

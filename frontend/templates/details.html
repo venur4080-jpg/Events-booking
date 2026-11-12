@@ -5,9 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ event.title }} | Events Booking</title>
+    <meta name="description" content="{{ event.desc or event.purpose }}">
+    {% set og_image_url = event.image if (event.image or '').startswith('http') else (request.url_root.rstrip('/') ~ (event.image or '')) %}
+    {% set canonical_event_url = public_event_url or url_for('event_detail', event_id=event.id, _external=True) %}
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ event.title }} | Events Booking">
+    <meta property="og:description" content="{{ event.desc or event.purpose }}">
+    <meta property="og:image" content="{{ og_image_url }}">
+    <meta property="og:url" content="{{ canonical_event_url }}">
+    <meta name="twitter:card" content="summary_large_image">
     <meta name="theme-color" content="#008be3">
     <link rel="manifest" href="/manifest.json">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=5.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=8.4">
     <script src="{{ url_for('static', filename='themes.js') }}?v=5.0"></script>
     <style>
         .details-container {
@@ -250,7 +259,7 @@
     </style>
 </head>
 
-<body data-event-color="{{ event.color }}" data-event-id="{{ event.id }}" data-is-registered="{{ '1' if event.is_registered else '0' }}" data-is-expired="{{ '1' if event.is_expired else '0' }}">
+<body data-event-color="{{ event.color }}" data-event-id="{{ event.id }}" data-is-registered="{{ '1' if event.is_registered else '0' }}" data-is-expired="{{ '1' if event.is_expired else '0' }}" data-is-logged-in="{{ '1' if is_logged_in else '0' }}">
     <script>
         if (localStorage.getItem('theme') === 'light') {
             document.body.classList.add('light-mode');
@@ -263,16 +272,26 @@
     <nav class="navbar">
         <div class="nav-container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
             <div style="display: flex; align-items: center;">
+                {% if is_logged_in %}
                 <div class="hamburger" id="hamburger">☰</div>
                 <a href="{{ url_for('dashboard') }}" class="logo" title="Events Booking Home">Events <span>Booking</span></a>
+                {% else %}
+                <a href="{{ url_for('login') }}" class="logo" title="Sign in to Events Booking">Events <span>Booking</span></a>
+                {% endif %}
             </div>
             <div class="nav-links" style="display: flex; align-items: center; gap: 12px;">
+                {% if is_logged_in %}
                 <a href="{{ url_for('dashboard') }}" class="nav-btn-dash">🏠 Dashboard</a>
                 <a href="{{ url_for('logout') }}" class="logout-btn-unique">⏻ Logout</a>
+                {% else %}
+                <a href="{{ url_for('login', next=url_for('event_detail', event_id=event.id)) }}" class="nav-btn-dash">🔑 Sign In</a>
+                <a href="{{ url_for('login', register=1, next=url_for('event_detail', event_id=event.id)) }}" class="logout-btn-unique" style="background: var(--primary); color: #070709; border-color: var(--primary);">✨ Create Account</a>
+                {% endif %}
             </div>
         </div>
     </nav>
 
+    {% if is_logged_in %}
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -303,13 +322,24 @@
             <li><a href="{{ url_for('logout') }}" style="color: var(--secondary);">🚪 Logout</a></li>
         </ul>
     </div>
+    {% endif %}
 
 
     <div class="details-container">
-        <div style="margin-bottom: 1.5rem;">
+        <div style="margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+            {% if is_logged_in %}
             <a href="{{ url_for('dashboard') }}" class="back-btn-unified">
                 <span class="arrow">←</span> Back to Dashboard
             </a>
+            {% else %}
+            <a href="{{ url_for('login', next=url_for('dashboard')) }}" class="back-btn-unified">
+                <span class="arrow">←</span> Sign In to Explore All Events
+            </a>
+            <div style="background: rgba(0, 139, 227, 0.12); border: 1px solid rgba(0, 139, 227, 0.35); color: #cbd5e1; padding: 0.55rem 1rem; border-radius: 12px; font-size: 0.84rem; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <span>🌐 <strong>Public Event View</strong> — Sign in before registering for passes.</span>
+                <a href="{{ url_for('login', next=url_for('register_event', event_id=event.id)) }}" style="color: #38bdf8; font-weight: 700; text-decoration: none;">Login to Register →</a>
+            </div>
+            {% endif %}
         </div>
 
         {% if event.is_today %}
@@ -370,6 +400,21 @@
                     </span>
                 </div>
                 <h1 class="hero-title details-hero-title" style="text-align: left; margin: 0; font-size: 3.5rem;">{{ event.title }}</h1>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 0.9rem; align-items: center;">
+                    <button type="button" class="btn-share-card" style="background: rgba(0, 139, 227, 0.2); border-color: rgba(0, 139, 227, 0.45); color: #e0f2fe;"
+                        data-share-title="{{ event.title }}"
+                        data-share-url="{{ canonical_event_url }}"
+                        data-share-category="{{ event.category }}"
+                        data-share-date="{{ event.date }}"
+                        onclick="shareEventFromBtn(this, event)">
+                        📤 Share Public Link
+                    </button>
+                    <button type="button" class="btn-share-card"
+                        data-share-title="{{ event.title }}"
+                        onclick="copyEventPlainText(this.getAttribute('data-share-title'), 'Event name')">
+                        📋 Copy Event Name
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -447,7 +492,22 @@
 
                             <!-- In-Person Actions -->
                             <div>
-                                {% if event.is_registered %}
+                                {% if not is_logged_in %}
+                                    {% if event.is_open and not event.is_in_person_sold_out %}
+                                    <a href="{{ url_for('login', next=url_for('register_event', event_id=event.id) ~ '?type=in_person') }}" class="btn-primary" style="width: 100%; padding: 0.75rem 1.2rem; border-radius: 10px; font-weight: 700; font-size: 0.92rem; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; text-align: center; box-sizing: border-box;">
+                                        🔒 Login to Register In-Person Pass
+                                    </a>
+                                    <div style="font-size: 0.75rem; color: #94a3b8; text-align: center; margin-top: 6px;">Login is mandatory before registering for any event.</div>
+                                    {% elif event.is_in_person_sold_out %}
+                                    <a href="{{ url_for('login', next=url_for('event_detail', event_id=event.id)) }}" class="btn-primary" style="width: 100%; padding: 0.75rem 1.2rem; border-radius: 10px; font-weight: 700; font-size: 0.92rem; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; text-align: center; box-sizing: border-box; background: linear-gradient(135deg, #f59e0b, #ea580c);">
+                                        🔒 Login to Join Priority Waitlist
+                                    </a>
+                                    {% else %}
+                                    <button class="btn-secondary" style="width: 100%; padding: 0.75rem 1.2rem; border-radius: 10px; font-weight: 700; font-size: 0.92rem; cursor: not-allowed; opacity: 0.7;" disabled title="{{ event.status_reason }}">
+                                        {% if event.is_cutoff_reached %}Registration Closed (2h Cutoff){% else %}Registration Closed{% endif %}
+                                    </button>
+                                    {% endif %}
+                                {% elif event.is_registered %}
                                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                                     <a href="{{ url_for('view_ticket_interactive', event_id=event.id) }}" class="btn-primary" style="flex: 1; padding: 0.7rem 1rem; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; font-weight: 700; font-size: 0.88rem; text-align: center;">🎟️ View Holographic Pass</a>
                                     {% if not event.checked_in %}
@@ -541,14 +601,20 @@
 
                             <!-- Live Stream Actions -->
                             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                {% if is_logged_in %}
                                 <a href="{{ url_for('live_event_page', event_id=event.id) }}" class="btn-primary" style="flex: 1; padding: 0.75rem 1rem; background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(220, 38, 38, 0.45)); border: 1px solid rgba(239, 68, 68, 0.6); color: #fca5a5; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; border-radius: 10px; font-weight: 700; font-size: 0.88rem; text-align: center;">
                                     <span style="width: 7px; height: 7px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
                                     📹 Enter Live Room
                                 </a>
 
-                                {% if not event.is_registered and not (user_subscription and (user_subscription.plan_type == 'super' or (user_subscription.plan_type == 'normal' and (event.price.lower() == 'free' or (event.price | replace('₹','') | replace(',','') | float(1001) <= 1000.0))))) %}
-                                <a href="{{ url_for('register_event', event_id=event.id) }}?type=live_stream" class="btn-primary" style="flex: 1; padding: 0.75rem 1rem; background: linear-gradient(135deg, #10b981, #059669); color: white; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; font-weight: 700; font-size: 0.88rem; text-align: center; border: none;">
-                                    📡 Register Stream Pass ({{ event.stream_price or '₹199' }})
+                                    {% if not event.is_registered and not (user_subscription and (user_subscription.plan_type == 'super' or (user_subscription.plan_type == 'normal' and (event.price.lower() == 'free' or (event.price | replace('₹','') | replace(',','') | float(1001) <= 1000.0))))) %}
+                                    <a href="{{ url_for('register_event', event_id=event.id) }}?type=live_stream" class="btn-primary" style="flex: 1; padding: 0.75rem 1rem; background: linear-gradient(135deg, #10b981, #059669); color: white; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; font-weight: 700; font-size: 0.88rem; text-align: center; border: none;">
+                                        📡 Register Stream Pass ({{ event.stream_price or '₹199' }})
+                                    </a>
+                                    {% endif %}
+                                {% else %}
+                                <a href="{{ url_for('login', next=url_for('register_event', event_id=event.id) ~ '?type=live_stream') }}" class="btn-primary" style="width: 100%; padding: 0.75rem 1rem; background: linear-gradient(135deg, #10b981, #059669); color: white; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; font-weight: 700; font-size: 0.88rem; text-align: center; border: none;">
+                                    🔒 Login to Register Stream ({{ event.stream_price or '₹199' }})
                                 </a>
                                 {% endif %}
                             </div>
@@ -657,17 +723,6 @@
                             </div>
                         </a>
                         {% endif %}
-                    </div>
-                    {% if refund_preview %}
-                    <div style="margin-top: 0.85rem; padding: 0.55rem 0.9rem; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 10px; font-size: 0.8rem; color: #cbd5e1;">
-                        🛡️ <strong>Refund Policy ({{ refund_preview.policy|title }}):</strong> {{ refund_preview.reason }}
-                        <a href="{{ url_for('wallet_page') }}" style="color: #34d399; margin-left: 0.5rem;">View Event Wallet →</a>
-                    </div>
-                    {% endif %}
-                                <div style="font-size: 0.75rem; color: #10b981;">Multilingual AI Captions</div>
-                            </div>
-                        </a>
-
                         <a href="{{ url_for('stage_trivia_view', event_id=event.id) }}" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 12px; text-decoration: none; color: #ffffff; display: flex; align-items: center; gap: 10px; transition: all 0.2s;" onmouseover="this.style.borderColor='#ec4899'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.transform='none'">
                             <span style="font-size: 1.5rem;">🎮</span>
                             <div>
@@ -684,6 +739,12 @@
                             </div>
                         </a>
                     </div>
+                    {% if refund_preview %}
+                    <div style="margin-top: 0.85rem; padding: 0.55rem 0.9rem; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 10px; font-size: 0.8rem; color: #cbd5e1;">
+                        🛡️ <strong>Refund Policy ({{ refund_preview.policy|title }}):</strong> {{ refund_preview.reason }}
+                        {% if is_logged_in %}<a href="{{ url_for('wallet_page') }}" style="color: #34d399; margin-left: 0.5rem;">View Event Wallet →</a>{% endif %}
+                    </div>
+                    {% endif %}
                 </div>
 
                 <!-- Event Venue & Location Address Section (Below Price & Register Now) -->
@@ -735,9 +796,15 @@
                         <div class="section-title" style="margin: 0; color: #fbbf24; font-size: 1.15rem;">
                             <span>⭐</span> Attendee Reviews & Ratings
                         </div>
+                        {% if is_logged_in %}
                         <button type="button" class="btn-primary" style="width: auto; padding: 0.45rem 1rem; font-size: 0.82rem; background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; border-radius: 8px; font-weight: 700; margin: 0;" onclick="document.getElementById('reviewModal').style.display='flex'">
                             ✍️ Write Review
                         </button>
+                        {% else %}
+                        <a href="{{ url_for('login', next=url_for('event_detail', event_id=event.id)) }}" class="btn-primary" style="width: auto; padding: 0.45rem 1rem; font-size: 0.82rem; background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; border-radius: 8px; font-weight: 700; margin: 0; text-decoration: none;">
+                            🔒 Login to Review
+                        </a>
+                        {% endif %}
                     </div>
                     <div id="reviewsSummaryBox" style="display: flex; align-items: center; gap: 15px; margin-bottom: 1.2rem; background: rgba(0,0,0,0.25); padding: 1rem; border-radius: 12px;">
                         <div style="font-size: 2.2rem; font-weight: 800; color: #fbbf24; font-family: var(--font-heading);" id="avgRatingNumber">5.0</div>
@@ -849,28 +916,41 @@
                     </div>
                     <!-- Share Buttons -->
                     <div style="margin-top:1.2rem">
-                        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.6rem;text-transform:uppercase;letter-spacing:1px">Share Event</div>
+                        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.6rem;text-transform:uppercase;letter-spacing:1px">Share Public Event Link</div>
                         <div style="display:flex;gap:0.6rem;flex-wrap:wrap">
-                            <a href="https://wa.me/?text={{ event.title | urlencode }}%20{{ request.url | urlencode }}" target="_blank"
+                            <a href="https://wa.me/?text={{ event.title | urlencode }}%20{{ canonical_event_url | urlencode }}" target="_blank" rel="noopener noreferrer"
                                style="background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.3);color:#25d366;
                                       padding:0.45rem 0.9rem;border-radius:50px;font-size:0.8rem;font-weight:700;
                                       text-decoration:none;display:flex;align-items:center;gap:5px;transition:0.2s"
                                onmouseover="this.style.background='rgba(37,211,102,0.25)'" onmouseout="this.style.background='rgba(37,211,102,0.12)'">
                                 💬 WhatsApp
                             </a>
-                            <a href="https://twitter.com/intent/tweet?text={{ event.title | urlencode }}&url={{ request.url | urlencode }}" target="_blank"
+                            <a href="https://twitter.com/intent/tweet?text={{ event.title | urlencode }}&url={{ canonical_event_url | urlencode }}" target="_blank" rel="noopener noreferrer"
                                style="background:rgba(29,155,240,0.12);border:1px solid rgba(29,155,240,0.3);color:#1d9bf0;
                                       padding:0.45rem 0.9rem;border-radius:50px;font-size:0.8rem;font-weight:700;
                                       text-decoration:none;display:flex;align-items:center;gap:5px;transition:0.2s"
                                onmouseover="this.style.background='rgba(29,155,240,0.25)'" onmouseout="this.style.background='rgba(29,155,240,0.12)'">
                                 🐦 Twitter
                             </a>
-                            <button onclick="navigator.clipboard.writeText(window.location.href).then(()=>window.showToast&&showToast('Link copied!','success'))"
+                            <button type="button"
+                               data-share-url="{{ canonical_event_url }}"
+                               onclick="copyEventPlainText(this.getAttribute('data-share-url'), 'Public event link')"
                                style="background:rgba(255,255,255,0.05);border:1px solid var(--glass-border);color:var(--text-muted);
                                       padding:0.45rem 0.9rem;border-radius:50px;font-size:0.8rem;font-weight:700;
                                       cursor:pointer;display:flex;align-items:center;gap:5px;transition:0.2s;font-family:inherit"
                                onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
-                                🔗 Copy Link
+                                🔗 Copy Public Link
+                            </button>
+                            <button type="button"
+                               data-share-title="{{ event.title }}"
+                               data-share-url="{{ canonical_event_url }}"
+                               data-share-category="{{ event.category }}"
+                               data-share-date="{{ event.date }}"
+                               onclick="shareEventFromBtn(this, event)"
+                               style="background:rgba(0,139,227,0.14);border:1px solid rgba(0,139,227,0.35);color:#38bdf8;
+                                      padding:0.45rem 0.9rem;border-radius:50px;font-size:0.8rem;font-weight:700;
+                                      cursor:pointer;display:flex;align-items:center;gap:5px;transition:0.2s;font-family:inherit">
+                                📤 Share Options
                             </button>
                         </div>
                     </div>
@@ -947,18 +1027,22 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='script.js') }}?v=8.4"></script>
     <script>
         const hamburger = document.getElementById('hamburger');
         const sidebar = document.getElementById('sidebar');
         const closeSidebar = document.getElementById('closeSidebar');
 
-        hamburger.onclick = () => sidebar.classList.add('active');
-        closeSidebar.onclick = () => sidebar.classList.remove('active');
+        if (hamburger && sidebar) {
+            hamburger.onclick = () => sidebar.classList.add('active');
+        }
+        if (closeSidebar && sidebar) {
+            closeSidebar.onclick = () => sidebar.classList.remove('active');
+        }
 
         // Close sidebar when clicking outside
         document.onclick = (e) => {
-            if (!sidebar.contains(e.target) && !hamburger.contains(e.target) && sidebar.classList.contains('active')) {
+            if (sidebar && hamburger && !sidebar.contains(e.target) && !hamburger.contains(e.target) && sidebar.classList.contains('active')) {
                 sidebar.classList.remove('active');
             }
         };
@@ -1224,30 +1308,42 @@
         // Load Attendees and Reviews
         async function loadAttendeesAndReviews() {
             const eventId = (document.body && document.body.dataset && document.body.dataset.eventId) || '';
-            // 1. Load Attendees
+            const isLoggedIn = Boolean(document.body && document.body.dataset && document.body.dataset.isLoggedIn === '1');
+            const badge = document.getElementById('attendeeCountBadge');
+            const grid = document.getElementById('attendeesGrid');
+            // 1. Load Attendees (logged-in peers)
             try {
-                const aRes = await fetch(`/api/event/${eventId}/attendees`);
-                const aData = await aRes.json();
-                if (aData.ok && aData.attendees) {
-                    const badge = document.getElementById('attendeeCountBadge');
-                    if (badge) badge.textContent = `${aData.count} Registered Peers`;
-                    const grid = document.getElementById('attendeesGrid');
-                    if (grid) {
-                        if (aData.attendees.length === 0) {
-                            grid.innerHTML = `<div style="color: var(--text-muted); font-size: 0.88rem;">Be the first attendee to register and connect!</div>`;
-                        } else {
-                            grid.innerHTML = aData.attendees.map(a => `
-                                <div style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); padding: 6px 12px; border-radius: 999px; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
-                                    <img src="${a.profile_photo}" alt="${a.username}" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;">
-                                    <span style="color: #ffffff; font-size: 0.82rem; font-weight: 600;">${a.full_name}</span>
-                                    <span style="font-size: 0.72rem; color: #008be3; background: rgba(0, 139, 227,0.12); padding: 1px 6px; border-radius: 6px;">${a.role}</span>
-                                </div>
-                            `).join('');
+                if (!isLoggedIn) {
+                    if (badge) badge.textContent = '{{ event.seats_filled or 0 }} Registered';
+                    if (grid) grid.innerHTML = `<div style="color: var(--text-muted); font-size: 0.88rem;">Sign in to connect with registered attendees.</div>`;
+                } else {
+                    const aRes = await fetch(`/api/event/${eventId}/attendees`);
+                    if (aRes.ok && (aRes.headers.get('content-type') || '').includes('application/json')) {
+                        const aData = await aRes.json();
+                        if (aData.ok && aData.attendees) {
+                            if (badge) badge.textContent = `${aData.count} Registered Peers`;
+                            if (grid) {
+                                if (aData.attendees.length === 0) {
+                                    grid.innerHTML = `<div style="color: var(--text-muted); font-size: 0.88rem;">Be the first attendee to register and connect!</div>`;
+                                } else {
+                                    grid.innerHTML = aData.attendees.map(a => `
+                                        <div style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); padding: 6px 12px; border-radius: 999px; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+                                            <img src="${a.profile_photo}" alt="${a.username}" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;">
+                                            <span style="color: #ffffff; font-size: 0.82rem; font-weight: 600;">${a.full_name}</span>
+                                            <span style="font-size: 0.72rem; color: #008be3; background: rgba(0, 139, 227,0.12); padding: 1px 6px; border-radius: 6px;">${a.role}</span>
+                                        </div>
+                                    `).join('');
+                                }
+                            }
                         }
+                    } else {
+                        if (badge) badge.textContent = '{{ event.seats_filled or 0 }} Registered';
+                        if (grid) grid.innerHTML = `<div style="color: var(--text-muted); font-size: 0.88rem;">Register for this event to connect with peers inside the Networking Hub!</div>`;
                     }
                 }
             } catch (err) {
-                console.error("Error loading attendees:", err);
+                if (badge) badge.textContent = '{{ event.seats_filled or 0 }} Registered';
+                if (grid) grid.innerHTML = `<div style="color: var(--text-muted); font-size: 0.88rem;">Networking directory available inside event hub.</div>`;
             }
 
             // 2. Load Reviews
@@ -1354,6 +1450,10 @@
         async function joinEventWaitlist(eventId) {
             try {
                 const res = await fetch(`/api/event/${eventId}/waitlist/join`, { method: 'POST' });
+                if (res.status === 401) {
+                    window.location.href = `/?next=${encodeURIComponent(window.location.pathname)}`;
+                    return;
+                }
                 const data = await res.json();
                 const box = document.getElementById('waitlistBox');
                 if (data.ok && box) {

@@ -6,7 +6,7 @@
     <title>My Bookings | Events Booking</title>
     <meta name="theme-color" content="#008be3">
     <link rel="manifest" href="/manifest.json">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=5.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=8.4">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
     <script src="{{ url_for('static', filename='themes.js') }}?v=5.0"></script>
     <style>
@@ -452,12 +452,8 @@
                     </div>
 
                     <div class="booking-body">
-                        <!-- Clickable Event Title -->
-                        <h3 style="margin-bottom: 0.6rem; font-size: 1.25rem; font-weight: 700; line-height: 1.3;">
-                            <a href="{{ url_for('event_detail', event_id=item.id) }}" style="color: #ffffff; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='#ffffff'">
-                                {{ item.title }}
-                            </a>
-                        </h3>
+                        <!-- Clickable Event Title (copies plain text only, never URL) -->
+                        <h3 class="event-copy-title" data-event-url="{{ url_for('event_detail', event_id=item.id) }}" tabindex="0" style="margin-bottom: 0.6rem; font-size: 1.25rem; font-weight: 700; line-height: 1.3; color: #ffffff;">{{ item.title }}</h3>
 
                         <div style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.6; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 4px;">
                             <div>📅 <strong>Date:</strong> {{ item.date }}</div>
@@ -787,6 +783,7 @@
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/motion@latest/dist/motion.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}?v=8.4"></script>
     <script src="{{ url_for('static', filename='animations.js') }}"></script>
     <script src="{{ url_for('static', filename='pwa.js') }}"></script>
     <script src="{{ url_for('static', filename='chatbot.js') }}?v=5.0"></script>

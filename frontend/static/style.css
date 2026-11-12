@@ -340,6 +340,12 @@ select:focus {
     background-color: rgba(0, 139, 227, 0.14) !important;
 }
 
+.captcha-digits-group input[type="text"].captcha-digit-box:disabled {
+    opacity: 1 !important;
+    -webkit-text-fill-color: inherit;
+    cursor: wait;
+}
+
 body.light-mode .captcha-digits-group input[type="text"].captcha-digit-box {
     color: #070709 !important;
     background: rgba(255, 255, 255, 0.9) !important;
@@ -5554,6 +5560,162 @@ body.light-mode .site-footer ul li a:hover {
         padding: 1.25rem 0.85rem !important;
     }
 }
+
+/* Event Plain-Text Copy Titles & Global Public Share UI */
+.event-copy-title {
+    cursor: pointer;
+    user-select: text !important;
+    -webkit-user-select: text !important;
+    transition: color 0.2s ease, text-shadow 0.2s ease;
+}
+
+.event-copy-title:hover {
+    color: var(--primary) !important;
+}
+
+.helix-motion-card:hover .event-copy-title {
+    color: #008be3 !important;
+    text-shadow: 0 0 12px rgba(0, 139, 227, 0.4);
+}
+
+.details-hero-title {
+    user-select: text !important;
+    -webkit-user-select: text !important;
+}
+
+.btn-share-card {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: #e2e8f0;
+    border-radius: 8px;
+    padding: 0 10px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-share-card:hover {
+    background: rgba(0, 139, 227, 0.18);
+    border-color: rgba(0, 139, 227, 0.55);
+    color: #38bdf8;
+    transform: translateY(-1px);
+}
+
+body.light-mode .btn-share-card {
+    background: rgba(15, 23, 42, 0.06);
+    border-color: rgba(15, 23, 42, 0.16);
+    color: #1e293b;
+}
+
+body.light-mode .btn-share-card:hover {
+    background: rgba(0, 139, 227, 0.12);
+    border-color: #008be3;
+    color: #0284c7;
+}
+
+.share-event-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 6, 23, 0.78);
+    backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 1rem;
+}
+
+.share-event-modal-overlay.active {
+    display: flex;
+}
+
+.share-event-modal-card {
+    width: 100%;
+    max-width: 480px;
+    background: rgba(15, 23, 42, 0.96);
+    border: 1px solid rgba(0, 139, 227, 0.35);
+    border-radius: 20px;
+    padding: 1.6rem;
+    color: #f8fafc;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.65);
+    box-sizing: border-box;
+}
+
+body.light-mode .share-event-modal-card {
+    background: #ffffff;
+    color: #0f172a;
+    border-color: rgba(0, 139, 227, 0.35);
+}
+
+.share-link-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin: 0.75rem 0 1rem;
+}
+
+.share-link-input {
+    flex: 1;
+    min-width: 0;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 10px;
+    color: #e2e8f0;
+    padding: 0.65rem 0.85rem;
+    font-size: 0.84rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+body.light-mode .share-link-input {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #0f172a;
+}
+
+.share-channels-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 0.9rem;
+}
+
+.share-channel-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.5rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    font-family: inherit;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.06);
+    color: #e2e8f0;
+    transition: all 0.2s ease;
+}
+
+.share-channel-pill:hover {
+    transform: translateY(-1px);
+    border-color: var(--primary);
+    color: #ffffff;
+}
+
+body.light-mode .share-channel-pill {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #1e293b;
+}
+
 
 
 

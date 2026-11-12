@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#008be3">
     <link rel="manifest" href="/manifest.json">
     <!-- Fonts and CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=6.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=8.4">
     <style>
         .calendar-container,
         .calendar-container * {
@@ -802,6 +802,15 @@
                 <a href="{{ url_for('event_google_calendar', event_id=next_event.id) }}" target="_blank" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 0.65rem 1rem; font-size: 0.85rem; border-radius: 10px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;" title="Add to Google Calendar">
                     📅 Calendar
                 </a>
+                <button type="button" class="btn-share-card" style="height: 40px; padding: 0 12px;"
+                    data-share-title="{{ next_event.title }}"
+                    data-share-url="{{ url_for('event_detail', event_id=next_event.id, _external=True) }}"
+                    data-share-category="{{ next_event.category or 'Featured Event' }}"
+                    data-share-date="{{ next_event.date or '' }}"
+                    onclick="shareEventFromBtn(this, event)"
+                    title="Share public event link">
+                    📤 Share
+                </button>
             </div>
         </div>
     </div>
@@ -1080,9 +1089,7 @@
                 </div>
                 <div style="padding: 1.25rem; display: flex; flex-direction: column; flex: 1; justify-content: space-between;">
                     <div>
-                        <h3 class="highlight-card-title">
-                            <a href="{{ url_for('event_detail', event_id=event.id) }}">{{ event.title }}</a>
-                        </h3>
+                        <h3 class="highlight-card-title event-copy-title" data-event-url="{{ url_for('event_detail', event_id=event.id) }}" tabindex="0">{{ event.title }}</h3>
 
                         <!-- Venue & Google Maps Link -->
                         <div class="highlight-venue-row">
@@ -1146,6 +1153,16 @@
                             <button class="card-btn-action" style="background: rgba(255,255,255,0.08); color: var(--text-muted); cursor: not-allowed; border: 1px solid rgba(255,255,255,0.1);" disabled>Closed</button>
                             {% endif %}
                             <a href="{{ url_for('category_events', category_name=event.category) }}" class="btn-domain-link" title="Open {{ event.category }} Carousel">Domain ➔</a>
+                            <button type="button" class="btn-share-card"
+                                data-share-title="{{ event.title }}"
+                                data-share-url="{{ url_for('event_detail', event_id=event.id, _external=True) }}"
+                                data-share-category="{{ event.category }}"
+                                data-share-date="{{ event.date }}"
+                                onclick="shareEventFromBtn(this, event)"
+                                title="Share public link for {{ event.title }}"
+                                aria-label="Share {{ event.title }}">
+                                📤
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1232,7 +1249,7 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/motion@latest/dist/motion.js"></script>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='script.js') }}?v=8.4"></script>
     <script src="{{ url_for('static', filename='animations.js') }}"></script>
     <script src="{{ url_for('static', filename='onboarding.js') }}"></script>
     <script>
@@ -1283,9 +1300,7 @@
                             <div style="padding: 0.9rem 1rem; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
                                 <div>
                                     <span style="font-size: 0.72rem; color: #008be3; font-weight: 700; text-transform: uppercase;">${ev.category || 'Tech Event'}</span>
-                                    <h4 style="color: #ffffff; font-size: 0.98rem; font-weight: 700; margin: 0.2rem 0 0.4rem; line-height: 1.3;">
-                                        <a href="/event/${ev.id}" style="color: inherit; text-decoration: none;">${ev.title}</a>
-                                    </h4>
+                                    <h4 class="event-copy-title" data-event-url="/event/${ev.id}" style="color: #ffffff; font-size: 0.98rem; font-weight: 700; margin: 0.2rem 0 0.4rem; line-height: 1.3;">${ev.title}</h4>
                                     <div style="color: var(--text-muted); font-size: 0.78rem; margin-bottom: 0.6rem;">
                                         🗓️ ${ev.date} &bull; 🏷️ ${ev.price}
                                     </div>

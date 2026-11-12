@@ -9,7 +9,7 @@
     <meta name="theme-color" content="{{ category_info.color or '#008be3' }}">
     <link rel="manifest" href="/manifest.json">
     <!-- Fonts and CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=5.1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=8.4">
     <style>
         .calendar-container,
         .calendar-container * {
@@ -593,13 +593,14 @@
             line-height: 1 !important;
         }
         .carousel-item .event-details-link-wrapper {
-            height: 20px !important;
-            min-height: 20px !important;
-            max-height: 20px !important;
+            height: 22px !important;
+            min-height: 22px !important;
+            max-height: 22px !important;
             margin: 0 !important;
             display: flex !important;
             align-items: center !important;
-            justify-content: center !important;
+            justify-content: space-between !important;
+            gap: 8px !important;
         }
         .carousel-item .event-details-link-wrapper a {
             font-size: 0.8rem !important;
@@ -1028,9 +1029,7 @@
                         </a>
 
                         <div class="card-content">
-                            <h3 class="event-title">
-                                <a href="{{ url_for('event_detail', event_id=event.id) }}" style="color: inherit; text-decoration: none;">{{ event.title }}</a>
-                            </h3>
+                            <h3 class="event-title event-copy-title" data-event-url="{{ url_for('event_detail', event_id=event.id) }}" tabindex="0">{{ event.title }}</h3>
 
                             <!-- Event Real-Time Location & Google Maps Navigation Link -->
                             <div class="event-venue-row" style="display: flex; align-items: center; gap: 6px; margin-bottom: 0.4rem; font-size: 0.8rem; overflow: hidden;">
@@ -1130,6 +1129,15 @@
                             </div>
                             <div class="event-details-link-wrapper">
                                 <a href="{{ url_for('event_detail', event_id=event.id) }}">View Purpose & Details →</a>
+                                <button type="button" class="btn-share-card" style="height: 22px; padding: 0 8px; font-size: 0.72rem; border-radius: 6px;"
+                                    data-share-title="{{ event.title }}"
+                                    data-share-url="{{ url_for('event_detail', event_id=event.id, _external=True) }}"
+                                    data-share-category="{{ event.category }}"
+                                    data-share-date="{{ event.date }}"
+                                    onclick="shareEventFromBtn(this, event)"
+                                    title="Share public link for {{ event.title }}">
+                                    📤 Share
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -1170,9 +1178,7 @@
             </a>
             <div style="padding: 1.25rem; display: flex; flex-direction: column; flex: 1; justify-content: space-between;">
                 <div>
-                    <h3 class="grid-event-card-title">
-                        <a href="{{ url_for('event_detail', event_id=event.id) }}">{{ event.title }}</a>
-                    </h3>
+                    <h3 class="grid-event-card-title event-copy-title" data-event-url="{{ url_for('event_detail', event_id=event.id) }}" tabindex="0">{{ event.title }}</h3>
                     <div class="grid-venue-row">
                         <span>📍</span> <span>{{ event.venue or 'Auditorium' }}</span>
                     </div>
@@ -1211,7 +1217,18 @@
                     {% else %}
                     <span class="event-price-tag price-paid" style="font-size: 0.95rem;">🎟️ {{ event.price }}</span>
                     {% endif %}
-                    <a href="{{ url_for('event_detail', event_id=event.id) }}" class="btn-primary" style="text-decoration: none; padding: 0.45rem 1rem; font-size: 0.82rem; border-radius: 8px; font-weight: 700; height: 34px; display: inline-flex; align-items: center; justify-content: center; width: auto; margin: 0;">Details & Booking →</a>
+                    <div style="display: inline-flex; align-items: center; gap: 6px;">
+                        <button type="button" class="btn-share-card" style="height: 34px; padding: 0 10px;"
+                            data-share-title="{{ event.title }}"
+                            data-share-url="{{ url_for('event_detail', event_id=event.id, _external=True) }}"
+                            data-share-category="{{ event.category }}"
+                            data-share-date="{{ event.date }}"
+                            onclick="shareEventFromBtn(this, event)"
+                            title="Share public link">
+                            📤 Share
+                        </button>
+                        <a href="{{ url_for('event_detail', event_id=event.id) }}" class="btn-primary" style="text-decoration: none; padding: 0.45rem 1rem; font-size: 0.82rem; border-radius: 8px; font-weight: 700; height: 34px; display: inline-flex; align-items: center; justify-content: center; width: auto; margin: 0;">Details & Booking →</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1290,9 +1307,7 @@
                             </div>
                         </a>
                         <div class="card-content" style="padding: 1.2rem 1.4rem;">
-                            <h3 class="event-title" style="color: #ffffff; font-size: 1.18rem; font-weight: 700; margin-bottom: 0.3rem;">
-                                <a href="{{ url_for('event_detail', event_id=event.id) }}" style="color: inherit; text-decoration: none;">{{ event.title }}</a>
-                            </h3>
+                            <h3 class="event-title event-copy-title" data-event-url="{{ url_for('event_detail', event_id=event.id) }}" tabindex="0" style="color: #ffffff; font-size: 1.18rem; font-weight: 700; margin-bottom: 0.3rem;">{{ event.title }}</h3>
                             <div class="event-venue-row" style="display: flex; align-items: center; gap: 6px; margin-bottom: 0.35rem; font-size: 0.78rem; overflow: hidden;">
                                 <a href="{{ event.maps_url or ('https://www.google.com/maps/search/?api=1&query=' ~ ((event.venue ~ ' ' ~ event.venue_address) | urlencode)) }}" target="_blank" rel="noopener noreferrer" class="event-venue-link" title="Open {{ event.venue }} on Google Maps" style="color: rgba(226, 232, 240, 0.75); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; font-weight: 500;">
                                     <span>📍</span> <span>{{ event.venue or 'Main Auditorium' }}</span> <span>↗</span>
@@ -1310,6 +1325,15 @@
                                         <button type="submit" class="register-btn-sm" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; white-space: nowrap; background: rgba(239,68,68,0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); cursor: pointer; border-radius: 6px;">Delete</button>
                                     </form>
                                     {% endif %}
+                                    <button type="button" class="btn-share-card" style="height: 30px; padding: 0 9px; font-size: 0.76rem;"
+                                        data-share-title="{{ event.title }}"
+                                        data-share-url="{{ url_for('event_detail', event_id=event.id, _external=True) }}"
+                                        data-share-category="{{ event.category }}"
+                                        data-share-date="{{ event.date }}"
+                                        onclick="shareEventFromBtn(this, event)"
+                                        title="Share public link">
+                                        📤
+                                    </button>
                                     <a href="{{ url_for('event_detail', event_id=event.id) }}" class="helix-detail-link">View Details →</a>
                                 </div>
                             </div>
@@ -1417,7 +1441,7 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/motion@latest/dist/motion.js"></script>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='script.js') }}?v=8.4"></script>
     <script src="{{ url_for('static', filename='animations.js') }}"></script>
     <script>
         // Sidebar controls

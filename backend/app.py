@@ -550,7 +550,7 @@ EVENTS = [
         "desc": "High-octane T20 cricket tournament between top university squads under floodlights.",
         "price": "₹500",
         "color": "#10b981",
-        "image": "https://images.unsplash.com/photo-1531415074868-036b1c5f53ec?auto=format&fit=crop&w=1200&q=80",
+        "image": "/static/event_images/cricket_league_2026.jpg",
         "purpose": "Foster collegiate athletic excellence and sporting camaraderie.",
         "full_details": "16 collegiate teams compete in knockout stages with professional DRS, live commentary, and scouting from state cricket selectors.",
         "outcome": "Champion Trophy, ₹1,50,000 team prize, Man of the Tournament medals, and scout selection.",
@@ -572,7 +572,7 @@ EVENTS = [
         "desc": "11v11 championship football knockout tournament on international-standard turf.",
         "price": "₹400",
         "color": "#059669",
-        "image": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80",
+        "image": "/static/event_images/football_cup_2026.jpg",
         "purpose": "Promote university football talent and strategic team athletic competition.",
         "full_details": "Group stage and knockout fixtures adhering strictly to FIFA regulations, with accredited referees and medical support staff.",
         "outcome": "Golden Boot award, team silverware, and club academy trials.",
@@ -1210,7 +1210,7 @@ EVENTS = [
         "desc": "Illuminated by 2,000 candles, classical musicians perform movie soundtracks and baroque sonatas.",
         "price": "₹1300",
         "color": "#f59e0b",
-        "image": "https://images.unsplash.com/photo-1520523839898-50712140d868?auto=format&fit=crop&w=1200&q=80",
+        "image": "/static/event_images/candlelight_concert.jpg",
         "purpose": "Create a peaceful, candlelit acoustic sanctuary in an architectural landmark.",
         "full_details": "Grand Steinway piano and string quartet performing Hans Zimmer, Ludovico Einaudi, and Chopin in a candle-lit hall.",
         "outcome": "Intimate concert experience, scented candle gift, and printed program booklet.",
@@ -2266,7 +2266,7 @@ EVENTS = [
         "desc": "Solar water pumping, agro-photovoltaics, and off-grid solar cold storage units.",
         "price": "Free",
         "color": "#eab308",
-        "image": "https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=1200&q=80",
+        "image": "/static/event_images/solar_agri_expo.jpg",
         "purpose": "Promote solar energy independence and decarbonize farm power consumption.",
         "full_details": "Live installations of solar micro-grids, solar-powered borewells, and dual-use agro-photovoltaic greenhouse structures.",
         "outcome": "Government solar subsidy guide, equipment manufacturer directory, and green certificate.",
@@ -2288,7 +2288,7 @@ EVENTS = [
         "desc": "IoT cattle health monitoring collars, robotic milking parlors, and fodder silage management.",
         "price": "₹300",
         "color": "#0284c7",
-        "image": "https://images.unsplash.com/photo-1527153857715-3908f2ae5e81?auto=format&fit=crop&w=1200&q=80",
+        "image": "/static/event_images/dairy_farming_expo.jpg",
         "purpose": "Modernize dairy cattle management, milk hygiene, and disease prevention.",
         "full_details": "Demonstration of automated milk yield analyzers, smart ear tags for estrus detection, and TMR silage mixers.",
         "outcome": "Dairy farm automation manual, cattle nutrition guide, and attendee badge.",
@@ -2552,7 +2552,7 @@ EVENTS = [
         "desc": "Open public townhall with municipal commissioners on traffic decongestion, waste management, and parks.",
         "price": "₹499",
         "color": "#0ea5e9",
-        "image": "https://images.unsplash.com/photo-1477959858617-67f30bc75b82?auto=format&fit=crop&w=1200&q=80",
+        "image": "/static/event_images/smart_city_townhall.jpg",
         "purpose": "Direct democratic citizen dialogue with city administrators and urban planners.",
         "full_details": "Citizens and resident welfare associations present neighborhood improvement proposals directly to city council heads.",
         "outcome": "Recorded civic grievance docket, Smart City masterplan booklet, and civic contributor badge.",
@@ -3762,7 +3762,7 @@ EVENTS = [
         "desc": "Exhibiting 200+ original paintings, kinetic sculptures, and interactive light installations.",
         "price": "Free",
         "color": "#ec4899",
-        "image": "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=1200&q=80",
+        "image": "/static/event_images/contemporary_art_biennial.jpg",
         "purpose": "Premier gathering for art, culture & theater enthusiasts and professionals.",
         "full_details": "Immersive art, culture & theater event featuring interactive sessions, live showcases, and networking with top experts and community leaders.",
         "outcome": "Gain industry exposure, network with art, culture & theater leaders, and receive an authentic participation credential.",
@@ -6454,6 +6454,54 @@ def dispatch_host_webhooks(event_type, event_id, payload_data):
         threading.Thread(target=_deliver_all, daemon=True).start()
 
 
+_LOCAL_CATEGORY_DEFAULT_IMAGES = {
+    'Sports': ['/static/event_images/cricket_league_2026.jpg', '/static/event_images/football_cup_2026.jpg'],
+    'Music Concerts': ['/static/event_images/candlelight_concert.jpg'],
+    'Agriculture': ['/static/event_images/solar_agri_expo.jpg', '/static/event_images/dairy_farming_expo.jpg'],
+    'Government': ['/static/event_images/smart_city_townhall.jpg'],
+    'Art, Culture & Theater': ['/static/event_images/contemporary_art_biennial.jpg'],
+    'AI & Machine Learning': [
+        '/static/event_images/genai_summit_1.jpg',
+        '/static/event_images/genai_summit_2.jpg',
+        '/static/event_images/genai_summit_3.jpg',
+    ],
+    'Technology & Startup': [
+        '/static/event_images/genai_summit_1.jpg',
+        '/static/event_images/genai_summit_2.jpg',
+        '/static/event_images/genai_summit_3.jpg',
+    ],
+}
+
+_BROKEN_EVENT_IMAGE_REPLACEMENTS = {
+    'photo-1531415074868-036b1c5f53ec': '/static/event_images/cricket_league_2026.jpg',
+    'photo-1508098682722-e99c43a406b2': '/static/event_images/football_cup_2026.jpg',
+    'photo-1520523839898-50712140d868': '/static/event_images/candlelight_concert.jpg',
+    'photo-1509391365360-2e959784a276': '/static/event_images/solar_agri_expo.jpg',
+    'photo-1527153857715-3908f2ae5e81': '/static/event_images/dairy_farming_expo.jpg',
+    'photo-1477959858617-67f30bc75b82': '/static/event_images/smart_city_townhall.jpg',
+    'photo-1579783902614-a3fb3927b675': '/static/event_images/contemporary_art_biennial.jpg',
+}
+
+def _get_category_default_image(category='', title='', seed_num=0):
+    """Return a clean local domain-matched event image instead of repeating a single default photo."""
+    pool = _LOCAL_CATEGORY_DEFAULT_IMAGES.get(category)
+    if not pool:
+        txt = f"{category} {title}".lower()
+        if any(k in txt for k in ('cricket', 'football', 'soccer', 'sport', 'tournament', 'cup')):
+            pool = _LOCAL_CATEGORY_DEFAULT_IMAGES['Sports']
+        elif any(k in txt for k in ('music', 'concert', 'piano', 'cello', 'festival', 'dj')):
+            pool = _LOCAL_CATEGORY_DEFAULT_IMAGES['Music Concerts']
+        elif any(k in txt for k in ('dairy', 'farm', 'solar', 'agri', 'crop')):
+            pool = _LOCAL_CATEGORY_DEFAULT_IMAGES['Agriculture']
+        elif any(k in txt for k in ('city', 'gov', 'policy', 'civic', 'townhall')):
+            pool = _LOCAL_CATEGORY_DEFAULT_IMAGES['Government']
+        elif any(k in txt for k in ('art', 'sculpture', 'museum', 'theater', 'biennial')):
+            pool = _LOCAL_CATEGORY_DEFAULT_IMAGES['Art, Culture & Theater']
+        else:
+            pool = _LOCAL_CATEGORY_DEFAULT_IMAGES['AI & Machine Learning']
+    idx = (abs(int(seed_num or 0)) + sum(ord(ch) for ch in (title or ''))) % len(pool)
+    return pool[idx]
+
 def init_db():
     conn = get_db()
     c = conn.cursor()
@@ -7025,7 +7073,14 @@ def init_db():
         c.execute("UPDATE events SET time = '10:00 AM' WHERE time IS NULL OR time = ''")
         c.execute("UPDATE events SET end_time = '05:00 PM' WHERE end_time IS NULL OR end_time = ''")
         c.execute("UPDATE events SET color = '#4facfe' WHERE color IS NULL OR color = ''")
-        c.execute("UPDATE events SET image = 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80' WHERE image IS NULL OR image = ''")
+        c.execute("UPDATE events SET image = '/static/event_images/genai_summit_1.jpg' WHERE image IS NULL OR image = ''")
+        for broken_id, local_path in _BROKEN_EVENT_IMAGE_REPLACEMENTS.items():
+            c.execute("UPDATE events SET image = ? WHERE image LIKE ?", (local_path, f"%{broken_id}%"))
+        c.execute(
+            "SELECT id, category, title FROM events WHERE id != 1 AND image LIKE '%photo-1504384308090-c894fdcc538d%' ORDER BY id ASC"
+        )
+        for idx, (dup_id, dup_cat, dup_title) in enumerate(c.fetchall()):
+            c.execute("UPDATE events SET image = ? WHERE id = ?", (_get_category_default_image(dup_cat or '', dup_title or '', idx), dup_id))
     except Exception:
         pass
 
@@ -7892,8 +7947,22 @@ def _record_login_session(conn, username, method='password'):
         pass
 
 
-def _finalize_authenticated_login(conn, username, role, is_admin_val, user_id_str, profile_photo, client_ip, raw_identifier):
+def _safe_next_url(target_url):
+    """Return target_url only if it is a safe local path on this origin."""
+    raw = (target_url or '').strip()
+    if not raw or len(raw) > 512:
+        return None
+    parsed = urllib.parse.urlsplit(raw)
+    if parsed.scheme or parsed.netloc:
+        return None
+    if not raw.startswith('/') or raw.startswith('//') or '\\' in raw:
+        return None
+    return raw
+
+
+def _finalize_authenticated_login(conn, username, role, is_admin_val, user_id_str, profile_photo, client_ip, raw_identifier, next_url=None):
     """Handle optional TOTP 2FA gate or establish active authenticated session."""
+    safe_next = _safe_next_url(next_url)
     c = conn.cursor()
     c.execute("SELECT is_enabled FROM user_2fa_settings WHERE username = ?", (username,))
     tfa_row = c.fetchone()
@@ -7906,6 +7975,7 @@ def _finalize_authenticated_login(conn, username, role, is_admin_val, user_id_st
             'is_admin': is_admin_val,
             'user_id': user_id_str,
             'profile_photo': profile_photo,
+            'next_url': safe_next,
         }
         return redirect(url_for('verify_2fa'), code=303)
 
@@ -7916,7 +7986,7 @@ def _finalize_authenticated_login(conn, username, role, is_admin_val, user_id_st
     session['user_id'] = user_id_str
     session['profile_photo'] = profile_photo
     _record_login_session(conn, username, method='password')
-    return redirect(url_for('dashboard'), code=303)
+    return redirect(safe_next or url_for('dashboard'), code=303)
 
 
 @app.route('/api/captcha/refresh', methods=['GET'])
@@ -7933,11 +8003,12 @@ def refresh_login_captcha():
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
+    next_url = _safe_next_url(request.args.get('next') or request.form.get('next'))
     if session.get('loggedin') and request.method == 'GET':
-        return redirect(url_for('dashboard'), code=303)
+        return redirect(next_url or url_for('dashboard'), code=303)
     error = None
     msg = request.args.get('msg')
-    open_register = False
+    open_register = request.args.get('register') in ('1', 'true', 'yes')
     http_status = 200
     if request.method == 'POST':
         action = request.form.get('action')
@@ -8040,7 +8111,7 @@ def login():
                 # Fast Admin / Host check with session recording & optional 2FA gate
                 conn = get_db()
                 resp_redirect = _finalize_authenticated_login(
-                    conn, 'admin', 'host', 1, 'UID-0001', generate_avatar_svg('Admin'), client_ip, raw_identifier
+                    conn, 'admin', 'host', 1, 'UID-0001', generate_avatar_svg('Admin'), client_ip, raw_identifier, next_url=next_url
                 )
                 conn.close()
                 return resp_redirect
@@ -8159,7 +8230,7 @@ def login():
                                     photo = url_for('static', filename=photo)
 
                                 resp_redirect = _finalize_authenticated_login(
-                                    conn, matched_username, user[1] or 'user', user[2] or 0, matched_uid, photo, client_ip, raw_identifier
+                                    conn, matched_username, user[1] or 'user', user[2] or 0, matched_uid, photo, client_ip, raw_identifier, next_url=next_url
                                 )
                                 conn.close()
                                 return resp_redirect
@@ -8180,6 +8251,7 @@ def login():
             challenge_svg=challenge_svg,
             reg_challenge_svg=reg_challenge_svg,
             open_register=open_register,
+            next_url=next_url or '',
             username=request.form.get('username', '')
         ),
         http_status
@@ -8527,9 +8599,9 @@ def category_events(category_name=None):
 
 @app.route('/event/<int:event_id>')
 def event_detail(event_id):
-    if not session.get('loggedin'):
-        return redirect(url_for('login'))
-    
+    # Public event link: anyone can inspect event details; registration actions enforce login.
+    is_logged_in = bool(session.get('loggedin'))
+
     # Find event by ID
     event = get_event(event_id)
     
@@ -8562,8 +8634,8 @@ def event_detail(event_id):
     event['stream_price'] = status_info.get('stream_price') or '₹199'
     
     # Check if user is registered (micro-cached)
-    username = session.get('username')
-    registered_ids = get_user_registered_ids(username)
+    username = session.get('username') if is_logged_in else None
+    registered_ids = get_user_registered_ids(username) if username else set()
     event['is_registered'] = event_id in registered_ids
     
     # Check if attendee has checked in
@@ -8661,6 +8733,8 @@ def event_detail(event_id):
         event=event,
         username=username,
         is_host=is_host(),
+        is_logged_in=is_logged_in,
+        public_event_url=url_for('event_detail', event_id=event_id, _external=True),
         google_cal_url=google_cal_url,
         conflict_event=conflict_event,
         waitlist_info=waitlist_info,
@@ -10030,7 +10104,9 @@ def api_promo_validate():
 @app.route('/register/<int:event_id>', methods=['GET', 'POST'])
 def register_event(event_id):
     if not session.get('loggedin'):
-        return redirect(url_for('login'))
+        flash("Please log in to register for this event.", "warning")
+        next_target = request.full_path.rstrip('?') if request.query_string else request.path
+        return redirect(url_for('login', next=_safe_next_url(next_target) or url_for('register_event', event_id=event_id)))
     
     event = get_event(event_id)
     if not event:
@@ -11798,7 +11874,7 @@ def add_event():
         desc = request.form.get('desc')
         price = request.form.get('price')
         color = request.form.get('color') or '#4facfe'
-        image = request.form.get('image') or 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80'
+        image = request.form.get('image') or _get_category_default_image(title=title or '', seed_num=int(time.time()))
         venue = request.form.get('venue', 'Main Campus Auditorium').strip()
         venue_address = request.form.get('venue_address', 'Tech Park Campus, Innovation Block A, Bangalore - 560103').strip()
         purpose = request.form.get('purpose')
@@ -12087,7 +12163,8 @@ def api_notif_read():
 @app.route('/event/<int:event_id>/review', methods=['POST'])
 def submit_review(event_id):
     if not session.get('loggedin'):
-        return redirect(url_for('login'))
+        flash('Please log in to submit a review.', 'warning')
+        return redirect(url_for('login', next=url_for('event_detail', event_id=event_id)))
     username = session.get('username')
     rating = request.form.get('rating', type=int)
     comment = request.form.get('comment', '').strip()
@@ -13196,7 +13273,7 @@ def get_stream_config(event_id):
 def live_event_page(event_id):
     if not session.get('loggedin'):
         flash("Please log in to access the live stream room.", "error")
-        return redirect(url_for('login'))
+        return redirect(url_for('login', next=url_for('live_event_page', event_id=event_id)))
     
     event = get_event(event_id)
     if not event:
@@ -15803,6 +15880,7 @@ def verify_2fa():
                 verified_method = 'backup_code'
 
         if verified_method:
+            safe_next = _safe_next_url(pending.get('next_url'))
             session.pop('pending_2fa_payload', None)
             session['loggedin'] = True
             session['username'] = uname
@@ -15813,7 +15891,7 @@ def verify_2fa():
             _record_login_session(conn, uname, method=verified_method)
             conn.close()
             log_action(uname, 'login_2fa_verified', f"Verified second factor via {verified_method}")
-            return redirect(url_for('dashboard'), code=303)
+            return redirect(safe_next or url_for('dashboard'), code=303)
 
         conn.close()
         error = "Invalid authentication code or backup recovery code. Please try again."
@@ -16558,6 +16636,9 @@ def speed_networking_lounge(event_id):
 @app.route('/event/<int:event_id>/group-booking')
 def group_booking_checkout(event_id):
     """Squad & Group Booking Page (3 to 10 Attendees with Discounts)"""
+    if not session.get('loggedin'):
+        flash("Please log in to register a squad or group for this event.", "warning")
+        return redirect(url_for('login', next=url_for('group_booking_checkout', event_id=event_id)))
     conn = get_db()
     c = conn.cursor()
     c.execute("SELECT id, title, date, time, venue, price, color, image FROM events WHERE id = ?", (event_id,))
@@ -17113,9 +17194,10 @@ def api_ai_magic_generate_event():
     purpose = "Accelerate industry breakthroughs, foster collaboration, and empower attendees with actionable technical blueprints."
     outcome = "Leave equipped with enterprise production frameworks, verified POAP credentials, and valuable peer connections."
 
+    ai_image = _get_category_default_image(category=category, title=title, seed_num=int(time.time()))
     c.execute("""INSERT INTO events (title, date, time, end_time, desc, price, color, image, stream_price, venue, venue_address, category, purpose, full_details, outcome, seats_total, seats_filled, is_draft, featured)
-                 VALUES (?, ?, '09:30 AM', '06:00 PM', ?, ?, '#008be3', 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80', '₹199', ?, ?, ?, ?, ?, ?, 250, 0, 0, 1)""",
-              (title, date_str, desc, price_str, venue, venue_address, category, purpose, full_details, outcome))
+                 VALUES (?, ?, '09:30 AM', '06:00 PM', ?, ?, '#008be3', ?, '₹199', ?, ?, ?, ?, ?, ?, 250, 0, 0, 1)""",
+              (title, date_str, desc, price_str, ai_image, venue, venue_address, category, purpose, full_details, outcome))
     new_event_id = c.lastrowid
 
     # 2. Insert Pricing Tiers
