@@ -842,6 +842,15 @@
                 <a href="{{ url_for('admin_dashboard') }}" style="margin-right:10px;color:var(--admin-accent,#f59e0b);font-weight:700;font-size:0.85rem;text-decoration:none;" title="Admin Panel">⚡ Admin</a>
                 {% endif %}
                 <a href="{{ url_for('logout') }}" class="logout-btn-unique" aria-label="Log out of your account">⏻ Logout</a>
+
+                <!-- Real-Time Date & Clock Widget -->
+                <div class="nav-clock-widget" title="Current Real Time (System Clock)" aria-label="Real-time date and clock">
+                    <span class="clock-live-dot" aria-hidden="true"></span>
+                    <div class="clock-content">
+                        <span class="clock-time">--:--:-- --</span>
+                        <span class="clock-date">---, -- --- ----</span>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>

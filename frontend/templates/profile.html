@@ -491,6 +491,15 @@
             <div class="nav-links" style="display: flex; align-items: center; gap: 12px;">
                 <a href="{{ url_for('dashboard') }}" class="nav-btn-dash">🏠 Dashboard</a>
                 <a href="{{ url_for('logout') }}" class="logout-btn-unique">⏻ Logout</a>
+
+                <!-- Real-Time Date & Clock Widget -->
+                <div class="nav-clock-widget" title="Current Real Time (System Clock)" aria-label="Real-time date and clock">
+                    <span class="clock-live-dot" aria-hidden="true"></span>
+                    <div class="clock-content">
+                        <span class="clock-time">--:--:-- --</span>
+                        <span class="clock-date">---, -- --- ----</span>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>

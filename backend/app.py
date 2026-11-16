@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session, send_file, make_response, jsonify, flash, Response
+from typing import Optional, List, Dict, Any
 import sys
 import time
 import random
@@ -5588,8 +5589,11 @@ def handle_403(e):
 @app.errorhandler(404)
 def handle_404(e):
     if request.path.startswith('/api/'):
-        return jsonify({'error': 'Resource not found', 'status': 404}), 404
-    return render_template('dashboard.html', error_banner="The requested page could not be found."), 404
+        return jsonify({'ok': False, 'error': 'Endpoint not found', 'status': 404}), 404
+    if any(request.path.endswith(ext) for ext in ('.ico', '.png', '.jpg', '.jpeg', '.svg', '.gif', '.webp', '.map', '.js', '.css', '.json', '.txt', '.woff', '.woff2', '.ttf')):
+        return "Not found", 404
+    flash("The requested page was not found.", "error")
+    return redirect(url_for('dashboard' if session.get('loggedin') else 'login'))
 
 @app.errorhandler(413)
 def handle_413(e):
@@ -5601,8 +5605,9 @@ def handle_413(e):
 @app.errorhandler(500)
 def handle_500(e):
     if request.path.startswith('/api/'):
-        return jsonify({'error': 'Internal Server Error', 'status': 500}), 500
-    return render_template('dashboard.html', error_banner="A temporary system error occurred. Please try again."), 500
+        return jsonify({'ok': False, 'error': 'Internal server error', 'status': 500}), 500
+    flash("An unexpected error occurred. Please try again.", "error")
+    return redirect(url_for('dashboard' if session.get('loggedin') else 'login'))
 
 import html
 
@@ -5694,7 +5699,7 @@ def get_db(timeout=60.0, row_factory=False):
 
 
 # In-memory Event Catalog Cache
-_EVENTS_CACHE = None
+_EVENTS_CACHE: Optional[List[Dict[str, Any]]] = None
 
 def get_events():
     global _EVENTS_CACHE
@@ -5901,27 +5906,6 @@ def push_notification(username, message, link='#'):
         conn.close()
     except Exception:
         pass
-
-def get_category(title):
-    t = title.lower()
-    if 'ai' in t or 'ml' in t or 'learning' in t or 'intel' in t:
-        return 'AI & ML'
-    elif 'cyber' in t or 'shield' in t or 'hack' in t or 'ctf' in t or 'security' in t or 'penetration' in t:
-        return 'Cybersecurity'
-    elif 'web' in t or 'stack' in t or 'react' in t or 'next' in t or 'js' in t or 'mosaic' in t:
-        return 'Web Development'
-    elif 'cloud' in t or 'azure' in t or 'aws' in t or 'devops' in t or 'kubernetes' in t or 'k8s' in t or 'serverless' in t:
-        return 'Cloud & DevOps'
-    elif 'gaming' in t or 'game' in t:
-        return 'Gaming'
-    elif 'design' in t or 'ui' in t or 'ux' in t or 'animation' in t:
-        return 'UI/UX Design'
-    elif 'iot' in t or 'robo' in t or 'embedded' in t or 'hardware' in t:
-        return 'IoT & Robotics'
-    elif 'data' in t or 'analytic' in t or 'spark' in t or 'kafka' in t or 'big data' in t:
-        return 'Data Science'
-    else:
-        return 'General Tech'
 
 def parse_time_string(time_str: str, default_hour=10, default_minute=0):
     """
@@ -13186,22 +13170,6 @@ def service_worker():
         return resp
     return ('', 204)
 
-@app.errorhandler(404)
-def handle_404(e):
-    if request.path.startswith('/api/'):
-        return jsonify({'ok': False, 'error': 'Endpoint not found'}), 404
-    # Do not flash error toasts or redirect for background assets, icons, fonts, or maps
-    if any(request.path.endswith(ext) for ext in ('.ico', '.png', '.jpg', '.jpeg', '.svg', '.gif', '.webp', '.map', '.js', '.css', '.json', '.txt', '.woff', '.woff2', '.ttf')):
-        return "Not found", 404
-    flash("The requested page was not found.", "error")
-    return redirect(url_for('dashboard' if session.get('loggedin') else 'login'))
-
-@app.errorhandler(500)
-def handle_500(e):
-    if request.path.startswith('/api/'):
-        return jsonify({'ok': False, 'error': 'Internal server error'}), 500
-    flash("An unexpected error occurred. Please try again.", "error")
-    return redirect(url_for('dashboard' if session.get('loggedin') else 'login'))
 
 # In-memory fast static file cache
 _STATIC_MEM_CACHE = {}

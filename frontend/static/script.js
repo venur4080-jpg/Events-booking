@@ -478,5 +478,61 @@ function shareEventFromBtn(btn, evt) {
     });
 }
 
-document.addEventListener('DOMContentLoaded', _initEventTitlePlainCopyAndClick);
+/**
+ * Real-Time Live Clock Widget
+ * Accurately ticks every second synchronized with system wall-clock time.
+ * Displays hours:minutes:seconds AM/PM and Day, DD Mon YYYY.
+ */
+function initNavRealtimeClock() {
+    const timeEls = document.querySelectorAll('.clock-time');
+    const dateEls = document.querySelectorAll('.clock-date');
+    if (!timeEls.length && !dateEls.length) return;
+
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    function tick() {
+        const now = new Date();
+
+        let hours = now.getHours();
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        const formattedHours = String(hours).padStart(2, '0');
+        const timeStr = `${formattedHours}:${minutes}:${seconds} ${ampm}`;
+
+        const dayName = days[now.getDay()];
+        const dateNum = String(now.getDate()).padStart(2, '0');
+        const monthName = months[now.getMonth()];
+        const year = now.getFullYear();
+        const dateStr = `${dayName}, ${dateNum} ${monthName} ${year}`;
+
+        for (let i = 0; i < timeEls.length; i++) {
+            if (timeEls[i].textContent !== timeStr) {
+                timeEls[i].textContent = timeStr;
+            }
+        }
+        for (let i = 0; i < dateEls.length; i++) {
+            if (dateEls[i].textContent !== dateStr) {
+                dateEls[i].textContent = dateStr;
+            }
+        }
+    }
+
+    tick();
+
+    const msUntilNextSecond = 1000 - (Date.now() % 1000);
+    setTimeout(() => {
+        tick();
+        setInterval(tick, 1000);
+    }, msUntilNextSecond);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    _initEventTitlePlainCopyAndClick();
+    initNavRealtimeClock();
+});
+
 

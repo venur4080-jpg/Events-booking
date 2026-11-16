@@ -99,35 +99,35 @@ class EventListResponse(BaseModel):
 
 
 class EventCreateRequest(BaseModel):
-    title: str = Field(..., min_length=3, max_length=150, example="Hackathon 2026")
-    date: str = Field(..., example="Apr 25, 2026")
-    time: str = Field(default="10:00 AM", example="10:00 AM")
-    end_time: str = Field(default="05:00 PM", example="05:00 PM")
-    desc: str = Field(..., example="24-hour coding hackathon for students")
-    price: str = Field(default="Free", example="Free")
-    color: str = Field(default="#4facfe", example="#4facfe")
+    title: str = Field(..., min_length=3, max_length=150, examples=["Hackathon 2026"])
+    date: str = Field(..., examples=["Apr 25, 2026"])
+    time: str = Field(default="10:00 AM", examples=["10:00 AM"])
+    end_time: str = Field(default="05:00 PM", examples=["05:00 PM"])
+    desc: str = Field(..., examples=["24-hour coding hackathon for students"])
+    price: str = Field(default="Free", examples=["Free"])
+    color: str = Field(default="#4facfe", examples=["#4facfe"])
     image: str = Field(default="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80")
-    purpose: Optional[str] = Field(default="", example="Rapid prototyping")
-    full_details: Optional[str] = Field(default="", example="Complete rules and breakdown")
-    outcome: Optional[str] = Field(default="", example="Prizes and certificates")
-    venue: str = Field(default="Main Campus Auditorium", example="BIEC Convention Centre")
-    venue_address: str = Field(default="Bangalore, Karnataka", example="Tumkur Road, Bangalore")
-    seats_total: int = Field(default=100, ge=1, le=50000, example=250)
+    purpose: Optional[str] = Field(default="", examples=["Rapid prototyping"])
+    full_details: Optional[str] = Field(default="", examples=["Complete rules and breakdown"])
+    outcome: Optional[str] = Field(default="", examples=["Prizes and certificates"])
+    venue: str = Field(default="Main Campus Auditorium", examples=["BIEC Convention Centre"])
+    venue_address: str = Field(default="Bangalore, Karnataka", examples=["Tumkur Road, Bangalore"])
+    seats_total: int = Field(default=100, ge=1, le=50000, examples=[250])
     featured: int = Field(default=0, ge=0, le=1)
 
 
 class UserLoginRequest(BaseModel):
-    identifier: str = Field(..., example="0001", description="4-digit User ID (e.g. 0001) or Registered Email Address")
-    password: str = Field(..., example="password123", min_length=3)
+    identifier: str = Field(..., examples=["0001"], description="4-digit User ID (e.g. 0001) or Registered Email Address")
+    password: str = Field(..., examples=["password123"], min_length=3)
 
 
 class UserRegisterRequest(BaseModel):
-    username: str = Field(..., min_length=3, max_length=50, example="student_dev")
-    full_name: str = Field(..., min_length=2, max_length=100, example="John Doe")
-    email: str = Field(..., example="john.doe@example.com")
-    password: str = Field(..., min_length=6, example="password123")
-    phone: Optional[str] = Field(default="", example="9876543210")
-    college_id: Optional[str] = Field(default="", example="ENG2026-0042")
+    username: str = Field(..., min_length=3, max_length=50, examples=["student_dev"])
+    full_name: str = Field(..., min_length=2, max_length=100, examples=["John Doe"])
+    email: str = Field(..., examples=["john.doe@example.com"])
+    password: str = Field(..., min_length=6, examples=["password123"])
+    phone: Optional[str] = Field(default="", examples=["9876543210"])
+    college_id: Optional[str] = Field(default="", examples=["ENG2026-0042"])
 
 
 class UserResponse(BaseModel):
@@ -150,16 +150,16 @@ class UserProfileResponse(BaseModel):
 
 
 class BookingCreateRequest(BaseModel):
-    event_id: int = Field(..., example=1)
-    username: str = Field(..., example="student_dev")
-    full_name: str = Field(..., example="John Doe")
-    email: str = Field(..., example="john.doe@example.com")
-    phone: Optional[str] = Field(default="", example="9876543210")
-    college_id: Optional[str] = Field(default="", example="ENG2026-0042")
-    payment_method: Optional[str] = Field(default="Free Pass", example="Free Pass")
-    upi_id: Optional[str] = Field(default="", example="")
-    team_name: Optional[str] = Field(default="", example="")
-    team_members: Optional[List[Dict[str, str]]] = Field(default=[], example=[])
+    event_id: int = Field(..., examples=[1])
+    username: str = Field(..., examples=["student_dev"])
+    full_name: str = Field(..., examples=["John Doe"])
+    email: str = Field(..., examples=["john.doe@example.com"])
+    phone: Optional[str] = Field(default="", examples=["9876543210"])
+    college_id: Optional[str] = Field(default="", examples=["ENG2026-0042"])
+    payment_method: Optional[str] = Field(default="Free Pass", examples=["Free Pass"])
+    upi_id: Optional[str] = Field(default="", examples=[""])
+    team_name: Optional[str] = Field(default="", examples=[""])
+    team_members: Optional[List[Dict[str, str]]] = Field(default=[], examples=[[]])
 
 
 class BookingResponse(BaseModel):
@@ -193,10 +193,10 @@ class TicketVerificationResponse(BaseModel):
 
 
 class ReviewCreateRequest(BaseModel):
-    event_id: int = Field(..., example=1)
-    username: str = Field(..., example="student_dev")
-    rating: int = Field(..., ge=1, le=5, example=5)
-    comment: Optional[str] = Field(default="", example="Outstanding session and great speaker!")
+    event_id: int = Field(..., examples=[1])
+    username: str = Field(..., examples=["student_dev"])
+    rating: int = Field(..., ge=1, le=5, examples=[5])
+    comment: Optional[str] = Field(default="", examples=["Outstanding session and great speaker!"])
 
 
 class ReviewResponse(BaseModel):
@@ -1188,17 +1188,17 @@ async def mark_notification_read(notification_id: int = Path(...)):
 # ============================================================================
 
 class RealtimeSeatBroadcastRequest(BaseModel):
-    event_id: int = Field(..., example=1)
-    seats_filled: int = Field(..., ge=0, example=24)
-    seats_total: int = Field(default=100, ge=1, example=100)
+    event_id: int = Field(..., examples=[1])
+    seats_filled: int = Field(..., ge=0, examples=[24])
+    seats_total: int = Field(default=100, ge=1, examples=[100])
 
 
 class RealtimeTelemetryBroadcastRequest(BaseModel):
-    event_id: int = Field(..., example=1)
-    attendee: str = Field(..., example="Venu R")
-    username: str = Field(..., example="venu")
-    ticket_code: Optional[str] = Field(default="", example="TKT-001-00045")
-    checkin_time: Optional[str] = Field(default=None, example="14 Oct 2026, 03:30 PM")
+    event_id: int = Field(..., examples=[1])
+    attendee: str = Field(..., examples=["Venu R"])
+    username: str = Field(..., examples=["venu"])
+    ticket_code: Optional[str] = Field(default="", examples=["TKT-001-00045"])
+    checkin_time: Optional[str] = Field(default=None, examples=["14 Oct 2026, 03:30 PM"])
 
 
 @api_v1.get(
@@ -1237,8 +1237,8 @@ async def api_broadcast_seat(payload: RealtimeSeatBroadcastRequest):
 
 
 class RealtimeLiveBroadcastRequest(BaseModel):
-    event_id: int = Field(..., example=1)
-    type: str = Field(..., example="qa_update")
+    event_id: int = Field(..., examples=[1])
+    type: str = Field(..., examples=["qa_update"])
     payload: Dict[str, Any] = Field(default_factory=dict)
 
 

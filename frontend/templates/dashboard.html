@@ -635,6 +635,15 @@
                 {% endif %}
                 <a href="{{ url_for('logout') }}" class="logout-btn-unique"
                     aria-label="Log out of your account">⏻ Logout</a>
+
+                <!-- Real-Time Date & Clock Widget -->
+                <div class="nav-clock-widget" id="navRealtimeClock" title="Current Real Time (System Clock)" aria-label="Real-time date and clock">
+                    <span class="clock-live-dot" aria-hidden="true"></span>
+                    <div class="clock-content">
+                        <span class="clock-time" id="navClockTime">--:--:-- --</span>
+                        <span class="clock-date" id="navClockDate">---, -- --- ----</span>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
@@ -1408,6 +1417,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             if (window.loadPersistedTheme) loadPersistedTheme();
             if (window.initOnboarding) initOnboarding();
+            if (window.initNavRealtimeClock) initNavRealtimeClock();
             loadAIRecommendations();
             initCountdownTimer();
         });
