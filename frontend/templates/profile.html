@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile | Events Booking</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=8.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=9.5">
     <script src="{{ url_for('static', filename='themes.js') }}?v=8.0"></script>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='script.js') }}?v=9.5"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
     <style>
@@ -493,13 +493,44 @@
                 <a href="{{ url_for('logout') }}" class="logout-btn-unique">⏻ Logout</a>
 
                 <!-- Real-Time Date & Clock Widget -->
-                <div class="nav-clock-widget" title="Current Real Time (System Clock)" aria-label="Real-time date and clock">
-                    <span class="clock-live-dot" aria-hidden="true"></span>
-                    <div class="clock-content">
-                        <span class="clock-time">--:--:-- --</span>
-                        <span class="clock-date">---, -- --- ----</span>
+                <div class="nav-clock-widget" title="Current Real Time (System Clock)" aria-label="Real-time date and clock"
+                    style="display: inline-flex !important; align-items: center !important; gap: 8px !important; padding: 4px 10px !important; background: rgba(255, 255, 255, 0.05) !important; border: 1px solid rgba(0, 139, 227, 0.35) !important; border-radius: 10px !important; margin-left: 6px !important; vertical-align: middle !important; white-space: nowrap !important; box-shadow: 0 2px 10px rgba(0,0,0,0.3) !important;">
+                    <span class="clock-live-dot" aria-hidden="true" style="width: 8px !important; height: 8px !important; border-radius: 50% !important; background: #10b981 !important; box-shadow: 0 0 8px #10b981 !important; display: inline-block !important; flex-shrink: 0 !important; animation: navClockPulse 2s infinite ease-in-out !important;"></span>
+                    <div class="clock-content" style="display: flex !important; flex-direction: column !important; align-items: flex-start !important; line-height: 1.15 !important;">
+                        <span class="clock-time" style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace !important; font-size: 0.84rem !important; font-weight: 700 !important; color: #38bdf8 !important; letter-spacing: 0.5px !important; font-variant-numeric: tabular-nums !important; display: block !important;">{{ realtime_now_time }}</span>
+                        <span class="clock-date" style="font-size: 0.68rem !important; font-weight: 500 !important; color: #94a3b8 !important; letter-spacing: 0.2px !important; display: block !important;">{{ realtime_now_date }}</span>
                     </div>
                 </div>
+                <script>
+                    (function initInlineLiveClock() {
+                        function updateNavClock() {
+                            var now = new Date();
+                            var hours = now.getHours();
+                            var minutes = String(now.getMinutes()).padStart(2, '0');
+                            var seconds = String(now.getSeconds()).padStart(2, '0');
+                            var ampm = hours >= 12 ? 'PM' : 'AM';
+                            hours = hours % 12;
+                            hours = hours ? hours : 12;
+                            var formattedHours = String(hours).padStart(2, '0');
+                            var timeStr = formattedHours + ':' + minutes + ':' + seconds + ' ' + ampm;
+
+                            var days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                            var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                            var dateStr = days[now.getDay()] + ', ' + String(now.getDate()).padStart(2, '0') + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
+
+                            var times = document.querySelectorAll('.clock-time');
+                            var dates = document.querySelectorAll('.clock-date');
+                            for (var i = 0; i < times.length; i++) times[i].textContent = timeStr;
+                            for (var j = 0; j < dates.length; j++) dates[j].textContent = dateStr;
+                        }
+                        updateNavClock();
+                        var ms = 1000 - (Date.now() % 1000);
+                        setTimeout(function () {
+                            updateNavClock();
+                            setInterval(updateNavClock, 1000);
+                        }, ms);
+                    })();
+                </script>
             </div>
         </div>
     </nav>

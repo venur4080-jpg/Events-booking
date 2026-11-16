@@ -7557,7 +7557,16 @@ def inject_user_data():
             'user_id': user_id or 'UID-0001',
             'subscription': user_sub
         }
-    return dict(current_user=current_user, is_admin=user_is_admin, is_host=user_is_host, user_subscription=user_sub, csrf_token=_get_csrf_token)
+    _now = datetime.now()
+    return dict(
+        current_user=current_user,
+        is_admin=user_is_admin,
+        is_host=user_is_host,
+        user_subscription=user_sub,
+        csrf_token=_get_csrf_token,
+        realtime_now_time=_now.strftime('%I:%M:%S %p'),
+        realtime_now_date=_now.strftime('%a, %d %b %Y')
+    )
 
 # Universal Validation Helpers for Email & Mobile Number 
 def validate_mobile(phone: str):
