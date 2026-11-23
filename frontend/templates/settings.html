@@ -377,6 +377,82 @@
             color: #0f172a;
             border-color: #cbd5e1;
         }
+
+        /* Compact, Properly Proportioned 2FA Buttons */
+        .btn-enable-2fa {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #008be3 0%, #0284c7 100%);
+            color: #ffffff !important;
+            border: 1px solid rgba(56, 189, 248, 0.45);
+            padding: 0.6rem 1.4rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.88rem;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 14px rgba(0, 139, 227, 0.28);
+            white-space: nowrap;
+            text-transform: none;
+            line-height: 1.3;
+            margin: 0.5rem 0 0 0;
+            outline: none;
+        }
+        .btn-enable-2fa:hover {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            border-color: #38bdf8;
+            box-shadow: 0 6px 20px rgba(0, 139, 227, 0.45);
+            transform: translateY(-1px);
+            color: #ffffff !important;
+        }
+        .btn-enable-2fa:active {
+            transform: translateY(0) scale(0.98);
+        }
+        .btn-verify-2fa {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #ffffff !important;
+            border: 1px solid rgba(16, 185, 129, 0.5);
+            padding: 0.55rem 1.15rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+            white-space: nowrap;
+            text-transform: none;
+            line-height: 1.3;
+            margin: 0;
+            outline: none;
+        }
+        .btn-verify-2fa:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            border-color: #34d399;
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+            transform: translateY(-1px);
+            color: #ffffff !important;
+        }
+        .btn-verify-2fa:active {
+            transform: translateY(0) scale(0.98);
+        }
+        body.light-mode .btn-enable-2fa {
+            background: linear-gradient(135deg, #008be3 0%, #0284c7 100%);
+            border-color: rgba(0, 139, 227, 0.5);
+            box-shadow: 0 4px 12px rgba(0, 139, 227, 0.2);
+        }
+        body.light-mode .btn-verify-2fa {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-color: rgba(16, 185, 129, 0.5);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -933,7 +1009,9 @@
                 </div>
                 {% else %}
                 <div id="twoFaSetupContainer">
-                    <button type="button" onclick="start2FASetup()" class="unique-save-btn" style="max-width: 260px;">Enable Authenticator 2FA</button>
+                    <button type="button" onclick="start2FASetup()" class="btn-enable-2fa">
+                        <span>🔐</span> Enable Authenticator 2FA
+                    </button>
                     <div id="twoFaSetupPanel" style="display: none; margin-top: 1.25rem; background: rgba(0, 0, 0, 0.28); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 14px; padding: 1.2rem;">
                         <div style="display: flex; flex-wrap: wrap; gap: 1.4rem; align-items: center;">
                             <img id="twoFaQrImg" src="" alt="2FA QR Code" style="width: 150px; height: 150px; border-radius: 10px; background: #fff; padding: 6px;">
@@ -943,7 +1021,9 @@
                                 <div style="font-size: 0.78rem; color: #fbbf24; margin-bottom: 0.75rem;">Save these Backup Codes: <span id="twoFaBackupList" style="font-family: monospace;"></span></div>
                                 <div style="display: flex; gap: 0.6rem; align-items: center;">
                                     <input type="text" id="twoFaVerifyCode" maxlength="6" placeholder="6-digit OTP" class="settings-input" style="max-width: 150px; text-align: center; font-weight: 700;">
-                                    <button type="button" onclick="confirm2FAEnable()" class="unique-save-btn" style="max-width: 180px;">Verify &amp; Activate</button>
+                                    <button type="button" onclick="confirm2FAEnable()" class="btn-verify-2fa">
+                                        <span>✓</span> Verify &amp; Activate
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -978,7 +1058,12 @@
                             {% for sess in login_sessions %}
                             <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
                                 <td style="padding: 0.5rem;">{{ sess.login_method }} • <code>{{ sess.ip_address }}</code></td>
-                                <td style="padding: 0.5rem; color: var(--text-muted);">{{ sess.user_agent[:52] }}</td>
+                                <td style="padding: 0.5rem;">
+                                    <div class="session-device-label" data-ua="{{ sess.user_agent }}" title="{{ sess.user_agent }}" style="display: inline-flex; align-items: center; gap: 7px; color: #f1f5f9; font-weight: 600;">
+                                        <span class="device-icon" style="font-size: 1.05rem; line-height: 1; flex-shrink: 0;">{{ sess.device_icon }}</span>
+                                        <span class="device-name-text" style="color: #f1f5f9; font-weight: 600; font-size: 0.85rem;">{{ sess.device_name }}</span>
+                                    </div>
+                                </td>
                                 <td style="padding: 0.5rem;">{{ sess.created_at }}</td>
                                 <td style="padding: 0.5rem;">
                                     {% if sess.is_current %}<span style="color: #38bdf8; font-weight: 700;">Current Device</span>
@@ -1655,6 +1740,42 @@
             highlightActiveNatureTile(localStorage.getItem('natureWallpaperTheme') || 'dynamic');
             syncLiveMotionState();
             highlightActiveParticleChip(localStorage.getItem('liveParticleMode') || 'auto');
+        });
+    </script>
+    <!-- Client-side Lightweight UA-Parser-JS for Instant Full User-Agent Resolution -->
+    <script src="https://cdn.jsdelivr.net/npm/ua-parser-js@1.0.38/dist/ua-parser.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof UAParser !== 'undefined') {
+                document.querySelectorAll('.session-device-label').forEach(function (el) {
+                    var raw = el.getAttribute('data-ua');
+                    if (!raw || raw === 'Browser Session' || raw.indexOf('Werkzeug') !== -1) return;
+                    try {
+                        var uap = new UAParser(raw);
+                        var b = uap.getBrowser();
+                        var o = uap.getOS();
+                        var d = uap.getDevice();
+                        var bName = b.name || '';
+                        var oName = o.name || '';
+                        if (oName === 'Mac OS') oName = 'macOS';
+
+                        var readable = '';
+                        if (d.model && (d.type === 'mobile' || d.type === 'tablet' || /iphone|ipad/i.test(raw))) {
+                            readable = (bName || 'Browser') + ' on ' + (d.model || oName);
+                        } else if (bName && oName) {
+                            readable = bName + ' on ' + oName;
+                        } else if (bName) {
+                            readable = bName;
+                        } else if (oName) {
+                            readable = 'Browser on ' + oName;
+                        }
+                        if (readable) {
+                            var textNode = el.querySelector('.device-name-text');
+                            if (textNode) textNode.textContent = readable;
+                        }
+                    } catch (err) {}
+                });
+            }
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/motion@latest/dist/motion.js"></script>

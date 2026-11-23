@@ -53,6 +53,7 @@ def test_dashboard_countdown_and_past_events(client):
     assert 'cdBannerTitle' in html
     assert 'cdBannerSubtitle' in html
     assert 'initCountdownTimer' in html
+    assert 'Concluded Event Archives' not in html
 
 def test_expired_events_routing():
     now = datetime.now()
@@ -211,5 +212,69 @@ def test_navbar_welcome_message_no_handle_pill(client):
     # Ensure @handle pill is not shown in the navbar welcome message
     assert 'navbar-handle-pill' not in html
     assert '@venu_r' not in html[:html.find('nav-links') + 600]
+
+def test_settings_2fa_button_sizing(client):
+    with client.session_transaction() as sess:
+        sess['loggedin'] = True
+        sess['username'] = 'venu_r'
+        sess['user_display_name'] = 'Venu R'
+        sess['role'] = 'host'
+    
+    resp = client.get('/settings')
+    assert resp.status_code == 200
+    html = resp.get_data(as_text=True)
+    assert 'btn-enable-2fa' in html
+    assert 'btn-verify-2fa' in html
+    # Ensure Enable Authenticator 2FA does not use oversized unique-save-btn
+    assert 'class="unique-save-btn">Enable Authenticator 2FA' not in html
+
+def test_user_agent_parsing_and_session_display(client):
+    from app import parse_device_info, get_db
+
+    # 1. Test parser directly
+    d1 = parse_device_info('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
+    assert d1['name'] == 'Chrome on Windows'
+    assert d1['icon'] == '💻'
+
+    d2 = parse_device_info('Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1')
+    assert d2['name'] == 'Safari on iPhone'
+    assert d2['icon'] == '📱'
+
+    d3 = parse_device_info('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0')
+    assert d3['name'] == 'Edge on macOS'
+
+    d4 = parse_device_info('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/158.0.0.0 Safari/537.36 Edg/158.0.0.0')
+    assert d4['name'] == 'Edge on Windows'
+
+    # 2. Insert test login session into DB for venu_r
+    import secrets
+    test_tok = f"tok_ua_test_{secrets.token_hex(8)}"
+    conn = get_db()
+    c = conn.cursor()
+    c.execute(
+        """INSERT INTO user_login_sessions (session_token, username, ip_address, user_agent, device_name, login_method, is_active)
+           VALUES (?, 'venu_r', '127.0.0.1', ?, ?, 'password', 1)""",
+        (test_tok, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/158.0.0.0 Safari/537.36 Edg/158.0.0.0', 'Edge on Windows')
+    )
+    conn.commit()
+    conn.close()
+
+    # 3. Access /settings and verify rendered table
+    with client.session_transaction() as sess:
+        sess['loggedin'] = True
+        sess['username'] = 'venu_r'
+        sess['user_display_name'] = 'Venu R'
+        sess['role'] = 'host'
+    
+    resp = client.get('/settings')
+    assert resp.status_code == 200
+    html = resp.get_data(as_text=True)
+    assert 'Edge on Windows' in html
+    assert 'AppleWebKi</td>' not in html  # Must not display truncated raw UA in table cell
+    assert 'AppleWebKi</span>' not in html
+    assert 'ua-parser.min.js' in html
+    assert 'session-device-label' in html
+
+
 
 

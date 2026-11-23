@@ -7215,11 +7215,16 @@ def init_db():
         username TEXT NOT NULL,
         ip_address TEXT DEFAULT '',
         user_agent TEXT DEFAULT '',
+        device_name TEXT DEFAULT '',
         login_method TEXT DEFAULT 'password',
         is_active INTEGER DEFAULT 1,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         last_seen_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )''')
+    try:
+        c.execute("ALTER TABLE user_login_sessions ADD COLUMN device_name TEXT DEFAULT ''")
+    except Exception:
+        pass
 
     c.execute('''CREATE TABLE IF NOT EXISTS user_wallet (
         username TEXT PRIMARY KEY,
@@ -8055,22 +8060,128 @@ def _generate_scope_captcha(scope='login'):
     return render_captcha_svg(code)
 
 
+def parse_device_info(ua_string: str) -> dict:
+    """Parse raw User-Agent into clean human-readable device name and icon (e.g. Chrome on Windows, Safari on iPhone, Edge on macOS)."""
+    if not ua_string or ua_string.strip() in ('', 'Browser', 'Browser Session'):
+        return {'name': 'Web Browser', 'icon': '🌐'}
+    raw = ua_string.strip()
+    
+    # Fast path for automated testing / CLI
+    if 'Werkzeug' in raw:
+        return {'name': 'Local Client (Werkzeug)', 'icon': '⚙️'}
+    if 'Postman' in raw or 'curl' in raw:
+        return {'name': raw.split()[0], 'icon': '⚡'}
+        
+    browser = None
+    os = None
+    device = None
+    
+    # 1. High-accuracy user_agents / ua-parser library
+    try:
+        from user_agents import parse
+        p = parse(raw)
+        browser = p.browser.family
+        os = p.os.family
+        device = p.device.family
+    except Exception:
+        pass
+
+    # 2. Normalize OS naming
+    if not os or os == 'Other':
+        if 'Windows' in raw:
+            os = 'Windows'
+        elif 'iPhone' in raw:
+            os = 'iPhone'
+        elif 'iPad' in raw:
+            os = 'iPad'
+        elif 'Macintosh' in raw or 'Mac OS' in raw or 'macOS' in raw:
+            os = 'macOS'
+        elif 'Android' in raw:
+            os = 'Android'
+        elif 'Linux' in raw:
+            os = 'Linux'
+        else:
+            os = 'Unknown OS'
+    elif 'Mac OS' in os or 'macOS' in os:
+        os = 'macOS'
+    elif 'Windows' in os:
+        os = 'Windows'
+    elif 'iOS' in os:
+        os = 'iOS'
+
+    # 3. Normalize Browser naming
+    if not browser or browser in ('Other', None):
+        if 'Edg/' in raw or 'Edge/' in raw or 'EdgA/' in raw or 'EdgiOS/' in raw:
+            browser = 'Edge'
+        elif 'OPR/' in raw or 'Opera/' in raw:
+            browser = 'Opera'
+        elif 'Brave/' in raw:
+            browser = 'Brave'
+        elif 'Chrome/' in raw or 'CriOS/' in raw:
+            browser = 'Chrome'
+        elif 'Firefox/' in raw or 'FxiOS/' in raw:
+            browser = 'Firefox'
+        elif 'Safari/' in raw and 'Chrome' not in raw:
+            browser = 'Safari'
+        elif 'AppleWebKi' in raw:
+            # Handles legacy rows truncated at 52 characters
+            browser = 'WebKit Browser'
+        else:
+            browser = 'Browser'
+    elif browser == 'Mobile Safari':
+        browser = 'Safari'
+    elif browser == 'Chrome Mobile':
+        browser = 'Chrome'
+
+    # 4. Device icon
+    icon = '💻'
+    if (device and ('iPhone' in device or 'iPad' in device)) or os in ('iPhone', 'iPad', 'iOS', 'Android') or 'Mobile' in raw:
+        icon = '📱'
+
+    # 5. Format human-readable string (matching: Chrome on Windows, Safari on iPhone, Edge on macOS)
+    if os in ('iPhone', 'iPad'):
+        name = f"{browser} on {os}"
+    elif device and device not in ('Other', 'Generic Smartphone', 'Generic Feature Phone') and ('iPhone' in device or 'iPad' in device):
+        name = f"{browser} on {device}"
+    elif browser and os and os != 'Unknown OS':
+        name = f"{browser} on {os}"
+    elif browser:
+        name = browser
+    elif os and os != 'Unknown OS':
+        name = f"Browser on {os}"
+    else:
+        name = 'Web Browser'
+
+    return {'name': name, 'icon': icon}
+
+
 def _record_login_session(conn, username, method='password'):
     """Persist an active login session token for session history and remote revoke."""
     tok = secrets.token_urlsafe(24)
     session['session_token'] = tok
     ip_addr = (request.remote_addr or '127.0.0.1')[:64]
-    ua = (request.headers.get('User-Agent') or 'Browser')[:220]
+    # Store full user-agent string up to 1024 characters without truncation
+    raw_ua = (request.headers.get('User-Agent') or 'Browser Session')[:1024]
+    device_info = parse_device_info(raw_ua)
+    device_name = device_info.get('name', 'Web Browser')
     try:
         c = conn.cursor()
         c.execute(
-            """INSERT INTO user_login_sessions (session_token, username, ip_address, user_agent, login_method, is_active)
-               VALUES (?, ?, ?, ?, ?, 1)""",
-            (tok, username, ip_addr, ua, method)
+            """INSERT INTO user_login_sessions (session_token, username, ip_address, user_agent, device_name, login_method, is_active)
+               VALUES (?, ?, ?, ?, ?, ?, 1)""",
+            (tok, username, ip_addr, raw_ua, device_name, method)
         )
         conn.commit()
     except Exception:
-        pass
+        try:
+            c.execute(
+                """INSERT INTO user_login_sessions (session_token, username, ip_address, user_agent, login_method, is_active)
+                   VALUES (?, ?, ?, ?, ?, 1)""",
+                (tok, username, ip_addr, raw_ua, method)
+            )
+            conn.commit()
+        except Exception:
+            pass
 
 
 def _safe_next_url(target_url):
@@ -11923,17 +12034,31 @@ def settings():
 
     try:
         c.execute(
-            """SELECT id, session_token, ip_address, user_agent, login_method, is_active, created_at
+            """SELECT id, session_token, ip_address, user_agent, login_method, is_active, created_at,
+                      COALESCE(device_name, '')
                FROM user_login_sessions WHERE username = ? ORDER BY id DESC LIMIT 12""",
             (username,)
         )
         cur_tok = session.get('session_token', '')
-        for sid, stok, sip, sua, smeth, sact, screated in c.fetchall():
+        for row in c.fetchall():
+            sid = row[0]
+            stok = row[1]
+            sip = row[2]
+            sua = row[3]
+            smeth = row[4]
+            sact = row[5]
+            screated = row[6]
+            sdev = row[7] if len(row) > 7 else ''
+            p_info = parse_device_info(sua)
+            display_name = sdev if (sdev and sdev.strip()) else p_info['name']
             login_sessions.append({
                 'id': sid,
+                'session_token': stok,
                 'is_current': bool(cur_tok and stok == cur_tok),
                 'ip_address': sip or '127.0.0.1',
                 'user_agent': sua or 'Browser Session',
+                'device_name': display_name,
+                'device_icon': p_info.get('icon', '💻'),
                 'login_method': smeth or 'password',
                 'is_active': bool(sact),
                 'created_at': screated or ''

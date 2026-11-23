@@ -3027,6 +3027,87 @@ body.light-mode .checkin-table td {
     transform: translateY(-2px);
 }
 
+/* --- Compact 2FA & Security Action Buttons --- */
+.btn-enable-2fa {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #008be3 0%, #0284c7 100%);
+    color: #ffffff !important;
+    border: 1px solid rgba(56, 189, 248, 0.45);
+    padding: 0.6rem 1.35rem;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.88rem;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 14px rgba(0, 139, 227, 0.28);
+    white-space: nowrap;
+    text-transform: none;
+    line-height: 1.3;
+    margin: 0;
+}
+
+.btn-enable-2fa:hover {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    border-color: #38bdf8;
+    box-shadow: 0 6px 20px rgba(0, 139, 227, 0.45);
+    transform: translateY(-1px);
+    color: #ffffff !important;
+}
+
+.btn-enable-2fa:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.btn-verify-2fa {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff !important;
+    border: 1px solid rgba(16, 185, 129, 0.5);
+    padding: 0.55rem 1.15rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+    white-space: nowrap;
+    text-transform: none;
+    line-height: 1.3;
+    margin: 0;
+}
+
+.btn-verify-2fa:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    border-color: #34d399;
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+    transform: translateY(-1px);
+    color: #ffffff !important;
+}
+
+.btn-verify-2fa:active {
+    transform: translateY(0) scale(0.98);
+}
+
+body.light-mode .btn-enable-2fa {
+    background: linear-gradient(135deg, #008be3 0%, #0284c7 100%);
+    border-color: rgba(0, 139, 227, 0.5);
+    box-shadow: 0 4px 12px rgba(0, 139, 227, 0.2);
+}
+
+body.light-mode .btn-verify-2fa {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-color: rgba(16, 185, 129, 0.5);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
 body.light-mode .danger-zone-card {
     background: #ffffff !important;
     border-color: rgba(239, 68, 68, 0.25) !important;
