@@ -325,6 +325,12 @@ class EventManagementSystemTests(unittest.TestCase):
         ev_id = ev['id']
 
         attendee_user = 'scanner_test_attendee'
+        # Clean up any leftover test registrations from previous runs
+        conn = sqlite3.connect(DB_PATH)
+        conn.execute("DELETE FROM registrations WHERE username IN (?, ?)", (attendee_user, 'test_scanner_revoked_user'))
+        conn.commit()
+        conn.close()
+
         with self.client.session_transaction() as sess:
             sess['loggedin'] = True
             sess['username'] = attendee_user
@@ -522,12 +528,32 @@ class EventManagementSystemTests(unittest.TestCase):
         c = conn.cursor()
         c.execute("DELETE FROM users WHERE username='uid_auth_test_user'")
         c.execute("""INSERT INTO users (username, password, full_name, email, phone, college_id, user_id, is_active)
-                     VALUES ('uid_auth_test_user', ?, 'Test Auth User', 'uid_auth@example.com', '9876543210', 'COL-UID-999', 'UID-0042', 1)""",
+                     VALUES ('uid_auth_test_user', ?, 'Test Auth User', 'uid_auth@example.com', '9876543210', 'COL-UID-999', 'TESTUSER948210', 1)""",
                   (pwd_hash,))
         conn.commit()
         conn.close()
 
-        # 1. Login with registered Email -> SUCCESS
+        # 1. Login with plain username 'uid_auth_test_user' -> SUCCESS
+        resp_user = self.client.post('/', data={
+            'action': 'login',
+            'username': 'uid_auth_test_user',
+            'password': 'SecretPass123!',
+            'captcha': self._fetch_login_captcha()
+        }, follow_redirects=False)
+        self.assertEqual(resp_user.status_code, 303)
+        self.assertIn('/dashboard', resp_user.headers.get('Location', ''))
+
+        # 2. Login with unique User ID 'TESTUSER948210' -> SUCCESS
+        resp_uid = self.client.post('/', data={
+            'action': 'login',
+            'username': 'TESTUSER948210',
+            'password': 'SecretPass123!',
+            'captcha': self._fetch_login_captcha()
+        }, follow_redirects=False)
+        self.assertEqual(resp_uid.status_code, 303)
+        self.assertIn('/dashboard', resp_uid.headers.get('Location', ''))
+
+        # 3. Login with registered Email -> SUCCESS
         resp_email = self.client.post('/', data={
             'action': 'login',
             'username': 'uid_auth@example.com',
@@ -537,54 +563,24 @@ class EventManagementSystemTests(unittest.TestCase):
         self.assertEqual(resp_email.status_code, 303)
         self.assertIn('/dashboard', resp_email.headers.get('Location', ''))
 
-        # 2. Login with 4-digit User ID '0042' -> SUCCESS
-        resp_4digits = self.client.post('/', data={
+        # 4. Attempt to login with Mobile number -> BLOCKED with explicit error message
+        resp_phone = self.client.post('/', data={
             'action': 'login',
-            'username': '0042',
-            'password': 'SecretPass123!',
-            'captcha': self._fetch_login_captcha()
-        }, follow_redirects=False)
-        self.assertEqual(resp_4digits.status_code, 303)
-        self.assertIn('/dashboard', resp_4digits.headers.get('Location', ''))
-
-        # 3. Login with full UID 'UID-0042' -> SUCCESS
-        resp_uid = self.client.post('/', data={
-            'action': 'login',
-            'username': 'UID-0042',
-            'password': 'SecretPass123!',
-            'captcha': self._fetch_login_captcha()
-        }, follow_redirects=False)
-        self.assertEqual(resp_uid.status_code, 303)
-        self.assertIn('/dashboard', resp_uid.headers.get('Location', ''))
-
-        # 4. Attempt to login with plain username 'uid_auth_test_user' -> BLOCKED with explicit error message
-        resp_name = self.client.post('/', data={
-            'action': 'login',
-            'username': 'uid_auth_test_user',
+            'username': '9876543210',
             'password': 'SecretPass123!',
             'captcha': self._fetch_login_captcha()
         }, follow_redirects=True)
-        self.assertEqual(resp_name.status_code, 200)
-        self.assertIn(b'Invalid credentials. Please enter your User ID or registered Email address.', resp_name.data)
+        self.assertEqual(resp_phone.status_code, 400)
+        self.assertIn(b'Login using Mobile number is disabled', resp_phone.data)
 
-        # 5. Attempt to login with full name 'Test Auth User' -> BLOCKED with explicit error message
-        resp_fullname = self.client.post('/', data={
-            'action': 'login',
-            'username': 'Test Auth User',
-            'password': 'SecretPass123!',
-            'captcha': self._fetch_login_captcha()
-        }, follow_redirects=True)
-        self.assertEqual(resp_fullname.status_code, 200)
-        self.assertIn(b'Invalid credentials. Please enter your User ID or registered Email address.', resp_fullname.data)
-
-        # 6. Forgot Password reset using 4-digit User ID '0042' + CAPTCHA -> SUCCESS
+        # 5. Forgot Password reset using Username + CAPTCHA -> SUCCESS
         resp_fg_get = self.client.get('/forgot_password')
         self.assertEqual(resp_fg_get.status_code, 200)
         self.assertIn(b'<svg', resp_fg_get.data)
         with self.client.session_transaction() as sess:
             forgot_cap = sess.get('forgot_captcha_answer', '')
         resp_forgot_uid = self.client.post('/forgot_password', data={
-            'username': '0042',
+            'username': 'uid_auth_test_user',
             'college_id': 'COL-UID-999',
             'phone': '9876543210',
             'new_password': 'BrandNewPass456!',
@@ -594,10 +590,10 @@ class EventManagementSystemTests(unittest.TestCase):
         self.assertEqual(resp_forgot_uid.status_code, 200)
         self.assertIn(b'Password reset successful', resp_forgot_uid.data)
 
-        # 7. Login with newly updated password via Email -> SUCCESS
+        # 6. Login with newly updated password via Username -> SUCCESS
         resp_login_new = self.client.post('/', data={
             'action': 'login',
-            'username': 'uid_auth@example.com',
+            'username': 'uid_auth_test_user',
             'password': 'BrandNewPass456!',
             'captcha': self._fetch_login_captcha()
         }, follow_redirects=False)
@@ -660,7 +656,7 @@ class EventManagementSystemTests(unittest.TestCase):
                 sess['captcha_answer'] = '03059'
             resp_wrong_admin = self.client.post('/', data={
                 'action': 'login',
-                'username': '0001',
+                'username': 'admin',
                 'password': 'password123',
                 'captcha': '12'
             }, follow_redirects=False)
@@ -675,7 +671,7 @@ class EventManagementSystemTests(unittest.TestCase):
                     sess['captcha_answer'] = '03059'
                 resp_bad = self.client.post('/', data={
                     'action': 'login',
-                    'username': 'captcha_test@example.com',
+                    'username': 'captcha_test_user',
                     'password': 'SecretPass123!',
                     'captcha': bad_val
                 }, follow_redirects=False)
@@ -688,7 +684,7 @@ class EventManagementSystemTests(unittest.TestCase):
                 sess['captcha_answer'] = '03059'
             resp_ok = self.client.post('/', data={
                 'action': 'login',
-                'username': 'captcha_test@example.com',
+                'username': 'captcha_test_user',
                 'password': 'SecretPass123!',
                 'captcha': '0 3 0 5 9'
             }, follow_redirects=False)
@@ -702,7 +698,7 @@ class EventManagementSystemTests(unittest.TestCase):
             admin_captcha = self._fetch_login_captcha()
             resp_admin_ok = self.client.post('/', data={
                 'action': 'login',
-                'username': '0001',
+                'username': 'admin',
                 'password': 'password123',
                 'captcha': admin_captcha
             }, follow_redirects=False)
@@ -1349,20 +1345,34 @@ class FastAPIApiTests(unittest.TestCase):
         self.assertTrue(len(resp_cats.json()) > 0)
 
     def test_04_auth_login_api(self):
-        """Verify /api/v1/auth/login with valid and invalid credentials."""
-        # Valid login with 0001
-        resp_valid_uid = self.client.post('/api/v1/auth/login', json={'identifier': '0001', 'password': 'password123'})
-        self.assertEqual(resp_valid_uid.status_code, 200)
-        self.assertTrue(resp_valid_uid.json()['success'])
+        """Verify /api/v1/auth/login and /api/v1/auth/check-username with valid and invalid credentials."""
+        # 1. Valid login with admin username
+        resp_valid_user = self.client.post('/api/v1/auth/login', json={'identifier': 'admin', 'password': 'password123'})
+        self.assertEqual(resp_valid_user.status_code, 200)
+        self.assertTrue(resp_valid_user.json()['success'])
 
-        # Valid login with email
-        resp_valid_email = self.client.post('/api/v1/auth/login', json={'identifier': 'admin@example.com', 'password': 'password123'})
-        self.assertEqual(resp_valid_email.status_code, 200)
-        self.assertTrue(resp_valid_email.json()['success'])
+        # 2. Login with registered email address -> SUCCESS
+        resp_email = self.client.post('/api/v1/auth/login', json={'identifier': 'admin@example.com', 'password': 'password123'})
+        self.assertEqual(resp_email.status_code, 200)
+        self.assertTrue(resp_email.json()['success'])
 
-        # Invalid password
-        resp_invalid = self.client.post('/api/v1/auth/login', json={'identifier': '0001', 'password': 'wrongpassword'})
+        # 3. Login with mobile phone number must be rejected with 400
+        resp_phone = self.client.post('/api/v1/auth/login', json={'identifier': '9876543210', 'password': 'password123'})
+        self.assertEqual(resp_phone.status_code, 400)
+        self.assertIn("Login using Mobile number is disabled", resp_phone.json()['detail'])
+
+        # 4. Invalid password
+        resp_invalid = self.client.post('/api/v1/auth/login', json={'identifier': 'admin', 'password': 'wrongpassword'})
         self.assertEqual(resp_invalid.status_code, 401)
+
+        # 4. Check username availability endpoint
+        resp_chk_taken = self.client.get('/api/v1/auth/check-username?username=admin')
+        self.assertEqual(resp_chk_taken.status_code, 200)
+        self.assertFalse(resp_chk_taken.json()['available'])
+
+        resp_chk_avail = self.client.get('/api/v1/auth/check-username?username=novel_unique_user_2026')
+        self.assertEqual(resp_chk_avail.status_code, 200)
+        self.assertTrue(resp_chk_avail.json()['available'])
 
     def test_05_ticket_verification_api(self):
         """Verify ticket validation endpoint."""

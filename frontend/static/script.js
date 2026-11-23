@@ -484,6 +484,11 @@ function shareEventFromBtn(btn, evt) {
  * Displays hours:minutes:seconds AM/PM and Day, DD Mon YYYY.
  */
 function initNavRealtimeClock() {
+    // Ensure mouse hover never shows any popup tooltip
+    document.querySelectorAll('.nav-clock-widget, .clock-content, .clock-time, .clock-date, .clock-live-dot').forEach(el => {
+        el.removeAttribute('title');
+    });
+
     const timeEls = document.querySelectorAll('.clock-time');
     const dateEls = document.querySelectorAll('.clock-date');
     if (!timeEls.length && !dateEls.length) return;

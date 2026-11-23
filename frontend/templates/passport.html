@@ -239,6 +239,46 @@
             <a href="{{ url_for('history') }}" class="nav-btn-dash">📋 Bookings</a>
             <a href="{{ url_for('profile') }}" class="nav-btn-dash">👤 Profile</a>
             <a href="{{ url_for('logout') }}" class="logout-btn-unique">⏻ Logout</a>
+
+            <!-- Real-Time Date & Clock Widget -->
+            <div class="nav-clock-widget" aria-label="Real-time date and clock"
+                style="display: inline-flex !important; align-items: center !important; gap: 8px !important; padding: 4px 10px !important; background: rgba(255, 255, 255, 0.05) !important; border: 1px solid rgba(0, 139, 227, 0.35) !important; border-radius: 10px !important; margin-left: 6px !important; vertical-align: middle !important; white-space: nowrap !important; box-shadow: 0 2px 10px rgba(0,0,0,0.3) !important;">
+                <span class="clock-live-dot" aria-hidden="true" style="width: 7px !important; height: 7px !important; border-radius: 50% !important; background: #10b981 !important; box-shadow: 0 0 8px #10b981 !important; display: inline-block !important; flex-shrink: 0 !important; animation: navClockPulse 2s infinite ease-in-out !important;"></span>
+                <div class="clock-content" style="display: inline-flex !important; flex-direction: row !important; align-items: center !important; gap: 8px !important; line-height: 1 !important; white-space: nowrap !important;">
+                    <span class="clock-time" style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace !important; font-size: 0.84rem !important; font-weight: 700 !important; color: #38bdf8 !important; letter-spacing: 0.5px !important; font-variant-numeric: tabular-nums !important; display: inline-block !important; white-space: nowrap !important;">{{ realtime_now_time }}</span>
+                    <span class="clock-date" style="font-size: 0.78rem !important; font-weight: 500 !important; color: #94a3b8 !important; letter-spacing: 0.3px !important; display: inline-block !important; white-space: nowrap !important;">{{ realtime_now_date }}</span>
+                </div>
+            </div>
+            <script>
+                (function initInlineLiveClock() {
+                    function updateNavClock() {
+                        var now = new Date();
+                        var hours = now.getHours();
+                        var minutes = String(now.getMinutes()).padStart(2, '0');
+                        var seconds = String(now.getSeconds()).padStart(2, '0');
+                        var ampm = hours >= 12 ? 'PM' : 'AM';
+                        hours = hours % 12;
+                        hours = hours ? hours : 12;
+                        var formattedHours = String(hours).padStart(2, '0');
+                        var timeStr = formattedHours + ':' + minutes + ':' + seconds + ' ' + ampm;
+
+                        var days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                        var dateStr = days[now.getDay()] + ', ' + String(now.getDate()).padStart(2, '0') + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
+
+                        var times = document.querySelectorAll('.clock-time');
+                        var dates = document.querySelectorAll('.clock-date');
+                        for (var i = 0; i < times.length; i++) times[i].textContent = timeStr;
+                        for (var j = 0; j < dates.length; j++) dates[j].textContent = dateStr;
+                    }
+                    updateNavClock();
+                    var ms = 1000 - (Date.now() % 1000);
+                    setTimeout(function () {
+                        updateNavClock();
+                        setInterval(updateNavClock, 1000);
+                    }, ms);
+                })();
+            </script>
         </div>
     </div>
 </nav>

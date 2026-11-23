@@ -136,7 +136,7 @@ class PlatformPillarsTests(unittest.TestCase):
                     sess['captcha_answer'] = '54321'
                 r_bf = self.client.post('/', data={
                     'action': 'login',
-                    'username': 'pillar_reg@example.com',
+                    'username': 'pillar_reg_user',
                     'password': 'WrongPassword!',
                     'captcha': '54321'
                 })
@@ -158,7 +158,7 @@ class PlatformPillarsTests(unittest.TestCase):
 
             r_no_csrf = self.client.post('/', data={
                 'action': 'login',
-                'username': 'pillar_reg@example.com',
+                'username': 'pillar_reg_user',
                 'password': 'Password123!',
                 'captcha': cap_tok
             })
@@ -168,7 +168,7 @@ class PlatformPillarsTests(unittest.TestCase):
                 sess['captcha_answer'] = cap_tok
             r_with_csrf = self.client.post('/', data={
                 'action': 'login',
-                'username': 'pillar_reg@example.com',
+                'username': 'pillar_reg_user',
                 'password': 'Password123!',
                 'captcha': cap_tok,
                 'csrf_token': csrf_tok
@@ -211,7 +211,7 @@ class PlatformPillarsTests(unittest.TestCase):
                 cap = sess['captcha_answer']
             r_login = self.client.post('/', data={
                 'action': 'login',
-                'username': 'pillar_2fa@example.com',
+                'username': uname,
                 'password': 'Password123!',
                 'captcha': cap
             }, follow_redirects=False)
@@ -658,7 +658,7 @@ class PlatformPillarsTests(unittest.TestCase):
             ans = sess['captcha_answer']
         login_res = self.client.post('/', data={
             'action': 'login',
-            'username': 'admin@example.com',
+            'username': 'admin',
             'password': 'password123',
             'captcha': ans,
             'next': '/register/19',
@@ -673,7 +673,7 @@ class PlatformPillarsTests(unittest.TestCase):
             ans2 = sess['captcha_answer']
         ext_res = self.client.post('/', data={
             'action': 'login',
-            'username': 'admin@example.com',
+            'username': 'admin',
             'password': 'password123',
             'captcha': ans2,
             'next': 'https://evil.example/phish',

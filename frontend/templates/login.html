@@ -179,6 +179,19 @@
             color: #fecdd3;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
+        .username-status-text {
+            display: block;
+            font-size: 0.82rem;
+            margin-top: 5px;
+            font-weight: 500;
+            min-height: 1.1rem;
+        }
+        .username-status-text.error {
+            color: #ef4444;
+        }
+        .username-status-text.success {
+            color: #10b981;
+        }
     </style>
 </head>
 
@@ -199,11 +212,11 @@
                 <input type="hidden" name="action" value="login">
                 <input type="hidden" name="next" value="{{ next_url or '' }}">
 
-                <!-- User ID or Email -->
+                <!-- Username, User ID or Email -->
                 <div class="input-group">
-                    <label for="username">User ID or Email</label>
+                    <label for="username">Username, User ID or Email</label>
                     <input type="text" id="username" name="username" class="input-field" required
-                        value="{{ username or '' }}" placeholder="Enter your User ID or Email" autocomplete="username">
+                        value="{{ username or '' }}" placeholder="Enter your Username, User ID or Email" autocomplete="username">
                 </div>
 
                 <!-- Password with Eyeball -->
@@ -308,8 +321,22 @@
                 </div>
                 
                 <div class="input-group">
-                    <label>Username / User ID *</label>
-                    <input type="text" name="reg_username" id="reg_username" class="input-field" required placeholder="Choose a unique username" autocomplete="username">
+                    <label for="reg_username" style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>Username *</span>
+                        <span id="usernameFormatBadge" style="font-size: 0.72rem; color: #38bdf8; font-family: ui-monospace, monospace; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.25); padding: 2px 7px; border-radius: 4px; font-weight: 600;">lowercase • no spaces</span>
+                    </label>
+                    <div style="position: relative; display: flex; align-items: center;">
+                        <span style="position: absolute; left: 14px; color: #008be3; font-weight: 800; font-size: 1.1rem; pointer-events: none; z-index: 2;">@</span>
+                        <input type="text" name="reg_username" id="reg_username" class="input-field" required 
+                               placeholder="username (e.g. alex_99, dev.venu)" autocomplete="username"
+                               style="padding-left: 36px !important; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important; font-size: 0.95rem !important;"
+                               oninput="handleRegUsernameInput(this)" onblur="checkUsernameAvailabilityNow(this.value)">
+                        <span id="usernameCheckSpinner" style="display: none; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 0.85rem; pointer-events: none;">⏳</span>
+                    </div>
+                    <div id="usernameHelpText" style="font-size: 0.74rem; color: #94a3b8; margin-top: 5px; line-height: 1.4;">
+                        Must contain small letters (<strong>a-z</strong>), numbers (<strong>0-9</strong>), and allowed symbols (<strong>_</strong>, <strong>.</strong>, <strong>-</strong>) only. No spaces.
+                    </div>
+                    <span id="usernameStatus" class="username-status-text"></span>
                 </div>
 
                 <div class="grid-2">
@@ -524,6 +551,115 @@
         }
 
         // Real-time live input validation handlers
+        let usernameCheckTimeout = null;
+        let isUsernameAvailable = null;
+
+        function handleRegUsernameInput(input) {
+            const statusEl = document.getElementById('usernameStatus');
+            const spinnerEl = document.getElementById('usernameCheckSpinner');
+            
+            // 1. Immediately convert to lowercase and remove spaces
+            const rawVal = input.value;
+            let cleaned = rawVal.replace(/\s+/g, '').toLowerCase();
+            if (rawVal !== cleaned) {
+                const caret = input.selectionStart;
+                input.value = cleaned;
+                try {
+                    input.setSelectionRange(caret - 1, caret - 1);
+                } catch(e) {}
+            }
+
+            const val = input.value;
+
+            if (usernameCheckTimeout) {
+                clearTimeout(usernameCheckTimeout);
+            }
+
+            if (!val) {
+                statusEl.textContent = '';
+                statusEl.className = 'username-status-text';
+                isUsernameAvailable = null;
+                if (spinnerEl) spinnerEl.style.display = 'none';
+                input.setCustomValidity('');
+                return;
+            }
+
+            // 2. Validate allowed symbols and characters: small letters, numbers, _, ., -
+            if (!/^[a-z0-9_.-]+$/.test(val)) {
+                statusEl.className = 'username-status-text error';
+                statusEl.textContent = '❌ Only small letters (a-z), numbers (0-9), and (_, ., -) are allowed.';
+                isUsernameAvailable = false;
+                if (spinnerEl) spinnerEl.style.display = 'none';
+                input.setCustomValidity('Invalid characters');
+                return;
+            }
+
+            // 3. Must start with small letter or number
+            if (!/^[a-z0-9]/.test(val)) {
+                statusEl.className = 'username-status-text error';
+                statusEl.textContent = '❌ Username must start with a small letter (a-z) or number (0-9).';
+                isUsernameAvailable = false;
+                if (spinnerEl) spinnerEl.style.display = 'none';
+                input.setCustomValidity('Must start with letter or number');
+                return;
+            }
+
+            // 4. Length check
+            if (val.length < 3) {
+                statusEl.className = 'username-status-text error';
+                statusEl.textContent = '❌ Username must be at least 3 characters.';
+                isUsernameAvailable = false;
+                if (spinnerEl) spinnerEl.style.display = 'none';
+                input.setCustomValidity('Too short');
+                return;
+            }
+
+            if (val.length > 30) {
+                statusEl.className = 'username-status-text error';
+                statusEl.textContent = '❌ Username cannot exceed 30 characters.';
+                isUsernameAvailable = false;
+                if (spinnerEl) spinnerEl.style.display = 'none';
+                input.setCustomValidity('Too long');
+                return;
+            }
+
+            statusEl.className = 'username-status-text';
+            statusEl.textContent = 'Checking availability for @' + val + '...';
+            if (spinnerEl) spinnerEl.style.display = 'inline-block';
+
+            usernameCheckTimeout = setTimeout(() => {
+                checkUsernameAvailabilityNow(val);
+            }, 300);
+        }
+
+        async function checkUsernameAvailabilityNow(val) {
+            const trimmed = (val || '').trim().toLowerCase();
+            const statusEl = document.getElementById('usernameStatus');
+            const spinnerEl = document.getElementById('usernameCheckSpinner');
+            const input = document.getElementById('reg_username');
+            if (!trimmed || trimmed.length < 3) return;
+
+            try {
+                const resp = await fetch("{{ url_for('check_username_availability') }}?username=" + encodeURIComponent(trimmed));
+                const data = await resp.json();
+                if (spinnerEl) spinnerEl.style.display = 'none';
+                if (data && data.available) {
+                    statusEl.className = 'username-status-text success';
+                    statusEl.textContent = '✓ ' + (data.message || ('Username @' + trimmed + ' is available!'));
+                    isUsernameAvailable = true;
+                    if (input) input.setCustomValidity('');
+                } else {
+                    statusEl.className = 'username-status-text error';
+                    statusEl.textContent = '❌ ' + (data && data.message ? data.message : 'This username is in use or not available.');
+                    isUsernameAvailable = false;
+                    if (input) input.setCustomValidity('This username is in use or not available.');
+                }
+            } catch (err) {
+                if (spinnerEl) spinnerEl.style.display = 'none';
+                console.error('Username check failed:', err);
+            }
+        }
+
         function handleRegPhoneInput(input) {
             const statusEl = document.getElementById('phoneOtpStatus');
             if (!input.value.trim()) {
@@ -557,6 +693,20 @@
         }
 
         function validateRegistrationForm() {
+            const uInp = document.getElementById('reg_username');
+            const uVal = uInp ? uInp.value.trim().toLowerCase() : '';
+            if (!/^[a-z0-9][a-z0-9_.-]{2,29}$/.test(uVal)) {
+                alert('⚠️ Username must contain only small letters (a-z), numbers (0-9), and allowed symbols (_, ., -) with no spaces (3 to 30 characters).');
+                if (uInp) uInp.focus();
+                return false;
+            }
+
+            if (isUsernameAvailable === false) {
+                alert('⚠️ This username is in use or not available. Please choose a different username.');
+                if (uInp) uInp.focus();
+                return false;
+            }
+
             const pwd = document.getElementById('reg_password').value;
             const cpwd = document.getElementById('reg_confirm_password').value;
 
@@ -591,6 +741,15 @@
             if (regCard && regCard.dataset.openRegister === '1') {
                 if (loginCard) loginCard.style.display = 'none';
                 regCard.style.display = 'block';
+            }
+
+            const uInp = document.getElementById('reg_username');
+            if (uInp) {
+                uInp.addEventListener('keydown', (e) => {
+                    if (e.key === ' ' || e.code === 'Space') {
+                        e.preventDefault();
+                    }
+                });
             }
         });
     </script>

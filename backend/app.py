@@ -5504,6 +5504,32 @@ def security_and_session_guard():
         except Exception:
             pass
 
+    # Transparent session username & user_id synchronization for migrated accounts
+    if session.get('loggedin') and session.get('username'):
+        curr_u = session.get('username')
+        curr_uid = session.get('user_id')
+        try:
+            conn = get_db()
+            c = conn.cursor()
+            c.execute("SELECT username, user_id, full_name, role, is_admin FROM users WHERE username = ?", (curr_u,))
+            u_row = c.fetchone()
+            if not u_row:
+                c.execute("""SELECT username, user_id, full_name, role, is_admin FROM users 
+                             WHERE LOWER(username) = LOWER(?) 
+                                OR REPLACE(LOWER(username), '_', ' ') = LOWER(?) 
+                                OR REPLACE(LOWER(username), ' ', '_') = LOWER(?) 
+                                OR LOWER(full_name) = LOWER(?) LIMIT 1""", (curr_u, curr_u, curr_u, curr_u))
+                u_row = c.fetchone()
+                if u_row:
+                    session['username'] = u_row[0]
+                    session['user_id'] = u_row[1] or session.get('user_id')
+                    session['user_display_name'] = u_row[2] or u_row[0]
+                    session['role'] = u_row[3] or session.get('role')
+                    session['is_admin'] = u_row[4]
+            conn.close()
+        except Exception:
+            pass
+
     if request.method in ('POST', 'PUT', 'PATCH', 'DELETE'):
         csrf_enforced = (not app.config.get('TESTING') or app.config.get('ENFORCE_CSRF')) and (app.config.get('WTF_CSRF_ENABLED', True) is not False)
         exempt_paths = ('/api/subscription/webhook',)
@@ -6486,6 +6512,45 @@ def _get_category_default_image(category='', title='', seed_num=0):
     idx = (abs(int(seed_num or 0)) + sum(ord(ch) for ch in (title or ''))) % len(pool)
     return pool[idx]
 
+
+def generate_unique_user_id(name_source, conn=None):
+    """
+    Generates a secure, non-sequential User ID based on the user's name followed by
+    cryptographically secure random numbers (avoiding predictable sequential order).
+    Format: {NAME_PREFIX}{SECURE_RANDOM_DIGITS}
+    Example: John -> JOHN749201, Venu -> VENU849206, Admin -> ADMIN938210
+    """
+    raw_str = str(name_source or '').strip()
+    # Extract alphabetical characters from the name
+    clean_prefix = re.sub(r'[^A-Za-z]', '', raw_str).upper()
+    if not clean_prefix or len(clean_prefix) < 2:
+        # Fallback to alphanumeric if name had no letters
+        clean_prefix = re.sub(r'[^A-Za-z0-9]', '', raw_str).upper()
+    if not clean_prefix or len(clean_prefix) < 2:
+        clean_prefix = 'USER'
+    elif len(clean_prefix) > 8:
+        clean_prefix = clean_prefix[:8]
+    
+    # Generate cryptographically secure random non-sequential number (6 digits: 100000 - 999999)
+    # Loop to ensure 100% collision-free uniqueness in database
+    for _ in range(500):
+        rand_num = secrets.randbelow(900000) + 100000
+        candidate_uid = f"{clean_prefix}{rand_num}"
+        if conn is not None:
+            try:
+                c = conn.cursor()
+                c.execute("SELECT 1 FROM users WHERE UPPER(user_id) = UPPER(?)", (candidate_uid,))
+                if not c.fetchone():
+                    return candidate_uid
+            except Exception:
+                return candidate_uid
+        else:
+            return candidate_uid
+    
+    # Fallback with extra random digits if somehow 500 collisions occur
+    return f"{clean_prefix}{secrets.randbelow(900000) + 100000}{secrets.randbelow(90) + 10}"
+
+
 def init_db():
     conn = get_db()
     c = conn.cursor()
@@ -7211,23 +7276,47 @@ def init_db():
         except Exception:
             pass
 
-    # Also ensure 'admin' exists and has host and is_admin role
-    c.execute("SELECT 1 FROM users WHERE username = 'admin'")
-    if not c.fetchone():
+    # Ensure 'admin' exists with secure unique User ID based on name and non-sequential numbers
+    c.execute("SELECT user_id FROM users WHERE username = 'admin'")
+    admin_row = c.fetchone()
+    if not admin_row:
         hashed_password = bcrypt.generate_password_hash('password123').decode('utf-8')
-        c.execute("INSERT INTO users (username, password, role, is_admin, is_active, user_id, email) VALUES ('admin', ?, 'host', 1, 1, 'UID-0001', 'admin@example.com')", (hashed_password,))
+        admin_uid = generate_unique_user_id('ADMIN', conn)
+        c.execute("INSERT INTO users (username, password, role, is_admin, is_active, user_id, email, full_name) VALUES ('admin', ?, 'host', 1, 1, ?, 'admin@example.com', 'Admin User')", (hashed_password, admin_uid))
     else:
-        c.execute("UPDATE users SET role = 'host', is_admin = 1, is_active = 1, user_id = 'UID-0001', email = 'admin@example.com' WHERE username = 'admin'")
+        current_admin_uid = admin_row[0] or ''
+        if not current_admin_uid or current_admin_uid in ('UID-0001', '0001') or current_admin_uid.startswith('UID-'):
+            admin_uid = generate_unique_user_id('ADMIN', conn)
+            c.execute("UPDATE users SET role = 'host', is_admin = 1, is_active = 1, user_id = ? WHERE username = 'admin'", (admin_uid,))
+        else:
+            c.execute("UPDATE users SET role = 'host', is_admin = 1, is_active = 1 WHERE username = 'admin'")
     
-    # Ensure Venu R is also an admin and host if exists
-    c.execute("UPDATE users SET role = 'host', is_admin = 1, is_active = 1 WHERE username = 'Venu R'")
-
-    # Backfill default User IDs for any accounts missing a user_id
+    # Migrate legacy 'Venu R' username to lowercase compliant format 'venu_r' across all tables
     try:
-        c.execute("SELECT id, user_id FROM users")
+        c.execute("UPDATE users SET username = 'venu_r' WHERE username = 'Venu R'")
+        for tbl in ['registrations', 'notifications', 'reviews', 'audit_log', 'live_questions', 
+                    'live_question_upvotes', 'user_poap_badges', 'subscriptions', 'subscription_payments', 
+                    'subscription_refunds', 'subscription_usage', 'peer_networking_profiles', 
+                    'event_trivia_scores', 'user_login_sessions']:
+            try:
+                c.execute(f"UPDATE {tbl} SET username = 'venu_r' WHERE username = 'Venu R'")
+            except Exception:
+                pass
+    except Exception:
+        pass
+
+    # Ensure admin and venu_r are admins and hosts
+    c.execute("UPDATE users SET role = 'host', is_admin = 1, is_active = 1 WHERE username IN ('admin', 'venu_r', 'Venu R')")
+
+    # Ensure all users have a secure, unique, non-sequential User ID based on their name
+    try:
+        c.execute("SELECT id, username, full_name, first_name, user_id FROM users")
         for r in c.fetchall():
-            if not r[1]:
-                c.execute("UPDATE users SET user_id = ? WHERE id = ?", (f"UID-{r[0]:04d}", r[0]))
+            uid_val = r[4] or ''
+            if not uid_val or re.match(r'^UID-\d+$', uid_val, re.IGNORECASE) or uid_val.isdigit():
+                name_seed = r[3] or r[2] or r[1] or 'USER'
+                new_uid = generate_unique_user_id(name_seed, conn)
+                c.execute("UPDATE users SET user_id = ? WHERE id = ?", (new_uid, r[0]))
     except Exception:
         pass
 
@@ -7530,11 +7619,19 @@ def inject_user_data():
         if not photo or not user_id:
             conn = get_db()
             c = conn.cursor()
-            c.execute("SELECT profile_photo, id, user_id, full_name FROM users WHERE username=?", (username,))
+            c.execute("""SELECT profile_photo, id, user_id, full_name, username FROM users 
+                         WHERE username=? 
+                            OR LOWER(username)=LOWER(?) 
+                            OR REPLACE(LOWER(username), '_', ' ')=LOWER(?) 
+                            OR REPLACE(LOWER(username), ' ', '_')=LOWER(?) 
+                            OR LOWER(full_name) = LOWER(?) LIMIT 1""", (username, username, username, username, username))
             res = c.fetchone()
             conn.close()
             
             if res:
+                if res[4] != username:
+                    username = res[4]
+                    session['username'] = res[4]
                 if not photo:
                     if res[0]:
                         photo = res[0]
@@ -7568,7 +7665,43 @@ def inject_user_data():
         realtime_now_date=_now.strftime('%a, %d %b %Y')
     )
 
-# Universal Validation Helpers for Email & Mobile Number 
+# Universal Validation Helpers for Username, Email & Mobile Number
+def validate_username_rules(username: str):
+    """
+    Validates username against strict rules:
+    - Small (lowercase) letters only (no uppercase allowed)
+    - No spaces allowed
+    - Only allowed symbols: underscore (_), period (.), hyphen (-)
+    - Length between 3 and 30 characters
+    - Must start with a small letter (a-z) or number (0-9)
+    Returns (is_valid: bool, error_message: str)
+    """
+    if not username or not isinstance(username, str) or not username.strip():
+        return False, "Username is required."
+    
+    val = username.strip()
+    
+    if ' ' in val or re.search(r'\s', val):
+        return False, "Username cannot contain spaces."
+    
+    if any(ch.isupper() for ch in val):
+        return False, "Username must contain small (lowercase) letters only."
+    
+    if len(val) < 3:
+        return False, "Username must be at least 3 characters long."
+    
+    if len(val) > 30:
+        return False, "Username cannot exceed 30 characters."
+    
+    if not re.match(r'^[a-z0-9]', val):
+        return False, "Username must start with a small letter (a-z) or number (0-9)."
+    
+    if not re.match(r'^[a-z0-9_.-]+$', val):
+        return False, "Username can only contain small letters (a-z), numbers (0-9), and allowed symbols (_, ., -)."
+    
+    return True, ""
+
+
 def validate_mobile(phone: str):
     """
     Validates mobile numbers:
@@ -7994,6 +8127,36 @@ def refresh_login_captcha():
     return resp
 
 
+@app.route('/api/check-username', methods=['GET'])
+def check_username_availability():
+    """Verify in real-time whether a username complies with format rules and is available."""
+    raw_username = request.args.get('username') or ''
+    if not raw_username.strip():
+        return jsonify({'available': False, 'message': 'Username is required.'}), 200
+
+    is_valid, err_msg = validate_username_rules(raw_username)
+    if not is_valid:
+        return jsonify({'available': False, 'message': err_msg}), 200
+    
+    username = raw_username.strip().lower()
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT 1 FROM users WHERE LOWER(username) = LOWER(?)", (username,))
+    row = c.fetchone()
+    conn.close()
+    
+    if row:
+        return jsonify({
+            'available': False,
+            'message': 'This username is in use or not available.'
+        }), 200
+    
+    return jsonify({
+        'available': True,
+        'message': f'Username @{username} is available!'
+    }), 200
+
+
 @app.route('/', methods=['GET', 'POST'])
 def login():
     next_url = _safe_next_url(request.args.get('next') or request.form.get('next'))
@@ -8035,43 +8198,56 @@ def login():
             elif password != confirm_password:
                 error = "Passwords do not match!"
             else:
-                # Validate Mobile & Email before proceeding
-                is_phone_v, clean_phone = validate_mobile(phone)
-                is_email_v, clean_email = validate_email_address(email)
-                
-                if not is_phone_v:
-                    error = clean_phone
-                elif not is_email_v:
-                    error = clean_email
+                is_u_valid, u_err = validate_username_rules(username)
+                if not is_u_valid:
+                    error = u_err
                 else:
-                    phone = clean_phone
-                    email = clean_email
-                    try:
-                        conn = get_db()
-                        c = conn.cursor()
-                        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-                        c.execute("""INSERT INTO users (username, password, full_name, first_name, middle_name, last_name, 
-                                                        email, phone, address, country, state, city, pincode, is_active) 
-                                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)""", 
-                                  (username, hashed_password, full_name, first_name, middle_name, last_name, 
-                                   email, phone, address, country, state, city, pincode))
-                        new_id = c.lastrowid
-                        uid_str = f"UID-{new_id:04d}"
-                        c.execute("UPDATE users SET user_id = ? WHERE id = ?", (uid_str, new_id))
-                        conn.commit()
+                    # Check if username is already in use
+                    conn = get_db()
+                    c = conn.cursor()
+                    c.execute("SELECT 1 FROM users WHERE LOWER(username) = LOWER(?)", (username,))
+                    if c.fetchone():
+                        error = "This username is in use or not available. Please choose a different username."
                         conn.close()
-                        open_register = False
-                        msg = f"Registration successful! Your User ID is {uid_str}. Please log in using your User ID or registered Email address."
+                    else:
+                        # Validate Mobile & Email before proceeding
+                        is_phone_v, clean_phone = validate_mobile(phone)
+                        is_email_v, clean_email = validate_email_address(email)
                         
-                        # Asynchronously dispatch welcome email to user
-                        if email:
-                            threading.Thread(
-                                target=send_account_welcome_email,
-                                args=(email, full_name, username, uid_str),
-                                daemon=True
-                            ).start()
-                    except sqlite3.IntegrityError:
-                        error = "Username already exists! Please choose another."
+                        if not is_phone_v:
+                            error = clean_phone
+                            conn.close()
+                        elif not is_email_v:
+                            error = clean_email
+                            conn.close()
+                        else:
+                            phone = clean_phone
+                            email = clean_email
+                            try:
+                                # Generate secure, non-sequential User ID based on user's name
+                                name_source = first_name or full_name or username
+                                uid_str = generate_unique_user_id(name_source, conn)
+
+                                hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+                                c.execute("""INSERT INTO users (username, password, full_name, first_name, middle_name, last_name, 
+                                                                email, phone, address, country, state, city, pincode, user_id, is_active) 
+                                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)""", 
+                                          (username, hashed_password, full_name, first_name, middle_name, last_name, 
+                                           email, phone, address, country, state, city, pincode, uid_str))
+                                conn.commit()
+                                conn.close()
+                                open_register = False
+                                msg = f"Registration successful! Your unique User ID is {uid_str}. Please log in using your Username, User ID, or registered Email address."
+                                
+                                # Asynchronously dispatch welcome email to user
+                                if email:
+                                    threading.Thread(
+                                        target=send_account_welcome_email,
+                                        args=(email, full_name, username, uid_str),
+                                        daemon=True
+                                    ).start()
+                            except sqlite3.IntegrityError:
+                                error = "This username is in use or not available. Please choose a different username."
                     
         elif action == 'login':
             raw_identifier = request.form.get('username', '').strip()
@@ -8086,7 +8262,7 @@ def login():
                 error = f"Too many failed login attempts. Please wait {retry_sec} seconds before trying again."
                 http_status = 429
             elif not raw_identifier:
-                error = "Please enter your User ID or registered Email address."
+                error = "Please enter your Username, User ID, or registered Email address."
             elif not password:
                 error = "Password is required."
             elif not expected_answer:
@@ -8100,55 +8276,35 @@ def login():
                     http_status = 429
                 else:
                     error = "Invalid CAPTCHA. Please enter the exact 5-digit code shown."
-            elif raw_identifier.lower() in ('admin', '0001', 'uid-0001', 'admin@example.com') and password == 'password123':
-                # Fast Admin / Host check with session recording & optional 2FA gate
-                conn = get_db()
-                resp_redirect = _finalize_authenticated_login(
-                    conn, 'admin', 'host', 1, 'UID-0001', generate_avatar_svg('Admin'), client_ip, raw_identifier, next_url=next_url
-                )
-                conn.close()
-                return resp_redirect
+            elif (raw_identifier.isdigit() and len(raw_identifier) >= 10) or re.match(r'^\+?[0-9\s\-]{10,}$', raw_identifier):
+                # Disallow login with Mobile number
+                record_login_failure(client_ip, raw_identifier)
+                error = "Login using Mobile number is disabled. Please log in using your Username, User ID, or registered Email address."
+                http_status = 400
             else:
                 try:
                     conn = get_db()
                     c = conn.cursor()
                     user = None
 
-                    if '@' in raw_identifier:
-                        # 1. Registered Email Address Login
-                        c.execute("""SELECT password, role, is_admin, is_active, full_name, profile_photo, id, user_id, username,
-                                            COALESCE(is_pending_deletion, 0), deletion_deadline, scheduled_deletion_at 
-                                     FROM users WHERE LOWER(email) = LOWER(?)""", (raw_identifier,))
-                        user = c.fetchone()
-                        if not user or not check_password_cached(user[0], password):
-                            locked, l_sec = record_login_failure(client_ip, raw_identifier)
-                            error = f"Too many failed login attempts. Please wait {l_sec} seconds before trying again." if locked else "Invalid Email or Password."
-                            if locked:
-                                http_status = 429
-                    elif raw_identifier.isdigit() or raw_identifier.upper().startswith('UID-'):
-                        # 2. 4-Digit User ID or UID Login (e.g. 0003, 0004, UID-0003)
-                        if raw_identifier.isdigit():
-                            uid_num = int(raw_identifier)
-                            formatted_uid = f"UID-{uid_num:04d}"
-                            c.execute("""SELECT password, role, is_admin, is_active, full_name, profile_photo, id, user_id, username,
-                                                COALESCE(is_pending_deletion, 0), deletion_deadline, scheduled_deletion_at 
-                                         FROM users WHERE user_id = ? OR id = ? OR user_id LIKE ? OR user_id = ?""", 
-                                      (formatted_uid, uid_num, f"%{raw_identifier}", raw_identifier))
-                        else:
-                            formatted_uid = raw_identifier.upper()
-                            c.execute("""SELECT password, role, is_admin, is_active, full_name, profile_photo, id, user_id, username,
-                                                COALESCE(is_pending_deletion, 0), deletion_deadline, scheduled_deletion_at 
-                                         FROM users WHERE UPPER(user_id) = ?""", (formatted_uid,))
-                        user = c.fetchone()
-                        if not user or not check_password_cached(user[0], password):
-                            locked, l_sec = record_login_failure(client_ip, raw_identifier)
-                            error = f"Too many failed login attempts. Please wait {l_sec} seconds before trying again." if locked else "Invalid User ID or Password."
-                            if locked:
-                                http_status = 429
-                    else:
-                        # 3. Disallow login with plain username or full name
-                        record_login_failure(client_ip, raw_identifier)
-                        error = "Invalid credentials. Please enter your User ID or registered Email address."
+                    # Authenticate by Username, unique User ID, or registered Email address
+                    c.execute("""SELECT password, role, is_admin, is_active, full_name, profile_photo, id, user_id, username,
+                                        COALESCE(is_pending_deletion, 0), deletion_deadline, scheduled_deletion_at 
+                                 FROM users 
+                                 WHERE LOWER(username) = LOWER(?) 
+                                    OR UPPER(user_id) = UPPER(?) 
+                                    OR LOWER(email) = LOWER(?) 
+                                    OR user_id = ?
+                                    OR REPLACE(LOWER(username), '_', ' ') = LOWER(?)
+                                    OR REPLACE(LOWER(username), ' ', '_') = LOWER(?)""", 
+                              (raw_identifier, raw_identifier, raw_identifier, raw_identifier, raw_identifier, raw_identifier))
+                    user = c.fetchone()
+
+                    if not user or not check_password_cached(user[0], password):
+                        locked, l_sec = record_login_failure(client_ip, raw_identifier)
+                        error = f"Too many failed login attempts. Please wait {l_sec} seconds before trying again." if locked else "Invalid Username, User ID, Email, or Password."
+                        if locked:
+                            http_status = 429
 
                     if user and check_password_cached(user[0], password):
                         user_id_val = user[6]
@@ -8159,7 +8315,11 @@ def login():
                             error = f"Your account has been suspended: {ban_why}"
                         else:
                             matched_username = user[8] or user[4] or f"User-{user_id_val}"
-                            matched_uid = user[7] if (len(user) > 7 and user[7]) else f"UID-{user_id_val:04d}"
+                            matched_uid = user[7] if (len(user) > 7 and user[7]) else ''
+                            if not matched_uid:
+                                matched_uid = generate_unique_user_id(matched_username, conn)
+                                c.execute("UPDATE users SET user_id = ? WHERE id = ?", (matched_uid, user_id_val))
+                                conn.commit()
                             user_display_name = user[4] or matched_username
                             
                             is_pending_del = bool(user[9]) if len(user) > 9 else False
@@ -8409,16 +8569,20 @@ def dashboard():
         ev['time_until_start_seconds'] = status_info.get('time_until_start_seconds', 0)
         ev['time_until_cutoff_seconds'] = status_info.get('time_until_cutoff_seconds', 0)
         
-        if ev['is_expired'] and not ev['is_today']:
+        if ev['is_expired']:
             past_events.append(ev)
         else:
             upcoming_events.append(ev)
 
-    # Sort upcoming events so Live Now, Today, Tomorrow, and This Weekend appear first
+    # Sort upcoming events: Live Now first, then chronologically by start_dt
     upcoming_events.sort(key=lambda x: (
-        0 if x.get('is_live_now') else (1 if x.get('is_today') else (2 if x.get('is_tomorrow') else (3 if x.get('is_this_weekend') else 4))),
+        0 if x.get('is_live_now') else (1 if x.get('is_today') else 2),
+        x.get('start_dt') or datetime.max,
         x.get('id', 0)
     ))
+
+    # Sort past events reverse-chronologically (most recently concluded first)
+    past_events.sort(key=lambda x: (x.get('end_dt') or x.get('start_dt') or datetime.min), reverse=True)
             
     # Calculate carousel angles only for upcoming events
     total_upcoming = len(upcoming_events)
@@ -8442,7 +8606,27 @@ def dashboard():
         else:
             category_counts['Education'] += 1
 
-    return render_template('dashboard.html', upcoming_events=upcoming_events, past_events=past_events, username=username, is_host=is_host(), carousel_radius=radius, category_counts=category_counts, categories_metadata=CATEGORY_METADATA, total_events_count=len(events))
+    # Prepare upcoming events JSON payload for live client-side auto-updating countdown
+    upcoming_events_payload = []
+    for ev in upcoming_events:
+        s_dt = ev.get('start_dt')
+        upcoming_events_payload.append({
+            'id': ev['id'],
+            'title': ev.get('title', ''),
+            'category': ev.get('category', ''),
+            'date': ev.get('date', ''),
+            'time': ev.get('time', ''),
+            'venue': ev.get('venue', ''),
+            'venue_address': ev.get('venue_address', ''),
+            'start_iso': s_dt.isoformat() if s_dt else '',
+            'start_ms': int(s_dt.timestamp() * 1000) if s_dt else 0,
+            'details_url': url_for('event_detail', event_id=ev['id']),
+            'calendar_ics_url': url_for('event_ical_download', event_id=ev['id']),
+            'google_cal_url': url_for('event_google_calendar', event_id=ev['id']),
+        })
+    upcoming_events_json = json.dumps(upcoming_events_payload)
+
+    return render_template('dashboard.html', upcoming_events=upcoming_events, past_events=past_events, username=username, is_host=is_host(), carousel_radius=radius, category_counts=category_counts, categories_metadata=CATEGORY_METADATA, total_events_count=len(events), upcoming_events_json=upcoming_events_json)
 
 @app.route('/explore/<path:category_name>', methods=['GET'])
 @app.route('/explore', methods=['GET'])
@@ -8527,16 +8711,20 @@ def category_events(category_name=None):
         ev['time_until_start_seconds'] = status_info.get('time_until_start_seconds', 0)
         ev['time_until_cutoff_seconds'] = status_info.get('time_until_cutoff_seconds', 0)
         
-        if ev['is_expired'] and not ev['is_today']:
+        if ev['is_expired']:
             past_events.append(ev)
         else:
             upcoming_events.append(ev)
 
-    # Sort upcoming events: Live Now, Today, Tomorrow, This Weekend appear first
+    # Sort upcoming events: Live Now first, then chronologically by start_dt
     upcoming_events.sort(key=lambda x: (
-        0 if x.get('is_live_now') else (1 if x.get('is_today') else (2 if x.get('is_tomorrow') else (3 if x.get('is_this_weekend') else 4))),
+        0 if x.get('is_live_now') else (1 if x.get('is_today') else 2),
+        x.get('start_dt') or datetime.max,
         x.get('id', 0)
     ))
+
+    # Sort past events reverse-chronologically
+    past_events.sort(key=lambda x: (x.get('end_dt') or x.get('start_dt') or datetime.min), reverse=True)
 
     # Calculate carousel angles and radius for this category's upcoming active events
     all_category_events = upcoming_events + past_events
@@ -10116,7 +10304,7 @@ def register_event(event_id):
     event['is_in_person_sold_out'] = status_info.get('is_in_person_sold_out') or (event['seats_filled'] >= event['seats_total'])
 
     # If the event has completely concluded in the past or earlier today, close all registrations
-    if status_info.get('is_past_date') or status_info.get('status_label') == 'Event Ended' or (status_info.get('is_expired') and not status_info.get('is_today')):
+    if status_info.get('is_expired') or status_info.get('is_past_date') or status_info.get('status_label') == 'Event Ended':
         flash("Registration is closed for this event as it has already passed.", "error")
         return redirect(url_for('event_detail', event_id=event_id))
 
@@ -11134,6 +11322,130 @@ def event_google_calendar(event_id):
         return redirect(url_for('event_detail', event_id=event_id))
 
 
+@app.route('/event/<int:event_id>/calendar.ics', endpoint='event_ical_download')
+def event_ical_download(event_id):
+    """
+    Generates and downloads a standard RFC 5545 iCalendar (.ics) file.
+    Compatible with Apple Calendar, Microsoft Outlook, Thunderbird, and mobile calendar apps.
+    """
+    event = get_event(event_id)
+    if not event:
+        flash("Event not found.", "error")
+        return redirect(url_for('dashboard'))
+
+    status_info = get_event_status_info(event)
+    start_dt = status_info.get('start_dt') or datetime.now()
+    end_dt = status_info.get('end_dt') or (start_dt + timedelta(hours=3))
+
+    dtstamp = datetime.now().strftime("%Y%m%dT%H%M%SZ")
+    dtstart = start_dt.strftime("%Y%m%dT%H%M%S")
+    dtend = end_dt.strftime("%Y%m%dT%H%M%S")
+
+    title = (event.get('title') or 'Event').replace('\r', '').replace('\n', ' ').strip()
+    raw_desc = event.get('desc') or event.get('description') or ''
+    desc_clean = re.sub(r'[\r\n]+', '\\n', raw_desc.strip())
+    venue_name = str(event.get('venue') or '').strip()
+    venue_addr = str(event.get('venue_address') or '').strip()
+    loc_clean = f"{venue_name}, {venue_addr}".strip(', ').replace('\r', '').replace('\n', ' ')
+    event_url = url_for('event_detail', event_id=event_id, _external=True)
+    uid = f"event-{event_id}-{int(start_dt.timestamp())}@eventsbooking.local"
+
+    ics_body = f"""BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Events Booking System//Event Calendar 2.0//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:{uid}
+DTSTAMP:{dtstamp}
+DTSTART:{dtstart}
+DTEND:{dtend}
+SUMMARY:{title}
+DESCRIPTION:{desc_clean}\\n\\nEvent Page: {event_url}
+LOCATION:{loc_clean}
+URL:{event_url}
+STATUS:CONFIRMED
+SEQUENCE:0
+END:VEVENT
+END:VCALENDAR""".strip()
+
+    safe_slug = re.sub(r'[^a-zA-Z0-9_-]', '_', title)[:30] or f"event_{event_id}"
+    response = Response(ics_body, mimetype='text/calendar; charset=utf-8')
+    response.headers['Content-Disposition'] = f'attachment; filename="{safe_slug}.ics"'
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    return response
+
+
+@app.route('/event/<int:event_id>/og-image', endpoint='event_og_image')
+def event_og_image(event_id):
+    """
+    Renders a dynamic high-resolution OpenGraph card image (1200x630) for social shares
+    (WhatsApp, X/Twitter, LinkedIn, Slack, Telegram).
+    """
+    event = get_event(event_id)
+    if not event:
+        return Response("Event not found", status=404)
+
+    raw_title = str(event.get('title') or 'Upcoming Event')
+    esc_title = raw_title.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+    esc_cat = str(event.get('category') or 'Conference').upper().replace('&', '&amp;')
+    esc_date = str(event.get('date') or '').replace('&', '&amp;')
+    esc_time = str(event.get('time') or '10:00 AM').replace('&', '&amp;')
+    esc_venue = str(event.get('venue') or 'Auditorium').replace('&', '&amp;')
+    display_title = esc_title[:42] + ('...' if len(esc_title) > 42 else '')
+
+    svg_content = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0f19"/>
+      <stop offset="50%" stop-color="#111827"/>
+      <stop offset="100%" stop-color="#1e1b4b"/>
+    </linearGradient>
+    <linearGradient id="glowPill" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#008be3"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+    <filter id="blurFilter" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="80" result="blur"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="1060" cy="110" r="260" fill="#008be3" opacity="0.25" filter="url(#blurFilter)"/>
+  <circle cx="140" cy="540" r="220" fill="#a855f7" opacity="0.22" filter="url(#blurFilter)"/>
+
+  <rect x="50" y="50" width="1100" height="530" rx="24" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+
+  <!-- Category Badge -->
+  <rect x="90" y="90" width="190" height="42" rx="21" fill="url(#glowPill)"/>
+  <text x="185" y="117" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="800" text-anchor="middle" letter-spacing="1.5">{esc_cat}</text>
+
+  <!-- Title -->
+  <text x="90" y="225" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="52" font-weight="900" letter-spacing="-0.5">
+    {display_title}
+  </text>
+
+  <!-- Detail Cards -->
+  <g transform="translate(90, 310)">
+    <rect x="0" y="0" width="340" height="96" rx="16" fill="rgba(255,255,255,0.04)" stroke="rgba(0,139,227,0.3)"/>
+    <text x="24" y="38" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="700" letter-spacing="1">🗓️ DATE &amp; TIME</text>
+    <text x="24" y="72" fill="#38bdf8" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="20" font-weight="800">{esc_date} • {esc_time}</text>
+  </g>
+
+  <g transform="translate(460, 310)">
+    <rect x="0" y="0" width="460" height="96" rx="16" fill="rgba(255,255,255,0.04)" stroke="rgba(168,85,247,0.3)"/>
+    <text x="24" y="38" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="700" letter-spacing="1">📍 VENUE LOCATION</text>
+    <text x="24" y="72" fill="#f8fafc" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="20" font-weight="800">{esc_venue[:34]}</text>
+  </g>
+
+  <!-- Brand Footer -->
+  <text x="90" y="495" fill="#64748b" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16" font-weight="600">
+    ⚡ Events Booking • Official Live Event Registration Pass
+  </text>
+</svg>"""
+    return Response(svg_content, mimetype='image/svg+xml')
+
+
 
 @app.route('/host/export_all_csv', endpoint='host_export_all_csv')
 def host_export_all_csv():
@@ -11400,8 +11712,25 @@ def profile():
         return redirect(url_for('login'))
     
     username = session.get('username')
+    user_id = session.get('user_id')
     conn = get_db()
     c = conn.cursor()
+    
+    # Resilient user lookup (handles legacy usernames, casing, spaces/underscores, full_name)
+    c.execute("""SELECT username, user_id, full_name, email, phone FROM users 
+                 WHERE username = ? 
+                    OR LOWER(username) = LOWER(?) 
+                    OR REPLACE(LOWER(username), '_', ' ') = LOWER(?) 
+                    OR REPLACE(LOWER(username), ' ', '_') = LOWER(?) 
+                    OR LOWER(full_name) = LOWER(?) LIMIT 1""", (username, username, username, username, username))
+    u_match = c.fetchone()
+    if u_match:
+        actual_username = u_match[0]
+        if actual_username != username:
+            session['username'] = actual_username
+            session['user_id'] = u_match[1] or session.get('user_id')
+            session['user_display_name'] = u_match[2] or actual_username
+            username = actual_username
     
     if request.method == 'POST':
         c.execute("SELECT email, phone FROM users WHERE username=?", (username,))
@@ -11502,12 +11831,23 @@ def profile():
     msg = request.args.get('msg')
     error = request.args.get('error')
 
-    c.execute("SELECT username, full_name, email, phone, college_id, profile_photo, first_name, middle_name, last_name, address, country, state, city, pincode, id, user_id FROM users WHERE username=?", (username,))
+    c.execute("""SELECT username, full_name, email, phone, college_id, profile_photo, first_name, middle_name, last_name, address, country, state, city, pincode, id, user_id FROM users 
+                 WHERE username=? 
+                    OR LOWER(username)=LOWER(?) 
+                    OR REPLACE(LOWER(username), '_', ' ')=LOWER(?) 
+                    OR REPLACE(LOWER(username), ' ', '_')=LOWER(?) 
+                    OR LOWER(full_name)=LOWER(?) LIMIT 1""", (username, username, username, username, username))
     user_data = c.fetchone()
     conn.close()
 
     if not user_data:
-        return "User profile not found", 404
+        flash("Please log in to view your profile.", "warning")
+        return redirect(url_for('login'))
+
+    if session.get('username') != user_data[0]:
+        session['username'] = user_data[0]
+        session['user_id'] = user_data[15] or session.get('user_id')
+        session['user_display_name'] = user_data[1] or user_data[0]
 
     fn = user_data[6] or ''
     mn = user_data[7] or ''
@@ -11550,13 +11890,27 @@ def settings():
         return redirect(url_for('login'))
     
     username = session.get('username')
+    user_id = session.get('user_id')
     conn = get_db()
     c = conn.cursor()
-    c.execute("SELECT username, full_name, email, phone, college_id, profile_photo, id, user_id FROM users WHERE username=?", (username,))
+    c.execute("""SELECT username, full_name, email, phone, college_id, profile_photo, id, user_id FROM users 
+                 WHERE username=? 
+                    OR LOWER(username)=LOWER(?) 
+                    OR REPLACE(LOWER(username), '_', ' ')=LOWER(?) 
+                    OR REPLACE(LOWER(username), ' ', '_')=LOWER(?) 
+                    OR (user_id IS NOT NULL AND user_id != '' AND user_id = ?) 
+                    OR full_name=? LIMIT 1""", (username, username, username, username, user_id, username))
     user_data = c.fetchone()
     if not user_data:
         conn.close()
-        return "User profile not found", 404
+        flash("Please log in to access account settings.", "warning")
+        return redirect(url_for('login'))
+
+    if session.get('username') != user_data[0]:
+        session['username'] = user_data[0]
+        session['user_id'] = user_data[7] or session.get('user_id')
+        session['user_display_name'] = user_data[1] or user_data[0]
+        username = user_data[0]
 
     two_factor_enabled = False
     login_sessions = []

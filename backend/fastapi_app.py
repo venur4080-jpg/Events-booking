@@ -10,6 +10,7 @@ import json
 import os
 import sys
 import sqlite3
+import re
 import asyncio
 import threading
 from contextlib import asynccontextmanager
@@ -33,6 +34,7 @@ get_event_status_info = backend_module.get_event_status_info
 check_password_cached = backend_module.check_password_cached
 bcrypt = backend_module.bcrypt
 flask_app = backend_module.app
+generate_unique_user_id = backend_module.generate_unique_user_id
 
 
 # ============================================================================
@@ -117,7 +119,7 @@ class EventCreateRequest(BaseModel):
 
 
 class UserLoginRequest(BaseModel):
-    identifier: str = Field(..., examples=["0001"], description="4-digit User ID (e.g. 0001) or Registered Email Address")
+    identifier: str = Field(..., examples=["admin"], description="Username, unique User ID, or registered Email address")
     password: str = Field(..., examples=["password123"], min_length=3)
 
 
@@ -683,42 +685,61 @@ async def delete_event(event_id: int = Path(...)):
 # 3. AUTHENTICATION & USER MANAGEMENT ENDPOINTS
 # ============================================================================
 
+@api_v1.get(
+    "/auth/check-username",
+    tags=["Authentication & Users"],
+    summary="Check Username Availability",
+    description="Verify in real-time whether a username is available or already in use."
+)
+async def api_check_username(username: str = ""):
+    u = (username or "").strip()
+    is_valid, err_msg = backend_module.validate_username_rules(u)
+    if not is_valid:
+        return {"available": False, "message": err_msg}
+    conn = get_db(row_factory=True)
+    c = conn.cursor()
+    c.execute("SELECT 1 FROM users WHERE LOWER(username) = LOWER(?)", (u.lower(),))
+    row = c.fetchone()
+    conn.close()
+    if row:
+        return {"available": False, "message": "This username is in use or not available."}
+    return {"available": True, "message": f"Username @{u.lower()} is available!"}
+
+
 @api_v1.post(
     "/auth/login",
     response_model=StandardApiResponse,
     tags=["Authentication & Users"],
-    summary="User Login (User ID or Email)",
-    description="Authenticates users by either their 4-digit User ID (e.g., '0001') or registered Email address."
+    summary="User Login (Username, User ID, or Email)",
+    description="Authenticates users by either their Username, unique User ID, or registered Email address."
 )
 async def api_login(payload: UserLoginRequest):
-    identifier = payload.identifier.strip().lower()
+    identifier = payload.identifier.strip()
     raw_password = payload.password
+
+    # Mobile number login is disabled
+    if (identifier.isdigit() and len(identifier) >= 10) or re.match(r'^\+?[0-9\s\-]{10,}$', identifier):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Login using Mobile number is disabled. Please log in using your Username, User ID, or Email address."
+        )
 
     conn = get_db(row_factory=True)
     c = conn.cursor()
-    # Support UID-0001, 0001, email, and username formats
-    uid_variations = [
-        identifier,
-        f"uid-{identifier}",
-        identifier.replace("uid-", ""),
-        f"{identifier.zfill(4)}" if identifier.isdigit() else identifier,
-        f"uid-{identifier.zfill(4)}" if identifier.isdigit() else identifier,
-    ]
-    
-    placeholders = ",".join(["?"] * len(uid_variations))
-    c.execute(f"""
+    c.execute("""
         SELECT * FROM users 
-        WHERE LOWER(user_id) IN ({placeholders}) 
-           OR LOWER(email) = ? 
-           OR LOWER(username) = ?
-    """, (*[v.lower() for v in uid_variations], identifier, identifier))
+        WHERE LOWER(username) = LOWER(?) 
+           OR UPPER(user_id) = UPPER(?) 
+           OR LOWER(email) = LOWER(?)
+           OR user_id = ?
+    """, (identifier, identifier, identifier, identifier))
     user_row = c.fetchone()
     conn.close()
 
     if not user_row:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials. Please enter your 4-digit User ID (e.g. 0001) or Email address."
+            detail="Invalid credentials. Please enter your Username, User ID, or Email address."
         )
 
     user_dict = dict(user_row)
@@ -751,6 +772,10 @@ async def api_login(payload: UserLoginRequest):
     summary="Register a new user account"
 )
 async def api_register(payload: UserRegisterRequest):
+    is_u_valid, u_err = backend_module.validate_username_rules(payload.username)
+    if not is_u_valid:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=u_err)
+
     conn = get_db(row_factory=True)
     c = conn.cursor()
 
@@ -758,18 +783,16 @@ async def api_register(payload: UserRegisterRequest):
     c.execute("SELECT id FROM users WHERE LOWER(username) = ?", (payload.username.lower(),))
     if c.fetchone():
         conn.close()
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Username is already taken")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="This username is in use or not available.")
 
     c.execute("SELECT id FROM users WHERE LOWER(email) = ?", (payload.email.lower(),))
     if c.fetchone():
         conn.close()
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="An account with this email already exists")
 
-    # Generate sequential 4-digit User ID
-    c.execute("SELECT MAX(id) FROM users")
-    max_id_row = c.fetchone()
-    next_num = (max_id_row[0] or 0) + 1
-    new_user_id = f"{next_num:04d}"
+    # Generate secure, non-sequential User ID based on user's name
+    name_source = payload.full_name or payload.username
+    new_user_id = generate_unique_user_id(name_source, conn)
 
     hashed_pwd = bcrypt.generate_password_hash(payload.password).decode('utf-8')
     created_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
