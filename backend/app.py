@@ -8679,6 +8679,12 @@ def dashboard():
         ev['is_this_weekend'] = status_info.get('is_this_weekend', False)
         ev['time_until_start_seconds'] = status_info.get('time_until_start_seconds', 0)
         ev['time_until_cutoff_seconds'] = status_info.get('time_until_cutoff_seconds', 0)
+        ev['start_dt'] = status_info.get('start_dt')
+        ev['end_dt'] = status_info.get('end_dt')
+        ev['cutoff_dt'] = status_info.get('cutoff_dt')
+        ev['start_dt_ms'] = int(status_info['start_dt'].timestamp() * 1000) if status_info.get('start_dt') else 0
+        ev['end_dt_ms'] = int(status_info['end_dt'].timestamp() * 1000) if status_info.get('end_dt') else 0
+        ev['cutoff_dt_ms'] = int(status_info['cutoff_dt'].timestamp() * 1000) if status_info.get('cutoff_dt') else 0
         
         if ev['is_expired']:
             past_events.append(ev)
@@ -8721,16 +8727,25 @@ def dashboard():
     upcoming_events_payload = []
     for ev in upcoming_events:
         s_dt = ev.get('start_dt')
+        e_dt = ev.get('end_dt')
+        c_dt = ev.get('cutoff_dt')
         upcoming_events_payload.append({
             'id': ev['id'],
             'title': ev.get('title', ''),
             'category': ev.get('category', ''),
             'date': ev.get('date', ''),
             'time': ev.get('time', ''),
+            'end_time': ev.get('end_time', ''),
+            'cutoff_time': ev.get('cutoff_time', ''),
             'venue': ev.get('venue', ''),
             'venue_address': ev.get('venue_address', ''),
             'start_iso': s_dt.isoformat() if s_dt else '',
             'start_ms': int(s_dt.timestamp() * 1000) if s_dt else 0,
+            'end_ms': int(e_dt.timestamp() * 1000) if e_dt else 0,
+            'cutoff_ms': int(c_dt.timestamp() * 1000) if c_dt else 0,
+            'image': ev.get('image', ''),
+            'desc': ev.get('desc', ''),
+            'price': ev.get('price', ''),
             'details_url': url_for('event_detail', event_id=ev['id']),
             'calendar_ics_url': url_for('event_ical_download', event_id=ev['id']),
             'google_cal_url': url_for('event_google_calendar', event_id=ev['id']),
@@ -8821,6 +8836,12 @@ def category_events(category_name=None):
         ev['is_this_weekend'] = status_info.get('is_this_weekend', False)
         ev['time_until_start_seconds'] = status_info.get('time_until_start_seconds', 0)
         ev['time_until_cutoff_seconds'] = status_info.get('time_until_cutoff_seconds', 0)
+        ev['start_dt'] = status_info.get('start_dt')
+        ev['end_dt'] = status_info.get('end_dt')
+        ev['cutoff_dt'] = status_info.get('cutoff_dt')
+        ev['start_dt_ms'] = int(status_info['start_dt'].timestamp() * 1000) if status_info.get('start_dt') else 0
+        ev['end_dt_ms'] = int(status_info['end_dt'].timestamp() * 1000) if status_info.get('end_dt') else 0
+        ev['cutoff_dt_ms'] = int(status_info['cutoff_dt'].timestamp() * 1000) if status_info.get('cutoff_dt') else 0
         
         if ev['is_expired']:
             past_events.append(ev)
@@ -10700,36 +10721,6 @@ def register_event(event_id):
                                  (registration_id, event_id, username, question_id, question_label, answer_value) 
                                  VALUES (?, ?, ?, ?, ?, ?)""", (reg_id, event_id, username, q_id, q_lbl, ans_val))
                 
-            if seats_to_add > 0:
-                c.execute("UPDATE events SET seats_filled = COALESCE(seats_filled, 0) + ? WHERE id = ?", (seats_to_add, event_id))
-
-            # Automatically unlock live video room for both pass types
-            c.execute("""INSERT OR REPLACE INTO live_stream_passes (event_id, username, pass_type, ticket_code, payment_method)
-                         VALUES (?, ?, ?, ?, ?)""",
-                      (event_id, username, 'virtual_pass' if pass_type == 'live_stream' else 'registered_ticket', ticket_code, payment_method or 'registered'))
-
-            conn.commit()
-            conn.close()
-            invalidate_user_regs(username)
-            invalidate_events_cache()
-
-            # Real-time WebSocket zero-latency broadcast & Host Webhooks
-            c_ev = get_event(event_id)
-            if seats_to_add > 0 and c_ev:
-                try:
-                    trigger_seat_update_broadcast(event_id, c_ev.get('seats_filled', 0), c_ev.get('seats_total', 100))
-                except Exception:
-                    pass
-
-            dispatch_host_webhooks('ticket.booked', event_id, {
-                'ticket_code': ticket_code,
-                'username': username,
-                'full_name': full_name,
-                'pass_type': pass_type,
-                'amount_paid': amount_paid,
-                'addons_total': addons_total,
-                'wallet_used': wallet_used,
-            })
             if seats_to_add > 0 and c_ev and (c_ev.get('seats_filled') or 0) >= (c_ev.get('seats_total') or 100):
                 dispatch_host_webhooks('event.sold_out', event_id, {
                     'event_title': event['title'],
@@ -12212,12 +12203,8 @@ def history():
     for reg in registrations:
         event = get_event(reg[0])
         if event:
-            is_expired = False
-            try:
-                event_date = datetime.strptime(event['date'], "%b %d, %Y")
-                is_expired = event_date < current_date
-            except Exception:
-                is_expired = False
+            status_info = get_event_status_info(event, ref_now=current_date)
+            is_expired = bool(status_info.get('is_expired'))
                 
             reg_status = reg[6] or 'active'
             cancelled_at = reg[8] if len(reg) > 8 else None
@@ -12225,10 +12212,16 @@ def history():
             checked_in = bool(reg[10]) if len(reg) > 10 and reg[10] else False
             checkin_time = reg[11] if len(reg) > 11 else None
 
+            s_dt = status_info.get('start_dt')
+            e_dt = status_info.get('end_dt')
+            c_dt = status_info.get('cutoff_dt')
+
             history_list.append({
                 'id': event['id'],
                 'title': event['title'],
                 'date': event['date'],
+                'time': status_info.get('time_str') or event.get('time', '10:00 AM'),
+                'end_time': status_info.get('end_time_str') or event.get('end_time', '05:00 PM'),
                 'desc': event.get('desc', ''),
                 'image': event.get('image', ''),
                 'price': event.get('price', 'Free'),
@@ -12243,6 +12236,11 @@ def history():
                 'cancelled_at': cancelled_at,
                 'cancellation_reason': cancellation_reason,
                 'is_expired': is_expired,
+                'status_label': status_info.get('status_label', ''),
+                'status_badge': status_info.get('status_badge', ''),
+                'start_dt_ms': int(s_dt.timestamp() * 1000) if s_dt else 0,
+                'end_dt_ms': int(e_dt.timestamp() * 1000) if e_dt else 0,
+                'cutoff_dt_ms': int(c_dt.timestamp() * 1000) if c_dt else 0,
                 'is_registered': reg_status == 'active',
                 'checked_in': checked_in,
                 'checkin_time': checkin_time
@@ -12705,6 +12703,12 @@ def api_events():
         ev_copy['is_in_person_sold_out'] = status_info.get('is_in_person_sold_out') or (ev_copy['seats_filled'] >= ev_copy['seats_total'])
         ev_copy['stream_price'] = status_info.get('stream_price') or '₹199'
         ev_copy['is_registered'] = ev_copy['id'] in registered_ids
+        s_dt = status_info.get('start_dt')
+        e_dt = status_info.get('end_dt')
+        c_dt = status_info.get('cutoff_dt')
+        ev_copy['start_dt_ms'] = int(s_dt.timestamp() * 1000) if s_dt else 0
+        ev_copy['end_dt_ms'] = int(e_dt.timestamp() * 1000) if e_dt else 0
+        ev_copy['cutoff_dt_ms'] = int(c_dt.timestamp() * 1000) if c_dt else 0
         event_list.append(ev_copy)
         
     return jsonify({

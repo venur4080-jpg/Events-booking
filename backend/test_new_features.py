@@ -1,6 +1,7 @@
 import pytest
 import sys
 import os
+import json
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__)))
 from app import app, get_events, get_event_status_info, validate_username_rules, get_db
@@ -86,6 +87,51 @@ def test_expired_events_routing():
     status_f = get_event_status_info(future_ev, ref_now=now)
     assert status_f['is_expired'] is False
     assert status_f['is_open'] is True
+
+    # Today's event whose cutoff has passed
+    today_cutoff_ev = {
+        'id': 9993,
+        'title': 'Today Passed Cutoff Event',
+        'date': now.strftime('%b %d, %Y'),
+        'time': (now + timedelta(hours=1)).strftime('%I:%M %p'),  # starts in 1h, cutoff was 1h ago
+        'end_time': (now + timedelta(hours=6)).strftime('%I:%M %p'),
+        'venue': 'Main Hall',
+        'seats_total': 100,
+        'seats_filled': 20
+    }
+    status_c = get_event_status_info(today_cutoff_ev, ref_now=now)
+    assert status_c['is_expired'] is True
+    assert status_c['is_cutoff_reached'] is True
+    assert status_c['is_open'] is False
+
+def test_history_and_dashboard_expired_events_routing(client):
+    with client.session_transaction() as sess:
+        sess['loggedin'] = True
+        sess['username'] = 'admin'
+        sess['role'] = 'host'
+
+    resp = client.get('/dashboard')
+    assert resp.status_code == 200
+    html = resp.get_data(as_text=True)
+    assert 'pastEventsContainer' in html
+    assert 'pastEventsSection' in html
+    assert 'checkAndTransitionExpiredEvents' in html
+
+    resp_hist = client.get('/history')
+    assert resp_hist.status_code == 200
+    hist_html = resp_hist.get_data(as_text=True)
+    assert 'checkAndTransitionExpiredBookings' in hist_html
+    assert 'filterBookings(\'past\'' in hist_html
+
+    resp_api = client.get('/api/events')
+    assert resp_api.status_code == 200
+    api_json = json.loads(resp_api.get_data(as_text=True))
+    assert 'events' in api_json
+    if len(api_json['events']) > 0:
+        ev0 = api_json['events'][0]
+        assert 'is_expired' in ev0
+        assert 'end_dt_ms' in ev0
+        assert 'cutoff_dt_ms' in ev0
 
 def test_username_validation_rules():
     # Valid usernames (lowercase letters, numbers, allowed symbols: _, ., -)

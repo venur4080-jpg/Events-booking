@@ -1119,7 +1119,7 @@
 
         <div class="highlights-grid">
             {% for event in upcoming_events[:6] %}
-            <div class="highlight-card" data-id="{{ event.id }}" data-category="{{ event.category }}" data-price="{% if event.price.lower() == 'free' %}free{% else %}paid{% endif %}" data-cutoff-time="{{ event.cutoff_time }}" data-is-today="{{ '1' if event.is_today else '0' }}">
+            <div class="highlight-card" data-id="{{ event.id }}" data-category="{{ event.category }}" data-price="{% if event.price.lower() == 'free' %}free{% else %}paid{% endif %}" data-cutoff-time="{{ event.cutoff_time }}" data-is-today="{{ '1' if event.is_today else '0' }}" data-start-ms="{{ event.start_dt_ms or 0 }}" data-end-ms="{{ event.end_dt_ms or 0 }}" data-cutoff-ms="{{ event.cutoff_dt_ms or 0 }}">
                 <div class="highlight-image-box">
                     <a href="{{ url_for('event_detail', event_id=event.id) }}" style="display: block; width: 100%; height: 100%; text-decoration: none;" title="{{ event.title }}">
                         <img src="{{ event.image }}" alt="{{ event.title }}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070&auto=format&fit=crop';">
@@ -1234,8 +1234,7 @@
     </section>
 
     <!-- 4. Past Concluded Events Section -->
-    {% if past_events %}
-    <section class="past-events-section" style="max-width: 1200px; margin: 4.5rem auto 3rem; padding: 0 1.5rem; position: relative;">
+    <section class="past-events-section" id="pastEventsSection" style="max-width: 1200px; margin: 4.5rem auto 3rem; padding: 0 1.5rem; position: relative; {% if not past_events %}display: none;{% endif %}">
         <div style="text-align: center; margin-bottom: 2.2rem;">
             <h2 style="color: #ffffff; font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 0.6rem;">
                 Past <span style="background: linear-gradient(135deg, #008be3, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Concluded Events</span>
@@ -1250,7 +1249,7 @@
 
         <div id="pastEventsContainer" style="display: none; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;">
             {% for event in past_events %}
-            <div class="glass-panel event-card" style="display: flex; flex-direction: column; overflow: hidden; border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); background: rgba(15, 23, 42, 0.7); transition: transform 0.3s, box-shadow 0.3s;">
+            <div class="glass-panel event-card" data-past-id="{{ event.id }}" style="display: flex; flex-direction: column; overflow: hidden; border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); background: rgba(15, 23, 42, 0.7); transition: transform 0.3s, box-shadow 0.3s;">
                 <div style="position: relative;">
                     <img src="{{ event.image }}" alt="{{ event.title }}" style="width: 100%; height: 180px; object-fit: cover; filter: grayscale(20%);" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070&auto=format&fit=crop';">
                     <span style="position: absolute; top: 12px; right: 12px; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(8px); padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; color: #38bdf8; border: 1px solid rgba(0, 139, 227, 0.35); font-weight: 600;">
@@ -1279,7 +1278,6 @@
             {% endfor %}
         </div>
     </section>
-    {% endif %}
 
     <!-- Footer -->
     <footer class="site-footer glass-panel"
@@ -1469,15 +1467,109 @@
             const btnText = document.getElementById('togglePastBtnText');
             const btnIcon = document.getElementById('togglePastBtnIcon');
             if (!cont) return;
+            const actualCount = cont.querySelectorAll('.event-card').length;
             if (cont.style.display === 'none' || cont.style.display === '') {
                 cont.style.display = 'grid';
                 if (btnText) btnText.textContent = 'Hide Past Events';
                 if (btnIcon) btnIcon.textContent = '▲';
             } else {
                 cont.style.display = 'none';
-                if (btnText) btnText.textContent = 'Explore {{ past_events|length }} Past Events';
+                if (btnText) btnText.textContent = `Explore ${actualCount} Past Events`;
                 if (btnIcon) btnIcon.textContent = '📁';
             }
+        }
+
+        // Automatic Dynamic Transition of Expired Events to Past Events Module
+        function checkAndTransitionExpiredEvents() {
+            const nowMs = Date.now();
+            const highlightCards = document.querySelectorAll('.highlight-card');
+            const pastContainer = document.getElementById('pastEventsContainer');
+            const pastSection = document.getElementById('pastEventsSection');
+            const togglePastBtnText = document.getElementById('togglePastBtnText');
+
+            highlightCards.forEach(card => {
+                const endMs = parseInt(card.getAttribute('data-end-ms') || '0', 10);
+                const cutoffMs = parseInt(card.getAttribute('data-cutoff-ms') || '0', 10);
+
+                // Expired if cutoff reached for today or event end time reached
+                const isExpired = (cutoffMs > 0 && nowMs >= cutoffMs) || (endMs > 0 && nowMs >= endMs);
+                if (isExpired) {
+                    const eventId = card.getAttribute('data-id');
+                    const title = card.querySelector('.event-copy-title')?.textContent?.trim() || 'Concluded Event';
+                    const cat = card.getAttribute('data-category') || 'General';
+                    const imgEl = card.querySelector('img');
+                    const imgSrc = imgEl ? imgEl.src : 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070&auto=format&fit=crop';
+                    const venueEl = card.querySelector('.event-venue-link span:nth-child(2)');
+                    const venue = venueEl ? venueEl.textContent.trim() : 'Auditorium';
+                    const dateBadge = card.querySelector('.date-badge');
+                    const dateStr = dateBadge ? dateBadge.textContent.trim() : '';
+                    const timeRow = card.querySelector('.highlight-timing-row span');
+                    const timeStr = timeRow ? timeRow.textContent.trim() : '';
+                    const descEl = card.querySelector('.highlight-desc-clamped');
+                    const desc = descEl ? descEl.textContent.trim() : '';
+                    const detailUrl = card.querySelector('.event-copy-title')?.getAttribute('data-event-url') || `/event/${eventId}`;
+
+                    // Fade out and remove from highlights grid
+                    card.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        card.remove();
+                        const remaining = document.querySelectorAll('.highlight-card');
+                        const emptyState = document.getElementById('highlightsEmptyState');
+                        if (emptyState && remaining.length === 0) {
+                            emptyState.style.display = 'block';
+                        }
+                    }, 400);
+
+                    // Add to past events archive container if not already present
+                    if (pastContainer && !pastContainer.querySelector(`[data-past-id="${eventId}"]`)) {
+                        const pastCard = document.createElement('div');
+                        pastCard.className = 'glass-panel event-card';
+                        pastCard.setAttribute('data-past-id', eventId);
+                        pastCard.style.cssText = 'display: flex; flex-direction: column; overflow: hidden; border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); background: rgba(15, 23, 42, 0.7); transition: transform 0.3s, box-shadow 0.3s;';
+                        pastCard.innerHTML = `
+                            <div style="position: relative;">
+                                <img src="${imgSrc}" alt="${title}" style="width: 100%; height: 180px; object-fit: cover; filter: grayscale(20%);" loading="lazy">
+                                <span style="position: absolute; top: 12px; right: 12px; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(8px); padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; color: #38bdf8; border: 1px solid rgba(0, 139, 227, 0.35); font-weight: 600;">
+                                    ${cat}
+                                </span>
+                                <span style="position: absolute; top: 12px; left: 12px; background: rgba(100, 116, 139, 0.9); backdrop-filter: blur(8px); padding: 4px 10px; border-radius: 20px; font-size: 0.72rem; color: #ffffff; font-weight: 700;">
+                                    ✓ Concluded
+                                </span>
+                            </div>
+                            <div style="padding: 1.25rem; display: flex; flex-direction: column; flex: 1;">
+                                <div style="font-size: 0.78rem; color: #94a3b8; margin-bottom: 0.4rem;">
+                                    🗓️ ${dateStr} &bull; ${timeStr}
+                                </div>
+                                <h3 style="font-size: 1.15rem; font-weight: 700; color: #ffffff; margin-bottom: 0.4rem; line-height: 1.3;">
+                                    ${title}
+                                </h3>
+                                <p style="font-size: 0.82rem; color: #94a3b8; line-height: 1.45; margin-bottom: 1rem; flex: 1; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                    ${desc}
+                                </p>
+                                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.75rem; margin-top: auto;">
+                                    <span style="font-size: 0.76rem; color: #64748b; max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">📍 ${venue}</span>
+                                    <a href="${detailUrl}" style="color: #008be3; font-weight: 700; font-size: 0.85rem; text-decoration: none;">View Archive →</a>
+                                </div>
+                            </div>
+                        `;
+                        pastContainer.prepend(pastCard);
+                        if (pastSection) pastSection.style.display = 'block';
+
+                        const totalCount = pastContainer.querySelectorAll('.event-card').length;
+                        if (togglePastBtnText) {
+                            togglePastBtnText.textContent = `Explore ${totalCount} Past Events`;
+                        }
+                    }
+
+                    // Remove from 3D carousel if present
+                    const carItem = document.querySelector(`.carousel-item[data-id="${eventId}"]`);
+                    if (carItem) {
+                        carItem.remove();
+                    }
+                }
+            });
         }
 
         // Auto-Updating Real-Time Event Countdown Timer
@@ -1595,6 +1687,7 @@
 
                 // If event countdown reached 0, transition immediately to the next upcoming event!
                 if (diff <= 0) {
+                    checkAndTransitionExpiredEvents();
                     currentIndex = findActiveEventIndex();
                     if (currentIndex === -1) {
                         updateUIForEvent(null);
@@ -1640,6 +1733,8 @@
             if (window.initNavRealtimeClock) initNavRealtimeClock();
             loadAIRecommendations();
             initCountdownTimer();
+            checkAndTransitionExpiredEvents();
+            setInterval(checkAndTransitionExpiredEvents, 5000);
         });
     </script>
 

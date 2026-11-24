@@ -459,7 +459,7 @@
             <!-- Bookings Card Grid -->
             <div class="bookings-grid" id="bookingsGrid">
                 {% for item in history %}
-                <div class="booking-card" data-status="{{ 'cancelled' if item.reg_status == 'cancelled' else ('past' if item.is_expired else 'upcoming') }}" data-reg-status="{{ item.reg_status }}" data-title="{{ item.title|lower }}">
+                <div class="booking-card" data-status="{{ 'cancelled' if item.reg_status == 'cancelled' else ('past' if item.is_expired else 'upcoming') }}" data-reg-status="{{ item.reg_status }}" data-title="{{ item.title|lower }}" data-end-ms="{{ item.end_dt_ms or 0 }}" data-cutoff-ms="{{ item.cutoff_dt_ms or 0 }}">
                     <div class="booking-image-wrap">
                         <a href="{{ url_for('event_detail', event_id=item.id) }}" style="display: block; width: 100%; height: 100%;">
                             <img src="{{ item.image or 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80' }}" alt="{{ item.title }}" class="booking-image" loading="lazy">
@@ -703,6 +703,40 @@
             });
         }
 
+        // Auto-check and update booking status if event expires in real-time
+        function checkAndTransitionExpiredBookings() {
+            const nowMs = Date.now();
+            let stateChanged = false;
+            document.querySelectorAll('.booking-card').forEach(card => {
+                const cardStatus = card.getAttribute('data-status');
+                const regStatus = card.getAttribute('data-reg-status');
+                if (cardStatus === 'upcoming' && regStatus !== 'cancelled') {
+                    const cutoffMs = parseInt(card.getAttribute('data-cutoff-ms') || '0', 10);
+                    const endMs = parseInt(card.getAttribute('data-end-ms') || '0', 10);
+                    if ((cutoffMs > 0 && nowMs >= cutoffMs) || (endMs > 0 && nowMs >= endMs)) {
+                        card.setAttribute('data-status', 'past');
+                        stateChanged = true;
+                    }
+                }
+            });
+            if (stateChanged) {
+                const allCards = Array.from(document.querySelectorAll('.booking-card'));
+                const nonCancelled = allCards.filter(c => c.getAttribute('data-reg-status') !== 'cancelled');
+                const upcomingCount = nonCancelled.filter(c => c.getAttribute('data-status') === 'upcoming').length;
+                const pastCount = nonCancelled.filter(c => c.getAttribute('data-status') === 'past').length;
+                const tabBtns = document.querySelectorAll('.filter-tab-btn');
+                tabBtns.forEach(btn => {
+                    if (btn.textContent.includes('Upcoming')) {
+                        btn.textContent = `Upcoming (${upcomingCount})`;
+                    } else if (btn.textContent.includes('Past')) {
+                        btn.textContent = `Past (${pastCount})`;
+                    }
+                });
+                const activeTab = document.querySelector('.filter-tab-btn.active');
+                if (activeTab) activeTab.click();
+            }
+        }
+
         // Live Search Bookings
         function searchBookings() {
             const query = (document.getElementById('bookingSearchInput').value || '').trim().toLowerCase();
@@ -801,6 +835,8 @@
 
         // Offline Pass Sync Engine
         document.addEventListener('DOMContentLoaded', () => {
+            checkAndTransitionExpiredBookings();
+            setInterval(checkAndTransitionExpiredBookings, 5000);
             try {
                 const bookingCards = document.querySelectorAll('.booking-card');
                 if (bookingCards.length > 0) {

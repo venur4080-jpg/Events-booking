@@ -1049,6 +1049,7 @@
                     data-title="{{ event.title|lower }}" data-category="{{ event.category }}"
                     data-date="{{ event.date }}" data-time="{{ event.time }}" data-end-time="{{ event.end_time }}"
                     data-cutoff-time="{{ event.cutoff_time }}"
+                    data-start-ms="{{ event.start_dt_ms or 0 }}" data-end-ms="{{ event.end_dt_ms or 0 }}" data-cutoff-ms="{{ event.cutoff_dt_ms or 0 }}"
                     data-venue="{{ event.venue }}"
                     data-venue-address="{{ event.venue_address }}"
                     data-maps-url="{{ event.maps_url or ('https://www.google.com/maps/search/?api=1&query=' ~ ((event.venue ~ ' ' ~ event.venue_address) | urlencode)) }}"
@@ -1208,7 +1209,7 @@
     <!-- 2. Standard Grid View Container (Initially Hidden) -->
     <div id="gridViewContainer" class="category-grid-stage" style="display: none;">
         {% for event in upcoming_events %}
-        <div class="grid-event-card" data-id="{{ event.id }}" data-category="{{ event.category }}" data-price="{% if event.price.lower() == 'free' %}free{% else %}paid{% endif %}">
+        <div class="grid-event-card" data-id="{{ event.id }}" data-category="{{ event.category }}" data-price="{% if event.price.lower() == 'free' %}free{% else %}paid{% endif %}" data-start-ms="{{ event.start_dt_ms or 0 }}" data-end-ms="{{ event.end_dt_ms or 0 }}" data-cutoff-ms="{{ event.cutoff_dt_ms or 0 }}">
             <a href="{{ url_for('event_detail', event_id=event.id) }}" style="display: block; position: relative; overflow: hidden; height: 180px; text-decoration: none;">
                 <img src="{{ event.image }}" alt="{{ event.title }}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease;" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070&auto=format&fit=crop';">
                 <div style="position: absolute; top: 10px; left: 10px; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(8px); padding: 4px 10px; border-radius: 20px; font-size: 0.74rem; color: var(--primary); font-weight: 700; border: 1px solid rgba(0, 139, 227, 0.35); z-index: 5;">
@@ -1306,8 +1307,7 @@
     </div>
 
     <!-- 4. Past Concluded Events Section -->
-    {% if past_events %}
-    <section class="past-events-section helix-thread-section" style="max-width: 1300px; margin: 4rem auto; padding: 0 1.5rem; position: relative;">
+    <section class="past-events-section helix-thread-section" id="pastEventsSection" style="max-width: 1300px; margin: 4rem auto; padding: 0 1.5rem; position: relative; {% if not past_events %}display: none;{% endif %}">
         <div style="text-align: center; margin-bottom: 2.5rem;">
             <h2 class="past-events-heading" style="color: #ffffff; font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 0.6rem;">
                 Past <span class="category-gradient-text">{{ category_info.title }} Events</span>
@@ -1324,7 +1324,7 @@
             <div class="helix-thread-stage">
                 {% for event in past_events %}
                 <div class="helix-thread-row" data-helix-index="{{ loop.index0 }}">
-                    <div class="glass-panel event-card helix-motion-card" data-id="{{ event.id }}"
+                    <div class="glass-panel event-card helix-motion-card" data-id="{{ event.id }}" data-past-id="{{ event.id }}"
                         data-title="{{ event.title|lower }}" data-category="{{ event.category }}"
                         data-date="{{ event.date }}" data-time="{{ event.time }}" data-end-time="{{ event.end_time }}"
                         data-cutoff-time="{{ event.cutoff_time }}"
@@ -1386,7 +1386,6 @@
             </div>
         </div>
     </section>
-    {% endif %}
 
     <!-- Footer -->
     <footer class="site-footer glass-panel" style="margin-top: 6rem; padding: 4rem 2rem 2rem; border-radius: 0; border-left: none; border-right: none; border-bottom: none; position: relative;">
