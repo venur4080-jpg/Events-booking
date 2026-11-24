@@ -159,8 +159,8 @@
             <a href="{{ url_for('settings') }}" class="admin-nav-item">
                 ⚙️ Settings
             </a>
-            <a href="{{ url_for('dashboard') }}" class="admin-nav-item">
-                🏠 Back to Dashboard
+            <a href="{{ url_for('dashboard') }}" class="admin-nav-item" onclick="if (window.history.length > 1 && document.referrer && document.referrer.startsWith(window.location.origin) && document.referrer !== window.location.href) { window.history.back(); return false; }">
+                🏠 Back
             </a>
             <a href="{{ url_for('logout') }}" class="logout-btn-unique" style="justify-content: center; width: 100%;">
                 ⏻ Logout
@@ -210,8 +210,8 @@
     <!-- Main Content -->
     <main id="admin-content" class="admin-main" role="main">
         <div style="margin-bottom: 1.5rem;">
-            <a href="{{ url_for('dashboard') }}" class="back-btn-unified">
-                <span class="arrow">←</span> Back to Main App
+            <a href="{{ url_for('dashboard') }}" class="back-btn-unified" onclick="if (window.history.length > 1 && document.referrer && document.referrer.startsWith(window.location.origin) && document.referrer !== window.location.href) { window.history.back(); return false; }">
+                <span class="arrow">←</span> Back
             </a>
         </div>
         {% block content %}{% endblock %}

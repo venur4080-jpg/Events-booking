@@ -38,7 +38,7 @@
 </head>
 <body>
     <nav class="navbar" style="padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center;">
-        <a href="{{ url_for('dashboard') }}" style="color: #fff; text-decoration: none; font-weight: 800; font-family: 'Outfit', sans-serif; font-size: 1.2rem;">← Back to Dashboard</a>
+        <a href="{{ url_for('dashboard') }}" style="color: #fff; text-decoration: none; font-weight: 800; font-family: 'Outfit', sans-serif; font-size: 1.2rem;" onclick="if (window.history.length > 1 && document.referrer && document.referrer.startsWith(window.location.origin) && document.referrer !== window.location.href) { window.history.back(); return false; }">← Back</a>
         <div style="display: flex; gap: 0.85rem;">
             <a href="{{ url_for('history') }}" class="btn-secondary" style="padding: 0.5rem 1rem; text-decoration: none; font-size: 0.88rem;">My Bookings</a>
             <a href="{{ url_for('settings') }}" class="btn-secondary" style="padding: 0.5rem 1rem; text-decoration: none; font-size: 0.88rem;">Security Settings</a>

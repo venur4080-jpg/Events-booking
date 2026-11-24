@@ -276,6 +276,13 @@
 
     <!-- Main Content -->
     <main class="my-events-wrapper">
+        <!-- Back Button -->
+        <div style="margin-bottom: 1.5rem;">
+            <a href="{{ url_for('dashboard') }}" class="back-btn-unified" onclick="if (window.history.length > 1 && document.referrer && document.referrer.startsWith(window.location.origin) && document.referrer !== window.location.href) { window.history.back(); return false; }">
+                <span class="arrow">←</span> Back
+            </a>
+        </div>
+
         <!-- Hero Banner -->
         <header class="host-hero-banner">
             <div>

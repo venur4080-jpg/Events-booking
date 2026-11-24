@@ -909,7 +909,7 @@
     <!-- Top Nav -->
     <nav class="sub-nav">
         <div style="display: flex; align-items: center; gap: 14px;">
-            <a href="{{ url_for('dashboard') }}" class="back-btn-unified" title="Return to Dashboard">
+            <a href="{{ url_for('dashboard') }}" class="back-btn-unified" title="Go Back" onclick="if (window.history.length > 1 && document.referrer && document.referrer.startsWith(window.location.origin) && document.referrer !== window.location.href) { window.history.back(); return false; }">
                 <span class="arrow">←</span> Back
             </a>
             <a href="{{ url_for('dashboard') }}" class="logo" title="Events Booking Home (Dashboard)" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit;">
@@ -933,8 +933,8 @@
     <div class="sub-container">
         <!-- Top Corner Back Button -->
         <div style="margin-bottom: 1.5rem;">
-            <a href="{{ url_for('dashboard') }}" class="back-btn-unified" title="Return to Dashboard">
-                <span class="arrow">←</span> Back to Dashboard
+            <a href="{{ url_for('dashboard') }}" class="back-btn-unified" title="Go Back" onclick="if (window.history.length > 1 && document.referrer && document.referrer.startsWith(window.location.origin) && document.referrer !== window.location.href) { window.history.back(); return false; }">
+                <span class="arrow">←</span> Back
             </a>
         </div>
 

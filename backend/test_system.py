@@ -1233,14 +1233,14 @@ class EventManagementSystemTests(unittest.TestCase):
         resp_edu = self.client.get('/category/Education')
         self.assertEqual(resp_edu.status_code, 200)
         self.assertIn(b'Education', resp_edu.data)
-        self.assertIn(b'Back to Dashboard', resp_edu.data)
+        self.assertIn(b'Back', resp_edu.data)
         self.assertIn(b'carouselContainer', resp_edu.data)
 
         # 3. Test dedicated Category page for Sports
         resp_sports = self.client.get('/category/Sports')
         self.assertEqual(resp_sports.status_code, 200)
         self.assertIn(b'Sports', resp_sports.data)
-        self.assertIn(b'Back to Dashboard', resp_sports.data)
+        self.assertIn(b'Back', resp_sports.data)
 
         # 4. Test dedicated Category page for Music Concerts via /explore alias
         resp_music = self.client.get('/explore/Music Concerts')

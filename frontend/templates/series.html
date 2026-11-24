@@ -29,7 +29,7 @@
 </head>
 <body>
     <nav class="navbar" style="padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center;">
-        <a href="{{ url_for('dashboard') }}" style="color: #fff; text-decoration: none; font-weight: 800; font-family: 'Outfit', sans-serif;">← Back to Dashboard</a>
+        <a href="{{ url_for('dashboard') }}" style="color: #fff; text-decoration: none; font-weight: 800; font-family: 'Outfit', sans-serif;" onclick="if (window.history.length > 1 && document.referrer && document.referrer.startsWith(window.location.origin) && document.referrer !== window.location.href) { window.history.back(); return false; }">← Back</a>
         <a href="{{ url_for('wallet_page') }}" class="btn-secondary" style="padding: 0.45rem 1rem; text-decoration: none; font-size: 0.85rem;">💰 Wallet: ₹{{ '%.2f'|format(wallet_balance) }}</a>
     </nav>
 

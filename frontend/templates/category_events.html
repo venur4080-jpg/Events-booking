@@ -924,8 +924,8 @@
 
     <!-- Top Navigation Bar & Breadcrumb -->
     <div class="category-page-topbar">
-        <a href="{{ url_for('dashboard') }}" class="category-back-btn">
-            <span>←</span> Back to Dashboard
+        <a href="{{ url_for('dashboard') }}" class="category-back-btn" onclick="if (window.history.length > 1 && document.referrer && document.referrer.startsWith(window.location.origin) && document.referrer !== window.location.href) { window.history.back(); return false; }">
+            <span>←</span> Back
         </a>
         <div style="display: flex; align-items: center; gap: 8px;">
             <span style="font-size: 0.85rem; color: var(--text-muted);">Active Domain:</span>
@@ -1201,7 +1201,7 @@
             <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 1.5rem;">There are currently no active registrations for this domain category. Check back soon or explore other categories!</p>
             <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
                 <a href="{{ url_for('category_events', category_name='all') }}" class="btn-primary" style="text-decoration: none; padding: 0.7rem 1.4rem; border-radius: 12px; font-weight: 700;">Explore All Categories</a>
-                <a href="{{ url_for('dashboard') }}" class="btn-secondary" style="text-decoration: none; padding: 0.7rem 1.4rem; border-radius: 12px;">Back to Dashboard</a>
+                <a href="{{ url_for('dashboard') }}" class="btn-secondary" style="text-decoration: none; padding: 0.7rem 1.4rem; border-radius: 12px;" onclick="if (window.history.length > 1 && document.referrer && document.referrer.startsWith(window.location.origin) && document.referrer !== window.location.href) { window.history.back(); return false; }">Back</a>
             </div>
         </div>
         {% endif %}

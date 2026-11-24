@@ -374,12 +374,12 @@
     <div class="details-container">
         <div style="margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
             {% if is_logged_in %}
-            <a href="{{ url_for('dashboard') }}" class="back-btn-unified">
-                <span class="arrow">←</span> Back to Dashboard
+            <a href="{{ url_for('dashboard') }}" class="back-btn-unified" onclick="if (window.history.length > 1 && document.referrer && document.referrer.startsWith(window.location.origin) && document.referrer !== window.location.href) { window.history.back(); return false; }">
+                <span class="arrow">←</span> Back
             </a>
             {% else %}
-            <a href="{{ url_for('login', next=url_for('dashboard')) }}" class="back-btn-unified">
-                <span class="arrow">←</span> Sign In to Explore All Events
+            <a href="{{ url_for('login', next=url_for('dashboard')) }}" class="back-btn-unified" onclick="if (window.history.length > 1 && document.referrer && document.referrer.startsWith(window.location.origin) && document.referrer !== window.location.href) { window.history.back(); return false; }">
+                <span class="arrow">←</span> Back
             </a>
             <div style="background: rgba(0, 139, 227, 0.12); border: 1px solid rgba(0, 139, 227, 0.35); color: #cbd5e1; padding: 0.55rem 1rem; border-radius: 12px; font-size: 0.84rem; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                 <span>🌐 <strong>Public Event View</strong> — Sign in before registering for passes.</span>

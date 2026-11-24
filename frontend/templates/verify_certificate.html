@@ -94,8 +94,8 @@
 <body>
     <div class="cert-verify-wrap">
         <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
-            <a href="{{ url_for('dashboard') }}" class="back-btn-unified">
-                <span class="arrow">←</span> Back to Dashboard
+            <a href="{{ url_for('dashboard') }}" class="back-btn-unified" onclick="if (window.history.length > 1 && document.referrer && document.referrer.startsWith(window.location.origin) && document.referrer !== window.location.href) { window.history.back(); return false; }">
+                <span class="arrow">←</span> Back
             </a>
             <a href="{{ url_for('dashboard') }}" class="logo" style="font-size: 1.3rem; text-decoration: none; color: inherit;" title="Events Booking Home">Events <span>Booking</span></a>
         </div>

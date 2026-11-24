@@ -457,8 +457,8 @@
     <div class="scanner-container">
         <!-- Back Button -->
         <div style="margin-bottom: 1.2rem;">
-            <a href="{{ url_for('dashboard') }}" class="back-btn-unified">
-                <span class="arrow">←</span> Back to Dashboard
+            <a href="{{ url_for('dashboard') }}" class="back-btn-unified" onclick="if (window.history.length > 1 && document.referrer && document.referrer.startsWith(window.location.origin) && document.referrer !== window.location.href) { window.history.back(); return false; }">
+                <span class="arrow">←</span> Back
             </a>
         </div>
 

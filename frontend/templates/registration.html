@@ -220,8 +220,8 @@
 
     <div class="reg-container">
         <div style="width: 100%; max-width: 550px; margin-bottom: 1.5rem;">
-            <a href="{{ url_for('event_detail', event_id=event.id if event else 1) }}" class="back-btn-unified">
-                <span class="arrow">←</span> Back to Event Details
+            <a href="{{ url_for('event_detail', event_id=event.id if event else 1) }}" class="back-btn-unified" onclick="if (window.history.length > 1 && document.referrer && document.referrer.startsWith(window.location.origin) && document.referrer !== window.location.href) { window.history.back(); return false; }">
+                <span class="arrow">←</span> Back
             </a>
         </div>
         <div class="reg-card">

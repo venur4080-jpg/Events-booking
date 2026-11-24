@@ -385,8 +385,8 @@
     <main class="container" style="max-width: 1280px; width: 100%; margin: 0 auto; padding: 2rem 1.5rem 5rem; min-height: calc(100vh - 90px); display: flex; flex-direction: column; box-sizing: border-box;">
         <!-- Back Button -->
         <div style="margin-bottom: 1.5rem; width: 100%;">
-            <a href="{{ url_for('dashboard') }}" class="back-btn-unified">
-                <span class="arrow">←</span> Back to Dashboard
+            <a href="{{ url_for('dashboard') }}" class="back-btn-unified" onclick="if (window.history.length > 1 && document.referrer && document.referrer.startsWith(window.location.origin) && document.referrer !== window.location.href) { window.history.back(); return false; }">
+                <span class="arrow">←</span> Back
             </a>
         </div>
 

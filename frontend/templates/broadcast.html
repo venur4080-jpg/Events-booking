@@ -71,8 +71,8 @@
 
     <div class="bc-container">
         <!-- Back Button -->
-        <a href="{{ url_for('event_detail', event_id=event.id) }}" class="back-btn-unified" style="margin-bottom: 1.5rem; display: inline-flex;">
-            <span class="arrow">←</span> Back to Event Details
+        <a href="{{ url_for('event_detail', event_id=event.id) }}" class="back-btn-unified" style="margin-bottom: 1.5rem; display: inline-flex;" onclick="if (window.history.length > 1 && document.referrer && document.referrer.startsWith(window.location.origin) && document.referrer !== window.location.href) { window.history.back(); return false; }">
+            <span class="arrow">←</span> Back
         </a>
 
         <!-- Header -->

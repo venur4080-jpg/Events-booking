@@ -501,6 +501,39 @@ def test_instant_role_revocation_on_demotion(client):
     assert 'Host Management' not in dash_html  # Host tools completely hidden for demoted user!
 
 
+def test_back_buttons_navigation_and_labels(client):
+    # Log in as admin/host
+    with client.session_transaction() as sess:
+        sess['loggedin'] = True
+        sess['username'] = 'admin'
+        sess['role'] = 'host'
+        sess['is_admin'] = True
+
+    endpoints = [
+        '/add_event',
+        '/history',
+        '/settings',
+        '/profile',
+        '/host/my-events',
+        '/host/analytics',
+        '/scan_ticket',
+        '/passport',
+        '/teams',
+        '/subscriptions'
+    ]
+
+    for ep in endpoints:
+        resp = client.get(ep)
+        assert resp.status_code == 200, f"Endpoint {ep} should return 200 OK"
+        html = resp.get_data(as_text=True)
+        # Ensure 'Back to Dashboard' is not present
+        assert 'Back to Dashboard' not in html, f"Endpoint {ep} should not contain 'Back to Dashboard'"
+        # Ensure 'Back' and one-page-back handler are present
+        assert 'Back' in html, f"Endpoint {ep} should have a 'Back' button"
+        assert 'window.history.back()' in html or 'goBackOnePage' in html, f"Endpoint {ep} should have one-page-back handler"
+
+
+
 
 
 

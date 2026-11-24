@@ -890,6 +890,26 @@
     init();
   }
 
+  // ─── 9. Universal One-Page-Back Navigation Helper ─────────────────────────
+  window.goBackOnePage = function (fallbackUrl) {
+    if (window.history.length > 1 && document.referrer && document.referrer.startsWith(window.location.origin) && document.referrer !== window.location.href) {
+      window.history.back();
+      return false;
+    }
+    window.location.href = fallbackUrl || '/dashboard';
+    return false;
+  };
+
+  document.addEventListener('click', function (e) {
+    const backBtn = e.target.closest('.back-btn-unified, .category-back-btn, .nav-btn-dash, [data-action="go-back"]');
+    if (backBtn && !backBtn.hasAttribute('data-no-history')) {
+      if (window.history.length > 1 && document.referrer && document.referrer.startsWith(window.location.origin) && document.referrer !== window.location.href) {
+        e.preventDefault();
+        window.history.back();
+      }
+    }
+  });
+
   // Expose API
   window.natureWallpapers = natureWallpapers;
   window.applyNatureWallpaper = applyNatureWallpaper;

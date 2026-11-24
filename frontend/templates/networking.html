@@ -104,7 +104,7 @@
                 <a href="{{ url_for('dashboard') }}" class="logo">Events <span>Booking</span></a>
             </div>
             <div class="nav-links" style="display: flex; align-items: center; gap: 12px;">
-                <a href="{{ url_for('event_detail', event_id=event.id) }}" class="nav-btn-dash">← Back to Event Details</a>
+                <a href="{{ url_for('event_detail', event_id=event.id) }}" class="nav-btn-dash" onclick="if (window.history.length > 1 && document.referrer && document.referrer.startsWith(window.location.origin) && document.referrer !== window.location.href) { window.history.back(); return false; }">← Back</a>
                 <a href="{{ url_for('dashboard') }}" class="nav-btn-dash">🏠 Dashboard</a>
             </div>
         </div>
