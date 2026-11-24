@@ -254,10 +254,23 @@ def test_navbar_welcome_message_no_handle_pill(client):
     assert resp.status_code == 200
     html = resp.get_data(as_text=True)
     assert 'Welcome,' in html
-    assert 'Venu R' in html
+    assert 'venu_r' in html
     # Ensure @handle pill is not shown in the navbar welcome message
     assert 'navbar-handle-pill' not in html
     assert '@venu_r' not in html[:html.find('nav-links') + 600]
+
+    # Test with admin user: should display 'Welcome, admin', not 'Welcome, Admin User'
+    with client.session_transaction() as sess:
+        sess['loggedin'] = True
+        sess['username'] = 'admin'
+        sess['role'] = 'host'
+        sess['is_admin'] = True
+
+    resp_admin = client.get('/dashboard')
+    assert resp_admin.status_code == 200
+    admin_html = resp_admin.get_data(as_text=True)
+    assert 'Welcome, <strong style="color: white;">admin</strong>' in admin_html
+    assert 'Welcome, <strong style="color: white;">Admin User</strong>' not in admin_html
 
 def test_settings_2fa_button_sizing(client):
     with client.session_transaction() as sess:

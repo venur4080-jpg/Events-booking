@@ -155,7 +155,7 @@
             </div>
             <div class="nav-links" style="display: flex; align-items: center; gap: 12px;">
                 <span style="margin-right: 10px; color: var(--text-muted); font-weight: 500; display: inline-flex; align-items: center;">
-                    <span>Welcome, <strong style="color: white;">{{ (current_user and current_user.full_name) or session.get('user_display_name') or username }}</strong></span>
+                    <span>Welcome, <strong style="color: white;">{{ username or (current_user and current_user.username) or session.get('username') }}</strong></span>
                 </span>
                 <a href="{{ url_for('dashboard') }}" class="nav-btn-dash">🏠 Dashboard</a>
                 {% if is_admin or session.get('username') in ['admin', 'venu_r', 'Venu R'] %}

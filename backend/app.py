@@ -7311,6 +7311,14 @@ def init_db():
     except Exception:
         pass
 
+    # Ensure 'venu_r' exists with secure unique User ID
+    c.execute("SELECT user_id FROM users WHERE username = 'venu_r'")
+    venu_row = c.fetchone()
+    if not venu_row:
+        hashed_password = bcrypt.generate_password_hash('password123').decode('utf-8')
+        venu_uid = generate_unique_user_id('VENU', conn)
+        c.execute("INSERT INTO users (username, password, role, is_admin, is_active, user_id, email, full_name) VALUES ('venu_r', ?, 'host', 1, 1, ?, 'venur4080@gmail.com', 'Venu R')", (hashed_password, venu_uid))
+
     # Ensure admin and venu_r are admins and hosts
     c.execute("UPDATE users SET role = 'host', is_admin = 1, is_active = 1 WHERE username IN ('admin', 'venu_r', 'Venu R')")
 
@@ -13432,7 +13440,7 @@ def admin_delete_user(user_id):
     target_username = row[0]
     
     # Protect primary system root administrators and own active account
-    if target_username.lower() in ('admin', 'venu r') or target_username.lower() == current_user.lower():
+    if target_username.lower() in ('admin', 'venu r', 'venu_r') or target_username.lower() == current_user.lower():
         conn.close()
         flash('Cannot delete primary system administrator or your own active account.', 'error')
         return redirect(url_for('admin_users'))
