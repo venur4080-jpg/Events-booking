@@ -1,0 +1,242 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div style="margin-bottom: 1.5rem;">
+    <a href="{{ url_for('admin_users') }}" style="color: var(--primary); text-decoration: none; font-weight: 700; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px;">
+        ← Back to Users Management
+    </a>
+</div>
+
+<!-- User Header Card -->
+<div class="panel-section" style="margin-bottom: 2rem; background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.75)); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 18px; padding: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 18px;">
+            <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(245, 158, 11, 0.15); border: 2px solid var(--admin-accent); display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+                👤
+            </div>
+            <div>
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <h1 style="color: #ffffff; font-size: 1.8rem; font-weight: 800; margin: 0;">
+                        {{ target_user.full_name or target_user.username }}
+                    </h1>
+                    {% if target_user.is_admin %}
+                    <span class="badge badge-admin" style="font-size: 0.8rem; padding: 4px 10px;">Admin</span>
+                    {% elif target_user.role == 'host' %}
+                    <span class="badge badge-host" style="font-size: 0.8rem; padding: 4px 10px; background: rgba(0, 139, 227, 0.2); color: #38bdf8; border: 1px solid #008be3;">Host / Organizer</span>
+                    {% else %}
+                    <span class="badge badge-user" style="font-size: 0.8rem; padding: 4px 10px;">Participant</span>
+                    {% endif %}
+                </div>
+                <div style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px; display: flex; gap: 15px; flex-wrap: wrap;">
+                    <span>Username: <strong style="color: #ffffff;">@{{ target_user.username }}</strong></span>
+                    <span>User ID: <code style="color: var(--primary);">{{ target_user.user_id or target_user.id }}</code></span>
+                    <span>Email: {{ target_user.email or '—' }}</span>
+                    <span>Phone: {{ target_user.phone or '—' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            {% if target_user.role != 'host' and not target_user.is_admin %}
+            <form action="{{ url_for('admin_promote_user', user_id=target_user.id) }}" method="POST" style="margin:0">
+                <button class="action-btn btn-warning" type="submit" style="padding: 0.6rem 1.2rem; font-weight: 700;">⬆ Make Host</button>
+            </form>
+            {% elif target_user.role == 'host' and not target_user.is_admin %}
+            <form action="{{ url_for('admin_demote_user', user_id=target_user.id) }}" method="POST" style="margin:0">
+                <button class="action-btn btn-warning" type="submit" style="padding: 0.6rem 1.2rem; font-weight: 700;">⬇ Change to Regular User</button>
+            </form>
+            {% endif %}
+            {% if target_user.username.lower() not in ['admin', 'venu r', 'venu_r'] and target_user.username.lower() != session.get('username', '').lower() %}
+            <form action="{{ url_for('admin_delete_user', user_id=target_user.id) }}" method="POST" style="margin:0" onsubmit="return confirm('CRITICAL: Are you sure you want to permanently delete user @{{ target_user.username }}?');">
+                <button class="action-btn btn-danger" type="submit" style="padding: 0.6rem 1.2rem;">🗑 Delete Account</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Metrics Counters Grid -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
+    <div class="panel-section" style="padding: 1.5rem; text-align: center; border-radius: 14px; background: rgba(15, 23, 42, 0.7);">
+        <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; letter-spacing: 1px;">🎪 Events Hosted</div>
+        <div style="font-size: 2.4rem; font-weight: 800; color: #38bdf8; margin: 0.3rem 0;">{{ total_hosted_events }}</div>
+        <div style="font-size: 0.78rem; color: var(--text-muted);">Events added by this host</div>
+    </div>
+    <div class="panel-section" style="padding: 1.5rem; text-align: center; border-radius: 14px; background: rgba(15, 23, 42, 0.7);">
+        <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; letter-spacing: 1px;">👥 Total Event Attendees</div>
+        <div style="font-size: 2.4rem; font-weight: 800; color: #ffffff; margin: 0.3rem 0;">{{ total_hosted_attendees }}</div>
+        <div style="font-size: 0.78rem; color: var(--text-muted);">Across this host's events</div>
+    </div>
+    <div class="panel-section" style="padding: 1.5rem; text-align: center; border-radius: 14px; background: rgba(15, 23, 42, 0.7);">
+        <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; letter-spacing: 1px;">💳 Gross Ticket Sales</div>
+        <div style="font-size: 2.4rem; font-weight: 800; color: #34d399; margin: 0.3rem 0;">₹{{ "{:,.2f}".format(total_hosted_revenue) }}</div>
+        <div style="font-size: 0.78rem; color: var(--text-muted);">Generated revenue</div>
+    </div>
+    <div class="panel-section" style="padding: 1.5rem; text-align: center; border-radius: 14px; background: rgba(15, 23, 42, 0.7);">
+        <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; letter-spacing: 1px;">🎟️ Bookings as Attendee</div>
+        <div style="font-size: 2.4rem; font-weight: 800; color: #fbbf24; margin: 0.3rem 0;">{{ user_registrations|length }}</div>
+        <div style="font-size: 0.78rem; color: var(--text-muted);">Events user attended</div>
+    </div>
+</div>
+
+<!-- Section 1: Events Added / Hosted by This User -->
+<div class="panel-section" style="margin-bottom: 2.5rem;">
+    <div class="panel-section-header">
+        <h3>🎪 Events Added / Hosted by @{{ target_user.username }} ({{ hosted_events|length }})</h3>
+        {% if hosted_events %}
+        <span style="color: var(--primary); font-size: 0.85rem; font-weight: 700;">Verified Organizer Records</span>
+        {% endif %}
+    </div>
+
+    {% if hosted_events %}
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Event Title</th>
+                <th>Category</th>
+                <th>Date & Time</th>
+                <th>Added / Updated By</th>
+                <th>Price</th>
+                <th>Seats Filled / Total</th>
+                <th>Revenue</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ev in hosted_events %}
+            <tr>
+                <td style="color:var(--text-muted)">#{{ ev.id }}</td>
+                <td>
+                    <strong style="color: #ffffff;">{{ ev.title }}</strong>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">📍 {{ ev.venue }}</div>
+                </td>
+                <td><span class="badge badge-active">{{ ev.category }}</span></td>
+                <td style="font-size: 0.85rem; color: #cbd5e1;">{{ ev.date }} &bull; {{ ev.time }}</td>
+                <td style="font-size: 0.8rem;">
+                    <div>Added: <strong style="color: #38bdf8;">@{{ ev.created_by or 'admin' }}</strong></div>
+                    {% if ev.updated_by and ev.updated_by != ev.created_by %}
+                    <div style="color: var(--text-muted); font-size: 0.75rem;">Edit: @{{ ev.updated_by }}</div>
+                    {% endif %}
+                </td>
+                <td>{{ ev.price }}</td>
+                <td>
+                    <strong style="color: var(--primary);">{{ ev.reg_count }}</strong> / {{ ev.seats_total or 100 }}
+                </td>
+                <td style="color: #34d399; font-weight: 700;">₹{{ "{:,.2f}".format(ev.revenue) }}</td>
+                <td>
+                    {% if ev.is_live_now %}
+                    <span class="badge" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444;">🔴 LIVE</span>
+                    {% elif ev.is_expired %}
+                    <span class="badge" style="background: rgba(148, 163, 184, 0.15); color: #94a3b8;">Concluded</span>
+                    {% else %}
+                    <span class="badge badge-active">Active</span>
+                    {% endif %}
+                </td>
+                <td style="display:flex; gap:6px;">
+                    <a href="{{ url_for('event_detail', event_id=ev.id) }}" class="action-btn btn-secondary" style="text-decoration:none" target="_blank">🔍 View</a>
+                    <a href="{{ url_for('host_export_event_attendees', event_id=ev.id) }}" class="action-btn btn-success" style="text-decoration:none" title="Download Attendee CSV">📥 CSV</a>
+                    <form action="{{ url_for('delete_event', event_id=ev.id) }}" method="POST" style="margin:0" onsubmit="return confirm('Delete event \'{{ ev.title | escape }}\'?');">
+                        <button class="action-btn btn-danger" type="submit">🗑</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📁</div>
+        <p style="margin: 0; font-size: 0.95rem;">This user has not created or added any events yet.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Section 2: Events Booked by this User (Participant Registrations) -->
+<div class="panel-section" style="margin-bottom: 2.5rem;">
+    <div class="panel-section-header">
+        <h3>📋 Participant Bookings ({{ user_registrations|length }})</h3>
+    </div>
+    {% if user_registrations %}
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Reg ID</th>
+                <th>Event Title</th>
+                <th>Event Date</th>
+                <th>Payment</th>
+                <th>Booking Time</th>
+                <th>Status</th>
+                <th>Venue Check-in</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in user_registrations %}
+            <tr>
+                <td style="color:var(--text-muted)">#{{ r.id }}</td>
+                <td>
+                    <a href="{{ url_for('event_detail', event_id=r.event_id) }}" style="color: var(--primary); font-weight: 700; text-decoration: none;">
+                        {{ r.event_title or ('Event #' ~ r.event_id) }}
+                    </a>
+                </td>
+                <td style="font-size: 0.85rem;">{{ r.event_date }}</td>
+                <td>{{ r.payment_method or 'Free' }}</td>
+                <td style="font-size: 0.82rem; color: var(--text-muted);">{{ r.timestamp }}</td>
+                <td>
+                    {% if r.status == 'cancelled' %}
+                    <span class="badge" style="background: rgba(239, 68, 68, 0.2); color: #ef4444;">Cancelled</span>
+                    {% else %}
+                    <span class="badge badge-active">Active</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if r.checked_in %}
+                    <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">✓ Checked In</span>
+                    {% else %}
+                    <span style="color: var(--text-muted); font-size: 0.82rem;">Pending</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+        No event registrations found for this user.
+    </div>
+    {% endif %}
+</div>
+
+<!-- Section 3: Audit Trail -->
+<div class="panel-section">
+    <div class="panel-section-header">
+        <h3>🛡️ Activity & Audit Trace for @{{ target_user.username }}</h3>
+    </div>
+    {% if audit_logs %}
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Action</th>
+                <th>Details</th>
+                <th>IP Address</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in audit_logs %}
+            <tr>
+                <td><strong style="color: var(--admin-accent);">{{ log.action }}</strong></td>
+                <td style="color: #cbd5e1; font-size: 0.85rem;">{{ log.details }}</td>
+                <td style="color: var(--text-muted); font-size: 0.8rem;">{{ log.ip_address or '—' }}</td>
+                <td style="color: var(--text-muted); font-size: 0.8rem;">{{ log.created_at }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+        No recent audit actions logged for this user.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

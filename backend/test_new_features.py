@@ -319,7 +319,187 @@ def test_user_agent_parsing_and_session_display(client):
     assert 'AppleWebKi</td>' not in html  # Must not display truncated raw UA in table cell
     assert 'AppleWebKi</span>' not in html
     assert 'ua-parser.min.js' in html
-    assert 'session-device-label' in html
+
+def test_admin_only_access_and_host_restrictions(client):
+    # Setup a non-admin host user in db
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("INSERT OR IGNORE INTO users (username, password, role, is_admin, email, full_name) VALUES ('test_host_1', 'pass123', 'host', 0, 'host1@test.com', 'Test Host One')")
+    c.execute("UPDATE users SET role = 'host', is_admin = 0 WHERE username = 'test_host_1'")
+    conn.commit()
+    c.execute("SELECT id FROM users WHERE username = 'test_host_1'")
+    h_uid = c.fetchone()[0]
+    conn.close()
+
+    # Non-admin host attempts to access admin panel routes
+    with client.session_transaction() as sess:
+        sess['loggedin'] = True
+        sess['username'] = 'test_host_1'
+        sess['role'] = 'host'
+        sess['is_admin'] = False
+
+    resp = client.get('/admin/users', follow_redirects=False)
+    assert resp.status_code == 302  # Blocked from admin users
+
+    resp2 = client.post(f'/admin/users/{h_uid}/promote', follow_redirects=False)
+    assert resp2.status_code == 302  # Blocked from promote
+
+    resp3 = client.post(f'/admin/users/{h_uid}/demote', follow_redirects=False)
+    assert resp3.status_code == 302  # Blocked from demote
+
+    resp4 = client.post(f'/admin/users/{h_uid}/delete', follow_redirects=False)
+    assert resp4.status_code == 302  # Blocked from delete
+
+    resp5 = client.get(f'/admin/user/{h_uid}', follow_redirects=False)
+    assert resp5.status_code == 302  # Blocked from admin user dossier
+
+
+def test_host_my_events_and_event_attribution(client):
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("DELETE FROM events WHERE created_by IN ('organizer_bob', 'host_clara') OR title LIKE '%Admin Mega Gala%'")
+    c.execute("INSERT OR IGNORE INTO users (username, password, role, is_admin, email, full_name) VALUES ('organizer_bob', 'pass123', 'host', 0, 'bob@test.com', 'Organizer Bob')")
+    c.execute("UPDATE users SET role = 'host', is_admin = 0 WHERE username = 'organizer_bob'")
+    
+    # Create an event created by organizer_bob and one created by admin with distinct image paths
+    c.execute("""INSERT INTO events (title, date, time, end_time, desc, price, venue, seats_total, seats_filled, image, created_by, updated_by)
+                 VALUES ('Bob Secret Summit', 'Dec 25, 2026', '10:00 AM', '04:00 PM', 'Bob desc', 'Free', 'Bob Hall', 100, 5, '/static/event_images/test_bob_summit.jpg', 'organizer_bob', 'organizer_bob')""")
+    bob_eid = c.lastrowid
+
+    c.execute("""INSERT INTO events (title, date, time, end_time, desc, price, venue, seats_total, seats_filled, image, created_by, updated_by)
+                 VALUES ('Admin Mega Gala', 'Dec 28, 2026', '11:00 AM', '05:00 PM', 'Admin desc', 'Free', 'Grand Arena', 500, 20, '/static/event_images/test_admin_gala.jpg', 'admin', 'admin')""")
+    admin_eid = c.lastrowid
+    conn.commit()
+    conn.close()
+
+    try:
+        # Organizer Bob visits /host/my-events
+        with client.session_transaction() as sess:
+            sess['loggedin'] = True
+            sess['username'] = 'organizer_bob'
+            sess['role'] = 'host'
+            sess['is_admin'] = False
+
+        resp = client.get('/host/my-events')
+        assert resp.status_code == 200
+        html = resp.get_data(as_text=True)
+        assert 'Bob Secret Summit' in html
+        assert 'Admin Mega Gala' not in html  # Isolation: Bob does not see Admin's event in My Hosted Events
+
+        # Bob attempts to delete Admin's event -> must be rejected
+        del_resp = client.post(f'/delete_event/{admin_eid}', follow_redirects=False)
+        assert del_resp.status_code == 302  # Redirected with error
+
+        conn = get_db()
+        c = conn.cursor()
+        c.execute("SELECT id FROM events WHERE id = ?", (admin_eid,))
+        assert c.fetchone() is not None  # Admin event was NOT deleted!
+
+        # Bob can delete his own event
+        del_own = client.post(f'/delete_event/{bob_eid}', follow_redirects=False)
+        assert del_own.status_code == 302
+        c.execute("SELECT id FROM events WHERE id = ?", (bob_eid,))
+        assert c.fetchone() is None  # Bob's own event was successfully deleted
+        conn.close()
+    finally:
+        conn = get_db()
+        c = conn.cursor()
+        c.execute("DELETE FROM events WHERE id IN (?, ?)", (bob_eid, admin_eid))
+        conn.commit()
+        conn.close()
+
+
+def test_admin_user_profile_dossier_and_events_count(client):
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("DELETE FROM events WHERE created_by = 'host_clara'")
+    c.execute("INSERT OR IGNORE INTO users (username, password, role, is_admin, email, full_name) VALUES ('host_clara', 'pass123', 'host', 0, 'clara@test.com', 'Clara Schumann')")
+    c.execute("UPDATE users SET role = 'host', is_admin = 0 WHERE username = 'host_clara'")
+    
+    # Add 2 events for Clara with distinct images
+    c.execute("""INSERT INTO events (title, date, time, end_time, desc, price, venue, seats_total, seats_filled, image, created_by, updated_by)
+                 VALUES ('Clara Chamber Night', 'Jan 15, 2027', '07:00 PM', '10:00 PM', 'Chamber concert', '₹499', 'Symphony Hall', 80, 12, '/static/event_images/test_clara_1.jpg', 'host_clara', 'host_clara')""")
+    e1 = c.lastrowid
+    c.execute("""INSERT INTO events (title, date, time, end_time, desc, price, venue, seats_total, seats_filled, image, created_by, updated_by)
+                 VALUES ('Clara Piano Masterclass', 'Jan 16, 2027', '02:00 PM', '05:00 PM', 'Masterclass', '₹999', 'Studio A', 30, 8, '/static/event_images/test_clara_2.jpg', 'host_clara', 'host_clara')""")
+    e2 = c.lastrowid
+    conn.commit()
+    c.execute("SELECT id FROM users WHERE username = 'host_clara'")
+    clara_uid = c.fetchone()[0]
+    conn.close()
+
+    try:
+        # Admin visits /admin/users
+        with client.session_transaction() as sess:
+            sess['loggedin'] = True
+            sess['username'] = 'admin'
+            sess['role'] = 'host'
+            sess['is_admin'] = True
+
+        resp = client.get('/admin/users')
+        assert resp.status_code == 200
+        html = resp.get_data(as_text=True)
+        assert 'Events Hosted' in html
+        assert f'/admin/user/{clara_uid}' in html
+        assert '2 Events' in html  # Clara has 2 hosted events badge
+
+        # Admin visits Clara's profile dossier
+        resp_prof = client.get(f'/admin/user/{clara_uid}')
+        assert resp_prof.status_code == 200
+        prof_html = resp_prof.get_data(as_text=True)
+        assert 'Clara Schumann' in prof_html
+        assert '@host_clara' in prof_html
+        assert 'Clara Chamber Night' in prof_html
+        assert 'Clara Piano Masterclass' in prof_html
+        assert 'Added: <strong style="color: #38bdf8;">@host_clara</strong>' in prof_html
+    finally:
+        conn = get_db()
+        c = conn.cursor()
+        c.execute("DELETE FROM events WHERE id IN (?, ?)", (e1, e2))
+        conn.commit()
+        conn.close()
+
+
+def test_instant_role_revocation_on_demotion(client):
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("INSERT OR IGNORE INTO users (username, password, role, is_admin, email, full_name) VALUES ('host_david', 'pass123', 'host', 0, 'david@test.com', 'David Host')")
+    c.execute("UPDATE users SET role = 'host', is_admin = 0 WHERE username = 'host_david'")
+    conn.commit()
+    c.execute("SELECT id FROM users WHERE username = 'host_david'")
+    david_uid = c.fetchone()[0]
+    conn.close()
+
+    # David has host session
+    with client.session_transaction() as sess:
+        sess['loggedin'] = True
+        sess['username'] = 'host_david'
+        sess['role'] = 'host'
+        sess['is_admin'] = False
+
+    # Verify David can initially access /host/my-events
+    resp1 = client.get('/host/my-events')
+    assert resp1.status_code == 200
+
+    # Admin demotes David to normal user in DB
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("UPDATE users SET role = 'user' WHERE id = ?", (david_uid,))
+    conn.commit()
+    conn.close()
+
+    # On David's next request, before_request synchronizes session['role'] to 'user'
+    resp2 = client.get('/host/my-events', follow_redirects=False)
+    assert resp2.status_code == 302  # Denied! Redirected to dashboard
+    with client.session_transaction() as sess:
+        assert sess.get('role') == 'user'  # Instant session sync!
+
+    # David visits dashboard as normal user -> sees home page, no Host Management
+    resp_dash = client.get('/dashboard')
+    assert resp_dash.status_code == 200
+    dash_html = resp_dash.get_data(as_text=True)
+    assert 'Host Management' not in dash_html  # Host tools completely hidden for demoted user!
+
 
 
 

@@ -368,6 +368,7 @@
             {% if is_host or is_admin %}
             <li><hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 1rem 0;"></li>
             <li style="padding: 0 1rem; color: var(--primary); font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Host & Check-in</li>
+            <li><a href="{{ url_for('my_hosted_events') }}">🎪 My Hosted Events</a></li>
             <li><a href="{{ url_for('scan_ticket') }}">🎟️ Check-In Scanner</a></li>
             <li><a href="{{ url_for('checkin_history') }}">📅 Check-in History</a></li>
             <li><a href="{{ url_for('add_event') }}">➕ Add New Event</a></li>

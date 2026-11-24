@@ -5520,12 +5520,12 @@ def security_and_session_guard():
                                 OR REPLACE(LOWER(username), ' ', '_') = LOWER(?) 
                                 OR LOWER(full_name) = LOWER(?) LIMIT 1""", (curr_u, curr_u, curr_u, curr_u))
                 u_row = c.fetchone()
-                if u_row:
-                    session['username'] = u_row[0]
-                    session['user_id'] = u_row[1] or session.get('user_id')
-                    session['user_display_name'] = u_row[2] or u_row[0]
-                    session['role'] = u_row[3] or session.get('role')
-                    session['is_admin'] = u_row[4]
+            if u_row:
+                session['username'] = u_row[0]
+                session['user_id'] = u_row[1] or session.get('user_id')
+                session['user_display_name'] = u_row[2] or u_row[0]
+                session['role'] = u_row[3] or 'user'
+                session['is_admin'] = u_row[4] or 0
             conn.close()
         except Exception:
             pass
@@ -5805,10 +5805,8 @@ def get_event(event_id):
 def is_host():
     if not session.get('loggedin'):
         return False
-    if session.get('role') == 'host' or session.get('is_admin'):
-        return True
     username = session.get('username', '').lower()
-    if username in ('admin', 'venu r'):
+    if username in ('admin', 'venu r', 'venu_r'):
         return True
     try:
         conn = get_db()
@@ -5818,12 +5816,13 @@ def is_host():
         conn.close()
         if not user:
             return False
-        is_h = user[0] == 'host' or (len(user) > 1 and user[1] == 1)
-        if is_h:
-            session['role'] = 'host'
-        return is_h
+        db_role = str(user[0] or 'user').lower()
+        db_is_admin = bool(len(user) > 1 and user[1] == 1)
+        session['role'] = db_role
+        session['is_admin'] = 1 if db_is_admin else 0
+        return (db_role == 'host' or db_is_admin)
     except Exception:
-        return False
+        return session.get('role') == 'host' or bool(session.get('is_admin'))
 
 
 def is_admin():
@@ -6588,6 +6587,8 @@ def init_db():
         ("ALTER TABLE events ADD COLUMN venue TEXT DEFAULT 'Main Campus Auditorium'",),
         ("ALTER TABLE events ADD COLUMN venue_address TEXT DEFAULT 'Tech Park Campus, Innovation Block A, Bangalore - 560103'",),
         ("ALTER TABLE events ADD COLUMN stream_price TEXT DEFAULT '₹199'",),
+        ("ALTER TABLE events ADD COLUMN created_by TEXT DEFAULT 'admin'",),
+        ("ALTER TABLE events ADD COLUMN updated_by TEXT DEFAULT 'admin'",),
         ("ALTER TABLE users ADD COLUMN first_name TEXT DEFAULT ''",),
         ("ALTER TABLE users ADD COLUMN middle_name TEXT DEFAULT ''",),
         ("ALTER TABLE users ADD COLUMN last_name TEXT DEFAULT ''",),
@@ -10721,6 +10722,7 @@ def register_event(event_id):
                                  (registration_id, event_id, username, question_id, question_label, answer_value) 
                                  VALUES (?, ?, ?, ?, ?, ?)""", (reg_id, event_id, username, q_id, q_lbl, ans_val))
                 
+            c_ev = get_event(event_id)
             if seats_to_add > 0 and c_ev and (c_ev.get('seats_filled') or 0) >= (c_ev.get('seats_total') or 100):
                 dispatch_host_webhooks('event.sold_out', event_id, {
                     'event_title': event['title'],
@@ -12382,11 +12384,12 @@ def add_event():
             addon_prices = request.form.getlist('addon_price') or request.form.getlist('addon_price[]')
             addon_stocks = request.form.getlist('addon_stock') or request.form.getlist('addon_stock[]')
 
+            creator_user = session.get('username') or 'admin'
             for idx, occ_date in enumerate(dates_to_create):
                 occ_title = f"{title} (#{idx + 1})" if len(dates_to_create) > 1 else title
-                c.execute("""INSERT INTO events (title, date, time, end_time, desc, price, color, image, purpose, full_details, outcome, venue, venue_address, seats_total, seats_filled, stream_price, series_id, refund_policy, allow_transfer) 
-                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?)""", 
-                          (occ_title, occ_date, time_val, end_time_val, desc, price, color, image, purpose, full_details, outcome, venue, venue_address, seats_total, stream_price, series_id, refund_policy, allow_transfer))
+                c.execute("""INSERT INTO events (title, date, time, end_time, desc, price, color, image, purpose, full_details, outcome, venue, venue_address, seats_total, seats_filled, stream_price, series_id, refund_policy, allow_transfer, created_by, updated_by) 
+                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?)""", 
+                          (occ_title, occ_date, time_val, end_time_val, desc, price, color, image, purpose, full_details, outcome, venue, venue_address, seats_total, stream_price, series_id, refund_policy, allow_transfer, creator_user, creator_user))
                 ev_id = c.lastrowid
                 for a_idx, a_name in enumerate(addon_names):
                     clean_name = (a_name or '').strip()
@@ -12411,20 +12414,40 @@ def add_event():
 @app.route('/delete_event/<int:event_id>', methods=['POST'])
 def delete_event(event_id):
     if not is_host():
+        flash("Host or Admin access required to delete events.", "error")
         return redirect(url_for('dashboard'))
+    
+    current_username = session.get('username', '')
+    user_is_adm = is_admin()
+
+    event = get_event(event_id)
+    if not event:
+        flash("Event not found.", "error")
+        return redirect(url_for('dashboard'))
+
+    created_by = (event.get('created_by') or 'admin').strip().lower()
+    
+    # Only Admin or the Host who created the event can delete it!
+    if not user_is_adm and created_by != current_username.lower():
+        flash("Access denied. You can only delete events that you personally created.", "error")
+        return redirect(request.referrer or url_for('dashboard'))
     
     try:
         conn = get_db()
         c = conn.cursor()
         c.execute("DELETE FROM events WHERE id = ?", (event_id,))
         c.execute("DELETE FROM registrations WHERE event_id = ?", (event_id,))
+        c.execute("DELETE FROM event_addons WHERE event_id = ?", (event_id,))
+        c.execute("DELETE FROM event_pricing_tiers WHERE event_id = ?", (event_id,))
         conn.commit()
         conn.close()
         invalidate_events_cache()
+        log_action(current_username, 'delete_event', f"Deleted event {event_id}: {event.get('title')}")
+        flash(f"Event '{event.get('title')}' was successfully deleted.", "success")
     except Exception as e:
         return f"Error: {str(e)}", 500
         
-    return redirect(url_for('dashboard'))
+    return redirect(request.referrer or url_for('dashboard'))
 
 @app.route('/logout')
 def logout():
@@ -12487,6 +12510,203 @@ END:VCALENDAR"""
     response.headers["Content-Disposition"] = f"attachment; filename=event_{event_id}.ics"
     response.headers["Content-Type"] = "text/calendar; charset=utf-8"
     return response
+
+@app.route('/host/my-events')
+def my_hosted_events():
+    if not is_host():
+        flash("Host privileges required to access My Hosted Events.", "error")
+        return redirect(url_for('dashboard'))
+
+    username = session.get('username', '')
+    user_is_adm = is_admin()
+
+    conn = get_db(row_factory=True)
+    c = conn.cursor()
+
+    creator_filter = request.args.get('creator', '').strip()
+    if user_is_adm and creator_filter:
+        c.execute("SELECT * FROM events WHERE LOWER(COALESCE(created_by, 'admin')) = LOWER(?) ORDER BY id DESC", (creator_filter,))
+    elif user_is_adm and request.args.get('all') == '1':
+        c.execute("SELECT * FROM events ORDER BY id DESC")
+    else:
+        c.execute("SELECT * FROM events WHERE LOWER(COALESCE(created_by, 'admin')) = LOWER(?) ORDER BY id DESC", (username,))
+    
+    events_raw = [dict(row) for row in c.fetchall()]
+
+    c.execute("SELECT event_id, COUNT(*) as count FROM registrations WHERE status IS NULL OR status != 'cancelled' GROUP BY event_id")
+    reg_counts = {row['event_id']: row['count'] for row in c.fetchall()}
+
+    c.execute("SELECT event_id, COUNT(*) as count FROM registrations WHERE checked_in = 1 GROUP BY event_id")
+    checkin_counts = {row['event_id']: row['count'] for row in c.fetchall()}
+    conn.close()
+
+    current_date = datetime.now()
+    hosted_events = []
+    total_revenue = 0.0
+    total_attendees = 0
+    total_checkins = 0
+
+    for ev in events_raw:
+        eid = ev['id']
+        ev['category'] = ev.get('category') or get_category(ev)
+        status_info = get_event_status_info(ev, ref_now=current_date)
+        
+        ev['time'] = status_info['time_str']
+        ev['end_time'] = status_info['end_time_str']
+        ev['cutoff_time'] = status_info['cutoff_time_str']
+        ev['is_today'] = status_info['is_today']
+        ev['is_expired'] = status_info['is_expired']
+        ev['is_cutoff_reached'] = status_info['is_cutoff_reached']
+        ev['is_open'] = status_info['is_open']
+        ev['status_label'] = status_info['status_label']
+        ev['status_badge'] = status_info['status_badge']
+        ev['is_live_now'] = status_info.get('is_live_now', False)
+
+        reg_cnt = reg_counts.get(eid, 0)
+        chk_cnt = checkin_counts.get(eid, 0)
+        ev['reg_count'] = reg_cnt
+        ev['checkin_count'] = chk_cnt
+        total_attendees += reg_cnt
+        total_checkins += chk_cnt
+
+        unit_price = parse_event_price_numeric(ev.get('price'))
+        ev_revenue = round(unit_price * reg_cnt, 2)
+        ev['revenue'] = ev_revenue
+        total_revenue += ev_revenue
+
+        seats_tot = ev.get('seats_total') or 100
+        ev['seats_filled_percent'] = min(100, int((reg_cnt / seats_tot) * 100)) if seats_tot > 0 else 0
+
+        hosted_events.append(ev)
+
+    active_events_count = sum(1 for e in hosted_events if not e['is_expired'])
+    concluded_events_count = sum(1 for e in hosted_events if e['is_expired'])
+    overall_checkin_rate = round((total_checkins / total_attendees * 100), 1) if total_attendees > 0 else 0
+
+    return render_template(
+        'my_hosted_events.html',
+        username=username,
+        is_host=is_host(),
+        is_admin=user_is_adm,
+        events=hosted_events,
+        total_events=len(hosted_events),
+        total_attendees=total_attendees,
+        total_revenue=total_revenue,
+        active_events_count=active_events_count,
+        concluded_events_count=concluded_events_count,
+        overall_checkin_rate=overall_checkin_rate
+    )
+
+
+@app.route('/api/host/event/<int:event_id>/attendees', methods=['GET'])
+def api_host_event_attendees(event_id):
+    if not is_host():
+        return jsonify({'ok': False, 'error': 'Unauthorized'}), 403
+    username = session.get('username', '')
+    user_is_adm = is_admin()
+
+    event = get_event(event_id)
+    if not event:
+        return jsonify({'ok': False, 'error': 'Event not found'}), 404
+
+    created_by = (event.get('created_by') or 'admin').strip().lower()
+    if not user_is_adm and created_by != username.lower():
+        return jsonify({'ok': False, 'error': 'Access denied: event not owned by current host.'}), 403
+
+    conn = get_db(row_factory=True)
+    c = conn.cursor()
+    c.execute("""SELECT r.id, r.full_name, r.username, r.timestamp, r.team_name, r.payment_method, 
+                        r.status, r.checked_in, r.checkin_time, u.email, u.phone
+                 FROM registrations r
+                 LEFT JOIN users u ON LOWER(r.username) = LOWER(u.username)
+                 WHERE r.event_id = ?
+                 ORDER BY r.id DESC""", (event_id,))
+    rows = [dict(r) for r in c.fetchall()]
+    conn.close()
+
+    attendees = []
+    for r in rows:
+        ticket_code = f"TKT-{event_id:03d}-{r['id']:05d}"
+        attendees.append({
+            'reg_id': r['id'],
+            'full_name': r['full_name'] or r['username'],
+            'username': r['username'],
+            'email': r.get('email') or '—',
+            'phone': r.get('phone') or '—',
+            'team_name': r.get('team_name') or 'Individual',
+            'payment_method': r.get('payment_method') or 'Free',
+            'registered_at': r['timestamp'],
+            'checked_in': bool(r['checked_in']),
+            'checkin_time': r.get('checkin_time') or '—',
+            'status': r.get('status') or 'active',
+            'ticket_code': ticket_code
+        })
+
+    return jsonify({
+        'ok': True,
+        'event_id': event_id,
+        'event_title': event['title'],
+        'attendees': attendees,
+        'total_count': len(attendees)
+    })
+
+
+@app.route('/host/event/<int:event_id>/export-attendees')
+def host_export_event_attendees(event_id):
+    if not is_host():
+        flash("Host access required.", "error")
+        return redirect(url_for('dashboard'))
+    username = session.get('username', '')
+    user_is_adm = is_admin()
+
+    event = get_event(event_id)
+    if not event:
+        flash("Event not found.", "error")
+        return redirect(url_for('my_hosted_events'))
+
+    created_by = (event.get('created_by') or 'admin').strip().lower()
+    if not user_is_adm and created_by != username.lower():
+        flash("Access denied: you can only export attendees for events you created.", "error")
+        return redirect(url_for('my_hosted_events'))
+
+    conn = get_db(row_factory=True)
+    c = conn.cursor()
+    c.execute("""SELECT r.id, r.full_name, r.username, r.timestamp, r.team_name, r.payment_method, 
+                        r.status, r.checked_in, r.checkin_time, u.email, u.phone
+                 FROM registrations r
+                 LEFT JOIN users u ON LOWER(r.username) = LOWER(u.username)
+                 WHERE r.event_id = ?
+                 ORDER BY r.id DESC""", (event_id,))
+    rows = c.fetchall()
+    conn.close()
+
+    import csv
+    import io
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['Ticket Code', 'Full Name', 'Username', 'Email', 'Phone', 'Team', 'Payment Method', 'Registered At', 'Checked In', 'Check-in Time', 'Status'])
+    for r in rows:
+        ticket_code = f"TKT-{event_id:03d}-{r['id']:05d}"
+        writer.writerow([
+            ticket_code,
+            r['full_name'] or r['username'],
+            r['username'],
+            r.get('email') or '',
+            r.get('phone') or '',
+            r.get('team_name') or 'Individual',
+            r.get('payment_method') or 'Free',
+            r['timestamp'],
+            'Yes' if r['checked_in'] else 'No',
+            r.get('checkin_time') or '',
+            r.get('status') or 'active'
+        ])
+
+    csv_data = output.getvalue()
+    resp = make_response(csv_data)
+    safe_title = "".join(c for c in event['title'] if c.isalnum() or c in (' ', '_', '-')).strip().replace(' ', '_')
+    resp.headers["Content-Disposition"] = f"attachment; filename=attendees_{event_id}_{safe_title}.csv"
+    resp.headers["Content-Type"] = "text/csv; charset=utf-8"
+    return resp
 
 @app.route('/host/analytics')
 def host_analytics():
@@ -12554,20 +12774,8 @@ def admin_required(f):
     def decorated(*args, **kwargs):
         if not session.get('loggedin'):
             return redirect(url_for('login'))
-        username = session.get('username', '').lower()
-        conn = get_db()
-        c = conn.cursor()
-        c.execute('SELECT is_admin, role FROM users WHERE LOWER(username)=?', (username,))
-        row = c.fetchone()
-        conn.close()
-        is_host_or_admin = (
-            (row and (row[0] == 1 or row[1] == 'host')) or
-            username in ('admin', 'venu r') or
-            session.get('role') == 'host' or
-            session.get('is_admin') == 1
-        )
-        if not is_host_or_admin:
-            flash('Access denied. Host and administrator privileges required.', 'error')
+        if not is_admin():
+            flash('Access denied. Administrator privileges required.', 'error')
             return redirect(url_for('dashboard'))
         return f(*args, **kwargs)
     return decorated
@@ -13040,8 +13248,112 @@ def admin_users():
                  FROM users u LEFT JOIN registrations r ON u.username=r.username
                  GROUP BY u.id ORDER BY u.id''')
     users = [dict(row) for row in c.fetchall()]
+
+    # Count events hosted/created by each user
+    c.execute('''SELECT LOWER(COALESCE(created_by, 'admin')) as creator, COUNT(*) as cnt 
+                 FROM events GROUP BY LOWER(COALESCE(created_by, 'admin'))''')
+    events_count_map = {row['creator']: row['cnt'] for row in c.fetchall()}
+
+    for u in users:
+        u_name = (u.get('username') or '').lower()
+        u['events_hosted_count'] = events_count_map.get(u_name, 0)
+
     conn.close()
     return render_template('admin/users.html', username=username, stats=stats, users=users, active='users')
+
+@app.route('/admin/user/<int:user_id>')
+@admin_required
+def admin_user_profile(user_id):
+    username = session.get('username')
+    stats = get_admin_stats()
+    conn = get_db(row_factory=True)
+    c = conn.cursor()
+    c.execute('SELECT * FROM users WHERE id = ?', (user_id,))
+    target_user = c.fetchone()
+    if not target_user:
+        conn.close()
+        flash('User account not found.', 'error')
+        return redirect(url_for('admin_users'))
+    
+    target_user = dict(target_user)
+    target_username = target_user['username']
+
+    # Fetch events created/hosted by this user
+    c.execute('''SELECT e.*, COUNT(r.id) as reg_count
+                 FROM events e 
+                 LEFT JOIN registrations r ON e.id = r.event_id AND (r.status IS NULL OR r.status != 'cancelled')
+                 WHERE LOWER(COALESCE(e.created_by, 'admin')) = LOWER(?)
+                 GROUP BY e.id ORDER BY e.id DESC''', (target_username,))
+    raw_hosted_events = [dict(row) for row in c.fetchall()]
+
+    current_date = datetime.now()
+    hosted_events = []
+    total_hosted_revenue = 0.0
+    total_hosted_attendees = 0
+
+    for ev in raw_hosted_events:
+        eid = ev['id']
+        ev['category'] = ev.get('category') or get_category(ev)
+        status_info = get_event_status_info(ev, ref_now=current_date)
+        ev['time'] = status_info['time_str']
+        ev['end_time'] = status_info['end_time_str']
+        ev['cutoff_time'] = status_info['cutoff_time_str']
+        ev['is_today'] = status_info['is_today']
+        ev['is_expired'] = status_info['is_expired']
+        ev['is_open'] = status_info['is_open']
+        ev['status_label'] = status_info['status_label']
+
+        start_dt = ev.get('datetime_obj')
+        end_dt = ev.get('end_datetime_obj')
+        ev['is_live_now'] = bool(start_dt and end_dt and start_dt <= current_date <= end_dt)
+
+        reg_cnt = ev.get('reg_count', 0)
+        total_hosted_attendees += reg_cnt
+
+        c.execute('''SELECT SUM(CASE 
+                                    WHEN amount_paid IS NOT NULL AND amount_paid > 0 THEN amount_paid
+                                    ELSE 0 
+                                END) as rev
+                     FROM registrations 
+                     WHERE event_id = ? AND (status IS NULL OR status != 'cancelled')''', (eid,))
+        rev_row = c.fetchone()
+        ev_revenue = float(rev_row['rev'] or 0.0) if rev_row else 0.0
+        
+        if ev_revenue == 0 and reg_cnt > 0:
+            unit_price = parse_event_price_numeric(ev.get('price'))
+            ev_revenue = round(unit_price * reg_cnt, 2)
+
+        ev['revenue'] = ev_revenue
+        total_hosted_revenue += ev_revenue
+        hosted_events.append(ev)
+
+    # Participant bookings (events this user registered for as an attendee)
+    c.execute('''SELECT r.*, e.title as event_title, e.date as event_date, e.time as event_time
+                 FROM registrations r
+                 LEFT JOIN events e ON r.event_id = e.id
+                 WHERE LOWER(r.username) = LOWER(?)
+                 ORDER BY r.id DESC''', (target_username,))
+    user_registrations = [dict(row) for row in c.fetchall()]
+
+    # Audit log activities
+    c.execute('''SELECT * FROM audit_log 
+                 WHERE LOWER(username) = LOWER(?) OR details LIKE ?
+                 ORDER BY id DESC LIMIT 50''', (target_username, f'%{target_username}%'))
+    audit_logs = [dict(row) for row in c.fetchall()]
+
+    conn.close()
+
+    return render_template('admin/user_profile.html',
+                           username=username,
+                           stats=stats,
+                           target_user=target_user,
+                           hosted_events=hosted_events,
+                           total_hosted_events=len(hosted_events),
+                           total_hosted_attendees=total_hosted_attendees,
+                           total_hosted_revenue=total_hosted_revenue,
+                           user_registrations=user_registrations,
+                           audit_logs=audit_logs,
+                           active='users')
 
 @app.route('/admin/events')
 @admin_required
@@ -17655,9 +17967,10 @@ def api_ai_magic_generate_event():
     outcome = "Leave equipped with enterprise production frameworks, verified POAP credentials, and valuable peer connections."
 
     ai_image = _get_category_default_image(category=category, title=title, seed_num=int(time.time()))
-    c.execute("""INSERT INTO events (title, date, time, end_time, desc, price, color, image, stream_price, venue, venue_address, category, purpose, full_details, outcome, seats_total, seats_filled, is_draft, featured)
-                 VALUES (?, ?, '09:30 AM', '06:00 PM', ?, ?, '#008be3', ?, '₹199', ?, ?, ?, ?, ?, ?, 250, 0, 0, 1)""",
-              (title, date_str, desc, price_str, ai_image, venue, venue_address, category, purpose, full_details, outcome))
+    creator_user = session.get('username') or 'admin'
+    c.execute("""INSERT INTO events (title, date, time, end_time, desc, price, color, image, stream_price, venue, venue_address, category, purpose, full_details, outcome, seats_total, seats_filled, is_draft, featured, created_by, updated_by)
+                 VALUES (?, ?, '09:30 AM', '06:00 PM', ?, ?, '#008be3', ?, '₹199', ?, ?, ?, ?, ?, ?, 250, 0, 0, 1, ?, ?)""",
+              (title, date_str, desc, price_str, ai_image, venue, venue_address, category, purpose, full_details, outcome, creator_user, creator_user))
     new_event_id = c.lastrowid
 
     # 2. Insert Pricing Tiers

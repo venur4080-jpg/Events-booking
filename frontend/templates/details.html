@@ -355,6 +355,7 @@
             {% if is_host or is_admin %}
             <li><hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 1rem 0;"></li>
             <li style="padding: 0 1rem; color: var(--primary); font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Host Management</li>
+            <li><a href="{{ url_for('my_hosted_events') }}">🎪 My Hosted Events</a></li>
             <li><a href="{{ url_for('scan_ticket') }}">📷 Live Ticket Scanner</a></li>
             <li><a href="{{ url_for('checkin_history') }}">📅 Check-in History</a></li>
             <li><a href="{{ url_for('add_event') }}">➕ Add New Event</a></li>
@@ -666,7 +667,7 @@
                         </div>
                     </div>
 
-                    {% if is_host %}
+                    {% if is_admin or (is_host and event.created_by and event.created_by|lower == session.get('username', '')|lower) %}
                     <div style="margin-top: 1rem; text-align: right;">
                         <form action="{{ url_for('delete_event', event_id=event.id) }}" method="POST" style="display: inline; margin: 0;" onsubmit="return confirm('Are you sure you want to delete this event?');">
                             <button type="submit" class="btn-secondary" style="padding: 0.6rem 1.2rem; background: rgba(255,255,255,0.08); color: var(--text-muted); border: 1px solid var(--glass-border); cursor: pointer; border-radius: 10px; font-size: 0.85rem;">Delete Event</button>

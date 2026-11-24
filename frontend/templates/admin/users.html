@@ -18,6 +18,7 @@
                 <th>Full Name</th>
                 <th>Email</th>
                 <th>Role</th>
+                <th>Events Hosted</th>
                 <th>Registrations</th>
                 <th>Actions</th>
             </tr>
@@ -26,7 +27,11 @@
             {% for u in users %}
             <tr>
                 <td style="color:var(--text-muted)">{{ u.id }}</td>
-                <td><strong>{{ u.username }}</strong></td>
+                <td>
+                    <a href="{{ url_for('admin_user_profile', user_id=u.id) }}" style="color: var(--primary); text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;" title="View user profile & hosted events">
+                        {{ u.username }} ↗
+                    </a>
+                </td>
                 <td>{{ u.full_name or '—' }}</td>
                 <td style="color:var(--text-muted)">{{ u.email or '—' }}</td>
                 <td>
@@ -38,8 +43,22 @@
                     <span class="badge badge-user">User</span>
                     {% endif %}
                 </td>
+                <td>
+                    {% if u.events_hosted_count > 0 %}
+                    <a href="{{ url_for('admin_user_profile', user_id=u.id) }}" style="text-decoration:none;">
+                        <span class="badge" style="background: rgba(0, 139, 227, 0.2); color: #38bdf8; border: 1px solid #008be3; font-weight: 700;">
+                            🎪 {{ u.events_hosted_count }} Events
+                        </span>
+                    </a>
+                    {% else %}
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">0</span>
+                    {% endif %}
+                </td>
                 <td><span class="badge badge-active">{{ u.reg_count }}</span></td>
                 <td style="display:flex;gap:6px;flex-wrap:wrap">
+                    <a href="{{ url_for('admin_user_profile', user_id=u.id) }}" class="action-btn" style="background: rgba(0, 139, 227, 0.15); color: #38bdf8; border: 1px solid rgba(0, 139, 227, 0.4); text-decoration: none;" title="View user profile and hosted events">
+                        👤 Profile
+                    </a>
                     {% if u.role != 'host' and not u.is_admin %}
                     <form action="{{ url_for('admin_promote_user', user_id=u.id) }}" method="POST" style="margin:0">
                         <button class="action-btn btn-warning" type="submit" title="Promote to host">⬆ Host</button>
@@ -58,7 +77,7 @@
                 </td>
             </tr>
             {% else %}
-            <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted)">No users found</td></tr>
+            <tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text-muted)">No users found</td></tr>
             {% endfor %}
         </tbody>
     </table>

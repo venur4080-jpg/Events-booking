@@ -911,6 +911,7 @@
             {% if is_host %}
             <li role="separator"><hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 1rem 0;"></li>
             <li style="padding: 0 1rem; color: var(--primary); font-size: 0.8rem; font-weight: 800; text-transform: uppercase;">Host Management</li>
+            <li><a href="{{ url_for('my_hosted_events') }}">🎪 My Hosted Events</a></li>
             <li><a href="{{ url_for('scan_ticket') }}">🎟️ Check-In Scanner</a></li>
             <li><a href="{{ url_for('checkin_history') }}">📅 Check-in History</a></li>
             <li><a href="{{ url_for('add_event') }}">➕ Add New Event</a></li>
@@ -1163,7 +1164,7 @@
                                         {% endif %}
                                     {% endif %}
 
-                                    {% if is_host %}
+                                    {% if is_admin or (is_host and event.created_by and event.created_by|lower == session.get('username', '')|lower) %}
                                     <form action="{{ url_for('delete_event', event_id=event.id) }}" method="POST" style="display: inline; margin: 0;" onsubmit="return confirmDelete(this, event);">
                                         <button type="submit" class="register-btn-sm" style="background: rgba(255,255,255,0.1); color: var(--text-muted); border: 1px solid var(--glass-border); cursor: pointer;">Delete</button>
                                     </form>
@@ -1362,7 +1363,7 @@
                             <div style="margin-top: 1.3rem; display: flex; justify-content: space-between; gap: 10px; align-items: center; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.9rem;">
                                 <span class="helix-completed-badge">Completed</span>
                                 <div style="display: inline-flex; align-items: center; gap: 8px;">
-                                    {% if is_host %}
+                                    {% if is_admin or (is_host and event.created_by and event.created_by|lower == session.get('username', '')|lower) %}
                                     <form action="{{ url_for('delete_event', event_id=event.id) }}" method="POST" style="display: inline; margin: 0;" onsubmit="return confirmDelete(this, event);">
                                         <button type="submit" class="register-btn-sm" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; white-space: nowrap; background: rgba(239,68,68,0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); cursor: pointer; border-radius: 6px;">Delete</button>
                                     </form>
